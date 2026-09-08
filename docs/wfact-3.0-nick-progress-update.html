@@ -68,8 +68,7 @@
   .tphase.next::before{border-color:var(--amber);}
   .thead{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; margin-bottom:4px;}
   .tnum{font-family:var(--font-mono); font-size:11px; color:var(--text-faint);}
-  .ttitle{font-family:var(--font-display); font-size:16.5px; font-weight:600;}
-  .tmeta{font-family:var(--font-mono); font-size:11px; color:var(--text-faint); margin-left:auto;}
+  .ttitle{font-family:var(--font-display); font-size:16.5px; font-weight:600; margin-right:auto;}
   .pill{font-family:var(--font-mono); font-size:10px; letter-spacing:.05em; text-transform:uppercase; padding:2px 9px; border-radius:100px; white-space:nowrap;}
   .pill.done{background:var(--green-soft); color:var(--green); border:1px solid rgba(111,207,151,.3);}
   .pill.next{background:var(--amber-soft); color:var(--amber); border:1px solid rgba(232,163,61,.3);}
@@ -114,12 +113,11 @@
   <div class="wrap hero-inner">
     <div class="eyebrow">WFACT 3.0 · Progress Report</div>
     <h1>Two phases in.</h1>
-    <p class="sub">Phases 1 and 2 of the 100 hour build are done.</p>
-    <p class="desc">This is where the sprint actually stands after the first 24 hours: what's built, what's tested, and where progress now depends on you. Real numbers, not a check in.</p>
+    <p class="sub">Phases 1 and 2 are done.</p>
+    <p class="desc">This is where the sprint actually stands so far: what's built, what's tested, and where progress now depends on you. Real numbers, not a check in.</p>
 
     <div class="stat-strip">
       <div class="stat"><div class="num">2 / 7</div><div class="label">Phases done</div></div>
-      <div class="stat"><div class="num">24 / 100</div><div class="label">Hours used</div></div>
       <div class="stat"><div class="num">1</div><div class="label">Real bug caught and fixed</div></div>
     </div>
 
@@ -142,7 +140,7 @@
 <section>
   <div class="wrap">
     <h2>Where each phase stands</h2>
-    <p class="sec-sub">The 7 phase plan you already approved, day by day.</p>
+    <p class="sec-sub">The 7 phase plan you already approved.</p>
 
     <div class="timeline">
       <div class="tphase done">
@@ -150,7 +148,6 @@
           <span class="tnum">01</span>
           <span class="ttitle">Foundation and Access</span>
           <span class="pill done">Done</span>
-          <span class="tmeta">Days 1 to 2</span>
         </div>
         <p class="tnote">Repository set up with the ground rules every AI agent reads before doing any work.</p>
         <p class="tproof">Proof: a working repository with checks running automatically from day one.</p>
@@ -161,7 +158,6 @@
           <span class="tnum">02</span>
           <span class="ttitle">State Layer and Second Brain v1</span>
           <span class="pill done">Done</span>
-          <span class="tmeta">Days 3 to 5</span>
         </div>
         <p class="tnote">The database holding every client, project, and task, with entities kept separate by the database itself.</p>
         <p class="tproof">Proof: an attack test aimed at crossing client boundaries was tried and it failed to get through.</p>
@@ -172,7 +168,6 @@
           <span class="tnum">03</span>
           <span class="ttitle">Hermes Controller Core</span>
           <span class="pill next">Next</span>
-          <span class="tmeta">Days 6 to 8</span>
         </div>
         <p class="tnote">The manager that decides which AI does what, wired to the memory and database from Phase 2.</p>
       </div>
@@ -182,7 +177,6 @@
           <span class="tnum">04</span>
           <span class="ttitle">Model Routing and Front End Loop v1</span>
           <span class="pill queued">Queued</span>
-          <span class="tmeta">Days 9 to 12</span>
         </div>
         <p class="tnote">The centerpiece: one real page built end to end, checked by a second AI before anyone sees it.</p>
       </div>
@@ -192,7 +186,6 @@
           <span class="tnum">05</span>
           <span class="ttitle">Verification Loop</span>
           <span class="pill queued">Queued</span>
-          <span class="tmeta">Days 13 to 15</span>
         </div>
         <p class="tnote">A small, working version of never trust done, only verified.</p>
       </div>
@@ -202,7 +195,6 @@
           <span class="tnum">06</span>
           <span class="ttitle">Cockpit MVP</span>
           <span class="pill queued">Queued</span>
-          <span class="tmeta">Days 16 to 18</span>
         </div>
         <p class="tnote">One screen showing what's running, what's waiting on you, and what's already been checked.</p>
       </div>
@@ -212,7 +204,6 @@
           <span class="tnum">07</span>
           <span class="ttitle">Proof Run and Handoff</span>
           <span class="pill queued">Queued</span>
-          <span class="tmeta">Days 19 to 20</span>
         </div>
         <p class="tnote">Run the whole thing once for real, document it honestly, and set the next sprint's scope.</p>
       </div>
@@ -254,7 +245,7 @@
     <div class="critical">
       <div class="clabel">The one that matters most</div>
       <h3>Close the comp and scope conversation</h3>
-      <p>Every document in this process has flagged this. I'd rather ask for it plainly again than let it sit under everything else. I'd like this closed before or alongside the next phase, not after the 100 hours are spent.</p>
+      <p>Every document in this process has flagged this. I'd rather ask for it plainly again than let it sit under everything else. I'd like this closed before or alongside the next phase, not further down the line.</p>
     </div>
 
     <div class="catlabel">Access</div>
@@ -279,7 +270,7 @@
         <div class="need-title">Confirm the 2 entities</div>
         <div class="need-desc">I've been proceeding with DreamSign and Bennett and Co as a placeholder so it doesn't block progress. Confirming it is a one line change once you say the word.</div>
       </div>
-      <span class="badge day">Day 3</span>
+      <span class="badge day">Needed soon</span>
     </div>
 
     <div class="catlabel">Budget</div>
@@ -297,14 +288,14 @@
         <div class="need-title">30 to 60 minutes on business rules</div>
         <div class="need-desc">Real pricing bands and standing rules for the shared memory file that every AI agent reads.</div>
       </div>
-      <span class="badge day">Day 3 to 5</span>
+      <span class="badge day">Needed soon</span>
     </div>
     <div class="need">
       <div class="need-body">
         <div class="need-title">One real project brief</div>
         <div class="need-desc">Even something low stakes is fine. This is what actually gets built and measured in Phase 4.</div>
       </div>
-      <span class="badge day">Day 9</span>
+      <span class="badge day">Needed for Phase 4</span>
     </div>
   </div>
 </section>
@@ -312,6 +303,6 @@
 <footer>
   <div class="wrap">
     <div class="foot-mark">Source</div>
-    Consolidated from the WFACT 3.0 Ecosystem Blueprint, Execution Roadmap, and the 20 Day Build Plan. Full detail on every open item lives in the repository's blocked items tracker. I'll keep this updated as the sprint moves rather than sending everything at the end.
+    Consolidated from the WFACT 3.0 Ecosystem Blueprint, Execution Roadmap, and the phase by phase build plan. Full detail on every open item lives in the repository's blocked items tracker. I'll keep this updated as the sprint moves rather than sending everything at the end.
   </div>
 </footer>
