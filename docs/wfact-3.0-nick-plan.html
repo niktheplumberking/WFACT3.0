@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WFACT 3.0 — The 100-Hour Build Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0C0F; --panel:#12151B; --panel-alt:#171B22; --line:#262B33; --line-soft:#1B1F26;
+    --text:#E8E6E0; --text-dim:#9BA3AF; --text-faint:#6B7280;
+    --amber:#E8A33D; --amber-soft:#3A2E18;
+    --cyan:#5EC8C0; --cyan-soft:#12302D;
+    --green:#6FCF97; --green-soft:#173622;
+    --rust:#E0684F; --rust-soft:#3A1D17;
+    --violet:#B08CE0; --violet-soft:#2A2038;
+    --radius:8px;
+    --font-display:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.65; font-size:16px;}
+  a{color:var(--cyan);}
+  a:focus-visible, summary:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  ::selection{background:var(--amber-soft); color:var(--amber);}
+
+  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+
+  .hero{
+    padding:80px 0 50px;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(circle at 90% 0%, rgba(232,163,61,0.10), transparent 45%),
+      linear-gradient(180deg, var(--panel), var(--bg) 75%);
+    position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; inset:0;
+    background-image:linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:44px 44px; opacity:.3; mask-image:linear-gradient(180deg, black, transparent 85%); pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .eyebrow{font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); margin-bottom:14px;}
+  h1{font-family:var(--font-display); font-size:clamp(34px,6vw,54px); line-height:1.04; margin:0 0 8px; letter-spacing:-.01em;}
+  .sub{font-family:var(--font-display); font-size:clamp(17px,2.2vw,21px); color:var(--amber); margin:0 0 18px; font-weight:600;}
+  .desc{color:var(--text-dim); max-width:680px; font-size:15.5px;}
+
+  .stat-strip{display:flex; flex-wrap:wrap; gap:14px; margin-top:32px;}
+  .stat{
+    background:var(--panel-alt); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 22px; min-width:120px;
+  }
+  .stat .num{font-family:var(--font-display); font-size:28px; color:var(--amber); font-weight:700; line-height:1;}
+  .stat .label{font-family:var(--font-mono); font-size:10.5px; color:var(--text-faint); letter-spacing:.08em; text-transform:uppercase; margin-top:6px;}
+
+  section{padding:44px 0; border-bottom:1px solid var(--line);}
+  h2{font-family:var(--font-display); font-size:26px; margin:0 0 18px; letter-spacing:-.01em;}
+
+  .callout{
+    border:1px solid var(--amber-soft); background:var(--amber-soft); border-radius:var(--radius);
+    padding:20px 22px; color:var(--text); font-size:14.5px;
+  }
+  .callout strong{color:var(--amber);}
+  .callout.cyan{border-color:var(--cyan-soft); background:var(--cyan-soft);}
+  .callout.cyan strong{color:var(--cyan);}
+
+  /* ---------- timeline ---------- */
+  .timeline{position:relative; padding-left:34px;}
+  .timeline::before{
+    content:""; position:absolute; left:9px; top:6px; bottom:6px; width:2px;
+    background:linear-gradient(var(--amber), var(--cyan));
+    opacity:.5;
+  }
+  .phase{position:relative; margin-bottom:38px;}
+  .phase:last-child{margin-bottom:0;}
+  .phase::before{
+    content:""; position:absolute; left:-34px; top:4px; width:20px; height:20px; border-radius:50%;
+    background:var(--bg); border:2px solid var(--amber);
+  }
+  .phase-head{display:flex; flex-wrap:wrap; align-items:baseline; gap:12px; margin-bottom:10px;}
+  .phase-num{font-family:var(--font-mono); font-size:12px; color:var(--amber); background:var(--amber-soft); border:1px solid rgba(232,163,61,.3); padding:3px 10px; border-radius:100px;}
+  .phase-title{font-family:var(--font-display); font-size:21px; font-weight:600;}
+  .phase-meta{font-family:var(--font-mono); font-size:12px; color:var(--text-faint);}
+  .phase p{color:var(--text-dim); margin:0 0 14px; font-size:14.5px;}
+  .phase ul{margin:0 0 14px; padding-left:20px; color:var(--text-dim); font-size:14.5px;}
+  .phase li{margin-bottom:6px;}
+  .deliverable{
+    display:flex; gap:10px; align-items:flex-start;
+    border:1px solid var(--line); background:var(--panel); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px;
+  }
+  .deliverable .tag{font-family:var(--font-mono); font-size:10.5px; color:var(--green); background:var(--green-soft); border:1px solid rgba(111,207,151,.3); padding:2px 9px; border-radius:100px; flex-shrink:0; margin-top:2px;}
+  .deliverable p{margin:0; color:var(--text); font-size:14px;}
+  .outcome{font-size:13.5px; color:var(--text-faint); font-style:italic;}
+
+  .checklist{list-style:none; margin:0; padding:0;}
+  .checklist li{
+    display:grid; grid-template-columns:1fr 2fr; gap:16px; padding:18px 0; border-bottom:1px solid var(--line-soft); font-size:14.5px;
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .k{color:var(--text); font-weight:500;}
+  .checklist .v{color:var(--text-dim);}
+
+  footer{padding:40px 0 70px; color:var(--text-faint); font-size:13px;}
+  .foot-mark{font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;}
+
+  @media (max-width:640px){
+    .checklist li{grid-template-columns:1fr;}
+    .timeline{padding-left:26px;}
+    .phase::before{left:-26px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow">WFACT 3.0 — Build Plan</div>
+    <h1>The 100-Hour Build</h1>
+    <p class="sub">7 phases. 20 days. One real, proven result.</p>
+    <p class="desc">This is what gets built in the next 20 days, and what you'll have in hand at the end of each phase. It follows directly from the Blueprint and Roadmap you already approved, compressed into a real, time-boxed sprint rather than the full multi-month build.</p>
+    <div class="stat-strip">
+      <div class="stat"><div class="num">100</div><div class="label">Hours</div></div>
+      <div class="stat"><div class="num">20</div><div class="label">Days</div></div>
+      <div class="stat"><div class="num">7</div><div class="label">Phases</div></div>
+      <div class="stat"><div class="num">1</div><div class="label">Proven loop</div></div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <strong>What this sprint is, plainly:</strong> 100 hours is enough to prove the new architecture works end to end on one real slice of the business, not to rebuild the entire factory. You'll get a working loop you can see and judge, backed by real numbers, not a finished product. What's deliberately left for the next sprint is listed at the bottom of this page, no surprises.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The 7 phases</h2>
+    <div class="timeline">
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-num">Phase 1</span>
+          <span class="phase-title">Foundation &amp; Access</span>
+          <span class="phase-meta">Days 1–2 · 8 hrs</span>
+        </div>
+        <p>Get every account, credential, and open decision unblocked before any building starts, and set up the new repository with its automated safety checks running from day one.</p>
+        <div class="deliverable"><span class="tag">Deliverable</span><p>A working repository with checks running automatically, and every access item either confirmed or actively tracked.</p></div>
+        <div class="outcome">Nothing else in these 20 days can start cleanly without this.</div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-num">Phase 2</span>
+          <span class="phase-title">State Layer &amp; Second Brain v1</span>
+          <span class="phase-meta">Days 3–5 · 16 hrs</span>
+        </div>
+        <p>Build the database that holds every client, project, and task, correctly separated by entity, and stand up a first working version of the "second brain," the shared memory every AI agent reads before doing anything.</p>
+        <div class="deliverable"><span class="tag">Deliverable</span><p>A tested database schema, plus a readable memory file describing the business, its rules, and its two entities.</p></div>
+        <div class="outcome">Every later phase now has a real place to store and retrieve information, instead of an agent guessing.</div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-num">Phase 3</span>
+          <span class="phase-title">Hermes Controller Core</span>
+          <span class="phase-meta">Days 6–8 · 14 hrs</span>
+        </div>
+        <p>Stand up Hermes, the manager that decides which AI does what, and connect it to the memory and database from Phase 2, with one model wired in as the first working path.</p>
+        <div class="deliverable"><span class="tag">Deliverable</span><p>Hermes answers a real question about the business, in plain language, using real data, not a canned response.</p></div>
+        <div class="outcome">Proves the "brain" of the system works before adding anything on top of it.</div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-num">Phase 4</span>
+          <span class="phase-title">Model Routing &amp; Front-End Loop v1</span>
+          <span class="phase-meta">Days 9–12 · 22 hrs</span>
+        </div>
+        <p>The centerpiece of the sprint: wire up the actual website-building loop, Motion Sites and 21st.dev generating a real page for one real project, checked by a second AI before anyone sees it.</p>
+        <div class="deliverable"><span class="tag">Deliverable</span><p>One real front-end page, built end to end through the new stack, for a real (even low-stakes) project.</p></div>
+        <div class="outcome">Direct, measured evidence on whether the new front-end approach actually beats 2.0's defect rate, not a guess.</div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-num">Phase 5</span>
+          <span class="phase-title">Verification Loop</span>
+          <span class="phase-meta">Days 13–15 · 14 hrs</span>
+        </div>
+        <p>A small, working version of the "never trust done, only verified" discipline from 2.0: a handful of automated checks, plus a second AI reviewing the first AI's work.</p>
+        <div class="deliverable"><span class="tag">Deliverable</span><p>A working check-and-fix loop that catches a deliberately broken test case before a human ever sees it.</p></div>
+        <div class="outcome">Proves the exact discipline that was missing in 2.0 holds in 3.0, even in miniature.</div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-num">Phase 6</span>
+          <span class="phase-title">Cockpit MVP</span>
+          <span class="phase-meta">Days 16–18 · 16 hrs</span>
+        </div>
+        <p>The smallest useful version of the control room: one screen showing what's running, what's waiting on you, and what's already been checked.</p>
+        <div class="deliverable"><span class="tag">Deliverable</span><p>A live dashboard showing the Phase 4 and 5 loop's real status.</p></div>
+        <div class="outcome">You get visibility into the system without needing to ask what's happening right now.</div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-head">
+          <span class="phase-num">Phase 7</span>
+          <span class="phase-title">Proof Run &amp; Handoff</span>
+          <span class="phase-meta">Days 19–20 · 10 hrs</span>
+        </div>
+        <p>Run the whole thing once, start to finish, on the real pilot project, and document honestly what worked, what didn't, and what the next sprint needs to cover.</p>
+        <div class="deliverable"><span class="tag">Deliverable</span><p>A short, honest results report, plus a clear, evidence-based list of what's proven versus what's still ahead.</p></div>
+        <div class="outcome">A real basis for deciding what comes next, backed by a working system, not a slide deck.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What you'll have after Day 20</h2>
+    <ul style="color:var(--text-dim); font-size:14.5px; padding-left:20px;">
+      <li>One real page or project built end to end through the new architecture: controller, memory, model routing, verification, and cockpit visibility, all working together.</li>
+      <li>A real, logged correction-round count for that build, measured against DreamSign's 40+ from 2.0.</li>
+      <li>A working, if minimal, version of every core system: second brain, controller, front-end loop, verification loop, and cockpit.</li>
+      <li>Honest, tested data on whether Kimi K3 is actually worth using over the MCP combination alone.</li>
+      <li>A clear, evidence-based scope for the next sprint, not a guess.</li>
+    </ul>
+  </div>
+</section>
+
+<section style="border-bottom:none;">
+  <div class="wrap">
+    <h2>What's deliberately not in this sprint</h2>
+    <div class="callout cyan">
+      <strong>This is a scope choice, not a shortfall.</strong> These are real, planned parts of WFACT 3.0 that simply need more than 100 hours, and are sequenced for the sprint after this one:
+    </div>
+    <ul style="color:var(--text-dim); font-size:14.5px; padding-left:20px; margin-top:18px;">
+      <li>The full 11-stage client pipeline (this sprint proves the front-end build and verification stages only)</li>
+      <li>The full cockpit room set (Money, SEO, Content, Calendar, and the rest)</li>
+      <li>The complete 78-check security and feature registry (a focused 5–8 check set is proven instead)</li>
+      <li>Cognee or any full knowledge-graph second brain (a flat-file version proves the concept first)</li>
+      <li>Local/open-source model evaluation (its own separate, parallel track, unaffected by this sprint)</li>
+      <li>Running multiple clients concurrently</li>
+      <li>Back-end, content, and SEO agent loops (only the front-end and verification loop are proven this sprint)</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-mark">Source</div>
+    <p>Builds directly on the approved WFACT 3.0 Ecosystem Blueprint and Execution Roadmap. Hour and day estimates are a real time budget, not padding, cut scope inside a phase before borrowing hours from another one.</p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WFACT 3.0 — What I Need From You</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0C0F; --panel:#12151B; --panel-alt:#171B22; --line:#262B33; --line-soft:#1B1F26;
+    --text:#E8E6E0; --text-dim:#9BA3AF; --text-faint:#6B7280;
+    --amber:#E8A33D; --amber-soft:#3A2E18;
+    --cyan:#5EC8C0; --cyan-soft:#12302D;
+    --green:#6FCF97; --green-soft:#173622;
+    --rust:#E0684F; --rust-soft:#3A1D17;
+    --radius:8px;
+    --font-display:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.6; font-size:16px;}
+  a{color:var(--cyan);}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  ::selection{background:var(--amber-soft); color:var(--amber);}
+  .wrap{max-width:880px; margin:0 auto; padding:0 24px;}
+
+  .hero{
+    padding:68px 0 40px; border-bottom:1px solid var(--line);
+    background:radial-gradient(circle at 90% 0%, rgba(232,163,61,0.10), transparent 45%), linear-gradient(180deg, var(--panel), var(--bg) 75%);
+    position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; inset:0;
+    background-image:linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:44px 44px; opacity:.3; mask-image:linear-gradient(180deg, black, transparent 85%); pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .eyebrow{font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); margin-bottom:14px;}
+  h1{font-family:var(--font-display); font-size:clamp(30px,5.5vw,46px); line-height:1.05; margin:0 0 8px; letter-spacing:-.01em;}
+  .sub{font-family:var(--font-display); font-size:clamp(15px,2vw,18px); color:var(--amber); margin:0 0 16px; font-weight:600;}
+  .desc{color:var(--text-dim); max-width:660px; font-size:14.5px;}
+
+  .progress-strip{display:flex; align-items:center; gap:14px; margin-top:30px; font-family:var(--font-mono); font-size:12.5px; color:var(--text-faint);}
+  .progress-bar{flex:1; height:6px; background:var(--panel-alt); border:1px solid var(--line); border-radius:100px; overflow:hidden;}
+  .progress-fill{height:100%; width:0%; background:linear-gradient(90deg, var(--amber), var(--cyan)); transition:width .2s ease;}
+
+  section{padding:38px 0; border-bottom:1px solid var(--line);}
+  h2{font-family:var(--font-display); font-size:22px; margin:0 0 6px; display:flex; align-items:center; gap:10px;}
+  .sec-sub{color:var(--text-faint); font-size:13.5px; margin:0 0 20px;}
+
+  .callout{border:1px solid var(--amber-soft); background:var(--amber-soft); border-radius:var(--radius); padding:16px 18px; font-size:14px; color:var(--text);}
+  .callout strong{color:var(--amber);}
+
+  .item{
+    display:flex; gap:14px; align-items:flex-start;
+    border:1px solid var(--line); background:var(--panel); border-radius:var(--radius);
+    padding:14px 16px; margin-bottom:10px;
+  }
+  .item input[type=checkbox]{
+    appearance:none; width:19px; height:19px; border:1.5px solid var(--line); border-radius:5px; margin-top:2px; flex-shrink:0; cursor:pointer;
+    background:var(--panel-alt);
+  }
+  .item input[type=checkbox]:checked{background:var(--green); border-color:var(--green);}
+  .item-body{flex:1;}
+  .item-title{font-weight:500; font-size:14.5px; color:var(--text); margin-bottom:4px;}
+  .item-desc{font-size:13px; color:var(--text-dim);}
+  .badge{
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase;
+    padding:3px 9px; border-radius:100px; white-space:nowrap; flex-shrink:0; margin-top:1px;
+  }
+  .badge.blocking{background:var(--rust-soft); color:var(--rust); border:1px solid rgba(224,104,79,.3);}
+  .badge.day{background:var(--cyan-soft); color:var(--cyan); border:1px solid rgba(94,200,192,.3);}
+
+  .critical{
+    border:1px solid rgba(224,104,79,.4); background:var(--rust-soft); border-radius:var(--radius);
+    padding:22px 22px; margin-top:6px;
+  }
+  .critical h3{font-family:var(--font-display); color:var(--rust); margin:0 0 8px; font-size:18px;}
+  .critical p{color:var(--text); font-size:14.5px; margin:0;}
+
+  footer{padding:34px 0 60px; color:var(--text-faint); font-size:13px;}
+  .foot-mark{font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;}
+
+  @media (max-width:600px){
+    .item{flex-direction:column;}
+    .badge{align-self:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow">WFACT 3.0 — For Nick</div>
+    <h1>What I Need From You</h1>
+    <p class="sub">Everything blocking the 100-hour build, in one list</p>
+    <p class="desc">Pulled straight from the Blueprint, the Roadmap, and the 20-day build plan, this is every access item, decision, approval, and bit of your time the sprint actually depends on. Grouped by type, tagged with when it's needed. Check things off as you get to them.</p>
+    <div class="progress-strip">
+      <span id="progressLabel">0 of 0 done</span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Access &amp; Credentials</h2>
+    <p class="sec-sub">Blocks Phase 1. Needed on Day 1, before anything else can start.</p>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">GitHub access</div><div class="item-desc">Access to the existing WFact2.0 repo, plus confirmation on setting up the new 3.0 repo under your org.</div></span><span class="badge blocking">Blocking</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Supabase access</div><div class="item-desc">Access to the current 2.0 project, so the new schema is designed with the real one in view, not a guess.</div></span><span class="badge blocking">Blocking</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Vercel + Hostinger access</div><div class="item-desc">Account access for the cockpit and for deployment.</div></span><span class="badge blocking">Blocking</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">The 3 SOPs + Operations Manual</div><div class="item-desc">Referenced throughout the Factory Book, sitting in your Google Drive, never actually handed over.</div></span><span class="badge blocking">Blocking</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Motion Sites MCP credentials</div></span><span class="badge day">Needed by Day 9</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">21st.dev premium account credentials</div><div class="item-desc">Your purchased account, the one you want driving front-end generation.</div></span><span class="badge day">Needed by Day 9</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Higgsfield MCP credentials</div></span><span class="badge day">Needed by Day 9</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Claude / Anthropic API billing confirmation</div><div class="item-desc">Confirm whether a billing setup already exists for WFACT, or whether I'm standing one up.</div></span><span class="badge blocking">Blocking</span></label>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Decisions</h2>
+    <p class="sec-sub">Only you can make these. Each one blocks a specific phase until it's answered.</p>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Which 2 entities</div><div class="item-desc">DreamSign + Bennett & Co, with Rizm running separately for now? Still unanswered from the Blueprint review, blocks Phase 2's schema.</div></span><span class="badge blocking">Blocking Day 3</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Fresh repo vs. carrying 2.0's structure forward</div><div class="item-desc">Sign-off that a clean 3.0 repo is the actual call, this is Phase 1's first real decision.</div></span><span class="badge blocking">Blocking Day 1</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Confirm the governance split</div><div class="item-desc">You: money, launch, client selection. Me: architecture and build. Atif: Rizm-side. Toby: planning. Confirm this is how you actually want it run, not just how it was proposed.</div></span><span class="badge day">Needed by Day 1</span></label>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Budget &amp; Spend Approval</h2>
+    <p class="sec-sub">Real money decisions, small enough to move fast on, big enough to need your sign-off.</p>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">API spend ceiling for the sprint</div><div class="item-desc">Covers Claude, Kimi K3, and any GPT-5.6 calls across the build and the model tests.</div></span><span class="badge blocking">Blocking Day 1</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Vercel plan upgrade</div><div class="item-desc">Fixes the 12-function serverless ceiling before it causes another outage, not after.</div></span><span class="badge day">Needed by Day 16</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Where the self-hosted second brain and Hermes actually run</div><div class="item-desc">Confirm the infrastructure, whose server, what budget, before Phase 2/3 need it live.</div></span><span class="badge day">Needed by Day 3</span></label>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Your Time</h2>
+    <p class="sec-sub">Specific, scheduled moments the sprint is built around. Not open-ended availability, just these five.</p>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">30–60 min session on business rules</div><div class="item-desc">Real pricing bands, entity specifics, and standing rules for the second brain's core file. Days 3–5.</div></span><span class="badge day">Day 3–5</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">One real pilot project brief</div><div class="item-desc">Even low-stakes is fine, this is what actually gets built and measured in Phase 4.</div></span><span class="badge blocking">Needed by Day 9</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Same-day answers during the front-end build</div><div class="item-desc">Direction questions during Phase 4 (Days 9–12) need a same-day response to keep the loop moving.</div></span><span class="badge day">Day 9–12</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">10–15 minutes on the cockpit MVP</div><div class="item-desc">Actually look at it and react, before the sprint ends, not after.</div></span><span class="badge day">Day 16–18</span></label>
+
+    <label class="item"><input type="checkbox"><span class="item-body"><div class="item-title">Attend the proof-run review</div><div class="item-desc">Day 19–20. This is where we look at the real results together and decide the next sprint's scope.</div></span><span class="badge day">Day 19–20</span></label>
+  </div>
+</section>
+
+<section style="border-bottom:none;">
+  <div class="wrap">
+    <h2>The one that matters most</h2>
+    <div class="critical">
+      <h3>Comp and scope, closed in writing</h3>
+      <p>Every document in this process has flagged this as open. The Roadmap lists it as a Phase 0 dependency, not a side conversation for later. I'd rather ask for this plainly than let it sit under everything else: can we close the cofounder / technical-lead scope and compensation before, or alongside, Day 1, not after the 100 hours are already spent.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-mark">Source</div>
+    <p>Consolidated from the approved WFACT 3.0 Ecosystem Blueprint, Execution Roadmap, and the 20-Day Build Plan. Nothing here is new, it's everything already scattered across those documents, in one place you can actually act on.</p>
+  </div>
+</footer>
+
+<script>
+  var boxes = document.querySelectorAll('.item input[type=checkbox]');
+  var label = document.getElementById('progressLabel');
+  var fill = document.getElementById('progressFill');
+  function update(){
+    var total = boxes.length;
+    var done = 0;
+    boxes.forEach(function(b){ if(b.checked) done++; });
+    label.textContent = done + ' of ' + total + ' done';
+    fill.style.width = (total ? (done/total*100) : 0) + '%';
+  }
+  boxes.forEach(function(b){ b.addEventListener('change', update); });
+  update();
+</script>
+</body>
+</html>

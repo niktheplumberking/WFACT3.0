@@ -1,0 +1,55 @@
+name: CI
+
+# Phase 1 skeleton (Operator's Manual: "base CI pipeline skeleton"). Runs on every push and PR.
+# Registry/check gates are required status checks, not advisory (Ecosystem Blueprint §15) — as real
+# checks get added (Phase 5 onward), wire them in here as required jobs, don't leave them optional.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  guardrails:
+    name: Repo law & structure guardrails
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Secrets scan (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify required law/memory files exist
+        run: |
+          set -e
+          for f in CLAUDE.md PROGRESS.md BLOCKED-ON-NICK.md memory/context.md memory/lessons-ledger.md; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Missing required file: $f"
+              exit 1
+            fi
+          done
+          echo "All required law/memory files present."
+
+      - name: Block plaintext secrets in tracked files
+        run: |
+          if [ -f .env ] || git ls-files | grep -qE '(^|/)\.env($|\.[^.]*$)' ; then
+            echo "::error::A .env file is tracked in git. Secrets must never be committed — see CLAUDE.md §6."
+            exit 1
+          fi
+          echo "No tracked .env files found."
+
+  # Placeholder — becomes real once apps/cockpit has a package.json (Phase 6).
+  # Never delete this job silently; replace its body when there's something to build.
+  build:
+    name: Build (placeholder until Phase 6)
+    runs-on: ubuntu-latest
+    needs: guardrails
+    steps:
+      - uses: actions/checkout@v4
+      - name: No build target yet
+        run: echo "No app to build yet — apps/cockpit lands in Phase 6. This job exists so CI is wired from Day 1."

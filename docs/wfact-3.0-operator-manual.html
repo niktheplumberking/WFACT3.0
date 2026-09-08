@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WFACT 3.0 — Build Operator's Manual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0C0F; --panel:#12151B; --panel-alt:#171B22; --line:#262B33; --line-soft:#1B1F26;
+    --text:#E8E6E0; --text-dim:#9BA3AF; --text-faint:#6B7280;
+    --amber:#E8A33D; --amber-soft:#3A2E18;
+    --cyan:#5EC8C0; --cyan-soft:#12302D;
+    --green:#6FCF97; --green-soft:#173622;
+    --rust:#E0684F; --rust-soft:#3A1D17;
+    --violet:#B08CE0; --violet-soft:#2A2038;
+    --radius:8px;
+    --font-display:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.6; font-size:16px;}
+  a{color:var(--cyan);}
+  a:focus-visible, summary:focus-visible, button:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  ::selection{background:var(--amber-soft); color:var(--amber);}
+  .wrap{max-width:960px; margin:0 auto; padding:0 24px;}
+
+  .hero{
+    padding:64px 0 40px; border-bottom:1px solid var(--line);
+    background:radial-gradient(circle at 90% 0%, rgba(94,200,192,0.10), transparent 45%), linear-gradient(180deg, var(--panel), var(--bg) 75%);
+    position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; inset:0;
+    background-image:linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:44px 44px; opacity:.3; mask-image:linear-gradient(180deg, black, transparent 85%); pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .eyebrow{font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); margin-bottom:14px;}
+  h1{font-family:var(--font-display); font-size:clamp(30px,5.5vw,46px); line-height:1.05; margin:0 0 8px; letter-spacing:-.01em;}
+  .sub{font-family:var(--font-display); font-size:clamp(15px,2vw,18px); color:var(--cyan); margin:0 0 16px; font-weight:600;}
+  .desc{color:var(--text-dim); max-width:680px; font-size:14.5px;}
+
+  .toolbar{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px;}
+  .btn{
+    font-family:var(--font-mono); font-size:12px; letter-spacing:.03em; color:var(--text-dim);
+    background:var(--panel-alt); border:1px solid var(--line); border-radius:100px; padding:9px 16px; cursor:pointer;
+  }
+  .btn:hover{color:var(--text); border-color:var(--amber-soft);}
+
+  section{padding:36px 0; border-bottom:1px solid var(--line);}
+  h2{font-family:var(--font-display); font-size:23px; margin:0 0 16px;}
+
+  .callout{border:1px solid var(--amber-soft); background:var(--amber-soft); border-radius:var(--radius); padding:16px 18px; font-size:14px; color:var(--text);}
+  .callout strong{color:var(--amber);}
+
+  /* ---------- phase accordion ---------- */
+  details.phase{
+    border:1px solid var(--line); border-radius:var(--radius); background:var(--panel);
+    margin-bottom:12px; overflow:hidden;
+  }
+  details.phase[open]{border-color:var(--amber-soft);}
+  summary{
+    list-style:none; cursor:pointer; padding:16px 18px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    font-family:var(--font-display); font-weight:600; font-size:16px;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary .chev{margin-left:auto; font-family:var(--font-mono); color:var(--text-faint); font-size:13px; transition:transform .15s ease;}
+  details[open] summary .chev{transform:rotate(90deg); color:var(--amber);}
+  summary .num{font-family:var(--font-mono); font-size:11.5px; color:var(--amber); background:var(--amber-soft); border:1px solid rgba(232,163,61,.3); padding:2px 9px; border-radius:100px;}
+  summary .meta{font-family:var(--font-mono); font-size:12px; color:var(--text-faint); font-weight:400;}
+
+  .phase-body{padding:0 18px 22px; border-top:1px solid var(--line-soft);}
+  .phase-body h4{font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); margin:20px 0 10px;}
+  .phase-body h4:first-child{margin-top:18px;}
+  .objective{color:var(--text-dim); font-size:14.5px; margin:0;}
+
+  .checklist{list-style:none; margin:0; padding:0;}
+  .checklist li{display:flex; align-items:flex-start; gap:10px; padding:6px 0; font-size:14px; color:var(--text-dim);}
+  .checklist input[type=checkbox]{
+    appearance:none; width:16px; height:16px; border:1.5px solid var(--line); border-radius:4px; margin-top:2px; flex-shrink:0; cursor:pointer;
+    background:var(--panel-alt);
+  }
+  .checklist input[type=checkbox]:checked{background:var(--green); border-color:var(--green);}
+
+  .req-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:6px 0 4px;}
+  .req-box{border-radius:var(--radius); padding:14px 16px; font-size:13.5px;}
+  .req-box.nick{border:1px solid rgba(232,163,61,.3); background:var(--amber-soft);}
+  .req-box.you{border:1px solid rgba(94,200,192,.3); background:var(--cyan-soft);}
+  .req-box .who{font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px; display:block;}
+  .req-box.nick .who{color:var(--amber);}
+  .req-box.you .who{color:var(--cyan);}
+  .req-box ul{margin:0; padding-left:16px; color:var(--text-dim);}
+  .req-box li{margin-bottom:5px;}
+
+  .edge-list{list-style:none; margin:0; padding:0;}
+  .edge-list li{
+    border-left:2px solid var(--violet); background:var(--violet-soft); border-radius:0 6px 6px 0;
+    padding:10px 14px; margin-bottom:8px; font-size:13.5px; color:var(--text-dim);
+  }
+  .edge-list strong{color:var(--violet); display:block; font-size:12.5px; margin-bottom:3px; font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.04em;}
+
+  .exit-check{
+    display:flex; gap:10px; align-items:flex-start; border:1px solid rgba(111,207,151,.3); background:var(--green-soft);
+    border-radius:var(--radius); padding:12px 14px; margin-top:16px; font-size:13.5px;
+  }
+  .exit-check .tag{font-family:var(--font-mono); font-size:10px; color:var(--green); background:rgba(111,207,151,.15); padding:2px 8px; border-radius:100px; flex-shrink:0; margin-top:1px;}
+  .exit-check p{margin:0; color:var(--text);}
+
+  .table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); margin-bottom:16px;}
+  table{border-collapse:collapse; width:100%; min-width:560px; font-size:13.5px;}
+  th{font-family:var(--font-mono); text-align:left; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--amber); background:var(--panel-alt); padding:10px 13px; border-bottom:1px solid var(--line);}
+  td{padding:10px 13px; border-bottom:1px solid var(--line-soft); color:var(--text-dim); vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  td:first-child{color:var(--text); font-weight:500;}
+
+  footer{padding:34px 0 60px; color:var(--text-faint); font-size:13px;}
+  .foot-mark{font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;}
+
+  @media (max-width:640px){
+    .req-grid{grid-template-columns:1fr;}
+    table{font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow">WFACT 3.0 — For Huraira</div>
+    <h1>Build Operator's Manual</h1>
+    <p class="sub">Your day-by-day field guide for the 100-hour sprint</p>
+    <p class="desc">Every phase, what it actually requires from you and from Nick, what to do when something doesn't go to plan, and the exit check that proves a phase is actually done, not just attempted. Use this daily, tick things off as you go, don't skip the exit checks.</p>
+    <div class="toolbar">
+      <button class="btn" id="expandAll">Expand all phases</button>
+      <button class="btn" id="collapseAll">Collapse all</button>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="callout">
+      <strong>How to use this page:</strong> work top to bottom, phase by phase. Each phase has a checklist, a two-column box showing exactly what's blocked on Nick versus what's entirely on you, a list of realistic edge cases with a pre-decided fallback (don't improvise live, use the fallback), and an exit check, the thing that has to be true before you move on. If a phase overruns its hour budget, cut scope inside that phase first. Never borrow hours from a later phase.
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The 7 phases</h2>
+
+    <details class="phase" open>
+      <summary><span class="num">01</span> Foundation &amp; Access <span class="meta">Days 1–2 · 8 hrs</span><span class="chev">▶</span></summary>
+      <div class="phase-body">
+        <h4>Objective</h4>
+        <p class="objective">Unblock every account, credential, and open decision before writing any code, and get the new repo running with checks from day one.</p>
+
+        <h4>Checklist</h4>
+        <ul class="checklist">
+          <li><input type="checkbox"> Confirm GitHub access: existing 2.0 repo + new 3.0 repo created</li>
+          <li><input type="checkbox"> Confirm Supabase project access</li>
+          <li><input type="checkbox"> Confirm Vercel + Hostinger account access</li>
+          <li><input type="checkbox"> Pull the 3 SOPs + Ops Manual from Nick's Drive</li>
+          <li><input type="checkbox"> Get Motion Sites MCP + 21st.dev premium credentials</li>
+          <li><input type="checkbox"> Get Higgsfield MCP credentials</li>
+          <li><input type="checkbox"> Confirm Claude/Anthropic API billing setup</li>
+          <li><input type="checkbox"> Confirm which 2 entities</li>
+          <li><input type="checkbox"> Set up repo skeleton, secrets manager, base CI</li>
+        </ul>
+
+        <h4>Requirements</h4>
+        <div class="req-grid">
+          <div class="req-box nick"><span class="who">From Nick</span><ul><li>Every access item above</li><li>Entity decision (which 2)</li><li>Budget ceiling sign-off for the sprint's API spend</li></ul></div>
+          <div class="req-box you"><span class="who">From you</span><ul><li>Repo scaffold + branch protection</li><li>CI pipeline skeleton</li><li>Secrets manager wired, nothing in plaintext</li></ul></div>
+        </div>
+
+        <h4>Edge cases &amp; fallbacks</h4>
+        <ul class="edge-list">
+          <li><strong>Access delayed</strong> Don't sit idle. Scaffold the repo and CI with placeholder credentials, swap in real ones the moment they land. Keep a visible "blocked on Nick" list rather than quietly waiting.</li>
+          <li><strong>GitHub org/seat constraints</strong> Ask for collaborator access on the existing account instead of waiting on a new org to be provisioned.</li>
+          <li><strong>Entity decision still pending</strong> Use placeholder names (Entity A / Entity B) in the schema now, don't block Phase 2 on it, rename later, it's a one-line change.</li>
+        </ul>
+
+        <div class="exit-check"><span class="tag">Exit check</span><p>A commit reaches a deployed preview through CI with zero manual steps, and every access item is either confirmed or has a tracked workaround in place.</p></div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary><span class="num">02</span> State Layer &amp; Second Brain v1 <span class="meta">Days 3–5 · 16 hrs</span><span class="chev">▶</span></summary>
+      <div class="phase-body">
+        <h4>Objective</h4>
+        <p class="objective">A tested database for clients, projects, and tasks, plus a first working, readable memory layer.</p>
+
+        <h4>Checklist</h4>
+        <ul class="checklist">
+          <li><input type="checkbox"> Design Supabase schema: clients, projects, tasks, 2 entities</li>
+          <li><input type="checkbox"> Write RLS policies</li>
+          <li><input type="checkbox"> Run an isolation/RLS attack test, adapted from 2.0's script</li>
+          <li><input type="checkbox"> Draft context.md: business rules, entities, pricing bands</li>
+          <li><input type="checkbox"> Set up the per-client memory file template</li>
+        </ul>
+
+        <h4>Requirements</h4>
+        <div class="req-grid">
+          <div class="req-box nick"><span class="who">From Nick</span><ul><li>30–60 min session to supply real business rules and pricing bands for context.md</li><li>Confirm entity names once decided</li></ul></div>
+          <div class="req-box you"><span class="who">From you</span><ul><li>Schema, RLS policies, attack test</li><li>context.md and per-client memory file structure</li></ul></div>
+        </div>
+
+        <h4>Edge cases &amp; fallbacks</h4>
+        <ul class="edge-list">
+          <li><strong>2.0's schema is messier than expected</strong> Don't migrate old data or structure. Build fresh, informed by 2.0's lessons, not its code.</li>
+          <li><strong>Full Cognee graph setup won't fit the time box</strong> That's expected, it's not in this sprint's scope. Flat files (context.md + per-client markdown) are the deliberate v1, not a compromise you need to apologize for.</li>
+          <li><strong>Nick's session gets delayed</strong> Draft context.md with placeholder rules pulled from the Factory Book and Blueprint, mark them clearly as drafts, swap in Nick's real answers when the session happens.</li>
+        </ul>
+
+        <div class="exit-check"><span class="tag">Exit check</span><p>A test query ("what stage is client X in") returns a correct answer from the memory files, and the RLS attack test fails to cross entity boundaries.</p></div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary><span class="num">03</span> Hermes Controller Core <span class="meta">Days 6–8 · 14 hrs</span><span class="chev">▶</span></summary>
+      <div class="phase-body">
+        <h4>Objective</h4>
+        <p class="objective">Hermes (or a working stand-in) wired to memory and state, answering real questions in plain language.</p>
+
+        <h4>Checklist</h4>
+        <ul class="checklist">
+          <li><input type="checkbox"> Self-host Hermes Agent</li>
+          <li><input type="checkbox"> Wire to memory (context.md + per-client files) and Supabase</li>
+          <li><input type="checkbox"> Configure Claude as the first model behind it</li>
+          <li><input type="checkbox"> Build the plain-language tone filter</li>
+          <li><input type="checkbox"> Smoke test with a real status question</li>
+        </ul>
+
+        <h4>Requirements</h4>
+        <div class="req-grid">
+          <div class="req-box nick"><span class="who">From Nick</span><ul><li>None blocking this phase</li></ul></div>
+          <div class="req-box you"><span class="who">From you</span><ul><li>Hermes install and config</li><li>Tone filter</li><li>The smoke test itself</li></ul></div>
+        </div>
+
+        <h4>Edge cases &amp; fallbacks</h4>
+        <ul class="edge-list">
+          <li><strong>Hermes self-hosting eats more time than budgeted</strong> Fallback: build "Hermes-lite," a thin script that reads memory, calls Claude, and applies the tone filter. Use it for this sprint, swap in real Hermes once there's runway. Tell Nick if you do this, don't substitute silently.</li>
+          <li><strong>Hermes's native MCP support is rough</strong> Wire the needed tools directly through Claude's own MCP support for now, migrate to Hermes-native once it's stable.</li>
+        </ul>
+
+        <div class="exit-check"><span class="tag">Exit check</span><p>Hermes (or its stand-in) answers "what's the status of X" correctly and in plain language, sourced from real memory and state, not a canned response.</p></div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary><span class="num">04</span> Model Routing &amp; Front-End Loop v1 <span class="meta">Days 9–12 · 22 hrs</span><span class="chev">▶</span></summary>
+      <div class="phase-body">
+        <h4>Objective</h4>
+        <p class="objective">The centerpiece: one real page built end to end through Motion Sites + 21st.dev, checked by a second AI before anyone sees it. The biggest hour allocation in the sprint on purpose, this is what 2.0 struggled with most.</p>
+
+        <h4>Checklist</h4>
+        <ul class="checklist">
+          <li><input type="checkbox"> Wire Motion Sites MCP</li>
+          <li><input type="checkbox"> Wire 21st.dev MCP</li>
+          <li><input type="checkbox"> Configure the front-end agent (Kimi K3 as candidate executor)</li>
+          <li><input type="checkbox"> Get one real pilot brief from Nick</li>
+          <li><input type="checkbox"> Run the loop: generate → self-review → fix → done</li>
+          <li><input type="checkbox"> Log every correction round, this number is the whole point</li>
+        </ul>
+
+        <h4>Requirements</h4>
+        <div class="req-grid">
+          <div class="req-box nick"><span class="who">From Nick</span><ul><li>One real, even low-stakes, project brief to use as the pilot</li><li>Same-day answer if a direction question comes up mid-build</li></ul></div>
+          <div class="req-box you"><span class="who">From you</span><ul><li>The loop itself, agent config, correction tracking</li></ul></div>
+        </div>
+
+        <h4>Edge cases &amp; fallbacks</h4>
+        <ul class="edge-list">
+          <li><strong>21st.dev's React/Tailwind lean doesn't match how sites actually ship</strong> Hand-pick 2–3 templates manually for this proof instead of full dynamic selection. Note it as a fix-later item, don't let it block the phase.</li>
+          <li><strong>Kimi K3 API access is delayed</strong> Use Claude for front-end generation this sprint, swap Kimi K3 in once access lands. This is also genuinely useful data on whether Kimi K3 is even needed, log it as such.</li>
+          <li><strong>First-pass output is rough</strong> Expected. The proof is whether the loop catches and fixes it, not first-pass perfection.</li>
+          <li><strong>No pilot brief from Nick by day 9</strong> Use a placeholder brief from an existing 2.0 case (e.g., re-run a DreamSign-style page) so the phase isn't blocked, swap to Nick's real brief the moment it arrives.</li>
+        </ul>
+
+        <div class="exit-check"><span class="tag">Exit check</span><p>One real page live, plus an honest correction-round count logged and compared against DreamSign's 40+.</p></div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary><span class="num">05</span> Verification Loop <span class="meta">Days 13–15 · 14 hrs</span><span class="chev">▶</span></summary>
+      <div class="phase-body">
+        <h4>Objective</h4>
+        <p class="objective">A working, if trimmed, version of "never trust done, only verified."</p>
+
+        <h4>Checklist</h4>
+        <ul class="checklist">
+          <li><input type="checkbox"> Pick 5–8 highest-value checks from 2.0's 78 (no console errors, responsive check, secrets scan, image optimization, isolation check)</li>
+          <li><input type="checkbox"> Wire an independent evaluator step, a different model than the builder</li>
+          <li><input type="checkbox"> Test with a deliberately broken build, confirm it's caught</li>
+        </ul>
+
+        <h4>Requirements</h4>
+        <div class="req-grid">
+          <div class="req-box nick"><span class="who">From Nick</span><ul><li>None blocking this phase</li></ul></div>
+          <div class="req-box you"><span class="who">From you</span><ul><li>Check scripts, evaluator wiring, the test case itself</li></ul></div>
+        </div>
+
+        <h4>Edge cases &amp; fallbacks</h4>
+        <ul class="edge-list">
+          <li><strong>No time for a truly separate model as evaluator</strong> Use a strict written rubric plus a separate Claude session as a stand-in, flagged clearly as temporary until Kimi K3 or GPT-5.6 access allows a real cross-model check.</li>
+          <li><strong>Tempted to build all 78 checks</strong> Don't. 5–8 well-chosen checks proving the loop works is the actual goal this sprint, completeness is next sprint's job.</li>
+        </ul>
+
+        <div class="exit-check"><span class="tag">Exit check</span><p>A deliberately broken test build gets caught and returned before being marked done.</p></div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary><span class="num">06</span> Cockpit MVP <span class="meta">Days 16–18 · 16 hrs</span><span class="chev">▶</span></summary>
+      <div class="phase-body">
+        <h4>Objective</h4>
+        <p class="objective">The smallest useful control room: one screen, live status, no logs required.</p>
+
+        <h4>Checklist</h4>
+        <ul class="checklist">
+          <li><input type="checkbox"> Build a minimal dashboard: status, approvals, recent runs</li>
+          <li><input type="checkbox"> Connect it to Supabase for live data</li>
+          <li><input type="checkbox"> Get Nick to actually look at it before day 20</li>
+        </ul>
+
+        <h4>Requirements</h4>
+        <div class="req-grid">
+          <div class="req-box nick"><span class="who">From Nick</span><ul><li>10–15 minutes to look at the MVP and give real reaction</li></ul></div>
+          <div class="req-box you"><span class="who">From you</span><ul><li>The dashboard build itself</li></ul></div>
+        </div>
+
+        <h4>Edge cases &amp; fallbacks</h4>
+        <ul class="edge-list">
+          <li><strong>A full React PWA doesn't fit the time box</strong> A single, minimally styled page reading straight from Supabase is enough for this sprint. The full room set from the Blueprint is explicit post-sprint work, not a gap in this one.</li>
+          <li><strong>Even that's tight</strong> A live Notion or Airtable view synced from Supabase is an acceptable stand-in for the proof. Not a permanent choice, just enough to hit the exit check.</li>
+        </ul>
+
+        <div class="exit-check"><span class="tag">Exit check</span><p>Nick can open one link and understand what's happening without asking a question first.</p></div>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary><span class="num">07</span> Proof Run &amp; Handoff <span class="meta">Days 19–20 · 10 hrs</span><span class="chev">▶</span></summary>
+      <div class="phase-body">
+        <h4>Objective</h4>
+        <p class="objective">Run it once for real, document it honestly, and set the next sprint's scope with actual evidence.</p>
+
+        <h4>Checklist</h4>
+        <ul class="checklist">
+          <li><input type="checkbox"> Run the full mini-pipeline once, end to end, on the pilot project</li>
+          <li><input type="checkbox"> Log real numbers: correction rounds, time taken, what the verification loop caught</li>
+          <li><input type="checkbox"> Write the honest results report: what's proven, what's not</li>
+          <li><input type="checkbox"> Present to Nick, agree on the next sprint's scope</li>
+        </ul>
+
+        <h4>Requirements</h4>
+        <div class="req-grid">
+          <div class="req-box nick"><span class="who">From Nick</span><ul><li>Attend the review</li><li>Decide what happens next</li></ul></div>
+          <div class="req-box you"><span class="who">From you</span><ul><li>Run it, document it honestly, resist inflating the result</li></ul></div>
+        </div>
+
+        <h4>Edge cases &amp; fallbacks</h4>
+        <ul class="edge-list">
+          <li><strong>The full loop isn't 100% working by day 19</strong> Don't fake it. Present exactly what's proven and what's still broken, with a concrete plan attached. That's more valuable to Nick than a staged demo, and it's the same standard this whole document holds everything else to.</li>
+        </ul>
+
+        <div class="exit-check"><span class="tag">Exit check</span><p>A documented, real run with real numbers that Nick has actually seen and responded to.</p></div>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>Sprint-level risk register</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Risk</th><th>Why it happens</th><th>Mitigation</th></tr></thead>
+      <tbody>
+        <tr><td>Access delays from Nick</td><td>He's the sole owner of every account</td><td>Fire off every access request on Day 0, not Day 1. Don't sit idle waiting.</td></tr>
+        <tr><td>Scope creep mid-sprint</td><td>Easy to want "just one more feature" once something's working</td><td>Anything outside these 7 phases goes on the next-sprint list, not into this one.</td></tr>
+        <tr><td>Hermes learning curve eats the budget</td><td>New, self-hosted tool, first time standing it up</td><td>The Hermes-lite fallback in Phase 3 exists specifically for this. Use it without guilt.</td></tr>
+        <tr><td>Kimi K3 / MCP access delays</td><td>Third-party accounts, not fully in your control</td><td>Claude fallback for front-end keeps Phase 4 moving regardless of when access lands.</td></tr>
+        <tr><td>Pilot project not ready</td><td>Needs a real, Nick-approved brief</td><td>Ask for it in Phase 1, not Phase 4, so it's sitting ready when you need it.</td></tr>
+        <tr><td>Hour-tracking drift</td><td>Easy to lose track across 20 days</td><td>Log actual hours per phase as you go. Check the running total against budget at Day 5, Day 12, and Day 18.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2 style="margin-top:32px;">Quick reference: if X happens, do Y</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>If this happens</th><th>Do this</th></tr></thead>
+      <tbody>
+        <tr><td>Access is late</td><td>Work on whatever doesn't need it yet, keep a visible blocked-items list</td></tr>
+        <tr><td>A tool integration fails</td><td>Use that phase's documented fallback, don't improvise a new one live</td></tr>
+        <tr><td>A phase overruns its hour budget</td><td>Cut scope inside that phase's checklist first, never borrow hours from a later phase</td></tr>
+        <tr><td>Nick wants to add scope mid-sprint</td><td>Note it, park it on the next-sprint list, don't renegotiate the 100 hours mid-flight</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-mark">Source</div>
+    <p>Companion to the Nick-facing 20-Day Build Plan, both derived from the approved WFACT 3.0 Ecosystem Blueprint and Execution Roadmap. This page is a working tool, not a report, expect to reopen it daily during the sprint.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('expandAll').addEventListener('click', function(){
+    document.querySelectorAll('details.phase').forEach(function(d){ d.open = true; });
+  });
+  document.getElementById('collapseAll').addEventListener('click', function(){
+    document.querySelectorAll('details.phase').forEach(function(d){ d.open = false; });
+  });
+</script>
+</body>
+</html>
