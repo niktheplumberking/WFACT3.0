@@ -36,8 +36,33 @@ skeleton is proceeding per the Day-0 fallback rule ("don't sit idle").
 
 ## Phase 2 — State Layer & Second Brain v1 (Days 3–5 · 16 hrs)
 
-Not started. Depends on Phase 1's entity confirmation and Nick's business-rules session (see
-`BLOCKED-ON-NICK.md`). Can begin schema design against placeholder entities in the meantime.
+**In progress**, started against placeholder entities per the Operator's Manual fallback ("entity
+decision still pending → use placeholder names now, don't block Phase 2 on it, rename later").
+
+- [x] Design Supabase schema: entities, clients, projects, tasks, correction_rounds, profiles/roles
+      — `packages/db/migrations/0001_init_schema.sql`
+- [x] Entity law encoded as a schema constraint (trigger), not just convention
+      — `packages/db/migrations/0002_entity_consistency_triggers.sql`
+- [x] Write RLS policies — `packages/db/migrations/0003_rls_policies.sql`
+- [x] Run an isolation/RLS attack test — `scripts/rls_attack_test.sql`,
+      results in `packages/db/RLS_ATTACK_TEST_RESULTS.md`: **PASS**, cross-entity isolation holds,
+      the entity-consistency trigger correctly rejects a mismatched insert
+- [x] Independent verification via `get_advisors(security)` — caught 2 real findings (mutable
+      search_path, publicly-exposed SECURITY DEFINER functions), fixed in migration `0004`; fixing
+      that then surfaced a genuine RLS recursion bug the attack test caught, fixed in migration `0005`
+      (see `memory/lessons-ledger.md` for the full lesson)
+- [x] Schema applied and verified against a real Postgres instance: `wfact-3-sandbox` (Supabase
+      project `xwljilyjirmcryakbirk`, under the Designtive org) — a dedicated sandbox for this sprint,
+      separate from Nick's real 2.0 project (still blocked)
+- [ ] Draft `context.md`: business rules, entities, pricing bands — done as placeholder in Phase 1,
+      still needs Nick's real business-rules session (Day 3–5) to become non-draft
+- [x] Set up the per-client memory file template — done in Phase 1
+
+**Exit check**: *"A test query ('what stage is client X is in') returns a correct answer from the memory
+files, and the RLS attack test fails to cross entity boundaries."* — **RLS half: met and verified**, see
+`packages/db/RLS_ATTACK_TEST_RESULTS.md`. Memory-file query half is trivially true today only because
+`context.md` is a placeholder with no real client yet — re-verify once a real client and Nick's business
+rules land.
 
 ## Phase 3 — Hermes Controller Core (Days 6–8 · 14 hrs)
 

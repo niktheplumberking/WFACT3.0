@@ -40,5 +40,16 @@ Format per entry: date, what happened, what it cost, the rule going forward.
 
 ## This sprint (2026, 100-hour build)
 
-_(Empty — entries get added here as the sprint runs, per Operator's Manual Phase 7's honest results
-report. Log the good and the bad; a lesson that flatters the builder isn't a lesson.)_
+1. **RLS helper functions using `SECURITY INVOKER` to read a table that has its own RLS policy calling
+   that same function caused infinite recursion (`stack depth limit exceeded`).** Postgres does not
+   guarantee short-circuit (left-to-right) evaluation of a policy's `OR` expression, so a naive
+   `id = auth.uid() or is_owner_or_admin()` policy can call `is_owner_or_admin()` before checking the
+   cheap identity condition, and if that function reads the same RLS-protected table, it recurses.
+   Caught by the RLS attack test itself (`scripts/rls_attack_test.sql`), not by review — the schema
+   looked correct on read-through. → Rule: any RLS helper function that reads a table protected by a
+   policy referencing that same function must be `SECURITY DEFINER`, owned by the table owner (so the
+   internal read is RLS-exempt), and moved to a non-PostgREST-exposed schema (`private`) rather than
+   `public`, so it's neither recursive nor a public RPC endpoint. See
+   `packages/db/RLS_ATTACK_TEST_RESULTS.md` for the full trace. Full credit to the discipline in
+   `CLAUDE.md` §1 for this being caught in Phase 2 against a sandbox, not months later against a real
+   client's data.

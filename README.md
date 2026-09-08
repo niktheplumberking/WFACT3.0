@@ -25,8 +25,13 @@ clients/
   _template/memory.md    per-client memory file template
 apps/
   cockpit/                the control room PWA (Phase 6+)
-packages/                 shared logic across apps
-scripts/                  automation, checks, attack tests
+packages/
+  db/
+    migrations/           versioned SQL, applied in order (entities, clients, projects, tasks,
+                           correction_rounds, RLS policies, entity-law triggers)
+    RLS_ATTACK_TEST_RESULTS.md   last real attack-test run against the sandbox project
+scripts/
+  rls_attack_test.sql     the actual isolation attack test, re-runnable against any fresh instance
 docs/                     source planning documents (do not treat this repo's other files as replacing
                            these — they summarize the docs, the docs are the source of truth)
 ```

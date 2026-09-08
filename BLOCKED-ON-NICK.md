@@ -10,7 +10,7 @@ rows, mark them done so there's a record of when they closed.
 | Item | Needed by | Status |
 |---|---|---|
 | GitHub access (existing WFact2.0 repo + new 3.0 repo/org) | Day 1 — blocking | **OPEN** |
-| Supabase access (current 2.0 project, to design schema against the real one) | Day 1 — blocking | **OPEN** |
+| Supabase access (current 2.0 project, to design schema against the real one) | Day 1 — blocking | **OPEN** — working around it with a fresh sandbox project (`wfact-3-sandbox`, ref `xwljilyjirmcryakbirk`, under Huraira's own Designtive org, $0/mo) so Phase 2 could proceed and be attack-tested for real; still needed to sanity-check the new schema against what 2.0 actually shipped, not just the docs' description of it |
 | Vercel + Hostinger access | Day 1 — blocking | **OPEN** |
 | The 3 SOPs + Operations Manual (Google Drive) | Day 1 — blocking | **OPEN** |
 | Motion Sites MCP credentials | Day 9 | **OPEN** |
@@ -25,6 +25,12 @@ rows, mark them done so there's a record of when they closed.
 | Which 2 entities (DreamSign + Bennett & Co, Rizm separate?) | Phase 2 schema | **OPEN** — using placeholder in `memory/context.md` §2 per fallback |
 | Fresh repo vs. carrying 2.0's structure forward | Phase 1 | **PROCEEDING** as fresh repo per Ecosystem Blueprint §15 recommendation; needs Nick's explicit sign-off |
 | Confirm the governance split (table in `CLAUDE.md` §3) | Day 1 | **OPEN** |
+
+## Carry-forward for the real project (not blocking this sprint)
+
+| Item | Notes |
+|---|---|
+| Enable "leaked password protection" in Supabase Auth settings | Flagged by `get_advisors` on the sandbox; a project-level Auth toggle (dashboard, not SQL), not a schema issue. Apply when the real production Supabase project is configured. |
 
 ## Budget & spend approval
 
