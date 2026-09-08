@@ -1,0 +1,317 @@
+<title>WFACT 3.0 Progress Report</title>
+<style>
+  :root{
+    --bg:#0A0C0F; --panel:#12151B; --panel-alt:#171B22; --line:#262B33; --line-soft:#1B1F26;
+    --text:#E8E6E0; --text-dim:#9BA3AF; --text-faint:#6B7280;
+    --amber:#E8A33D; --amber-soft:#3A2E18;
+    --cyan:#5EC8C0; --cyan-soft:#12302D;
+    --green:#6FCF97; --green-soft:#173622;
+    --rust:#E0684F; --rust-soft:#3A1D17;
+    --radius:8px;
+    --font-display:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'IBM Plex Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.01ms !important; transition-duration:.01ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.65; font-size:16px;}
+  a{color:var(--cyan);}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
+  ::selection{background:var(--amber-soft); color:var(--amber);}
+  h1,h2,h3{text-wrap:balance;}
+
+  .wrap{max-width:860px; margin:0 auto; padding:0 24px;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:64px 0 40px; border-bottom:1px solid var(--line);
+    background:radial-gradient(circle at 88% 0%, rgba(232,163,61,0.09), transparent 45%), linear-gradient(180deg, var(--panel), var(--bg) 78%);
+    position:relative; overflow:hidden;
+  }
+  .hero::after{
+    content:""; position:absolute; inset:0;
+    background-image:linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:44px 44px; opacity:.28; mask-image:linear-gradient(180deg, black, transparent 82%); pointer-events:none;
+  }
+  .hero-inner{position:relative; z-index:1;}
+  .eyebrow{font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--cyan); margin-bottom:14px;}
+  h1{font-family:var(--font-display); font-size:clamp(32px,5.6vw,48px); line-height:1.04; margin:0 0 10px; letter-spacing:-.01em;}
+  .sub{font-family:var(--font-display); font-size:clamp(15px,2vw,18px); color:var(--amber); margin:0 0 16px; font-weight:600;}
+  .desc{color:var(--text-dim); max-width:600px; font-size:14.5px;}
+
+  .stat-strip{display:flex; flex-wrap:wrap; gap:12px; margin-top:30px;}
+  .stat{background:var(--panel-alt); border:1px solid var(--line); border-radius:var(--radius); padding:14px 20px; min-width:128px;}
+  .stat .num{font-family:var(--font-mono); font-variant-numeric:tabular-nums; font-size:24px; color:var(--amber); font-weight:700; line-height:1;}
+  .stat .label{font-family:var(--font-mono); font-size:10px; color:var(--text-faint); letter-spacing:.08em; text-transform:uppercase; margin-top:6px;}
+
+  .progress-strip{display:flex; align-items:center; gap:14px; margin-top:22px; font-family:var(--font-mono); font-size:12px; color:var(--text-faint);}
+  .progress-track{flex:1; display:flex; gap:4px;}
+  .progress-seg{flex:1; height:6px; border-radius:100px; background:var(--panel-alt); border:1px solid var(--line);}
+  .progress-seg.done{background:linear-gradient(90deg, var(--amber), var(--cyan)); border-color:transparent;}
+
+  section{padding:40px 0; border-bottom:1px solid var(--line);}
+  h2{font-family:var(--font-display); font-size:23px; margin:0 0 6px; letter-spacing:-.01em;}
+  .sec-sub{color:var(--text-faint); font-size:13.5px; margin:0 0 24px;}
+
+  /* ---------- phase timeline ---------- */
+  .timeline{position:relative; padding-left:30px;}
+  .timeline::before{
+    content:""; position:absolute; left:9px; top:6px; bottom:6px; width:2px;
+    background:linear-gradient(var(--green) 0%, var(--green) 26%, var(--line) 26%, var(--line) 100%);
+  }
+  .tphase{position:relative; padding-bottom:20px;}
+  .tphase:last-child{padding-bottom:0;}
+  .tphase::before{
+    content:""; position:absolute; left:-30px; top:2px; width:16px; height:16px; border-radius:50%;
+    background:var(--bg); border:2px solid var(--line);
+  }
+  .tphase.done::before{border-color:var(--green); background:var(--green);}
+  .tphase.next::before{border-color:var(--amber);}
+  .thead{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; margin-bottom:4px;}
+  .tnum{font-family:var(--font-mono); font-size:11px; color:var(--text-faint);}
+  .ttitle{font-family:var(--font-display); font-size:16.5px; font-weight:600;}
+  .tmeta{font-family:var(--font-mono); font-size:11px; color:var(--text-faint); margin-left:auto;}
+  .pill{font-family:var(--font-mono); font-size:10px; letter-spacing:.05em; text-transform:uppercase; padding:2px 9px; border-radius:100px; white-space:nowrap;}
+  .pill.done{background:var(--green-soft); color:var(--green); border:1px solid rgba(111,207,151,.3);}
+  .pill.next{background:var(--amber-soft); color:var(--amber); border:1px solid rgba(232,163,61,.3);}
+  .pill.queued{background:var(--panel-alt); color:var(--text-faint); border:1px solid var(--line);}
+  .tnote{color:var(--text-dim); font-size:13.5px; margin:4px 0 0;}
+  .tproof{color:var(--green); font-size:12.5px; margin:4px 0 0; font-style:italic;}
+
+  /* ---------- deliverable cards ---------- */
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:640px){ .grid2{grid-template-columns:1fr;} }
+  .card{border:1px solid var(--line); background:var(--panel); border-radius:var(--radius); padding:18px 20px;}
+  .card .ctitle{font-family:var(--font-display); font-size:15px; font-weight:600; margin:0 0 8px; display:flex; align-items:center; gap:8px;}
+  .card .ctitle::before{content:"✓"; color:var(--green); font-family:var(--font-mono); font-size:13px; border:1px solid var(--green); border-radius:50%; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .card p{margin:0; color:var(--text-dim); font-size:13.5px;}
+
+  /* ---------- critical callout ---------- */
+  .critical{border:1px solid rgba(224,104,79,.4); background:var(--rust-soft); border-radius:var(--radius); padding:22px; margin-bottom:22px;}
+  .critical .clabel{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--rust); margin-bottom:8px;}
+  .critical h3{font-family:var(--font-display); color:var(--text); margin:0 0 8px; font-size:18px;}
+  .critical p{color:var(--text-dim); font-size:14px; margin:0;}
+
+  /* ---------- needs list ---------- */
+  .need{display:flex; gap:14px; align-items:flex-start; border:1px solid var(--line); background:var(--panel); border-radius:var(--radius); padding:14px 16px; margin-bottom:10px;}
+  .need-body{flex:1;}
+  .need-title{font-weight:500; font-size:14.5px; color:var(--text); margin-bottom:4px;}
+  .need-desc{font-size:13px; color:var(--text-dim);}
+  .badge{font-family:var(--font-mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; padding:3px 9px; border-radius:100px; white-space:nowrap; flex-shrink:0; margin-top:1px;}
+  .badge.blocking{background:var(--rust-soft); color:var(--rust); border:1px solid rgba(224,104,79,.3);}
+  .badge.day{background:var(--cyan-soft); color:var(--cyan); border:1px solid rgba(94,200,192,.3);}
+  @media (max-width:600px){ .need{flex-direction:column;} .badge{align-self:flex-start;} }
+
+  .catlabel{font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); margin:22px 0 10px;}
+  .catlabel:first-of-type{margin-top:0;}
+
+  footer{padding:32px 0 60px; color:var(--text-faint); font-size:13px;}
+  .foot-mark{font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<div class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow">WFACT 3.0 · Progress Report</div>
+    <h1>Two phases in.</h1>
+    <p class="sub">Phases 1 and 2 of the 100 hour build are done.</p>
+    <p class="desc">This is where the sprint actually stands after the first 24 hours: what's built, what's tested, and where progress now depends on you. Real numbers, not a check in.</p>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="num">2 / 7</div><div class="label">Phases done</div></div>
+      <div class="stat"><div class="num">24 / 100</div><div class="label">Hours used</div></div>
+      <div class="stat"><div class="num">1</div><div class="label">Real bug caught and fixed</div></div>
+    </div>
+
+    <div class="progress-strip">
+      <span>Phase 1</span>
+      <div class="progress-track">
+        <div class="progress-seg done"></div>
+        <div class="progress-seg done"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+        <div class="progress-seg"></div>
+      </div>
+      <span>Phase 7</span>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <h2>Where each phase stands</h2>
+    <p class="sec-sub">The 7 phase plan you already approved, day by day.</p>
+
+    <div class="timeline">
+      <div class="tphase done">
+        <div class="thead">
+          <span class="tnum">01</span>
+          <span class="ttitle">Foundation and Access</span>
+          <span class="pill done">Done</span>
+          <span class="tmeta">Days 1 to 2</span>
+        </div>
+        <p class="tnote">Repository set up with the ground rules every AI agent reads before doing any work.</p>
+        <p class="tproof">Proof: a working repository with checks running automatically from day one.</p>
+      </div>
+
+      <div class="tphase done">
+        <div class="thead">
+          <span class="tnum">02</span>
+          <span class="ttitle">State Layer and Second Brain v1</span>
+          <span class="pill done">Done</span>
+          <span class="tmeta">Days 3 to 5</span>
+        </div>
+        <p class="tnote">The database holding every client, project, and task, with entities kept separate by the database itself.</p>
+        <p class="tproof">Proof: an attack test aimed at crossing client boundaries was tried and it failed to get through.</p>
+      </div>
+
+      <div class="tphase next">
+        <div class="thead">
+          <span class="tnum">03</span>
+          <span class="ttitle">Hermes Controller Core</span>
+          <span class="pill next">Next</span>
+          <span class="tmeta">Days 6 to 8</span>
+        </div>
+        <p class="tnote">The manager that decides which AI does what, wired to the memory and database from Phase 2.</p>
+      </div>
+
+      <div class="tphase">
+        <div class="thead">
+          <span class="tnum">04</span>
+          <span class="ttitle">Model Routing and Front End Loop v1</span>
+          <span class="pill queued">Queued</span>
+          <span class="tmeta">Days 9 to 12</span>
+        </div>
+        <p class="tnote">The centerpiece: one real page built end to end, checked by a second AI before anyone sees it.</p>
+      </div>
+
+      <div class="tphase">
+        <div class="thead">
+          <span class="tnum">05</span>
+          <span class="ttitle">Verification Loop</span>
+          <span class="pill queued">Queued</span>
+          <span class="tmeta">Days 13 to 15</span>
+        </div>
+        <p class="tnote">A small, working version of never trust done, only verified.</p>
+      </div>
+
+      <div class="tphase">
+        <div class="thead">
+          <span class="tnum">06</span>
+          <span class="ttitle">Cockpit MVP</span>
+          <span class="pill queued">Queued</span>
+          <span class="tmeta">Days 16 to 18</span>
+        </div>
+        <p class="tnote">One screen showing what's running, what's waiting on you, and what's already been checked.</p>
+      </div>
+
+      <div class="tphase">
+        <div class="thead">
+          <span class="tnum">07</span>
+          <span class="ttitle">Proof Run and Handoff</span>
+          <span class="pill queued">Queued</span>
+          <span class="tmeta">Days 19 to 20</span>
+        </div>
+        <p class="tnote">Run the whole thing once for real, document it honestly, and set the next sprint's scope.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What's actually built and tested</h2>
+    <p class="sec-sub">Not a status update. Here's what exists and how it was checked.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <p class="ctitle">Ground rules, in writing</p>
+        <p>The repository now carries the rules every AI agent reads before touching anything: who decides what, and the standing rule that nothing counts as done until something outside the builder checks it.</p>
+      </div>
+      <div class="card">
+        <p class="ctitle">Client data kept apart by the database itself</p>
+        <p>The structure holding every client, project, and task is built, with DreamSign and Bennett and Co kept separate at the database level, not just by a rule someone has to remember to follow.</p>
+      </div>
+      <div class="card">
+        <p class="ctitle">A real break in attempt, caught and fixed</p>
+        <p>I tried to make one client's data leak into another's view. The first attempt found a real gap in how permissions were being checked. It's fixed now, and the same attack no longer works, tried again to confirm.</p>
+      </div>
+      <div class="card">
+        <p class="ctitle">A safe place to test, so nothing waited</p>
+        <p>Since your Supabase login is still pending, I stood up a separate free sandbox account under my own login to keep testing moving. Nothing here touches your real 2.0 data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="border-bottom:none;">
+  <div class="wrap">
+    <h2>What's needed from you</h2>
+    <p class="sec-sub">Nothing above was blocked on you. The next phases genuinely are.</p>
+
+    <div class="critical">
+      <div class="clabel">The one that matters most</div>
+      <h3>Close the comp and scope conversation</h3>
+      <p>Every document in this process has flagged this. I'd rather ask for it plainly again than let it sit under everything else. I'd like this closed before or alongside the next phase, not after the 100 hours are spent.</p>
+    </div>
+
+    <div class="catlabel">Access</div>
+    <div class="need">
+      <div class="need-body">
+        <div class="need-title">GitHub, Supabase, Vercel, and Hostinger</div>
+        <div class="need-desc">Needed to move this work off my local sandbox and onto the real setup.</div>
+      </div>
+      <span class="badge blocking">Blocking</span>
+    </div>
+    <div class="need">
+      <div class="need-body">
+        <div class="need-title">The 3 SOPs and Operations Manual</div>
+        <div class="need-desc">Sitting in your Drive, referenced throughout the build docs, never actually handed over.</div>
+      </div>
+      <span class="badge blocking">Blocking</span>
+    </div>
+
+    <div class="catlabel">Decisions</div>
+    <div class="need">
+      <div class="need-body">
+        <div class="need-title">Confirm the 2 entities</div>
+        <div class="need-desc">I've been proceeding with DreamSign and Bennett and Co as a placeholder so it doesn't block progress. Confirming it is a one line change once you say the word.</div>
+      </div>
+      <span class="badge day">Day 3</span>
+    </div>
+
+    <div class="catlabel">Budget</div>
+    <div class="need">
+      <div class="need-body">
+        <div class="need-title">API spend ceiling and Claude billing confirmation</div>
+        <div class="need-desc">Covers Claude, Kimi K3, and any other model calls across the build.</div>
+      </div>
+      <span class="badge blocking">Blocking</span>
+    </div>
+
+    <div class="catlabel">Your time</div>
+    <div class="need">
+      <div class="need-body">
+        <div class="need-title">30 to 60 minutes on business rules</div>
+        <div class="need-desc">Real pricing bands and standing rules for the shared memory file that every AI agent reads.</div>
+      </div>
+      <span class="badge day">Day 3 to 5</span>
+    </div>
+    <div class="need">
+      <div class="need-body">
+        <div class="need-title">One real project brief</div>
+        <div class="need-desc">Even something low stakes is fine. This is what actually gets built and measured in Phase 4.</div>
+      </div>
+      <span class="badge day">Day 9</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-mark">Source</div>
+    Consolidated from the WFACT 3.0 Ecosystem Blueprint, Execution Roadmap, and the 20 Day Build Plan. Full detail on every open item lives in the repository's blocked items tracker. I'll keep this updated as the sprint moves rather than sending everything at the end.
+  </div>
+</footer>
