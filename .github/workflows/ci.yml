@@ -43,6 +43,29 @@ jobs:
           fi
           echo "No tracked .env files found."
 
+  # Phase 3: the first real, required (non-advisory) check job — Ecosystem Blueprint §15.
+  # No network calls, no credentials needed (see packages/hermes/README.md verification table);
+  # a live Claude/Supabase check stays a manual step until ANTHROPIC_API_KEY/SUPABASE_SERVICE_ROLE_KEY
+  # land, per BLOCKED-ON-NICK.md.
+  hermes:
+    name: Hermes-lite — typecheck + unit tests
+    runs-on: ubuntu-latest
+    needs: guardrails
+    defaults:
+      run:
+        working-directory: packages/hermes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
   # Placeholder — becomes real once apps/cockpit has a package.json (Phase 6).
   # Never delete this job silently; replace its body when there's something to build.
   build:

@@ -30,6 +30,10 @@ packages/
     migrations/           versioned SQL, applied in order (entities, clients, projects, tasks,
                            correction_rounds, RLS policies, entity-law triggers)
     RLS_ATTACK_TEST_RESULTS.md   last real attack-test run against the sandbox project
+  hermes/
+    src/                  Hermes-lite (Phase 3 stand-in controller) — see packages/hermes/README.md
+                           for what it is, why it's a stand-in, and its verification status
+    test/                 unit tests, no credentials needed — `npm test` from packages/hermes/
 scripts/
   rls_attack_test.sql     the actual isolation attack test, re-runnable against any fresh instance
 docs/                     source planning documents (do not treat this repo's other files as replacing

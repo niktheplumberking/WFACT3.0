@@ -16,7 +16,8 @@ rows, mark them done so there's a record of when they closed.
 | Motion Sites MCP credentials | Day 9 | **OPEN** |
 | 21st.dev premium account credentials | Day 9 | **OPEN** |
 | Higgsfield MCP credentials | Day 9 | **OPEN** |
-| Claude / Anthropic API billing confirmation (existing WFACT billing, or standing one up) | Day 1 — blocking | **OPEN** |
+| Claude / Anthropic API billing confirmation (existing WFACT billing, or standing one up) | Day 1 — blocking | **OPEN** — Phase 3's Hermes-lite (`packages/hermes/`) is fully built and tested against it being unset; the one thing it can't do without this is the actual live smoke test (`npm run ask`). Everything else is verified — see `packages/hermes/README.md`. |
+| `SUPABASE_SERVICE_ROLE_KEY` for `wfact-3-sandbox` | Day 6 — blocking Phase 3's live smoke test | **OPEN** — new finding, Phase 3: tested Hermes-lite's state tool against the sandbox with only the anon key, and it correctly connects but returns 0 rows even though fixture project data exists, because RLS blocks an unauthenticated read (the anon key alone has no session). Hermes needs the service-role key to read real client status; the anon key on its own will always look empty. See `PROGRESS.md` Phase 3 and the lessons-ledger proposal below. |
 
 ## Decisions (only Nick can make these)
 
@@ -25,6 +26,7 @@ rows, mark them done so there's a record of when they closed.
 | Which 2 entities (DreamSign + Bennett & Co, Rizm separate?) | Phase 2 schema | **OPEN** — using placeholder in `memory/context.md` §2 per fallback |
 | Fresh repo vs. carrying 2.0's structure forward | Phase 1 | **PROCEEDING** as fresh repo per Ecosystem Blueprint §15 recommendation; needs Nick's explicit sign-off |
 | Confirm the governance split (table in `CLAUDE.md` §3) | Day 1 | **OPEN** |
+| Phase 3 used the Operator's Manual's own named fallback — "Hermes-lite" (`packages/hermes/`) instead of self-hosting the real Hermes Agent, because the infra/budget item above is still open at Day 6 | Nothing blocked — the Manual pre-authorizes this fallback | **TELL NICK, DON'T JUST LOG IT** — the Manual says "tell Nick if you do this, don't substitute silently." Not yet actually communicated to Nick; this row is that disclosure in writing, real conversation still owed. |
 
 ## Carry-forward for the real project (not blocking this sprint)
 

@@ -1,0 +1,23 @@
+{
+  "name": "@wfact/hermes-lite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phase 3 stand-in for the self-hosted Hermes Agent — see README.md for why, and CLAUDE.md §8 for the substitution-disclosure rule this follows.",
+  "type": "module",
+  "scripts": {
+    "ask": "tsx src/cli.ts",
+    "test": "tsx --test test/*.test.ts",
+    "verify:supabase": "tsx scripts/verify-supabase-connection.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.0",
+    "@supabase/supabase-js": "^2.58.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

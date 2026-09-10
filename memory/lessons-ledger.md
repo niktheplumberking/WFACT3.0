@@ -53,3 +53,19 @@ Format per entry: date, what happened, what it cost, the rule going forward.
    `packages/db/RLS_ATTACK_TEST_RESULTS.md` for the full trace. Full credit to the discipline in
    `CLAUDE.md` §1 for this being caught in Phase 2 against a sandbox, not months later against a real
    client's data.
+
+2. **[PROPOSED, unapproved] "It connects" is not "it works" for anything RLS-protected — a controller
+   answering status questions needs the service-role key, not the anon key, even for read-only work.**
+   Phase 3: Hermes-lite's Supabase-backed state tool was pointed at `wfact-3-sandbox` using only
+   `SUPABASE_ANON_KEY` (the only key available without a service-role secret). It connected cleanly,
+   the query ran with no error, and it returned **zero rows** — even though the same query, run via
+   the Supabase admin path, returns real fixture data. The RLS policies (proven correct in Phase 2)
+   were doing exactly their job: blocking an unauthenticated request. Nothing failed loudly; it just
+   quietly looked like "no client data exists yet," which is a plausible-sounding wrong answer, not
+   an obvious one. → Proposed rule: when wiring any internal, trusted service (a controller, a cron
+   job, an agent) to Supabase for read access, treat "connects successfully" and "returns real rows"
+   as two separate checks, always test both, and default such services to the service-role key
+   (server-side only, per CLAUDE.md §6's secrets-manager rule) rather than the anon key — the anon
+   key is for client-facing, RLS-scoped access, not for an internal reader that needs to see
+   everything a human operator could see. See `packages/hermes/README.md`'s verification table and
+   `BLOCKED-ON-NICK.md` for where this is tracked.

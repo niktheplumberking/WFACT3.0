@@ -66,7 +66,45 @@ rules land.
 
 ## Phase 3 — Hermes Controller Core (Days 6–8 · 14 hrs)
 
-Not started.
+**In progress**, built as **Hermes-lite**, the Operator's Manual's own named fallback ("Hermes
+self-hosting eats more time than budgeted → build Hermes-lite... Tell Nick if you do this, don't
+substitute silently"). Self-hosting real Hermes has an open infra/budget dependency in
+`BLOCKED-ON-NICK.md` ("Where the self-hosted second brain + Hermes run") that's still open at Day 6
+— per the fallback rule, that blocks real Hermes without blocking this phase. **Nick needs to be
+told about this substitution explicitly** — it isn't hidden, but it hasn't been said to him yet.
+
+- [x] Wire to memory (`context.md` + per-client files) — `packages/hermes/src/tools/memoryTools.ts`,
+      read-only, path-traversal-guarded, tested against the real `memory/context.md`
+- [x] Wire to Supabase state — `packages/hermes/src/state.ts` + `tools/stateTools.ts`, read-only,
+      no write path exists in this package at all
+- [x] Schema-validated tool wrapper + allowlist (CLAUDE.md §6) — `packages/hermes/src/tools/schema.ts`,
+      the allowlist itself is `tools/registry.ts`; nothing else can be called
+- [x] Build the plain-language tone filter — `packages/hermes/src/toneFilter.ts`, built in this phase
+      per the team's own call, not bolted on later
+- [x] Bounded retry / escalation (CLAUDE.md §6: bounded, exponential backoff, hard cap, then
+      escalate) — `packages/hermes/src/escalation.ts`
+- [x] Configure Claude as the first model behind it — `packages/hermes/src/modelClient.ts`
+      (`ClaudeModelClient`); one model path only, per Blueprint Phase 3 scope
+- [x] 26 automated tests, no live credentials needed — `packages/hermes/test/`, run via `npm test`,
+      wired as a required CI job (`.github/workflows/ci.yml`, `hermes` job)
+- [x] Live-query shape verified against the real `wfact-3-sandbox` Supabase project (admin path,
+      `execute_sql`, 2026-09-10) — the `entities`/`clients`/`projects` join `state.ts` uses is correct
+- [x] **New finding, not previously known**: verified this app's *own* credential path (not the
+      admin path above) actually reaches Supabase — it does, but with only the anon key it returns
+      **0 rows** even though fixture data exists, because RLS correctly blocks an unauthenticated
+      request. Hermes needs `SUPABASE_SERVICE_ROLE_KEY` to answer real status questions, not just
+      `SUPABASE_ANON_KEY`. Logged as a lessons-ledger proposal; added to `BLOCKED-ON-NICK.md`.
+- [ ] Smoke test with a real status question — **BLOCKED**: `ANTHROPIC_API_KEY` is unset
+      (`BLOCKED-ON-NICK.md`, "Claude / Anthropic API billing confirmation," open since Day 1). The CLI
+      (`npm run ask -- "..."`) refuses to fabricate an answer without a real key rather than mocking
+      around the gap — see `packages/hermes/README.md`'s verification table for exactly what is and
+      isn't proven yet.
+
+**Exit check** (not yet met): *"Hermes (or its stand-in) answers 'what's the status of X' correctly
+and in plain language, sourced from real memory and state, not a canned response."* Everything up to
+the live model call is built and independently tested against real files and a real database. The
+call itself is blocked on `ANTHROPIC_API_KEY`. Not marking this done until that call actually runs
+and is checked by something other than this same agent's own report — see `CLAUDE.md` §1.
 
 ## Phase 4 — Model Routing & Front-End Loop v1 (Days 9–12 · 22 hrs)
 
