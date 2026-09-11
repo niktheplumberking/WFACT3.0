@@ -1,0 +1,4512 @@
+{
+  "nodes": [
+    {
+      "id": "claude_hooks_notification_token_display",
+      "label": "notification-token-display.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/notification-token-display.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_notification_token_display_sh__entry",
+      "label": "notification-token-display.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/notification-token-display.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_post_write_token_diff",
+      "label": "post-write-token-diff.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/post-write-token-diff.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_post_write_token_diff_sh__entry",
+      "label": "post-write-token-diff.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/post-write-token-diff.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_pre_tool_bash_guard",
+      "label": "pre-tool-bash-guard.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/pre-tool-bash-guard.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_pre_tool_bash_guard_sh__entry",
+      "label": "pre-tool-bash-guard.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/pre-tool-bash-guard.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_pre_tool_read_guard",
+      "label": "pre-tool-read-guard.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/pre-tool-read-guard.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_pre_tool_read_guard_sh__entry",
+      "label": "pre-tool-read-guard.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/pre-tool-read-guard.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_pre_tool_token_guard",
+      "label": "pre-tool-token-guard.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/pre-tool-token-guard.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_pre_tool_token_guard_sh__entry",
+      "label": "pre-tool-token-guard.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/pre-tool-token-guard.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_session_end_token_report",
+      "label": "session-end-token-report.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/session-end-token-report.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_session_end_token_report_sh__entry",
+      "label": "session-end-token-report.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/session-end-token-report.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_stop_path_guard",
+      "label": "stop-path-guard.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/stop-path-guard.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_stop_path_guard_sh__entry",
+      "label": "stop-path-guard.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/stop-path-guard.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_stop_session_snapshot",
+      "label": "stop-session-snapshot.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/stop-session-snapshot.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_stop_session_snapshot_sh__entry",
+      "label": "stop-session-snapshot.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/stop-session-snapshot.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_user_prompt_ghost_scanner",
+      "label": "user-prompt-ghost-scanner.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/user-prompt-ghost-scanner.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_user_prompt_ghost_scanner_sh__entry",
+      "label": "user-prompt-ghost-scanner.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/user-prompt-ghost-scanner.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_user_prompt_inject_context",
+      "label": "user-prompt-inject-context.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/user-prompt-inject-context.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_user_prompt_inject_context_sh__entry",
+      "label": "user-prompt-inject-context.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/user-prompt-inject-context.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_user_prompt_inject_snapshot",
+      "label": "user-prompt-inject-snapshot.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/user-prompt-inject-snapshot.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_user_prompt_inject_snapshot_sh__entry",
+      "label": "user-prompt-inject-snapshot.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/user-prompt-inject-snapshot.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_user_prompt_validate_claude_md",
+      "label": "user-prompt-validate-claude-md.sh",
+      "file_type": "code",
+      "source_file": ".claude/hooks/user-prompt-validate-claude-md.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "claude_hooks_user_prompt_validate_claude_md_sh__entry",
+      "label": "user-prompt-validate-claude-md.sh script",
+      "file_type": "code",
+      "source_file": ".claude/hooks/user-prompt-validate-claude-md.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0001_init_schema",
+      "label": "0001_init_schema.sql",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": null,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0001_init_schema_public_entities",
+      "label": "public.entities",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L11",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0001_init_schema_public_clients",
+      "label": "public.clients",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L26",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0001_init_schema_public_profiles",
+      "label": "public.profiles",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L38",
+      "_origin": "ast"
+    },
+    {
+      "id": "auth_users",
+      "label": "auth.users",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0001_init_schema_public_profile_clients",
+      "label": "public.profile_clients",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L46",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0001_init_schema_public_projects",
+      "label": "public.projects",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L59",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0001_init_schema_public_tasks",
+      "label": "public.tasks",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L80",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0001_init_schema_public_correction_rounds",
+      "label": "public.correction_rounds",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L99",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0002_entity_consistency_triggers",
+      "label": "0002_entity_consistency_triggers.sql",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": null,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0002_entity_consistency_triggers_public_enforce_project_entity_matches_client",
+      "label": "public.enforce_project_entity_matches_client()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0002_entity_consistency_triggers_sql_public_clients",
+      "label": "public.clients",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0002_entity_consistency_triggers_trg_project_entity_consistency",
+      "label": "trg_project_entity_consistency",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L28",
+      "_origin": "ast"
+    },
+    {
+      "id": "public_enforce_project_entity_matches_client",
+      "label": "public.enforce_project_entity_matches_client",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0002_entity_consistency_triggers_public_enforce_task_entity_matches_project",
+      "label": "public.enforce_task_entity_matches_project()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L32",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0002_entity_consistency_triggers_sql_public_projects",
+      "label": "public.projects",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0002_entity_consistency_triggers_trg_task_entity_consistency",
+      "label": "trg_task_entity_consistency",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L53",
+      "_origin": "ast"
+    },
+    {
+      "id": "public_enforce_task_entity_matches_project",
+      "label": "public.enforce_task_entity_matches_project",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0003_rls_policies",
+      "label": "0003_rls_policies.sql",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": null,
+      "_origin": "ast"
+    },
+    {
+      "id": "public_entities",
+      "label": "public.entities",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0003_rls_policies_sql_public_profiles",
+      "label": "public.profiles",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0003_rls_policies_sql_public_profile_clients",
+      "label": "public.profile_clients",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0003_rls_policies_sql_public_clients",
+      "label": "public.clients",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0003_rls_policies_sql_public_projects",
+      "label": "public.projects",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "public_tasks",
+      "label": "public.tasks",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "public_correction_rounds",
+      "label": "public.correction_rounds",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0003_rls_policies_public_current_role_name",
+      "label": "public.current_role_name()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L19",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0003_rls_policies_public_is_owner_or_admin",
+      "label": "public.is_owner_or_admin()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L29",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0003_rls_policies_public_assigned_client_ids",
+      "label": "public.assigned_client_ids()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L39",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0004_security_advisor_fixes",
+      "label": "0004_security_advisor_fixes.sql",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": null,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0004_security_advisor_fixes_public_current_role_name",
+      "label": "public.current_role_name()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0004_security_advisor_fixes_sql_public_profiles",
+      "label": "public.profiles",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0004_security_advisor_fixes_public_is_owner_or_admin",
+      "label": "public.is_owner_or_admin()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L26",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0004_security_advisor_fixes_public_assigned_client_ids",
+      "label": "public.assigned_client_ids()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L36",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0004_security_advisor_fixes_sql_public_profile_clients",
+      "label": "public.profile_clients",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0005_fix_rls_recursion",
+      "label": "0005_fix_rls_recursion.sql",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": null,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0005_fix_rls_recursion_private_current_role_name",
+      "label": "private.current_role_name()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L47",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0005_fix_rls_recursion_sql_public_profiles",
+      "label": "public.profiles",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0005_fix_rls_recursion_private_is_owner_or_admin",
+      "label": "private.is_owner_or_admin()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L57",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0005_fix_rls_recursion_private_assigned_client_ids",
+      "label": "private.assigned_client_ids()",
+      "file_type": "code",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L67",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_db_migrations_0005_fix_rls_recursion_sql_public_profile_clients",
+      "label": "public.profile_clients",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package",
+      "label": "package.json",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_name",
+      "label": "name",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L2",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_version",
+      "label": "version",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L3",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_private",
+      "label": "private",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L4",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_description",
+      "label": "description",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L5",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_type",
+      "label": "type",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_scripts",
+      "label": "scripts",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_scripts_ask",
+      "label": "ask",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_scripts_test",
+      "label": "test",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L9",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_scripts_verify_supabase",
+      "label": "verify:supabase",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L10",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_scripts_typecheck",
+      "label": "typecheck",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L11",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_dependencies",
+      "label": "dependencies",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L13",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_dependencies_anthropic_ai_sdk",
+      "label": "@anthropic-ai/sdk",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L14",
+      "_origin": "ast"
+    },
+    {
+      "id": "ref_anthropic_ai_sdk",
+      "label": "@anthropic-ai/sdk",
+      "file_type": "concept",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L14",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_dependencies_supabase_supabase_js",
+      "label": "@supabase/supabase-js",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
+      "id": "ref_supabase_supabase_js",
+      "label": "@supabase/supabase-js",
+      "file_type": "concept",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_dependencies_zod",
+      "label": "zod",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "ref_zod",
+      "label": "zod",
+      "file_type": "concept",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L16",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_devdependencies",
+      "label": "devDependencies",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L18",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_devdependencies_types_node",
+      "label": "@types/node",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L19",
+      "_origin": "ast"
+    },
+    {
+      "id": "ref_types_node",
+      "label": "@types/node",
+      "file_type": "concept",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L19",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_devdependencies_tsx",
+      "label": "tsx",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L20",
+      "_origin": "ast"
+    },
+    {
+      "id": "ref_tsx",
+      "label": "tsx",
+      "file_type": "concept",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L20",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_package_devdependencies_typescript",
+      "label": "typescript",
+      "file_type": "code",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L21",
+      "_origin": "ast"
+    },
+    {
+      "id": "ref_typescript",
+      "label": "typescript",
+      "file_type": "concept",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L21",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_scripts_verify_supabase_connection",
+      "label": "verify-supabase-connection.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/scripts/verify-supabase-connection.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_scripts_verify_supabase_connection_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "packages/hermes/scripts/verify-supabase-connection.ts",
+      "source_location": "L19",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_cli",
+      "label": "cli.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_cli_main",
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L12",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_controller",
+      "label": "controller.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_controller_known_entities",
+      "label": "KNOWN_ENTITIES",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L21",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_controller_detectentityslug",
+      "label": "detectEntitySlug()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L26",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_controller_hermesanswer",
+      "label": "HermesAnswer",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L36",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_controller_hermesliteoptions",
+      "label": "HermesLiteOptions",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L46",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_controller_hermeslite",
+      "label": "HermesLite",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L52",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_controller_hermeslite_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L57",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_controller_hermeslite_answerstatusquestion",
+      "label": ".answerStatusQuestion()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L63",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_escalation",
+      "label": "escalation.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_escalation_escalationerror",
+      "label": "EscalationError",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L6",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_escalation_escalationerror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L7",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_escalation_retryoptions",
+      "label": "RetryOptions",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L17",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_escalation_defaultsleep",
+      "label": "defaultSleep()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L24",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_escalation_withboundedretry",
+      "label": "withBoundedRetry()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L26",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient",
+      "label": "modelClient.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_modelrequest",
+      "label": "ModelRequest",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L11",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_modelclient",
+      "label": "ModelClient",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L16",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_modelclient_complete",
+      "label": ".complete()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L18",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_modelnotconfigurederror",
+      "label": "ModelNotConfiguredError",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L21",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_modelnotconfigurederror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L22",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_claudemodelclient",
+      "label": "ClaudeModelClient",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L34",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_claudemodelclient_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L39",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_claudemodelclient_complete",
+      "label": ".complete()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L44",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_modelclientfromenv",
+      "label": "modelClientFromEnv()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L64",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_mockmodelclient",
+      "label": "MockModelClient",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L82",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_mockmodelclient_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L86",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_modelclient_mockmodelclient_complete",
+      "label": ".complete()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L88",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_state",
+      "label": "state.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_state_projectstatusrow",
+      "label": "ProjectStatusRow",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L12",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_state_statereader",
+      "label": "StateReader",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L21",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_state_statereader_getprojectstatuses",
+      "label": ".getProjectStatuses()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L23",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_state_supabasestatereader",
+      "label": "SupabaseStateReader",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L26",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_state_supabasestatereader_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L29",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_state_supabasestatereader_getprojectstatuses",
+      "label": ".getProjectStatuses()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L33",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_state_statereaderfromenv",
+      "label": "stateReaderFromEnv()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L70",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tonefilter",
+      "label": "toneFilter.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tonefilter_jargon_glossary",
+      "label": "JARGON_GLOSSARY",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L14",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tonefilter_glossary_entries",
+      "label": "GLOSSARY_ENTRIES",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L33",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tonefilter_escaperegexp",
+      "label": "escapeRegExp()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L35",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tonefilter_tonefilterresult",
+      "label": "ToneFilterResult",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L39",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tonefilter_applytonefilter",
+      "label": "applyToneFilter()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L47",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tonefilter_buildplainlanguagesystemprompt",
+      "label": "buildPlainLanguageSystemPrompt()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L67",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_memorytools",
+      "label": "memoryTools.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_memorytools_reporoot",
+      "label": "repoRoot()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_memorytools_readcontextinput",
+      "label": "readContextInput",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L20",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_memorytools_readcontextoutput",
+      "label": "readContextOutput",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L21",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_memorytools_readcontexttool",
+      "label": "readContextTool",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L26",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_memorytools_readclientinput",
+      "label": "readClientInput",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L38",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_memorytools_readclientoutput",
+      "label": "readClientOutput",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L43",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_memorytools_readclientmemorytool",
+      "label": "readClientMemoryTool",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L49",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_registry",
+      "label": "registry.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_registry_buildtoolregistry",
+      "label": "buildToolRegistry()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L11",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema",
+      "label": "schema.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_toolnotallowlistederror",
+      "label": "ToolNotAllowlistedError",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L14",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_toolnotallowlistederror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_toolinputvalidationerror",
+      "label": "ToolInputValidationError",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L24",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_toolinputvalidationerror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L25",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_tooloutputvalidationerror",
+      "label": "ToolOutputValidationError",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L34",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_tooloutputvalidationerror_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L35",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_tooldefinition",
+      "label": "ToolDefinition",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L47",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_toolregistry",
+      "label": "ToolRegistry",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L57",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_toolregistry_register",
+      "label": ".register()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L61",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_toolregistry_listallowlisted",
+      "label": ".listAllowlisted()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L70",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_schema_toolregistry_invoke",
+      "label": ".invoke()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L74",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_statetools",
+      "label": "stateTools.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_statetools_projectstatusinput",
+      "label": "projectStatusInput",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_statetools_projectstatusoutput",
+      "label": "projectStatusOutput",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L11",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_src_tools_statetools_createprojectstatustool",
+      "label": "createProjectStatusTool()",
+      "file_type": "code",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L29",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_controller_test",
+      "label": "controller.test.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_controller_test_fakestatereader",
+      "label": "FakeStateReader",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L8",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_controller_test_fakestatereader_constructor",
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L9",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_controller_test_fakestatereader_getprojectstatuses",
+      "label": ".getProjectStatuses()",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L10",
+      "_callable": true,
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_controller_test_fakerows",
+      "label": "fakeRows",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L15",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_escalation_test",
+      "label": "escalation.test.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/escalation.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_memorytools_test",
+      "label": "memoryTools.test.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_schema_test",
+      "label": "schema.test.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_schema_test_echotool",
+      "label": "echoTool",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L11",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_test_tonefilter_test",
+      "label": "toneFilter.test.ts",
+      "file_type": "code",
+      "source_file": "packages/hermes/test/toneFilter.test.ts",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig",
+      "label": "tsconfig.json",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L1",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L2",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_target",
+      "label": "target",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L3",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_module",
+      "label": "module",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L4",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_moduleresolution",
+      "label": "moduleResolution",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L5",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_strict",
+      "label": "strict",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L6",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_nouncheckedindexedaccess",
+      "label": "noUncheckedIndexedAccess",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L7",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_esmoduleinterop",
+      "label": "esModuleInterop",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L8",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_skiplibcheck",
+      "label": "skipLibCheck",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L9",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_resolvejsonmodule",
+      "label": "resolveJsonModule",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L10",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_compileroptions_outdir",
+      "label": "outDir",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L11",
+      "_origin": "ast"
+    },
+    {
+      "id": "packages_hermes_tsconfig_include",
+      "label": "include",
+      "file_type": "code",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L13",
+      "_origin": "ast"
+    },
+    {
+      "id": "scripts_rls_attack_test",
+      "label": "rls_attack_test.sql",
+      "file_type": "code",
+      "source_file": "scripts/rls_attack_test.sql",
+      "source_location": null,
+      "_origin": "ast"
+    }
+  ],
+  "edges": [
+    {
+      "source": "claude_hooks_notification_token_display",
+      "target": "claude_hooks_notification_token_display_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/notification-token-display.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_post_write_token_diff",
+      "target": "claude_hooks_post_write_token_diff_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/post-write-token-diff.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_pre_tool_bash_guard",
+      "target": "claude_hooks_pre_tool_bash_guard_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/pre-tool-bash-guard.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_pre_tool_read_guard",
+      "target": "claude_hooks_pre_tool_read_guard_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/pre-tool-read-guard.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_pre_tool_token_guard",
+      "target": "claude_hooks_pre_tool_token_guard_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/pre-tool-token-guard.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_session_end_token_report",
+      "target": "claude_hooks_session_end_token_report_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/session-end-token-report.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_stop_path_guard",
+      "target": "claude_hooks_stop_path_guard_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/stop-path-guard.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_stop_session_snapshot",
+      "target": "claude_hooks_stop_session_snapshot_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/stop-session-snapshot.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_user_prompt_ghost_scanner",
+      "target": "claude_hooks_user_prompt_ghost_scanner_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/user-prompt-ghost-scanner.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_user_prompt_inject_context",
+      "target": "claude_hooks_user_prompt_inject_context_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/user-prompt-inject-context.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_user_prompt_inject_snapshot",
+      "target": "claude_hooks_user_prompt_inject_snapshot_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/user-prompt-inject-snapshot.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "claude_hooks_user_prompt_validate_claude_md",
+      "target": "claude_hooks_user_prompt_validate_claude_md_sh__entry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/hooks/user-prompt-validate-claude-md.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema",
+      "target": "packages_db_migrations_0001_init_schema_public_entities",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema",
+      "target": "packages_db_migrations_0001_init_schema_public_clients",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_clients",
+      "target": "packages_db_migrations_0001_init_schema_public_entities",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema",
+      "target": "packages_db_migrations_0001_init_schema_public_profiles",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_profiles",
+      "target": "auth_users",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema",
+      "target": "packages_db_migrations_0001_init_schema_public_profile_clients",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_profile_clients",
+      "target": "packages_db_migrations_0001_init_schema_public_profiles",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_profile_clients",
+      "target": "packages_db_migrations_0001_init_schema_public_clients",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema",
+      "target": "packages_db_migrations_0001_init_schema_public_projects",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_projects",
+      "target": "packages_db_migrations_0001_init_schema_public_clients",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_projects",
+      "target": "packages_db_migrations_0001_init_schema_public_entities",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema",
+      "target": "packages_db_migrations_0001_init_schema_public_tasks",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_tasks",
+      "target": "packages_db_migrations_0001_init_schema_public_projects",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_tasks",
+      "target": "packages_db_migrations_0001_init_schema_public_entities",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema",
+      "target": "packages_db_migrations_0001_init_schema_public_correction_rounds",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L99",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0001_init_schema_public_correction_rounds",
+      "target": "packages_db_migrations_0001_init_schema_public_projects",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0001_init_schema.sql",
+      "source_location": "L99",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0002_entity_consistency_triggers",
+      "target": "packages_db_migrations_0002_entity_consistency_triggers_public_enforce_project_entity_matches_client",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0002_entity_consistency_triggers_public_enforce_project_entity_matches_client",
+      "target": "packages_db_migrations_0002_entity_consistency_triggers_sql_public_clients",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0002_entity_consistency_triggers",
+      "target": "packages_db_migrations_0002_entity_consistency_triggers_trg_project_entity_consistency",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0002_entity_consistency_triggers_trg_project_entity_consistency",
+      "target": "public_enforce_project_entity_matches_client",
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0002_entity_consistency_triggers",
+      "target": "packages_db_migrations_0002_entity_consistency_triggers_public_enforce_task_entity_matches_project",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0002_entity_consistency_triggers_public_enforce_task_entity_matches_project",
+      "target": "packages_db_migrations_0002_entity_consistency_triggers_sql_public_projects",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0002_entity_consistency_triggers",
+      "target": "packages_db_migrations_0002_entity_consistency_triggers_trg_task_entity_consistency",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0002_entity_consistency_triggers_trg_task_entity_consistency",
+      "target": "public_enforce_task_entity_matches_project",
+      "relation": "triggers",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0002_entity_consistency_triggers.sql",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0003_rls_policies",
+      "target": "packages_db_migrations_0003_rls_policies_public_current_role_name",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0003_rls_policies_public_current_role_name",
+      "target": "packages_db_migrations_0003_rls_policies_sql_public_profiles",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0003_rls_policies",
+      "target": "packages_db_migrations_0003_rls_policies_public_is_owner_or_admin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0003_rls_policies_public_is_owner_or_admin",
+      "target": "packages_db_migrations_0003_rls_policies_sql_public_profiles",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0003_rls_policies",
+      "target": "packages_db_migrations_0003_rls_policies_public_assigned_client_ids",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0003_rls_policies_public_assigned_client_ids",
+      "target": "packages_db_migrations_0003_rls_policies_sql_public_profile_clients",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0003_rls_policies.sql",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0004_security_advisor_fixes",
+      "target": "packages_db_migrations_0004_security_advisor_fixes_public_current_role_name",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0004_security_advisor_fixes_public_current_role_name",
+      "target": "packages_db_migrations_0004_security_advisor_fixes_sql_public_profiles",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0004_security_advisor_fixes",
+      "target": "packages_db_migrations_0004_security_advisor_fixes_public_is_owner_or_admin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0004_security_advisor_fixes_public_is_owner_or_admin",
+      "target": "packages_db_migrations_0004_security_advisor_fixes_sql_public_profiles",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0004_security_advisor_fixes",
+      "target": "packages_db_migrations_0004_security_advisor_fixes_public_assigned_client_ids",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0004_security_advisor_fixes_public_assigned_client_ids",
+      "target": "packages_db_migrations_0004_security_advisor_fixes_sql_public_profile_clients",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0004_security_advisor_fixes.sql",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0005_fix_rls_recursion",
+      "target": "packages_db_migrations_0005_fix_rls_recursion_private_current_role_name",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0005_fix_rls_recursion_private_current_role_name",
+      "target": "packages_db_migrations_0005_fix_rls_recursion_sql_public_profiles",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0005_fix_rls_recursion",
+      "target": "packages_db_migrations_0005_fix_rls_recursion_private_is_owner_or_admin",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0005_fix_rls_recursion_private_is_owner_or_admin",
+      "target": "packages_db_migrations_0005_fix_rls_recursion_sql_public_profiles",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0005_fix_rls_recursion",
+      "target": "packages_db_migrations_0005_fix_rls_recursion_private_assigned_client_ids",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_db_migrations_0005_fix_rls_recursion_private_assigned_client_ids",
+      "target": "packages_db_migrations_0005_fix_rls_recursion_sql_public_profile_clients",
+      "relation": "reads_from",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/db/migrations/0005_fix_rls_recursion.sql",
+      "source_location": "L74",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_name",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_version",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_private",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_description",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_type",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_scripts",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_scripts",
+      "target": "packages_hermes_package_scripts_ask",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_scripts",
+      "target": "packages_hermes_package_scripts_test",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_scripts",
+      "target": "packages_hermes_package_scripts_verify_supabase",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_scripts",
+      "target": "packages_hermes_package_scripts_typecheck",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_dependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_dependencies",
+      "target": "packages_hermes_package_dependencies_anthropic_ai_sdk",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "ref_anthropic_ai_sdk",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L14",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_dependencies",
+      "target": "packages_hermes_package_dependencies_supabase_supabase_js",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "ref_supabase_supabase_js",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L15",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_dependencies",
+      "target": "packages_hermes_package_dependencies_zod",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "ref_zod",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L16",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_devdependencies",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_devdependencies",
+      "target": "packages_hermes_package_devdependencies_types_node",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "ref_types_node",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L19",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_devdependencies",
+      "target": "packages_hermes_package_devdependencies_tsx",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "ref_tsx",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L20",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package_devdependencies",
+      "target": "packages_hermes_package_devdependencies_typescript",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "ref_typescript",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L21",
+      "weight": 1.0,
+      "context": "import",
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_scripts_verify_supabase_connection",
+      "target": "packages_hermes_src_state",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/scripts/verify-supabase-connection.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_scripts_verify_supabase_connection",
+      "target": "packages_hermes_src_state_statereaderfromenv",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/scripts/verify-supabase-connection.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_scripts_verify_supabase_connection",
+      "target": "packages_hermes_scripts_verify_supabase_connection_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/scripts/verify-supabase-connection.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_tools_registry",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_tools_registry_buildtoolregistry",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_state",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_state_statereaderfromenv",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_modelclient",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_modelclient_modelclientfromenv",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_controller",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_controller_hermeslite",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli",
+      "target": "packages_hermes_src_cli_main",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_tools_schema",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "type_only": true,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_tools_schema_toolregistry",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_modelclient",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "type_only": true,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_modelclient_modelclient",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_tonefilter",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_tonefilter_applytonefilter",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_tonefilter_buildplainlanguagesystemprompt",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_tonefilter_tonefilterresult",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_escalation",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_escalation_withboundedretry",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_escalation_escalationerror",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_controller_known_entities",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_controller_detectentityslug",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_controller_hermesanswer",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_controller_hermesliteoptions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller",
+      "target": "packages_hermes_src_controller_hermeslite",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermeslite",
+      "target": "packages_hermes_src_controller_hermeslite_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermeslite",
+      "target": "packages_hermes_src_controller_hermeslite_answerstatusquestion",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermeslite_answerstatusquestion",
+      "target": "packages_hermes_src_controller_detectentityslug",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_escalation",
+      "target": "packages_hermes_src_escalation_escalationerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_escalation_escalationerror",
+      "target": "packages_hermes_src_escalation_escalationerror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_escalation",
+      "target": "packages_hermes_src_escalation_retryoptions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_escalation",
+      "target": "packages_hermes_src_escalation_defaultsleep",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_escalation",
+      "target": "packages_hermes_src_escalation_withboundedretry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_escalation_withboundedretry",
+      "target": "packages_hermes_src_escalation_escalationerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/escalation.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient",
+      "target": "ref_anthropic_ai_sdk",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient",
+      "target": "packages_hermes_src_modelclient_modelrequest",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient",
+      "target": "packages_hermes_src_modelclient_modelclient",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_modelclient",
+      "target": "packages_hermes_src_modelclient_modelclient_complete",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient",
+      "target": "packages_hermes_src_modelclient_modelnotconfigurederror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_modelnotconfigurederror",
+      "target": "packages_hermes_src_modelclient_modelnotconfigurederror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient",
+      "target": "packages_hermes_src_modelclient_claudemodelclient",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_claudemodelclient",
+      "target": "packages_hermes_src_modelclient_claudemodelclient_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_claudemodelclient",
+      "target": "packages_hermes_src_modelclient_claudemodelclient_complete",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient",
+      "target": "packages_hermes_src_modelclient_modelclientfromenv",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient",
+      "target": "packages_hermes_src_modelclient_mockmodelclient",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_mockmodelclient",
+      "target": "packages_hermes_src_modelclient_mockmodelclient_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_mockmodelclient",
+      "target": "packages_hermes_src_modelclient_mockmodelclient_complete",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L88",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_modelclientfromenv",
+      "target": "packages_hermes_src_modelclient_claudemodelclient",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state",
+      "target": "ref_supabase_supabase_js",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state",
+      "target": "packages_hermes_src_state_projectstatusrow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state",
+      "target": "packages_hermes_src_state_statereader",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state_statereader",
+      "target": "packages_hermes_src_state_statereader_getprojectstatuses",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state",
+      "target": "packages_hermes_src_state_supabasestatereader",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state_supabasestatereader",
+      "target": "packages_hermes_src_state_supabasestatereader_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state_supabasestatereader",
+      "target": "packages_hermes_src_state_supabasestatereader_getprojectstatuses",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state",
+      "target": "packages_hermes_src_state_statereaderfromenv",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state_statereaderfromenv",
+      "target": "packages_hermes_src_state_supabasestatereader",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L84",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tonefilter",
+      "target": "packages_hermes_src_tonefilter_jargon_glossary",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tonefilter",
+      "target": "packages_hermes_src_tonefilter_glossary_entries",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tonefilter",
+      "target": "packages_hermes_src_tonefilter_escaperegexp",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tonefilter",
+      "target": "packages_hermes_src_tonefilter_tonefilterresult",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tonefilter",
+      "target": "packages_hermes_src_tonefilter_applytonefilter",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tonefilter",
+      "target": "packages_hermes_src_tonefilter_buildplainlanguagesystemprompt",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tonefilter_applytonefilter",
+      "target": "packages_hermes_src_tonefilter_escaperegexp",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/toneFilter.ts",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "ref_node_fs_promises",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "ref_node_path",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "ref_zod",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_schema",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "type_only": true,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_schema_tooldefinition",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_memorytools_reporoot",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_memorytools_readcontextinput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_memorytools_readcontextoutput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_memorytools_readcontexttool",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_memorytools_readclientinput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_memorytools_readclientoutput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_memorytools",
+      "target": "packages_hermes_src_tools_memorytools_readclientmemorytool",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/memoryTools.ts",
+      "source_location": "L49",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_tools_schema",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_tools_schema_toolregistry",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_tools_memorytools",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_tools_memorytools_readcontexttool",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_tools_memorytools_readclientmemorytool",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_tools_statetools",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_tools_statetools_createprojectstatustool",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_state",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "type_only": true,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_state_statereader",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry",
+      "target": "packages_hermes_src_tools_registry_buildtoolregistry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema",
+      "target": "ref_zod",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema",
+      "target": "packages_hermes_src_tools_schema_toolnotallowlistederror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_toolnotallowlistederror",
+      "target": "packages_hermes_src_tools_schema_toolnotallowlistederror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema",
+      "target": "packages_hermes_src_tools_schema_toolinputvalidationerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_toolinputvalidationerror",
+      "target": "packages_hermes_src_tools_schema_toolinputvalidationerror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema",
+      "target": "packages_hermes_src_tools_schema_tooloutputvalidationerror",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_tooloutputvalidationerror",
+      "target": "packages_hermes_src_tools_schema_tooloutputvalidationerror_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema",
+      "target": "packages_hermes_src_tools_schema_tooldefinition",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema",
+      "target": "packages_hermes_src_tools_schema_toolregistry",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_toolregistry",
+      "target": "packages_hermes_src_tools_schema_toolregistry_register",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_toolregistry",
+      "target": "packages_hermes_src_tools_schema_toolregistry_listallowlisted",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_toolregistry",
+      "target": "packages_hermes_src_tools_schema_toolregistry_invoke",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L74",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_toolregistry_invoke",
+      "target": "packages_hermes_src_tools_schema_toolnotallowlistederror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L77",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_toolregistry_invoke",
+      "target": "packages_hermes_src_tools_schema_toolinputvalidationerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_schema_toolregistry_invoke",
+      "target": "packages_hermes_src_tools_schema_tooloutputvalidationerror",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/schema.ts",
+      "source_location": "L89",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools",
+      "target": "ref_zod",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools",
+      "target": "packages_hermes_src_tools_schema",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "type_only": true,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools",
+      "target": "packages_hermes_src_tools_schema_tooldefinition",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools",
+      "target": "packages_hermes_src_state",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "type_only": true,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools",
+      "target": "packages_hermes_src_state_statereader",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools",
+      "target": "packages_hermes_src_tools_statetools_projectstatusinput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools",
+      "target": "packages_hermes_src_tools_statetools_projectstatusoutput",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools",
+      "target": "packages_hermes_src_tools_statetools_createprojectstatustool",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "ref_node_test",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "ref_node_assert_strict",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_tools_registry",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_tools_registry_buildtoolregistry",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_controller",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_controller_hermeslite",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_controller_detectentityslug",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_modelclient",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_modelclient_mockmodelclient",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_state",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "type_only": true,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_state_projectstatusrow",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_src_state_statereader",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_test_controller_test_fakestatereader",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test_fakestatereader",
+      "target": "packages_hermes_test_controller_test_fakestatereader_constructor",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test_fakestatereader",
+      "target": "packages_hermes_test_controller_test_fakestatereader_getprojectstatuses",
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test",
+      "target": "packages_hermes_test_controller_test_fakerows",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_escalation_test",
+      "target": "ref_node_test",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/escalation.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_escalation_test",
+      "target": "ref_node_assert_strict",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/escalation.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_escalation_test",
+      "target": "packages_hermes_src_escalation",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/escalation.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_escalation_test",
+      "target": "packages_hermes_src_escalation_withboundedretry",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/escalation.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_escalation_test",
+      "target": "packages_hermes_src_escalation_escalationerror",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/escalation.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_memorytools_test",
+      "target": "ref_node_test",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_memorytools_test",
+      "target": "ref_node_assert_strict",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_memorytools_test",
+      "target": "packages_hermes_src_tools_memorytools",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_memorytools_test",
+      "target": "packages_hermes_src_tools_memorytools_readcontexttool",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_memorytools_test",
+      "target": "packages_hermes_src_tools_memorytools_readclientmemorytool",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_memorytools_test",
+      "target": "packages_hermes_src_tools_schema",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_memorytools_test",
+      "target": "packages_hermes_src_tools_schema_toolregistry",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_memorytools_test",
+      "target": "packages_hermes_src_tools_schema_toolinputvalidationerror",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/memoryTools.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "ref_node_test",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "ref_node_assert_strict",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "ref_zod",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "packages_hermes_src_tools_schema",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "packages_hermes_src_tools_schema_toolregistry",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "packages_hermes_src_tools_schema_toolnotallowlistederror",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "packages_hermes_src_tools_schema_toolinputvalidationerror",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "packages_hermes_src_tools_schema_tooloutputvalidationerror",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_schema_test",
+      "target": "packages_hermes_test_schema_test_echotool",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/schema.test.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_tonefilter_test",
+      "target": "ref_node_test",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/toneFilter.test.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_tonefilter_test",
+      "target": "ref_node_assert_strict",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/toneFilter.test.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_tonefilter_test",
+      "target": "packages_hermes_src_tonefilter",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/toneFilter.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_tonefilter_test",
+      "target": "packages_hermes_src_tonefilter_applytonefilter",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/toneFilter.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_tonefilter_test",
+      "target": "packages_hermes_src_tonefilter_jargon_glossary",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/toneFilter.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig",
+      "target": "packages_hermes_tsconfig_compileroptions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_target",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_module",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_moduleresolution",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_strict",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_nouncheckedindexedaccess",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_esmoduleinterop",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_skiplibcheck",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_resolvejsonmodule",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig_compileroptions",
+      "target": "packages_hermes_tsconfig_compileroptions_outdir",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_tsconfig",
+      "target": "packages_hermes_tsconfig_include",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_scripts_verify_supabase_connection_main",
+      "target": "packages_hermes_src_state_statereaderfromenv",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/scripts/verify-supabase-connection.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli_main",
+      "target": "packages_hermes_src_modelclient_modelclientfromenv",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli_main",
+      "target": "packages_hermes_src_state_statereaderfromenv",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli_main",
+      "target": "packages_hermes_src_tools_registry_buildtoolregistry",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermesanswer",
+      "target": "packages_hermes_src_tonefilter_tonefilterresult",
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermesliteoptions",
+      "target": "packages_hermes_src_tools_schema_toolregistry",
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermesliteoptions",
+      "target": "packages_hermes_src_modelclient_modelclient",
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermeslite",
+      "target": "packages_hermes_src_tools_schema_toolregistry",
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermeslite",
+      "target": "packages_hermes_src_modelclient_modelclient",
+      "relation": "references",
+      "context": "field",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_claudemodelclient",
+      "target": "packages_hermes_src_modelclient_modelclient",
+      "relation": "implements",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_modelclient_mockmodelclient",
+      "target": "packages_hermes_src_modelclient_modelclient",
+      "relation": "implements",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/modelClient.ts",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_state_supabasestatereader",
+      "target": "packages_hermes_src_state_statereader",
+      "relation": "implements",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/src/state.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test_fakestatereader",
+      "target": "packages_hermes_src_state_statereader",
+      "relation": "implements",
+      "context": "type",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test_fakestatereader_constructor",
+      "target": "packages_hermes_src_state_projectstatusrow",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_test_controller_test_fakestatereader_getprojectstatuses",
+      "target": "packages_hermes_src_state_projectstatusrow",
+      "relation": "references",
+      "context": "generic_arg",
+      "confidence": "EXTRACTED",
+      "source_file": "packages/hermes/test/controller.test.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli_main",
+      "target": "packages_hermes_src_controller_hermeslite",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermeslite_answerstatusquestion",
+      "target": "packages_hermes_src_escalation_withboundedretry",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L114",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermeslite_answerstatusquestion",
+      "target": "packages_hermes_src_tonefilter_buildplainlanguagesystemprompt",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L115",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_controller_hermeslite_answerstatusquestion",
+      "target": "packages_hermes_src_tonefilter_applytonefilter",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/src/controller.ts",
+      "source_location": "L118",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry_buildtoolregistry",
+      "target": "packages_hermes_src_tools_schema_toolregistry",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry_buildtoolregistry",
+      "target": "packages_hermes_src_tools_statetools_createprojectstatustool",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_cli_main",
+      "target": "packages_hermes_src_controller_hermeslite_answerstatusquestion",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "packages/hermes/src/cli.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_registry_buildtoolregistry",
+      "target": "packages_hermes_src_tools_schema_toolregistry_register",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "packages/hermes/src/tools/registry.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast"
+    },
+    {
+      "source": "packages_hermes_src_tools_statetools_createprojectstatustool",
+      "target": "packages_hermes_src_state_statereader_getprojectstatuses",
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "packages/hermes/src/tools/stateTools.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_origin": "ast"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "failed_sources": [],
+  "extracted_sources": [
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/notification-token-display.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/post-write-token-diff.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/pre-tool-bash-guard.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/pre-tool-read-guard.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/pre-tool-token-guard.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/session-end-token-report.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/stop-path-guard.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/stop-session-snapshot.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/user-prompt-ghost-scanner.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/user-prompt-inject-context.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/user-prompt-inject-snapshot.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/hooks/user-prompt-validate-claude-md.sh",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/.claude/settings.json",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/db/migrations/0001_init_schema.sql",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/db/migrations/0002_entity_consistency_triggers.sql",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/db/migrations/0003_rls_policies.sql",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/db/migrations/0004_security_advisor_fixes.sql",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/db/migrations/0005_fix_rls_recursion.sql",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/package.json",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/scripts/verify-supabase-connection.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/cli.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/controller.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/escalation.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/modelClient.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/state.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/toneFilter.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/tools/memoryTools.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/tools/registry.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/tools/schema.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/src/tools/stateTools.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/test/controller.test.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/test/escalation.test.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/test/memoryTools.test.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/test/schema.test.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/test/toneFilter.test.ts",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/packages/hermes/tsconfig.json",
+    "/Users/abuhuraira2129/Documents/WFACT 3.0/wfact-3.0-build/scripts/rls_attack_test.sql"
+  ]
+}

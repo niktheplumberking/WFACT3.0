@@ -6,10 +6,46 @@ that phase first — never borrow hours from a later phase.
 
 ---
 
-## Phase 1 — Foundation & Access (Days 1–2 · 8 hrs)
+**Status summary**: We're actually in **Phase 4 — Model Routing & Front-End Loop v1**. Phases 1–3 are
+built and independently verified (Hermes-lite: 26/26 tests re-run and passing today; RLS attack test:
+PASS) modulo the access items still open in `BLOCKED-ON-NICK.md`. Phase 4's builder/evaluator loop,
+hand-picked templates, brief loader, and correction-log writer are fully coded and unit-tested (20/20
+passing) against the hand-picked-template + Claude-only fallbacks the Manual itself pre-authorizes —
+but **no live run has happened yet** (no `ANTHROPIC_API_KEY`, no `.env` in this environment), and this
+entire Phase 4 body of work (`packages/frontend-loop/`, `clients/dreamsign-pilot/`) currently sits
+**uncommitted** in the working tree. Biggest blocker: `ANTHROPIC_API_KEY` (open since Day 1) is what
+stands between "code that passes its own unit tests" and the actual generate→review→fix proof run
+Phase 4's exit check requires.
 
-**Objective**: unblock every account/credential/decision before writing code; get the repo running with
-checks from day one.
+**Next up**:
+1. Commit the uncommitted Phase 4 work (`packages/frontend-loop/`, `clients/dreamsign-pilot/`) — it's
+   real, tested, and currently unprotected by git.
+2. Get `ANTHROPIC_API_KEY` (and ideally `SUPABASE_SERVICE_ROLE_KEY`, blocking Phase 3's smoke test too)
+   to unblock the first live loop run.
+3. Get Nick's real pilot brief, or an explicit go-ahead to run the DreamSign placeholder as the sprint's
+   proof case, so the correction-round count that comes out means something.
+
+**Gaps noticed**:
+- The Manual's Phase 4 exit check says "one real page live" but never defines "live" — a locally written
+  HTML file (what `cli.ts` currently produces) vs. something actually hosted/deployed. Worth confirming
+  with Nick before calling Phase 4 done even once a live loop run succeeds.
+- The Manual asks for hour tracking checked against budget at Day 5, 12, and 18 (`docs/wfact-3.0-operator-manual.html`
+  risk register); no actual-hours data has been logged anywhere in the repo so far.
+- `packages/frontend-loop` has no CI job (unlike `packages/hermes`'s typecheck+test job in
+  `.github/workflows/ci.yml`) — add the same pattern once this package is committed.
+
+**Unplanned work done**:
+- Local Claude Code tooling scaffold added: `.claude/` (Claude Token Optimizer hooks/settings,
+  `COMMON_MISTAKES.md`, `QUICK_START.md`, `ARCHITECTURE_MAP.md`) and a `graphify` knowledge-graph skill,
+  plus a `.claudeignore` and a "Session Start Protocol" + "graphify" section appended to `CLAUDE.md`.
+  This is agent/dev-environment tooling, not a WFACT sprint deliverable from any phase checklist.
+- Two Nick-facing progress-report docs published (`docs/wfact-3.0-nick-progress-update.html`, added and
+  then reframed on 2026-09-08 to drop hour/day estimates in favor of phase names) — a communication
+  artifact that isn't itself a phase checklist item, but supports Phase 7's "present to Nick" step.
+
+---
+
+## Phase 1: Foundation & Access (Days 1–2 · 8 hrs)
 
 - [x] Set up repo skeleton (this commit)
 - [x] Draft `CLAUDE.md` (law file)
@@ -17,7 +53,8 @@ checks from day one.
 - [x] Set up `memory/lessons-ledger.md`
 - [x] Set up per-client memory template (`clients/_template/memory.md`)
 - [x] Set up `BLOCKED-ON-NICK.md` tracker
-- [ ] Base CI skeleton (in progress, this commit)
+- [ ] Base CI skeleton (guardrails + hermes typecheck/test jobs exist in `.github/workflows/ci.yml`;
+      still a placeholder `build` job pending Phase 6's `apps/cockpit`)
 - [ ] Secrets manager wired, nothing in plaintext (pattern documented in `.env.example`; real secrets
       manager needs infra decision — see `BLOCKED-ON-NICK.md`)
 - [ ] Confirm GitHub access: existing 2.0 repo + new 3.0 repo created — **blocked on Nick**
@@ -31,13 +68,9 @@ checks from day one.
 
 **Exit check** (not yet met): *"A commit reaches a deployed preview through CI with zero manual steps,
 and every access item is either confirmed or has a tracked workaround in place."* — Cannot fully close
-without GitHub + Vercel access (no remote to push to, no deploy target yet). Local scaffold + CI
-skeleton is proceeding per the Day-0 fallback rule ("don't sit idle").
+without GitHub + Vercel access (no remote to push to, no deploy target yet).
 
-## Phase 2 — State Layer & Second Brain v1 (Days 3–5 · 16 hrs)
-
-**In progress**, started against placeholder entities per the Operator's Manual fallback ("entity
-decision still pending → use placeholder names now, don't block Phase 2 on it, rename later").
+## Phase 2: State Layer & Second Brain v1 (Days 3–5 · 16 hrs)
 
 - [x] Design Supabase schema: entities, clients, projects, tasks, correction_rounds, profiles/roles
       — `packages/db/migrations/0001_init_schema.sql`
@@ -56,7 +89,8 @@ decision still pending → use placeholder names now, don't block Phase 2 on it,
       separate from Nick's real 2.0 project (still blocked)
 - [ ] Draft `context.md`: business rules, entities, pricing bands — done as placeholder in Phase 1,
       still needs Nick's real business-rules session (Day 3–5) to become non-draft
-- [x] Set up the per-client memory file template — done in Phase 1
+- [x] Set up the per-client memory file template — done in Phase 1 (now has a real instance in use:
+      `clients/dreamsign-pilot/memory.md`, see Phase 4)
 
 **Exit check**: *"A test query ('what stage is client X is in') returns a correct answer from the memory
 files, and the RLS attack test fails to cross entity boundaries."* — **RLS half: met and verified**, see
@@ -64,14 +98,12 @@ files, and the RLS attack test fails to cross entity boundaries."* — **RLS hal
 `context.md` is a placeholder with no real client yet — re-verify once a real client and Nick's business
 rules land.
 
-## Phase 3 — Hermes Controller Core (Days 6–8 · 14 hrs)
+## Phase 3: Hermes Controller Core (Days 6–8 · 14 hrs)
 
-**In progress**, built as **Hermes-lite**, the Operator's Manual's own named fallback ("Hermes
-self-hosting eats more time than budgeted → build Hermes-lite... Tell Nick if you do this, don't
-substitute silently"). Self-hosting real Hermes has an open infra/budget dependency in
-`BLOCKED-ON-NICK.md` ("Where the self-hosted second brain + Hermes run") that's still open at Day 6
-— per the fallback rule, that blocks real Hermes without blocking this phase. **Nick needs to be
-told about this substitution explicitly** — it isn't hidden, but it hasn't been said to him yet.
+**Built as Hermes-lite**, the Operator's Manual's own named fallback. Self-hosting real Hermes has an
+open infra/budget dependency in `BLOCKED-ON-NICK.md` that's still open — per the fallback rule, that
+blocks real Hermes without blocking this phase. **Nick still needs to be told about this substitution
+explicitly** — logged in `BLOCKED-ON-NICK.md`, not yet an actual conversation.
 
 - [x] Wire to memory (`context.md` + per-client files) — `packages/hermes/src/tools/memoryTools.ts`,
       read-only, path-traversal-guarded, tested against the real `memory/context.md`
@@ -85,49 +117,65 @@ told about this substitution explicitly** — it isn't hidden, but it hasn't bee
       escalate) — `packages/hermes/src/escalation.ts`
 - [x] Configure Claude as the first model behind it — `packages/hermes/src/modelClient.ts`
       (`ClaudeModelClient`); one model path only, per Blueprint Phase 3 scope
-- [x] 26 automated tests, no live credentials needed — `packages/hermes/test/`, run via `npm test`,
-      wired as a required CI job (`.github/workflows/ci.yml`, `hermes` job)
+- [x] 26 automated tests, no live credentials needed — `packages/hermes/test/`, re-run today
+      (2026-09-11): **26/26 passing**, wired as a required CI job (`hermes` job in
+      `.github/workflows/ci.yml`)
 - [x] Live-query shape verified against the real `wfact-3-sandbox` Supabase project (admin path,
       `execute_sql`, 2026-09-10) — the `entities`/`clients`/`projects` join `state.ts` uses is correct
-- [x] **New finding, not previously known**: verified this app's *own* credential path (not the
-      admin path above) actually reaches Supabase — it does, but with only the anon key it returns
-      **0 rows** even though fixture data exists, because RLS correctly blocks an unauthenticated
-      request. Hermes needs `SUPABASE_SERVICE_ROLE_KEY` to answer real status questions, not just
-      `SUPABASE_ANON_KEY`. Logged as a lessons-ledger proposal; added to `BLOCKED-ON-NICK.md`.
-- [ ] Smoke test with a real status question — **BLOCKED**: `ANTHROPIC_API_KEY` is unset
-      (`BLOCKED-ON-NICK.md`, "Claude / Anthropic API billing confirmation," open since Day 1). The CLI
-      (`npm run ask -- "..."`) refuses to fabricate an answer without a real key rather than mocking
-      around the gap — see `packages/hermes/README.md`'s verification table for exactly what is and
-      isn't proven yet.
+- [x] **New finding**: verified this app's *own* credential path (not the admin path above) actually
+      reaches Supabase — it does, but with only the anon key it returns **0 rows** even though fixture
+      data exists, because RLS correctly blocks an unauthenticated request. Hermes needs
+      `SUPABASE_SERVICE_ROLE_KEY` to answer real status questions, not just `SUPABASE_ANON_KEY`. Logged
+      as a lessons-ledger proposal; added to `BLOCKED-ON-NICK.md`.
+- [ ] Smoke test with a real status question — **still BLOCKED**: re-confirmed today (2026-09-11) that
+      no `ANTHROPIC_API_KEY` and no `.env` exist in this environment. The CLI (`npm run ask -- "..."`)
+      refuses to fabricate an answer without a real key rather than mocking around the gap.
 
 **Exit check** (not yet met): *"Hermes (or its stand-in) answers 'what's the status of X' correctly
 and in plain language, sourced from real memory and state, not a canned response."* Everything up to
 the live model call is built and independently tested against real files and a real database. The
-call itself is blocked on `ANTHROPIC_API_KEY`. Not marking this done until that call actually runs
-and is checked by something other than this same agent's own report — see `CLAUDE.md` §1.
+call itself is blocked on `ANTHROPIC_API_KEY`.
 
-## Phase 4 — Model Routing & Front-End Loop v1 (Days 9–12 · 22 hrs)
+## Phase 4: Model Routing & Front-End Loop v1 (Days 9–12 · 22 hrs)
 
-Not started. Needs Nick's pilot project brief by Day 9 (fallback: reuse a DreamSign-style page if late).
+**In progress, not yet committed to git.** Built against the Manual's own two named fallbacks for this
+phase: hand-picked templates instead of dynamic 21st.dev selection, and Claude instead of Kimi K3 (both
+credentials still open in `BLOCKED-ON-NICK.md`).
 
-## Phase 5 — Verification Loop (Days 13–15 · 14 hrs)
+- [ ] Wire Motion Sites MCP — not started; still **OPEN** in `BLOCKED-ON-NICK.md` (credentials due Day 9)
+- [ ] Wire 21st.dev MCP — not started; taking the Manual's own fallback instead: 3 hand-picked templates
+      in `packages/frontend-loop/src/templates.ts` (`clean-agency`, `bold-startup`, `minimal-portfolio`)
+- [x] Configure the front-end agent (Kimi K3 as candidate executor) — built with Claude as builder *and*
+      evaluator (two separate client instances, `packages/frontend-loop/src/modelClient.ts` +
+      `loop.ts`), per the Manual's explicit Kimi-K3-delayed fallback; Kimi K3 itself not yet available
+- [ ] Get one real pilot brief from Nick — not received; running against a placeholder brief
+      (`clients/dreamsign-pilot/brief.json`, `source: "placeholder-2.0-case"`, reused from the 2.0-era
+      DreamSign homepage brief) per the Manual's "no pilot brief by day 9" fallback
+- [ ] Run the loop: generate → self-review → fix → done — **code complete and unit-tested**
+      (`packages/frontend-loop/src/loop.ts` + `test/loop.test.ts`, 20/20 tests passing, re-run today
+      against a mocked model client, including hard-cap escalation and malformed-evaluator-response
+      handling), but **no live run has happened** — blocked on `ANTHROPIC_API_KEY`
+      (`packages/frontend-loop/src/cli.ts` refuses to fabricate a result without it, same pattern as
+      Hermes's CLI)
+- [ ] Log every correction round, this number is the whole point — the logging mechanism is built and
+      tested (`packages/frontend-loop/src/correctionLog.ts`, appends to a client's `memory.md`), but the
+      correction-round table in `clients/dreamsign-pilot/memory.md` is still empty because no real run
+      has completed yet
+
+**Exit check** (not yet met): *"One real page live, plus an honest correction-round count logged and
+compared against DreamSign's 40+."* Everything short of an actual model call is built and passing its
+own tests against a real placeholder brief. Not marking any part of this done until a real loop run
+happens and something other than this same agent's own report checks it — see `CLAUDE.md` §1.
+
+## Phase 5: Verification Loop (Days 13–15 · 14 hrs)
+
+Not started. No files found under any plausible location for check scripts or evaluator wiring beyond
+what Phase 4's loop already does structurally (separate builder/evaluator instances).
+
+## Phase 6: Cockpit MVP (Days 16–18 · 16 hrs)
+
+Not started. `apps/cockpit/` contains only a `.gitkeep`.
+
+## Phase 7: Proof Run & Handoff (Days 19–20 · 10 hrs)
 
 Not started.
-
-## Phase 6 — Cockpit MVP (Days 16–18 · 16 hrs)
-
-Not started.
-
-## Phase 7 — Proof Run & Handoff (Days 19–20 · 10 hrs)
-
-Not started.
-
----
-
-## Hour tracking
-
-Check running total against budget at Day 5, Day 12, and Day 18 (Operator's Manual risk register).
-
-| Phase | Budget | Actual so far |
-|---|---|---|
-| 1 | 8 hrs | — |

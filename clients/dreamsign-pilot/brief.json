@@ -1,0 +1,10 @@
+{
+  "clientSlug": "dreamsign-pilot",
+  "entitySlug": "dreamsign",
+  "projectName": "DreamSign Homepage — Phase 4 Pilot",
+  "goal": "A one-page homepage introducing DreamSign's services: what it does, how the process works, and a way to get in touch. This mirrors the 2.0-era DreamSign homepage brief, reused per the Operator's Manual's Phase 4 fallback because Nick's real pilot brief has not landed yet.",
+  "requiredSections": ["hero", "services", "process", "contact"],
+  "brandNotes": "Clean, high-trust, restrained — not flashy. DreamSign is a services business, so the copy tone should read as credible and specific, not hype-driven.",
+  "templatePreference": "clean-agency",
+  "source": "placeholder-2.0-case"
+}
