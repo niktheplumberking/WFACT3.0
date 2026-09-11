@@ -6,24 +6,32 @@ that phase first — never borrow hours from a later phase.
 
 ---
 
-**Status summary**: We're actually in **Phase 4 — Model Routing & Front-End Loop v1**. Phases 1–3 are
-built and independently verified (Hermes-lite: 26/26 tests re-run and passing today; RLS attack test:
-PASS) modulo the access items still open in `BLOCKED-ON-NICK.md`. Phase 4's builder/evaluator loop,
-hand-picked templates, brief loader, and correction-log writer are fully coded and unit-tested (20/20
-passing) against the hand-picked-template + Claude-only fallbacks the Manual itself pre-authorizes —
-but **no live run has happened yet** (no `ANTHROPIC_API_KEY`, no `.env` in this environment), and this
-entire Phase 4 body of work (`packages/frontend-loop/`, `clients/dreamsign-pilot/`) currently sits
-**uncommitted** in the working tree. Biggest blocker: `ANTHROPIC_API_KEY` (open since Day 1) is what
-stands between "code that passes its own unit tests" and the actual generate→review→fix proof run
-Phase 4's exit check requires.
+**Status summary**: We're actually in **Phase 5 — Verification Loop**. Phases 1–3 are built and
+independently verified (Hermes-lite: 26/26 tests re-run and passing today; RLS attack test: PASS)
+modulo the access items still open in `BLOCKED-ON-NICK.md`. **Correction to this file's own prior
+entry**: Phase 4's body of work (`packages/frontend-loop/`, `clients/dreamsign-pilot/`) was reported
+here as "uncommitted" — that was stale; both were already committed (`a0a2bbb`, confirmed via a
+clean `git status` today, 2026-09-11). Phase 4's builder/evaluator loop, hand-picked templates,
+brief loader, and correction-log writer are fully coded and unit-tested (20/20 passing, re-run
+today) against the hand-picked-template + Claude-only fallbacks the Manual itself pre-authorizes —
+but **no live run has happened yet** (no `ANTHROPIC_API_KEY`, no `.env` in this environment).
+Phase 5 is genuinely unblocked by Nick (its own Requirements table says "From Nick: none blocking
+this phase") and is now built the same way: `packages/verification/` — 6 deterministic checks (the
+Manual's 5 named examples plus one backstop) and an independent LLM-evaluator step, 12/12 tests
+passing including the Manual's own exit check run as a real test (a deliberately broken fixture
+page, every check catches it). See `packages/verification/README.md` for the full verification
+table. Biggest blocker across every phase remains the same: `ANTHROPIC_API_KEY` (open since Day 1)
+is what stands between "code that passes its own unit tests" and any actual live model call.
 
 **Next up**:
-1. Commit the uncommitted Phase 4 work (`packages/frontend-loop/`, `clients/dreamsign-pilot/`) — it's
-   real, tested, and currently unprotected by git.
-2. Get `ANTHROPIC_API_KEY` (and ideally `SUPABASE_SERVICE_ROLE_KEY`, blocking Phase 3's smoke test too)
-   to unblock the first live loop run.
-3. Get Nick's real pilot brief, or an explicit go-ahead to run the DreamSign placeholder as the sprint's
-   proof case, so the correction-round count that comes out means something.
+1. Get `ANTHROPIC_API_KEY` (and ideally `SUPABASE_SERVICE_ROLE_KEY`, blocking Phase 3's smoke test
+   too) — this single item is what unblocks the first live Phase 4 build *and* the first live
+   Phase 5 evaluator run.
+2. Get Nick's real pilot brief, or an explicit go-ahead to run the DreamSign placeholder as the
+   sprint's proof case, so the correction-round count that comes out means something.
+3. Once a real page exists (Phase 4), run it through `packages/verification`'s CLI as a genuinely
+   separate step — that's the actual end-to-end proof Phase 5 exists for, not just its own unit
+   tests.
 
 **Gaps noticed**:
 - The Manual's Phase 4 exit check says "one real page live" but never defines "live" — a locally written
@@ -31,8 +39,9 @@ Phase 4's exit check requires.
   with Nick before calling Phase 4 done even once a live loop run succeeds.
 - The Manual asks for hour tracking checked against budget at Day 5, 12, and 18 (`docs/wfact-3.0-operator-manual.html`
   risk register); no actual-hours data has been logged anywhere in the repo so far.
-- `packages/frontend-loop` has no CI job (unlike `packages/hermes`'s typecheck+test job in
-  `.github/workflows/ci.yml`) — add the same pattern once this package is committed.
+- Phase 5's evaluator, like Phase 4's, is Claude reviewing Claude's own output family — the
+  Manual's own named fallback, but the "ideally different vendor" half of CLAUDE.md §6 stays an
+  open, tracked gap until Kimi K3/GPT-5.6 access lands.
 
 **Unplanned work done**:
 - Local Claude Code tooling scaffold added: `.claude/` (Claude Token Optimizer hooks/settings,
@@ -169,8 +178,38 @@ happens and something other than this same agent's own report checks it — see 
 
 ## Phase 5: Verification Loop (Days 13–15 · 14 hrs)
 
-Not started. No files found under any plausible location for check scripts or evaluator wiring beyond
-what Phase 4's loop already does structurally (separate builder/evaluator instances).
+**In progress — the deterministic half is done and independently proven.** This phase's own
+Requirements table says "From Nick: none blocking this phase," so unlike Phases 3–4 there's no
+access item standing between "coded" and "exit check met" here.
+
+- [x] Pick 5–8 highest-value checks from 2.0's 78 — `packages/verification/src/checks/`: the
+      Manual's 5 named examples (secrets scan, responsive check, no-console-errors, image
+      optimization, isolation check) plus one deterministic backstop (required-sections)
+- [x] Wire an independent evaluator step, a different model than the builder — Manual's own named
+      fallback taken openly: "a strict written rubric plus a separate Claude session as a
+      stand-in" — `packages/verification/src/evaluator.ts` (`RUBRIC` + `runEvaluator`), a fresh
+      `Anthropic` client instance distinct from Phase 4's, same "ideally different vendor" gap
+      Phase 4 already carries (still open in `BLOCKED-ON-NICK.md`)
+- [x] Test with a deliberately broken build, confirm it's caught — **this is the exit check
+      itself, run as a real automated test**: `packages/verification/test/registry.test.ts`
+      against `fixtures/broken.html`, all 6 checks fail with specific reasons; `fixtures/clean.html`
+      passes all 6. 12/12 tests passing, re-run 2026-09-11. Two real bugs were caught and fixed
+      while proving this out (a required-sections false-positive matching an attribute value, and
+      a fixture's own doc comment leaking another client's slug into its own isolation check) —
+      logged in `packages/verification/README.md` so the fix doesn't get silently re-broken
+- [ ] Run the verification CLI against a real Phase-4-built page, as a genuinely separate step —
+      not yet possible: Phase 4 has no live-generated page yet (blocked on `ANTHROPIC_API_KEY`,
+      same item), so there's nothing real to verify end-to-end. `packages/verification`'s own CLI
+      (`npm run verify --`) is built and ready the moment Phase 4 produces real output.
+- [ ] Live evaluator run (`npm run verify --` with a real `ANTHROPIC_API_KEY`) — **BLOCKED**, same
+      open item as every other phase's live model call
+
+**Exit check** (deterministic half met, live half blocked): *"A deliberately broken test build gets
+caught and returned before being marked done."* Proven — see
+`packages/verification/README.md`'s verification table. Not marking the whole phase done: the
+checklist's "independent evaluator" item is code-complete and unit-tested against a mock (same
+pattern as Phase 3/4), but its live run and the full end-to-end pass against a real Phase-4 page
+are both still blocked on `ANTHROPIC_API_KEY`.
 
 ## Phase 6: Cockpit MVP (Days 16–18 · 16 hrs)
 

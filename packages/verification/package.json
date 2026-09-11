@@ -1,0 +1,20 @@
+{
+  "name": "@wfact/verification",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phase 5 verification loop — 6 deterministic checks plus an independent evaluator step. See README.md for scope and CLAUDE.md §8 for the substitution-disclosure rule this follows.",
+  "type": "module",
+  "scripts": {
+    "verify": "tsx src/cli.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,23 @@
+<!--
+Deliberately broken fixture — the Manual's own Phase 5 exit check: "A deliberately broken test
+build gets caught and returned before being marked done." Every one of the 6 registry checks
+should fail against this page. See test/registry.test.ts and test/verificationLoop.test.ts.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Broken Page</title>
+  <script src="https://example.com/external.js"></script>
+</head>
+<body>
+  <h1>Welcome</h1>
+  <img src="hero.png">
+  <p>Contact our team. API_KEY: "sk-ant-fakekeyfakekeyfakekeyfakekey12345"</p>
+  <p>Ask our sister client bennett-co about their results.</p>
+  <script>
+    function broken( {
+      return "this is not valid javascript"
+  </script>
+</body>
+</html>

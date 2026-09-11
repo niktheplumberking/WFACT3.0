@@ -66,6 +66,54 @@ jobs:
       - name: Unit tests
         run: npm test
 
+  # Phase 4: same pattern as the hermes job above. No network calls, no credentials needed — see
+  # packages/frontend-loop's test suite (builder/evaluator loop against a MockModelClient); the
+  # live Claude run stays a manual step until ANTHROPIC_API_KEY lands, per BLOCKED-ON-NICK.md.
+  # This job was a tracked gap in PROGRESS.md ("packages/frontend-loop has no CI job") from when
+  # the package was committed without one — closed here.
+  frontend-loop:
+    name: Frontend loop — typecheck + unit tests
+    runs-on: ubuntu-latest
+    needs: guardrails
+    defaults:
+      run:
+        working-directory: packages/frontend-loop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
+  # Phase 5: the check registry runs for real here — this is the Manual's own Phase 5 exit check
+  # ("a deliberately broken test build gets caught and returned before being marked done") proven
+  # on every push, not just asserted once locally. No network calls, no credentials needed for the
+  # 6 deterministic checks; the evaluator step's live run stays manual until ANTHROPIC_API_KEY
+  # lands, per BLOCKED-ON-NICK.md — see packages/verification/README.md.
+  verification:
+    name: Verification loop — typecheck + unit tests
+    runs-on: ubuntu-latest
+    needs: guardrails
+    defaults:
+      run:
+        working-directory: packages/verification
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
   # Placeholder — becomes real once apps/cockpit has a package.json (Phase 6).
   # Never delete this job silently; replace its body when there's something to build.
   build:

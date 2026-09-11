@@ -1,0 +1,33 @@
+<!--
+Clean fixture — should pass all 6 registry checks. See test/registry.test.ts and
+test/verificationLoop.test.ts for the exact required-sections and other-client-slugs context
+this is checked against (deliberately not spelled out here — an isolation-check test fixture
+must not itself contain another client's slug, or it would fail its own check). Deliberately
+small base64 pixel so the image-optimization check's size threshold isn't the thing under test.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clean Page</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; }
+    @media (max-width: 600px) {
+      body { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <section id="hero">
+    <h1>Welcome to DreamSign</h1>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=" alt="DreamSign logo" />
+  </section>
+  <section id="contact">
+    <p>Reach out any time.</p>
+  </section>
+  <script>
+    console.log("page loaded");
+  </script>
+</body>
+</html>
