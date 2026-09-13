@@ -147,7 +147,7 @@ call itself is blocked on `ANTHROPIC_API_KEY`.
 
 ## Phase 4: Model Routing & Front-End Loop v1 (Days 9–12 · 22 hrs)
 
-**In progress, not yet committed to git.** Built against the Manual's own two named fallbacks for this
+**In progress, committed (`a0a2bbb`).** Built against the Manual's own two named fallbacks for this
 phase: hand-picked templates instead of dynamic 21st.dev selection, and Claude instead of Kimi K3 (both
 credentials still open in `BLOCKED-ON-NICK.md`).
 
