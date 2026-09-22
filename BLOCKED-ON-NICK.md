@@ -53,7 +53,7 @@ rows, mark them done so there's a record of when they closed.
 | 30–60 min session on business rules (pricing bands, entity specifics, standing rules) | Day 3–5 | **OPEN** |
 | One real pilot project brief | Day 9 | **OPEN** |
 | Same-day answers during the front-end build | Day 9–12 | not yet due |
-| 10–15 min looking at the cockpit MVP | Day 16–18 | not yet due |
+| 10–15 min looking at the cockpit MVP | Day 16–18 | **READY 2026-09-22** — live at `https://wfact-cockpit-niktheplumberkings-projects.vercel.app`, sign in with `abuhuraira2129@gmail.com` via magic link. Shows the real DreamSign pilot project and its 2 real correction rounds. |
 | Attend the proof-run review | Day 19–20 | not yet due |
 
 ## The one that matters most

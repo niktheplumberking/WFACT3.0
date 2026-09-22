@@ -6,16 +6,16 @@ top to bottom. Nothing gets checked as done until its **exit check** actually pa
 Last synced: 2026-09-22, via `/progress-sync` — rebuilt from git history and direct repo verification,
 not from self-report. See `git log` for the full commit trail this reflects.
 
-**Status summary**: Phases 1–5 are functionally complete with real, independently-verified evidence —
-Phase 5's 6 checks and live evaluator have now run for real against Phase 4's actual live output, not
-just a fixture. Phases 6–7 haven't started. No hard blocker remains; the open Phase 1 items
-(CI-automated deploys, a real secrets manager, a handful of Nick-only decisions) all have tracked
-workarounds, not open stops.
+**Status summary**: Phases 1–6 are functionally complete with real, independently-verified evidence —
+including the Cockpit MVP, live at a real URL with real data and a genuinely tested RLS-gated write.
+Only Phase 7 (the proof-run writeup and Nick's own review/decisions) remains, and those are largely
+Nick-only steps this session can't close on its own. No hard blocker remains; the open Phase 1 items
+(CI-automated deploys, a real secrets manager) have tracked workarounds, not open stops.
 
 **Next up**:
-1. Phase 6: cockpit MVP — 3 rooms per the Fast-Track Plan's revision (Pipeline, Approvals, Runs), not the Manual's original unscoped dashboard.
-2. Phase 7: proof run — this is largely a documentation/presentation pass over what Phases 1–5 already proved for real, plus getting Nick to actually look at it.
-3. Phase 1: automate the Vercel deploy through CI — this session's deploy was a manual CLI call, not "zero manual steps."
+1. Phase 7: write the honest results report (what's proven, what's not) and get Nick to actually look at the Cockpit and the live DreamSign page.
+2. Phase 1: automate the Vercel deploy through CI — every deploy this sprint has been a manual CLI call, not "zero manual steps."
+3. Once Nick reviews: agree the next sprint's scope (a second/third real client, per the Execution Roadmap's own Phase 2).
 
 **Gaps noticed**:
 - Phase 1's exit check ("zero manual steps") is not met even though every access item now is — the CI pipeline doesn't auto-deploy yet; this session's Vercel deploy was manual.
@@ -101,9 +101,28 @@ goal this sprint, completeness is next sprint's job") — this is that trimmed s
 
 ## Phase 6: Cockpit MVP (Days 16–18 · 16 hrs)
 
-- [ ] Not started — `apps/cockpit/` contains only a `.gitkeep`. Scope per the Fast-Track Plan: 3 rooms
-      (Pipeline, Approvals, Runs), not the Manual's original full dashboard.
+- [x] Built the 3-room MVP (Pipeline, Approvals, Runs) per the Fast-Track Plan's scope — Vite +
+      React + TypeScript, `apps/cockpit/`, reading/writing Supabase directly with the anon key,
+      access controlled entirely by Phase 2's real RLS policies (no service-role key in the
+      browser bundle)
+- [x] Connected to Supabase for live data — verified with real data, not a mock: Pipeline and Runs
+      show the real DreamSign pilot project and its 2 real correction rounds (seeded from what
+      Phase 4 actually produced); Approvals genuinely advances `projects.stage` through a real
+      RLS-gated write (tested end-to-end: advanced then reverted via a real authenticated session,
+      not just a client-side check)
+- [x] Real login — Supabase magic-link auth (no password to manage), a real owner-role profile
+      seeded for Huraira via the Auth Admin API, not a raw table insert
+- [ ] Get Nick to actually look at it before day 20 — not yet done, this is explicitly his step
+
+**Exit check** (build half met, Nick's review not yet done): *"Nick can open one link and understand
+what's happening without asking a question first."* Live at
+`https://wfact-cockpit-niktheplumberkings-projects.vercel.app` — verified reachable via `curl`
+(HTTP 200). Vercel's default deployment-protection (SSO gate) was disabled for this project
+specifically, since it would have blocked exactly the one-link access this exit check asks for; the
+app's own Supabase auth + RLS is the real access control layer, not Vercel's. The review itself —
+Nick actually looking at it — is a Nick-only step, still open.
 
 ## Phase 7: Proof Run & Handoff (Days 19–20 · 10 hrs)
 
-- [ ] Not started.
+- [ ] Not started. Largely a documentation/presentation pass over what Phases 1–6 already proved
+      for real, plus Nick attending the review and deciding next steps — both Nick-only.

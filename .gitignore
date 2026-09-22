@@ -15,6 +15,7 @@ build/
 .next/
 .vercel/
 .turbo/
+*.tsbuildinfo
 
 # OS / editor noise
 .DS_Store

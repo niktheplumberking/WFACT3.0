@@ -1,0 +1,25 @@
+{
+  "name": "@wfact/cockpit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Phase 6 Cockpit MVP — 3 rooms (Pipeline, Approvals, Runs) per the Fast-Track Plan's revision of the Manual's original 11-room dashboard. A single, minimally styled page reading/writing straight from Supabase, per the Manual's own sanctioned fallback for a time-boxed sprint.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.58.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.5"
+  }
+}
