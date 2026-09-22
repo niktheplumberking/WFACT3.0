@@ -122,6 +122,19 @@ specifically, since it would have blocked exactly the one-link access this exit 
 app's own Supabase auth + RLS is the real access control layer, not Vercel's. The review itself —
 Nick actually looking at it — is a Nick-only step, still open.
 
+**A second real issue, also caught by Huraira and fixed, not this session noticing on its own**:
+Huraira's first real sign-in attempt hit a stale magic-link email (from this session's own earlier
+dev-server testing on `localhost:5173`) that was also expired — real screenshot evidence
+(`ERR_CONNECTION_REFUSED`, `otp_expired`). Investigating found the actual underlying blocker:
+Supabase Auth's Site URL was still the project default (`http://localhost:3000`), so even a fresh
+link from the real production URL would have failed — confirmed by explicitly requesting
+`redirect_to` = the production URL via the Admin API and getting back a link that silently fell back
+to `localhost:3000` anyway. No available tool in this session could change that setting (it's
+dashboard/Management-API config, not reachable via the service-role key or SQL) — Huraira updated
+Site URL + Redirect URLs in the Supabase dashboard directly. Re-verified after: a fresh generated
+link now correctly resolves to the production URL, and the full verify step was completed end-to-end
+(real access token issued) before telling Huraira to try again for real.
+
 **A real regression happened and got fixed, logged honestly rather than smoothed over**: pushing this
 phase's commit to GitHub triggered Vercel's Git integration to auto-build from the repo root (this
 repo deliberately has no root `package.json`), which silently produced an empty output and overwrote
