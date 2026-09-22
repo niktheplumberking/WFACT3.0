@@ -52,43 +52,47 @@ export function Approvals() {
     await load();
   }
 
-  if (error) return <p style={{ color: "crimson" }}>{error}</p>;
-  if (!projects) return <p>Loading…</p>;
-  if (projects.length === 0) return <p>No projects to approve.</p>;
+  if (!projects) return <p className="loading-state">Loading…</p>;
+  if (projects.length === 0) return <p className="empty-state">No projects to approve.</p>;
 
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead>
-        <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-          <th style={{ padding: "0.5rem" }}>Project</th>
-          <th style={{ padding: "0.5rem" }}>Current stage</th>
-          <th style={{ padding: "0.5rem" }}>Next stage</th>
-          <th style={{ padding: "0.5rem" }}></th>
-        </tr>
-      </thead>
-      <tbody>
-        {projects.map((p) => {
-          const next = nextStage(p.stage);
-          return (
-            <tr key={p.id} style={{ borderBottom: "1px solid #eee" }}>
-              <td style={{ padding: "0.5rem" }}>{p.name}</td>
-              <td style={{ padding: "0.5rem" }}>
-                <code>{p.stage}</code>
-              </td>
-              <td style={{ padding: "0.5rem" }}>{next ? <code>{next}</code> : "— final stage —"}</td>
-              <td style={{ padding: "0.5rem" }}>
-                <button
-                  disabled={!next || busyId === p.id}
-                  onClick={() => approve(p)}
-                  style={{ padding: "0.35rem 0.8rem" }}
-                >
-                  {busyId === p.id ? "Approving…" : "Approve → next stage"}
-                </button>
-              </td>
+    <div>
+      {error && <p className="error-state">{error}</p>}
+      <div className="panel">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Project</th>
+              <th>Current stage</th>
+              <th>Next stage</th>
+              <th></th>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          </thead>
+          <tbody>
+            {projects.map((p) => {
+              const next = nextStage(p.stage);
+              return (
+                <tr key={p.id}>
+                  <td>{p.name}</td>
+                  <td>
+                    <code>{p.stage}</code>
+                  </td>
+                  <td>{next ? <code>{next}</code> : "— final stage —"}</td>
+                  <td>
+                    <button
+                      className="btn primary"
+                      disabled={!next || busyId === p.id}
+                      onClick={() => approve(p)}
+                    >
+                      {busyId === p.id ? "Approving…" : "Approve → next stage"}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

@@ -25,26 +25,31 @@ export function Login() {
   }
 
   return (
-    <div style={{ maxWidth: 360, margin: "4rem auto", fontFamily: "system-ui, sans-serif" }}>
-      <h1 style={{ fontSize: "1.25rem" }}>WFACT Cockpit</h1>
-      {status === "sent" ? (
-        <p>Check {email} for a sign-in link.</p>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            required
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: "100%", padding: "0.5rem", marginBottom: "0.5rem" }}
-          />
-          <button type="submit" disabled={status === "sending"} style={{ padding: "0.5rem 1rem" }}>
-            {status === "sending" ? "Sending…" : "Send magic link"}
-          </button>
-          {error && <p style={{ color: "crimson" }}>{error}</p>}
-        </form>
-      )}
+    <div className="login-shell">
+      <div className="login-card">
+        <div className="login-mark">
+          <span className="sidebar-mark-dot" />
+          <h1 className="login-title">WFACT Cockpit</h1>
+        </div>
+        {status === "sent" ? (
+          <p>Check {email} for a sign-in link.</p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <input
+              className="login-input"
+              type="email"
+              required
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <button type="submit" className="btn primary" disabled={status === "sending"}>
+              {status === "sending" ? "Sending…" : "Send magic link"}
+            </button>
+            {error && <p className="login-error">{error}</p>}
+          </form>
+        )}
+      </div>
     </div>
   );
 }

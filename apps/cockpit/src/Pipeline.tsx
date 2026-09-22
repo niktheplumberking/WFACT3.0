@@ -31,34 +31,40 @@ export function Pipeline() {
     };
   }, []);
 
-  if (error) return <p style={{ color: "crimson" }}>Error loading projects: {error}</p>;
-  if (!projects) return <p>Loading…</p>;
-  if (projects.length === 0) return <p>No projects yet.</p>;
+  if (error) return <p className="error-state">Error loading projects: {error}</p>;
+  if (!projects) return <p className="loading-state">Loading…</p>;
+  if (projects.length === 0) return <p className="empty-state">No projects yet.</p>;
 
   return (
-    <table style={{ width: "100%", borderCollapse: "collapse" }}>
-      <thead>
-        <tr style={{ textAlign: "left", borderBottom: "1px solid #ddd" }}>
-          <th style={{ padding: "0.5rem" }}>Project</th>
-          <th style={{ padding: "0.5rem" }}>Client</th>
-          <th style={{ padding: "0.5rem" }}>Entity</th>
-          <th style={{ padding: "0.5rem" }}>Stage</th>
-          <th style={{ padding: "0.5rem" }}>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {projects.map((p) => (
-          <tr key={p.id} style={{ borderBottom: "1px solid #eee" }}>
-            <td style={{ padding: "0.5rem" }}>{p.name}</td>
-            <td style={{ padding: "0.5rem" }}>{p.clients?.name ?? "—"}</td>
-            <td style={{ padding: "0.5rem" }}>{p.clients?.entities?.name ?? "—"}</td>
-            <td style={{ padding: "0.5rem" }}>
-              <code>{p.stage}</code>
-            </td>
-            <td style={{ padding: "0.5rem" }}>{p.status}</td>
+    <div className="panel">
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Client</th>
+            <th>Entity</th>
+            <th>Stage</th>
+            <th>Status</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {projects.map((p) => (
+            <tr key={p.id}>
+              <td>{p.name}</td>
+              <td>{p.clients?.name ?? "—"}</td>
+              <td>{p.clients?.entities?.name ?? "—"}</td>
+              <td>
+                <code>{p.stage}</code>
+              </td>
+              <td>
+                <span className={`pill${p.status === "active" ? " status-active" : " status-default"}`}>
+                  {p.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

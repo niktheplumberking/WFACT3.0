@@ -35,20 +35,20 @@ export function Runs() {
     };
   }, []);
 
-  if (error) return <p style={{ color: "crimson" }}>Error loading runs: {error}</p>;
-  if (!rounds) return <p>Loading…</p>;
-  if (rounds.length === 0) return <p>No runs logged yet.</p>;
+  if (error) return <p className="error-state">Error loading runs: {error}</p>;
+  if (!rounds) return <p className="loading-state">Loading…</p>;
+  if (rounds.length === 0) return <p className="empty-state">No runs logged yet.</p>;
 
   return (
-    <div>
+    <div className="panel">
       {rounds.map((r) => (
-        <div key={r.id} style={{ borderBottom: "1px solid #eee", padding: "0.75rem 0" }}>
-          <div style={{ fontSize: "0.85rem", color: "#666" }}>
-            {r.projects?.name ?? "—"} · round {r.round_number} · <code>{r.stage}</code> ·{" "}
+        <div key={r.id} className="run-item">
+          <div className="run-meta">
+            {r.projects?.name ?? "—"} · round {r.round_number} · <span className="stage-tag">{r.stage}</span> ·{" "}
             {new Date(r.created_at).toLocaleString()}
           </div>
-          <div>{r.issue}</div>
-          <div style={{ fontSize: "0.85rem", color: "#666" }}>
+          <div className="run-issue">{r.issue}</div>
+          <div className="run-footer">
             flagged by {r.flagged_by}
             {r.fixed_by ? ` · fixed by ${r.fixed_by}` : ""}
           </div>
