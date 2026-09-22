@@ -53,7 +53,7 @@ rows, mark them done so there's a record of when they closed.
 | 30–60 min session on business rules (pricing bands, entity specifics, standing rules) | Day 3–5 | **OPEN** |
 | One real pilot project brief | Day 9 | **OPEN** |
 | Same-day answers during the front-end build | Day 9–12 | not yet due |
-| 10–15 min looking at the cockpit MVP | Day 16–18 | **READY 2026-09-22** — live at `https://wfact-cockpit-niktheplumberkings-projects.vercel.app`, sign in with `abuhuraira2129@gmail.com` via magic link. Shows the real DreamSign pilot project and its 2 real correction rounds. |
+| 10–15 min looking at the cockpit MVP | Day 16–18 | **LOGIN CONFIRMED WORKING 2026-09-22** — live at `https://wfact-cockpit-niktheplumberkings-projects.vercel.app`, sign in with `abuhuraira2129@gmail.com` via magic link. Two real issues surfaced and fixed along the way (both caught by Huraira actually trying it, not by this session's own checks): a git-triggered deploy that silently built empty (missing Root Directory / env vars, fixed in Vercel project settings) and a magic-link redirect that defaulted to `localhost:3000` (Supabase Auth Site URL/Redirect URLs weren't configured for the production domain, fixed by Huraira in the dashboard, no tool in this session could reach that setting). Login itself now confirmed working by Huraira directly. Still open: his own actual review of Pipeline/Approvals/Runs, and the 10-15 minutes to give real reaction per the exit check. |
 | Attend the proof-run review | Day 19–20 | not yet due |
 
 ## The one that matters most
