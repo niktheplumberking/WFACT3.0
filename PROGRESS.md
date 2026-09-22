@@ -122,6 +122,20 @@ specifically, since it would have blocked exactly the one-link access this exit 
 app's own Supabase auth + RLS is the real access control layer, not Vercel's. The review itself —
 Nick actually looking at it — is a Nick-only step, still open.
 
+**A real regression happened and got fixed, logged honestly rather than smoothed over**: pushing this
+phase's commit to GitHub triggered Vercel's Git integration to auto-build from the repo root (this
+repo deliberately has no root `package.json`), which silently produced an empty output and overwrote
+the working manual deploy on the shared alias — Huraira caught this from a real 404 in his own
+browser, not something this session noticed on its own. Root cause confirmed via build logs (`Build
+Completed in [151ms]`, nothing built). Fixed properly, not just patched around: set the Vercel
+project's Root Directory to `apps/cockpit` and added real `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`
+project environment variables (the anon key deliberately as `--type config`, i.e. public — matches
+`supabaseClient.ts`'s own design, RLS protects data, not this key), then verified a fresh git-shaped
+deploy actually builds correctly (`✓ 75 modules transformed`, not another empty build) before
+considering this closed. This also means future `git push`es now redeploy Cockpit automatically and
+correctly, which is real progress on Phase 1's still-open "zero manual steps" gap — for the Cockpit
+specifically, not the whole repo yet.
+
 ## Phase 7: Proof Run & Handoff (Days 19–20 · 10 hrs)
 
 - [ ] Not started. Largely a documentation/presentation pass over what Phases 1–6 already proved
