@@ -12,10 +12,13 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { loadBrief } from "./brief.js";
 import { selectTemplate } from "./templates.js";
-import { modelClientFromEnv } from "./modelClient.js";
+import { modelClientFromEnv, Agent37ModelClient, ClaudeModelClient } from "./modelClient.js";
 import { FrontendLoop } from "./loop.js";
 import { appendCorrectionLogRows, formatCorrectionSummary } from "./correctionLog.js";
 import { repoRoot } from "./paths.js";
+
+// claude-sonnet-5 pricing, checked 2026-06-24 — see packages/hermes/src/cli.ts for the same note.
+const CLAUDE_PRICING_USD_PER_MTOK = { input: 2.0, output: 10.0 };
 
 async function main() {
   const briefPath = process.argv[2];
@@ -35,23 +38,48 @@ async function main() {
   }
   const template = selectTemplate(brief.templatePreference);
 
-  const { client: builderModel, reason: builderReason } = modelClientFromEnv();
+  const { client: builderModel, reason: builderReason, chose: builderChose } = modelClientFromEnv("builder");
   if (!builderModel) {
     console.error(`BLOCKED (builder model): ${builderReason}`);
     process.exitCode = 1;
     return;
   }
-  const { client: evaluatorModel, reason: evaluatorReason } = modelClientFromEnv();
+  console.error(`(builder model: ${builderChose})`);
+  const { client: evaluatorModel, reason: evaluatorReason, chose: evaluatorChose } =
+    modelClientFromEnv("evaluator");
   if (!evaluatorModel) {
     console.error(`BLOCKED (evaluator model): ${evaluatorReason}`);
     process.exitCode = 1;
     return;
   }
+  console.error(`(evaluator model: ${evaluatorChose})`);
 
   const loop = new FrontendLoop({ builderModel, evaluatorModel });
   const result = await loop.run(brief, template);
 
   console.error(formatCorrectionSummary(result.rounds, result.approved));
+
+  for (const [role, client] of [
+    ["builder", builderModel],
+    ["evaluator", evaluatorModel],
+  ] as const) {
+    if (client instanceof ClaudeModelClient) {
+      const { inputTokens, outputTokens } = client.totalUsage;
+      const cost =
+        (inputTokens / 1_000_000) * CLAUDE_PRICING_USD_PER_MTOK.input +
+        (outputTokens / 1_000_000) * CLAUDE_PRICING_USD_PER_MTOK.output;
+      console.error(
+        `(cost — ${role} (claude ${client.modelIdUsed}): ${inputTokens} in / ${outputTokens} out ` +
+          `tokens, $${cost.toFixed(4)})`,
+      );
+    } else if (client instanceof Agent37ModelClient) {
+      console.error(
+        `(cost — ${role} (agent37): ${client.totalUsage.promptTokens} prompt / ` +
+          `${client.totalUsage.completionTokens} completion tokens this run; billed per Agent 37's ` +
+          `own free-tier terms, not Anthropic-equivalent pricing)`,
+      );
+    }
+  }
 
   if (result.needsHuman) {
     console.error(`ESCALATED — needs a human: ${result.escalationReason}`);
@@ -70,7 +98,7 @@ async function main() {
       memoryPath,
       result.rounds,
       "4_homepage_build",
-      "frontend-loop (Claude, self-reviewed)",
+      `frontend-loop (builder: ${builderModel.name}, evaluator: ${evaluatorModel.name})`,
     );
     console.error(`Correction log appended to ${memoryPath}`);
   } catch (err) {

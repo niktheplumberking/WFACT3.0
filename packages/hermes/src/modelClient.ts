@@ -31,14 +31,27 @@ export class ModelNotConfiguredError extends Error {
 // buried in logic.
 const DEFAULT_MODEL_ID = "claude-sonnet-5";
 
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+}
+
 export class ClaudeModelClient implements ModelClient {
   readonly name = "claude";
   private readonly client: Anthropic;
   private readonly modelId: string;
 
+  // Accumulated across every complete() call this instance makes (retries included) — per
+  // CLAUDE.md §3 ("log the real cost of every paid call"), the CLI reads this after each run.
+  // Not part of the ModelClient interface: verification/frontend-loop implement that interface
+  // too, and this is scoped to Hermes's own cost-logging need, not a shared contract change.
+  public totalUsage: TokenUsage = { inputTokens: 0, outputTokens: 0 };
+  public readonly modelIdUsed: string;
+
   constructor(apiKey: string, modelId: string = DEFAULT_MODEL_ID) {
     this.client = new Anthropic({ apiKey });
     this.modelId = modelId;
+    this.modelIdUsed = modelId;
   }
 
   async complete({ system, user }: ModelRequest): Promise<string> {
@@ -48,6 +61,8 @@ export class ClaudeModelClient implements ModelClient {
       system,
       messages: [{ role: "user", content: user }],
     });
+    this.totalUsage.inputTokens += response.usage.input_tokens;
+    this.totalUsage.outputTokens += response.usage.output_tokens;
     const textBlock = response.content.find((block) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
       throw new Error("Claude response contained no text block — cannot answer from this.");

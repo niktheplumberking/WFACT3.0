@@ -1,11 +1,23 @@
 /**
- * Hand-picked template presets. Phase 4's real target is dynamic template selection through the
- * Motion Sites + 21st.dev MCPs (`docs/wfact-3.0-operator-manual.html`, Phase 4 checklist: "Wire
- * Motion Sites MCP," "Wire 21st.dev MCP"). Both are still OPEN in `BLOCKED-ON-NICK.md` ("Motion
- * Sites MCP credentials," "21st.dev premium account credentials," due Day 9). The Manual's own
- * named fallback for this: "21st.dev's React/Tailwind lean doesn't match how sites actually ship →
- * Hand-pick 2–3 templates manually for this proof instead of full dynamic selection. Note it as a
- * fix-later item, don't let it block the phase." This file is that fix-later item, taken openly.
+ * Template presets. As of 2026-09-22 both Motion Sites and 21st.dev credentials are real (see
+ * BLOCKED-ON-NICK.md) and `clean-agency`'s styleGuidance below is genuinely sourced from them —
+ * Motion Sites prompt id `agency-services` (Kanit font, dark→white rounded-top services section,
+ * numbered list) and a 21st.dev search for "clean agency services homepage hero" (id 28280,
+ * "Agency Hero Section" — sticky nav, trust avatars, marquee of client logos).
+ *
+ * One real constraint stayed even with real access, and it's the exact one the Manual's own
+ * fallback already named: both services return React + Tailwind + framer-motion (Motion Sites) /
+ * shadcn React components (21st.dev) — this pipeline's builder produces a single static HTML5
+ * document with inline CSS, no build step (see loop.ts's system prompt), by deliberate design for
+ * this proof sprint. So the real fetched content is *translated* below into inline-CSS-compatible
+ * guidance (the same fonts, colors, layout structure, numbered-list pattern, fade-in behavior via
+ * CSS transitions instead of framer-motion) rather than literally installed as React components.
+ * That's a disclosed adaptation of real sourced content, not a fabricated design.
+ *
+ * `bold-startup` and `minimal-portfolio` are unchanged from Phase 4's original hand-picked set —
+ * DreamSign's actual brief only exercises `clean-agency`; the other two stay as-is until a brief
+ * that actually needs them lands, rather than spending real API calls sourcing content nothing
+ * will use yet.
  */
 
 export interface PageTemplate {
@@ -24,9 +36,26 @@ export const HAND_PICKED_TEMPLATES: PageTemplate[] = [
     name: "Clean Agency",
     description: "Restrained, high-trust layout for a services business — the DreamSign-style default.",
     styleGuidance:
-      "Single-page, semantic HTML5 + inline CSS (no build step). Generous whitespace, one accent " +
-      "color, a sans-serif system font stack, sharp corners over rounded, no stock-photo placeholders " +
-      "(use described empty states instead). Mobile-first responsive via CSS Grid/Flexbox.",
+      "Single-page, semantic HTML5 + inline CSS (no build step). Sourced from real Motion Sites " +
+      "prompt `agency-services` and 21st.dev component search 'clean agency services homepage " +
+      "hero' (id 28280 'Agency Hero Section'), translated from their React/Tailwind/framer-motion " +
+      "originals into inline CSS: load Google Font 'Kanit' (weights 300-900) via a <link> tag in " +
+      "<head>, font-family: 'Kanit', sans-serif on html/body. Hero: sticky/fixed top nav, a row of " +
+      "3 small overlapping circular trust avatars plus a 'X+ businesses served' line, a bold " +
+      "uppercase headline, one clear primary CTA button above the fold — a subtle marquee or row " +
+      "of client-name logos beneath it if content allows. Services section: white background with " +
+      "large rounded top corners (border-radius ~40-60px) sitting visually on top of a darker " +
+      "section above it (#0C0C0C or similar near-black), generous vertical padding (~5-8rem). " +
+      "Services heading set in a huge, black, uppercase, tight-tracking display size (clamp(3rem, " +
+      "12vw, 160px)). List each service as a horizontal row: a large uppercase zero-padded number " +
+      "(01, 02, ...) on the left in the same huge display weight, name + description stacked on " +
+      "the right (description at ~60% opacity of the body color), a thin 1px divider between rows " +
+      "(not above the first). Fade each row in on scroll via a CSS `@starting-style`/transition or " +
+      "an IntersectionObserver-triggered class (translateY(30px)→0, opacity 0→1, ~0.7s ease, " +
+      "staggered ~0.1s per row) — same visual effect as the source's framer-motion FadeIn, done " +
+      "with plain CSS/JS since there's no build step here. One accent color elsewhere, sharp " +
+      "corners on secondary elements, no stock-photo placeholders (use described empty states " +
+      "instead). Mobile-first responsive via CSS Grid/Flexbox.",
     requiredSections: ["hero", "services", "process", "contact"],
   },
   {

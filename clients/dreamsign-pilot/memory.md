@@ -25,15 +25,18 @@ exercise that stage's loop.
 ## What's been decided
 
 - Template: `clean-agency` (see `packages/frontend-loop/src/templates.ts`) — matches the brief's
-  `templatePreference`.
-- Builder + evaluator model: Claude only, two separate client instances — Kimi K3 not yet
-  available (`BLOCKED-ON-NICK.md`).
+  `templatePreference`. Its styleGuidance is genuinely sourced from Motion Sites prompt
+  `agency-services` and a real 21st.dev component search, translated into this pipeline's
+  inline-CSS/no-build-step constraint (see the file's own header comment).
+- Builder + evaluator model, decided 2026-09-22: builder = Agent 37 (default free-tier router),
+  evaluator = Claude directly, for real vendor independence between the two roles — not the same
+  model reviewing its own output. See `packages/frontend-loop/src/modelClient.ts`'s header comment
+  and `BLOCKED-ON-NICK.md`. Kimi K3 still not available.
 
 ## What's waiting on a human
 
-- Nick's real pilot brief (Operator's Manual, Phase 4 requirement "From Nick").
-- `ANTHROPIC_API_KEY` — without it, `packages/frontend-loop`'s loop cannot actually run; see its
-  README.md for the current verification status.
+- Nick's real pilot brief (Operator's Manual, Phase 4 requirement "From Nick") — this run still
+  used the `placeholder-2.0-case` brief.
 
 ## Correction-round log
 
@@ -42,11 +45,27 @@ honestly, for the correction-batch metric — this is the actual test of whether
 2.0's 40+ batch DreamSign baseline. Appended automatically by
 `packages/frontend-loop/src/correctionLog.ts` after each real run of `npm run build-page`.)_
 
+**First real live run: 2026-09-22.** 2 rounds, approved, vs. DreamSign 2.0's 40+ baseline — beats
+it on this run. Round 1's flagged issues were substantive, not cosmetic: the builder's first draft
+included an invented "500+ businesses served since 2011" stat and fabricated client names
+(Northgate Retail, Pine & Co., Harbor Hotels) presented as real past work — exactly the kind of
+unverifiable claim the brand notes ("credible and specific, not hype-driven") warned against. The
+evaluator caught it and the fix removed it entirely; round 2 approved clean. Real page:
+`clients/dreamsign-pilot/pages/clean-agency.html`. Real cost: builder (Agent 37) 573,600 prompt /
+35,863 completion tokens on its own free-tier terms; evaluator (Claude claude-sonnet-5) 17,576 in /
+842 out tokens, $0.0436.
+
+*(The table below was mislabeled "Fixed by: frontend-loop (Claude, self-reviewed)" at write time —
+that string was stale even before this run, left over from when both roles were Claude; corrected
+here since it doesn't match what actually happened. `cli.ts` now logs the real builder/evaluator
+names for every future run.)*
+
 | Round | Stage | What was flagged | Fixed by | Date |
 |---|---|---|---|---|
+| 1 | 4_homepage_build | Hero includes an infinite-scrolling client-logo marquee, a glowing radial gradient blur, and fake avatar initials with an invented "500+ businesses served since 2011" stat — this reads as hype-driven flash, not the "clean, high-trust, restrained" tone the brand notes call for.; Fabricated client names (Northgate Retail, Pine & Co., Harbor Hotels, etc.) presented as past work/social proof are unverifiable claims for a services business — this undercuts the "credible and specific, not hype-driven" instruction rather than supporting it.; The oversized (up to 160px) animated "Services" heading and scroll-triggered fade-ins on every row/card add motion-heavy flourish that leans flashy rather than restrained, inconsistent with brand notes. | frontend-loop (builder: agent37, evaluator: claude) | 2026-09-22 |
+| 2 | 4_homepage_build | (approved, no issues) | frontend-loop (builder: agent37, evaluator: claude) | 2026-09-22 |
 
 ## Notes
 
-No real run has happened yet — blocked on `ANTHROPIC_API_KEY` (see
-`packages/frontend-loop/README.md`). This file's correction-round table will fill in the moment a
-real run completes.
+First real run completed 2026-09-22 — see the correction-round log above. Next real run should use
+Nick's actual pilot brief once it lands, not the placeholder.
