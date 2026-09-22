@@ -6,15 +6,15 @@ top to bottom. Nothing gets checked as done until its **exit check** actually pa
 Last synced: 2026-09-22, via `/progress-sync` — rebuilt from git history and direct repo verification,
 not from self-report. See `git log` for the full commit trail this reflects.
 
-**Status summary**: Phases 1–4 are functionally complete with real, independently-verified evidence.
-Phase 5's deterministic checks are proven but its live evaluator run against a real page has never
-happened — now unblocked, since Phase 4 just produced one. Phases 6–7 haven't started. No hard blocker
-remains; the open Phase 1 items (CI-automated deploys, a real secrets manager, a handful of Nick-only
-decisions) all have tracked workarounds, not open stops.
+**Status summary**: Phases 1–5 are functionally complete with real, independently-verified evidence —
+Phase 5's 6 checks and live evaluator have now run for real against Phase 4's actual live output, not
+just a fixture. Phases 6–7 haven't started. No hard blocker remains; the open Phase 1 items
+(CI-automated deploys, a real secrets manager, a handful of Nick-only decisions) all have tracked
+workarounds, not open stops.
 
 **Next up**:
-1. Phase 5: run the verification CLI + live evaluator against `clients/dreamsign-pilot/pages/clean-agency.html`, as a genuinely separate check from the build itself.
-2. Phase 6: cockpit MVP — 3 rooms per the Fast-Track Plan's revision (Pipeline, Approvals, Runs), not the Manual's original unscoped dashboard.
+1. Phase 6: cockpit MVP — 3 rooms per the Fast-Track Plan's revision (Pipeline, Approvals, Runs), not the Manual's original unscoped dashboard.
+2. Phase 7: proof run — this is largely a documentation/presentation pass over what Phases 1–5 already proved for real, plus getting Nick to actually look at it.
 3. Phase 1: automate the Vercel deploy through CI — this session's deploy was a manual CLI call, not "zero manual steps."
 
 **Gaps noticed**:
@@ -86,12 +86,18 @@ compared against DreamSign's 40+."* All three parts independently verified, not 
 - [x] 6 deterministic checks built — the Manual's 5 named examples plus one backstop (required-sections), `packages/verification/src/checks/`
 - [x] Independent evaluator wired — separate Claude instance, distinct from Phase 4's builder/evaluator instances
 - [x] Deliberately broken build caught — proven via test fixture, 12/12 tests passing (re-confirmed 2026-09-22)
-- [ ] Verification CLI run against the real Phase 4 page — not yet done; now unblocked, since a real page exists (`clients/dreamsign-pilot/pages/clean-agency.html`)
-- [ ] Live evaluator run (real model call, not mocked) — same; unblocked but not yet run
+- [x] Verification CLI run against the real Phase 4 page — **MET 2026-09-22**: all 6 checks PASS
+      against `clients/dreamsign-pilot/pages/clean-agency.html` (secrets-scan, responsive-check,
+      no-console-errors, image-optimization, isolation-check, required-sections)
+- [x] Live evaluator run (real model call, not mocked) — same run: live Claude evaluator approved,
+      real cost logged ($0.0160, 7924 in / 13 out tokens)
 
-**Exit check** (deterministic half met, live half not yet run): *"A deliberately broken test build gets
-caught and returned before being marked done."* Proven against a fixture. The genuinely separate step —
-running this against Phase 4's real output — hasn't happened yet.
+**Exit check: MET (both halves) 2026-09-22.** *"A deliberately broken test build gets caught and
+returned before being marked done."* Proven against a fixture (Run 1, pre-dating this session) and
+now also run for real against Phase 4's actual live output — genuinely separate process, separate
+invocation, real Anthropic call. The full 78-check/50-point registry is out of scope for this sprint
+by the Manual's own explicit fallback ("5–8 well-chosen checks proving the loop works is the actual
+goal this sprint, completeness is next sprint's job") — this is that trimmed set, run for real.
 
 ## Phase 6: Cockpit MVP (Days 16–18 · 16 hrs)
 

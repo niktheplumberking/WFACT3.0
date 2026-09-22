@@ -13,8 +13,11 @@
  */
 import { readFileSync } from "node:fs";
 import { VerificationLoop, formatVerificationSummary } from "./verificationLoop.js";
-import { evaluatorModelClientFromEnv } from "./modelClient.js";
+import { evaluatorModelClientFromEnv, ClaudeModelClient } from "./modelClient.js";
 import { knownClientSlugs } from "./paths.js";
+
+// claude-sonnet-5 pricing, checked 2026-06-24 — see packages/hermes/src/cli.ts for the same note.
+const PRICING_USD_PER_MTOK = { input: 2.0, output: 10.0 };
 
 async function main() {
   const [htmlPath, clientSlug, goal, sectionsArg] = process.argv.slice(2);
@@ -37,6 +40,17 @@ async function main() {
   const result = await loop.run({ html, clientSlug, requiredSections, otherClientSlugs }, goal);
 
   console.log(formatVerificationSummary(result));
+
+  if (evaluatorModel instanceof ClaudeModelClient) {
+    const { inputTokens, outputTokens } = evaluatorModel.totalUsage;
+    const cost =
+      (inputTokens / 1_000_000) * PRICING_USD_PER_MTOK.input +
+      (outputTokens / 1_000_000) * PRICING_USD_PER_MTOK.output;
+    console.error(
+      `(cost — evaluator (claude ${evaluatorModel.modelIdUsed}): ${inputTokens} in / ` +
+        `${outputTokens} out tokens, $${cost.toFixed(4)})`,
+    );
+  }
 
   process.exitCode = result.status === "approved" ? 0 : 1;
 }

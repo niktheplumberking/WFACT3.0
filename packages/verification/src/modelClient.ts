@@ -5,6 +5,13 @@
  * for "no time for a truly separate model as evaluator" is "a separate Claude session as a
  * stand-in, flagged clearly as temporary" — a fresh `Anthropic` client instance here, distinct from
  * whatever instance built or Phase-4-reviewed the page.
+ *
+ * 2026-09-22: kept on Claude deliberately, not switched to Agent 37. Phase 4's builder now
+ * defaults to Agent 37 (see packages/frontend-loop/src/modelClient.ts) — routing this evaluator
+ * to Agent 37 too would mean the same model family checking its own output at one remove, exactly
+ * the correlated-failure risk CLAUDE.md §6 exists to prevent. Since the builder changed vendor,
+ * this file's own "ideally different vendor" gap (previously Claude reviewing Claude) is now
+ * genuinely closed, not just structurally distinct instances.
  */
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -31,10 +38,15 @@ export class ClaudeModelClient implements ModelClient {
   readonly name = "claude";
   private readonly client: Anthropic;
   private readonly modelId: string;
+  public readonly modelIdUsed: string;
+  // Same rationale as the other two packages' modelClient.ts — real cost logging per the
+  // Fast-Track routing rule.
+  public totalUsage = { inputTokens: 0, outputTokens: 0 };
 
   constructor(apiKey: string, modelId: string = DEFAULT_MODEL_ID) {
     this.client = new Anthropic({ apiKey });
     this.modelId = modelId;
+    this.modelIdUsed = modelId;
   }
 
   async complete({ system, user }: ModelRequest): Promise<string> {
@@ -44,6 +56,8 @@ export class ClaudeModelClient implements ModelClient {
       system,
       messages: [{ role: "user", content: user }],
     });
+    this.totalUsage.inputTokens += response.usage.input_tokens;
+    this.totalUsage.outputTokens += response.usage.output_tokens;
     const textBlock = response.content.find((block) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
       throw new Error("Claude response contained no text block — cannot verify a page from this.");
