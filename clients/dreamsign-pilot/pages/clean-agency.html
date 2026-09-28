@@ -3,624 +3,548 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DreamSign — Signage &amp; Brand Environments for Businesses</title>
-<meta name="description" content="DreamSign designs, fabricates, permits, and installs signage systems for retail, hospitality, and corporate businesses.">
+<title>DreamSign — Signage & Brand Identity, Done Right</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#0C0C0C;
-    --paper:#FFFFFF;
-    --paper-soft:#F6F5F2;
-    --accent:#FF6B2C;
-    --body-60: rgba(12,12,12,0.6);
-    --body-60-inv: rgba(255,255,255,0.6);
-    --line: rgba(12,12,12,0.12);
-    --line-inv: rgba(255,255,255,0.16);
-    --radius-lg: 48px;
-    --maxw: 1180px;
+    --accent:#D6482F;
+    --near-black:#0C0C0C;
+    --ink:#101010;
+    --paper:#ffffff;
+    --muted: rgba(16,16,16,0.6);
+    --muted-inv: rgba(255,255,255,0.6);
   }
-
   *{box-sizing:border-box;margin:0;padding:0;}
-
-  html{scroll-behavior:smooth;}
-
   html,body{
     font-family:'Kanit', sans-serif;
-    background:var(--paper);
+    background:var(--near-black);
     color:var(--ink);
+    scroll-behavior:smooth;
     -webkit-font-smoothing:antialiased;
   }
-
-  img,svg{display:block;max-width:100%;}
-
+  img{max-width:100%;display:block;}
   a{color:inherit;text-decoration:none;}
-
   ul{list-style:none;}
-
   button{font-family:inherit;cursor:pointer;}
 
-  .wrap{
-    max-width:var(--maxw);
-    margin:0 auto;
-    padding-left:1.25rem;
-    padding-right:1.25rem;
-  }
-
-  /* ---------- Skip link ---------- */
-  .skip-link{
-    position:absolute;
-    left:-999px;
-    top:0;
-    background:var(--accent);
-    color:#fff;
-    padding:0.75rem 1rem;
-    z-index:200;
-  }
-  .skip-link:focus{left:1rem;top:1rem;}
-
-  /* ---------- Nav ---------- */
-  .site-nav{
+  /* ---------- NAV ---------- */
+  header.site-nav{
     position:fixed;
     top:0;left:0;right:0;
-    z-index:100;
-    background:rgba(12,12,12,0.72);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line-inv);
-  }
-  .site-nav .wrap{
+    z-index:1000;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    min-height:64px;
+    padding:1.1rem 1.25rem;
+    background:rgba(12,12,12,0.82);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
   }
   .brand{
     color:#fff;
-    font-weight:800;
-    font-size:1.15rem;
+    font-weight:600;
+    font-size:1.05rem;
     letter-spacing:0.02em;
-    text-transform:uppercase;
   }
   .brand span{color:var(--accent);}
-  .nav-toggle{
+  nav.site-links{display:none;}
+  nav.site-links ul{display:flex;gap:2rem;}
+  nav.site-links a{
+    color:var(--muted-inv);
+    font-size:0.9rem;
+    font-weight:400;
+    letter-spacing:0.02em;
+    transition:color 0.2s ease;
+  }
+  nav.site-links a:hover{color:#fff;}
+  .nav-cta{
+    display:none;
+    padding:0.6rem 1.3rem;
+    background:var(--accent);
+    color:#fff;
+    font-weight:500;
+    font-size:0.85rem;
+    letter-spacing:0.02em;
+  }
+  @media (min-width:840px){
+    nav.site-links{display:block;}
+    .nav-cta{display:inline-block;}
+  }
+
+  /* ---------- HERO ---------- */
+  #hero{
+    background:var(--near-black);
+    color:#fff;
+    padding:8.5rem 1.25rem 4rem;
+    min-height:80vh;
     display:flex;
     flex-direction:column;
     justify-content:center;
-    align-items:center;
-    gap:5px;
-    width:38px;height:38px;
-    background:transparent;
-    border:1px solid var(--line-inv);
-    border-radius:8px;
+    position:relative;
   }
-  .nav-toggle span{
-    display:block;width:18px;height:2px;background:#fff;
+  .hero-inner{
+    max-width:1100px;
+    margin:0 auto;
+    width:100%;
   }
-  .nav-links{
-    position:absolute;
-    top:64px;left:0;right:0;
-    background:rgba(12,12,12,0.97);
-    display:flex;
-    flex-direction:column;
-    max-height:0;
-    overflow:hidden;
-    transition:max-height 0.35s ease;
-    border-bottom:1px solid var(--line-inv);
+  .eyebrow-hero{
+    font-size:0.85rem;
+    color:var(--muted-inv);
+    letter-spacing:0.05em;
+    margin-bottom:1.5rem;
   }
-  .nav-links.open{max-height:320px;}
-  .nav-links a{
-    color:#fff;
-    padding:1rem 1.25rem;
-    font-size:0.95rem;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    border-top:1px solid var(--line-inv);
-  }
-  .nav-links a:hover{color:var(--accent);}
-  .nav-cta{display:none;}
-
-  @media (min-width:860px){
-    .nav-toggle{display:none;}
-    .nav-links{
-      position:static;
-      flex-direction:row;
-      max-height:none;
-      background:transparent;
-      border-bottom:none;
-      overflow:visible;
-    }
-    .nav-links a{border-top:none;padding:0.5rem 0.9rem;}
-    .nav-cta{
-      display:inline-block;
-      margin-left:1rem;
-      padding:0.6rem 1.2rem;
-      background:var(--accent);
-      color:#fff;
-      font-size:0.85rem;
-      text-transform:uppercase;
-      letter-spacing:0.06em;
-      font-weight:600;
-      border-radius:4px;
-    }
-    .nav-links-inner{display:flex;align-items:center;}
-  }
-
-  /* ---------- Hero ---------- */
-  .hero{
-    background:var(--ink);
-    color:#fff;
-    padding:7.5rem 0 4.5rem;
-  }
-  .hero h1{
-    text-transform:uppercase;
-    font-weight:800;
-    line-height:1.05;
+  .eyebrow-hero strong{color:var(--accent);font-weight:600;}
+  h1.hero-headline{
+    font-weight:600;
     letter-spacing:-0.01em;
-    font-size:clamp(2.1rem, 8vw, 4.4rem);
-    max-width:16ch;
-    margin-bottom:1.4rem;
+    line-height:1.12;
+    font-size:clamp(2rem, 6vw, 3.4rem);
+    max-width:18ch;
+    margin-bottom:1.5rem;
   }
-  .hero h1 em{
-    font-style:normal;
+  h1.hero-headline em{
     color:var(--accent);
+    font-style:normal;
   }
-  .hero p.lede{
-    max-width:52ch;
-    color:var(--body-60-inv);
-    font-size:1.05rem;
-    line-height:1.6;
-    margin-bottom:2.2rem;
+  .hero-sub{
+    font-size:clamp(1rem, 2vw, 1.15rem);
+    color:var(--muted-inv);
+    max-width:46ch;
+    margin-bottom:2.25rem;
+    font-weight:300;
   }
-  .btn-primary{
+  .cta-primary{
     display:inline-block;
     background:var(--accent);
     color:#fff;
-    padding:1rem 1.8rem;
-    font-weight:600;
+    font-weight:500;
+    letter-spacing:0.02em;
     font-size:0.95rem;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    border-radius:4px;
+    padding:1rem 2.1rem;
     border:none;
-    transition:transform 0.2s ease, box-shadow 0.2s ease;
+    transition:background 0.2s ease;
   }
-  .btn-primary:hover{
-    transform:translateY(-2px);
-    box-shadow:0 10px 24px rgba(255,107,44,0.35);
+  .cta-primary:hover{background:#c13c25;}
+
+  .service-tags{
+    margin-top:3.5rem;
+    padding-top:1.75rem;
+    border-top:1px solid rgba(255,255,255,0.1);
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.6rem 1.6rem;
   }
-  .btn-ghost{
-    display:inline-block;
-    background:transparent;
-    color:var(--ink);
-    padding:1rem 1.8rem;
-    font-weight:600;
-    font-size:0.95rem;
-    text-transform:uppercase;
-    letter-spacing:0.06em;
-    border-radius:4px;
-    border:1px solid var(--ink);
+  .service-tags span{
+    font-size:0.9rem;
+    font-weight:400;
+    letter-spacing:0.03em;
+    color:rgba(255,255,255,0.4);
+    white-space:nowrap;
   }
 
-  @media (prefers-reduced-motion: reduce){
-    .btn-primary{transition:none;}
-  }
-
-  /* ---------- Services ---------- */
-  .services{
+  /* ---------- SERVICES ---------- */
+  #services{
     background:var(--paper);
-    border-radius:var(--radius-lg) var(--radius-lg) 0 0;
-    margin-top:-2.5rem;
+    border-radius:16px 16px 0 0;
+    padding:5rem 1.25rem 6rem;
     position:relative;
+    margin-top:-1.25rem;
     z-index:2;
-    padding:5rem 0 6rem;
   }
-  .section-kicker{
-    display:inline-block;
-    font-size:0.8rem;
+  @media (min-width:640px){
+    #services{ border-radius:20px 20px 0 0; padding:6rem 2rem 7rem; }
+  }
+  .section-inner{
+    max-width:1100px;
+    margin:0 auto;
+  }
+  .eyebrow{
     text-transform:uppercase;
     letter-spacing:0.14em;
-    color:var(--accent);
+    font-size:0.8rem;
     font-weight:600;
-    margin-bottom:0.8rem;
+    color:var(--accent);
+    margin-bottom:1rem;
   }
-  .services h2{
-    text-transform:uppercase;
-    font-weight:800;
+  h2.display-heading{
+    font-weight:600;
     letter-spacing:-0.01em;
-    line-height:1;
-    font-size:clamp(2.2rem, 6vw, 4rem);
-    margin-bottom:2.5rem;
-  }
-  .service-row{
-    display:flex;
-    flex-direction:column;
-    gap:0.8rem;
-    padding:2rem 0;
-    border-top:1px solid var(--line);
-  }
-  .service-row:first-child{border-top:none;}
-  .service-num{
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:-0.01em;
-    font-size:clamp(2.4rem, 9vw, 5.5rem);
-    line-height:1;
+    line-height:1.05;
+    font-size:clamp(2rem, 5vw, 3.4rem);
     color:var(--ink);
-  }
-  .service-body h3{
-    font-size:clamp(1.3rem, 3vw, 1.9rem);
-    font-weight:700;
-    text-transform:uppercase;
-    margin-bottom:0.5rem;
-    letter-spacing:0.01em;
-  }
-  .service-body p{
-    font-size:1rem;
-    line-height:1.65;
-    color:var(--ink);
-    opacity:0.6;
-    max-width:60ch;
-  }
-  @media (min-width:720px){
-    .service-row{flex-direction:row;align-items:center;gap:3rem;}
-    .service-num{flex:0 0 auto;width:8rem;}
+    margin-bottom:3rem;
   }
 
-  /* ---------- Process ---------- */
-  .process{
-    background:var(--paper-soft);
-    padding:5rem 0 6rem;
+  .service-row{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:1rem;
+    padding:2rem 0;
+    border-top:1px solid rgba(16,16,16,0.12);
+    opacity:0;
+    transform:translateY(20px);
+    transition:opacity 0.6s ease, transform 0.6s ease;
   }
-  .process h2{
-    text-transform:uppercase;
-    font-weight:800;
-    letter-spacing:-0.01em;
-    font-size:clamp(2rem, 6vw, 3.2rem);
-    margin-bottom:0.8rem;
-    max-width:16ch;
+  .service-row:first-of-type{border-top:none;}
+  .service-row.is-visible{opacity:1;transform:translateY(0);}
+  @media (min-width:760px){
+    .service-row{
+      grid-template-columns:110px 1fr;
+      align-items:center;
+      gap:2rem;
+    }
   }
-  .process > .wrap > p{
-    max-width:56ch;
+  .service-number{
+    font-size:clamp(1.6rem, 3vw, 2.2rem);
+    font-weight:600;
+    color:var(--muted);
+    line-height:1;
+  }
+  .service-name{
+    font-size:clamp(1.15rem, 2.2vw, 1.5rem);
+    font-weight:600;
+    letter-spacing:-0.005em;
+    margin-bottom:0.5rem;
+  }
+  .service-desc{
+    color:var(--ink);
     opacity:0.6;
-    margin-bottom:3rem;
-    line-height:1.6;
+    font-size:1rem;
+    font-weight:300;
+    max-width:60ch;
+    line-height:1.5;
+  }
+
+  /* ---------- PROCESS ---------- */
+  #process{
+    background:var(--paper);
+    padding:2rem 1.25rem 6rem;
+  }
+  @media (min-width:640px){ #process{ padding:2rem 2rem 7rem; } }
+  #process .section-inner h2.display-heading{
+    font-size:clamp(1.8rem, 4vw, 2.6rem);
+    margin-bottom:2.5rem;
   }
   .process-grid{
     display:grid;
     grid-template-columns:1fr;
-    gap:1.5rem;
+    gap:2rem;
   }
-  @media (min-width:720px){
-    .process-grid{grid-template-columns:repeat(2,1fr);}
-  }
-  @media (min-width:1024px){
-    .process-grid{grid-template-columns:repeat(4,1fr);}
+  @media (min-width:700px){
+    .process-grid{grid-template-columns:repeat(4,1fr);gap:1.5rem;}
   }
   .process-step{
-    background:var(--paper);
-    border:1px solid var(--line);
-    padding:2rem 1.5rem;
+    border-left:3px solid var(--accent);
+    padding-left:1.1rem;
   }
-  .step-index{
-    display:inline-flex;
-    align-items:center;justify-content:center;
-    width:2.6rem;height:2.6rem;
-    border-radius:50%;
-    background:var(--ink);
-    color:#fff;
-    font-weight:700;
-    font-size:0.95rem;
-    margin-bottom:1.2rem;
+  .process-step .step-num{
+    font-weight:600;
+    font-size:0.85rem;
+    letter-spacing:0.08em;
+    color:var(--accent);
+    text-transform:uppercase;
+    margin-bottom:0.6rem;
+    display:block;
   }
   .process-step h3{
     font-size:1.1rem;
-    text-transform:uppercase;
-    font-weight:700;
-    margin-bottom:0.6rem;
-    letter-spacing:0.01em;
+    font-weight:600;
+    margin-bottom:0.5rem;
   }
   .process-step p{
     font-size:0.95rem;
-    line-height:1.6;
     opacity:0.6;
+    font-weight:300;
+    line-height:1.5;
   }
 
-  /* ---------- Contact ---------- */
-  .contact{
-    background:var(--ink);
+  /* ---------- CONTACT ---------- */
+  #contact{
+    background:var(--near-black);
     color:#fff;
-    border-radius:var(--radius-lg) var(--radius-lg) 0 0;
-    margin-top:0;
-    padding:5rem 0 5rem;
+    padding:5rem 1.25rem 4rem;
   }
-  .contact h2{
-    text-transform:uppercase;
-    font-weight:800;
-    font-size:clamp(2rem, 6vw, 3.4rem);
-    letter-spacing:-0.01em;
-    max-width:14ch;
-    margin-bottom:0.8rem;
-  }
-  .contact > .wrap > p.lede{
-    max-width:52ch;
-    color:var(--body-60-inv);
-    line-height:1.6;
-    margin-bottom:2.8rem;
-  }
-  .contact-grid{
+  @media (min-width:640px){ #contact{ padding:6rem 2rem 5rem; } }
+  #contact .section-inner{
     display:grid;
     grid-template-columns:1fr;
-    gap:2.5rem;
+    gap:3rem;
   }
-  @media (min-width:900px){
-    .contact-grid{grid-template-columns:1.1fr 0.9fr;gap:4rem;}
+  @media (min-width:840px){
+    #contact .section-inner{grid-template-columns:1fr 1fr;gap:4rem;}
   }
-  .contact-form{
+  #contact h2.display-heading{
+    color:#fff;
+    font-size:clamp(1.8rem, 4.5vw, 2.8rem);
+    margin-bottom:1.25rem;
+  }
+  #contact .contact-lede{
+    color:var(--muted-inv);
+    font-size:1.05rem;
+    font-weight:300;
+    max-width:44ch;
+    margin-bottom:2rem;
+  }
+  .contact-detail{
+    margin-bottom:1.25rem;
+  }
+  .contact-detail span.label{
+    display:block;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    font-size:0.75rem;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:0.3rem;
+  }
+  .contact-detail a, .contact-detail p{
+    font-size:1.1rem;
+    font-weight:400;
+    color:#fff;
+  }
+
+  form.contact-form{
     display:flex;
     flex-direction:column;
     gap:1.1rem;
   }
-  .field{
+  .form-group{
     display:flex;
     flex-direction:column;
     gap:0.4rem;
   }
-  .field label{
-    font-size:0.78rem;
+  .form-group label{
+    font-size:0.75rem;
     text-transform:uppercase;
-    letter-spacing:0.08em;
-    color:var(--body-60-inv);
+    letter-spacing:0.1em;
+    color:var(--muted-inv);
+    font-weight:500;
   }
-  .field input,
-  .field textarea{
+  .form-group input, .form-group textarea{
     background:transparent;
     border:none;
-    border-bottom:1px solid var(--line-inv);
+    border-bottom:1px solid rgba(255,255,255,0.25);
     color:#fff;
     font-family:inherit;
     font-size:1rem;
     padding:0.6rem 0.1rem;
     outline:none;
+    transition:border-color 0.2s ease;
   }
-  .field input:focus,
-  .field textarea:focus{
+  .form-group input:focus, .form-group textarea:focus{
     border-bottom-color:var(--accent);
   }
-  .field textarea{resize:vertical;min-height:100px;}
-  .contact-form .btn-primary{
+  .form-group textarea{resize:vertical;min-height:90px;}
+  button.form-submit{
+    margin-top:0.75rem;
     align-self:flex-start;
-    margin-top:0.6rem;
-    border:none;
-  }
-  .contact-direct{
-    border-left:1px solid var(--line-inv);
-    padding-left:1.75rem;
-    display:flex;
-    flex-direction:column;
-    gap:1.6rem;
-  }
-  @media (max-width:899px){
-    .contact-direct{border-left:none;padding-left:0;border-top:1px solid var(--line-inv);padding-top:1.75rem;}
-  }
-  .contact-direct dt{
-    font-size:0.78rem;
-    text-transform:uppercase;
-    letter-spacing:0.08em;
-    color:var(--body-60-inv);
-    margin-bottom:0.3rem;
-  }
-  .contact-direct dd a{
-    font-size:1.15rem;
+    background:var(--accent);
+    color:#fff;
     font-weight:500;
+    letter-spacing:0.02em;
+    font-size:0.9rem;
+    padding:0.95rem 2rem;
+    border:none;
+    transition:background 0.2s ease;
   }
-  .contact-direct dd a:hover{color:var(--accent);}
+  button.form-submit:hover{background:#c13c25;}
+  .form-note{
+    font-size:0.8rem;
+    color:var(--muted-inv);
+    margin-top:0.5rem;
+  }
 
-  /* ---------- Footer ---------- */
-  footer.site-footer{
-    background:var(--ink);
-    color:var(--body-60-inv);
-    padding:2rem 0 2.5rem;
-    font-size:0.85rem;
+  footer{
+    background:var(--near-black);
+    color:var(--muted-inv);
+    padding:2rem 1.25rem;
+    text-align:center;
+    font-size:0.8rem;
+    border-top:1px solid rgba(255,255,255,0.08);
   }
-  .footer-row{
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
-    border-top:1px solid var(--line-inv);
-    padding-top:1.5rem;
-  }
-  @media (min-width:640px){
-    .footer-row{flex-direction:row;justify-content:space-between;align-items:center;}
-  }
-  .footer-links{display:flex;gap:1.2rem;flex-wrap:wrap;}
-  .footer-links a:hover{color:var(--accent);}
+  footer strong{color:#fff;}
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-nav">
-  <div class="wrap">
-    <a class="brand" href="#hero">Dream<span>Sign</span></a>
-    <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="nav-links-inner">
-      <div class="nav-links" id="navLinks">
-        <a href="#services">Services</a>
-        <a href="#process">Process</a>
-        <a href="#contact">Contact</a>
-      </div>
-      <a class="nav-cta" href="#contact">Get a Quote</a>
-    </nav>
-  </div>
+  <a href="#hero" class="brand">Dream<span>Sign</span></a>
+  <nav class="site-links">
+    <ul>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+  <a href="#contact" class="nav-cta">Get a Quote</a>
 </header>
 
-<main id="main">
+<main>
 
-  <section class="hero" id="hero" aria-label="Introduction">
-    <div class="wrap">
-      <h1>Signage, designed and built <em>around your business</em></h1>
+  <section id="hero" aria-label="Introduction">
+    <div class="hero-inner">
+      <p class="eyebrow-hero"><strong>Signage & Brand Identity</strong> — design, fabrication, and installation</p>
+      <h1 class="hero-headline">Signage &amp; identity work <em>built to last</em></h1>
+      <p class="hero-sub">DreamSign designs, fabricates, and installs signage and brand identity systems for businesses that want to be taken seriously — from storefronts to full site packages.</p>
+      <a href="#contact" class="cta-primary">Start a Project</a>
 
-      <p class="lede">DreamSign designs, fabricates, permits, and installs signage systems for retail, hospitality, and corporate spaces — from a single storefront sign to a multi-site rollout, handled end-to-end by one accountable team.</p>
-
-      <a class="btn-primary" href="#contact">Book a Site Consultation</a>
-    </div>
-  </section>
-
-  <section class="services" id="services" aria-label="Our services">
-    <div class="wrap">
-      <span class="section-kicker">What we do</span>
-      <h2>Services</h2>
-
-      <div class="service-row">
-        <div class="service-num">01</div>
-        <div class="service-body">
-          <h3>Brand Signage Design</h3>
-          <p>We translate your brand guidelines into signage that reads clearly at 5 feet and 50 feet — channel letters, monument signs, window graphics, and interior wayfinding, all specified to code before a single panel is cut.</p>
-        </div>
-      </div>
-
-      <div class="service-row">
-        <div class="service-num">02</div>
-        <div class="service-body">
-          <h3>Fabrication &amp; Installation</h3>
-          <p>In-house fabrication means one point of accountability from shop drawing to final mount. Our installation crews are licensed, insured, and scheduled around your operating hours.</p>
-        </div>
-      </div>
-
-      <div class="service-row">
-        <div class="service-num">03</div>
-        <div class="service-body">
-          <h3>Permitting &amp; Compliance</h3>
-          <p>Sign permitting varies block to block. We handle the applications, zoning variances, and landlord approvals so your project doesn't stall in a filing cabinet.</p>
-        </div>
-      </div>
-
-      <div class="service-row">
-        <div class="service-num">04</div>
-        <div class="service-body">
-          <h3>Maintenance &amp; Repair</h3>
-          <p>Illuminated signage fails quietly — a dark storefront at night costs more than the repair would have. We offer scheduled inspections and rapid-response repair contracts.</p>
-        </div>
+      <div class="service-tags" aria-label="Industries we work with">
+        <span>Retail</span><span>Hospitality</span><span>Healthcare</span><span>Real Estate</span><span>Automotive</span><span>Professional Services</span><span>Franchise Groups</span>
       </div>
     </div>
   </section>
 
-  <section class="process" id="process" aria-label="Our process">
-    <div class="wrap">
-      <span class="section-kicker">How it works</span>
-      <h2>A process built to remove surprises</h2>
-      <p>Every project follows the same four stages, in the same order, with the same paperwork — so you always know what's next and what it costs.</p>
+  <section id="services" aria-label="Services">
+    <div class="section-inner">
+      <p class="eyebrow">What We Do</p>
+      <h2 class="display-heading">Services</h2>
+
+      <div class="service-row">
+        <div class="service-number">01</div>
+        <div>
+          <h3 class="service-name">Signage Design</h3>
+          <p class="service-desc">Custom exterior and interior sign concepts built around your brand, your building, and your local code requirements — not a template.</p>
+        </div>
+      </div>
+
+      <div class="service-row">
+        <div class="service-number">02</div>
+        <div>
+          <h3 class="service-name">Fabrication</h3>
+          <p class="service-desc">Channel letters, monument signs, lightboxes, and dimensional lettering produced in-house to spec, with materials matched to your site conditions.</p>
+        </div>
+      </div>
+
+      <div class="service-row">
+        <div class="service-number">03</div>
+        <div>
+          <h3 class="service-name">Installation</h3>
+          <p class="service-desc">Licensed, insured install crews who handle permitting, mounting, and electrical hookup so the sign goes up right the first time.</p>
+        </div>
+      </div>
+
+      <div class="service-row">
+        <div class="service-number">04</div>
+        <div>
+          <h3 class="service-name">Brand Identity Systems</h3>
+          <p class="service-desc">Logo marks, color and type systems, and signage guidelines that keep every location and every sign consistent as you grow.</p>
+        </div>
+      </div>
+
+      <div class="service-row">
+        <div class="service-number">05</div>
+        <div>
+          <h3 class="service-name">Maintenance &amp; Repair</h3>
+          <p class="service-desc">Scheduled inspections, relamping, and repair service to keep existing signage compliant, lit, and looking the way it did on day one.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" aria-label="Our Process">
+    <div class="section-inner">
+      <p class="eyebrow">How It Works</p>
+      <h2 class="display-heading">Process</h2>
 
       <div class="process-grid">
         <div class="process-step">
-          <span class="step-index">1</span>
-          <h3>Site Walk &amp; Consultation</h3>
-          <p>We assess your location, sign codes, and existing structure before recommending anything.</p>
+          <span class="step-num">Step 01</span>
+          <h3>Consult</h3>
+          <p>We visit or review your site remotely, talk through goals and budget, and confirm what's possible under local sign code.</p>
         </div>
         <div class="process-step">
-          <span class="step-index">2</span>
-          <h3>Design &amp; Proposal</h3>
-          <p>You receive scaled renderings, material specs, and a fixed-price proposal — no change orders buried in fine print.</p>
+          <span class="step-num">Step 02</span>
+          <h3>Design</h3>
+          <p>You get concept renderings and material options, with revisions until the direction is locked in.</p>
         </div>
         <div class="process-step">
-          <span class="step-index">3</span>
-          <h3>Fabrication</h3>
-          <p>Panels, letters, and structures are built in our shop and quality-checked against the approved drawings.</p>
+          <span class="step-num">Step 03</span>
+          <h3>Fabricate</h3>
+          <p>Approved designs move to our shop for production, with progress updates and a firm delivery timeline.</p>
         </div>
         <div class="process-step">
-          <span class="step-index">4</span>
-          <h3>Install &amp; Handoff</h3>
-          <p>We install on your schedule, walk you through maintenance, and leave you with as-built documentation.</p>
+          <span class="step-num">Step 04</span>
+          <h3>Install</h3>
+          <p>Our crew handles permitting, mounting, and final sign-off — you get a working, code-compliant sign and a maintenance plan.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="contact" id="contact" aria-label="Contact us">
-    <div class="wrap">
-      <span class="section-kicker">Get in touch</span>
-      <h2>Let's talk about your signage</h2>
-      <p class="lede">Tell us about your space and timeline. Most consultations are scheduled within a week, and every proposal comes with a fixed price before work begins.</p>
+  <section id="contact" aria-label="Contact">
+    <div class="section-inner">
+      <div>
+        <p class="eyebrow" style="color:var(--accent);">Get In Touch</p>
+        <h2 class="display-heading">Contact</h2>
+        <p class="contact-lede">Tell us about your space and your timeline. We'll follow up within one business day with next steps.</p>
 
-      <div class="contact-grid">
-        <form class="contact-form" action="mailto:hello@dreamsign.co" method="post" enctype="text/plain">
-          <div class="field">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" autocomplete="name" required>
-          </div>
-          <div class="field">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" autocomplete="email" required>
-          </div>
-          <div class="field">
-            <label for="company">Company</label>
-            <input type="text" id="company" name="company" autocomplete="organization">
-          </div>
-          <div class="field">
-            <label for="message">Tell us about your project</label>
-            <textarea id="message" name="message" required></textarea>
-          </div>
-          <button type="submit" class="btn-primary">Send Message</button>
-        </form>
-
-        <dl class="contact-direct">
-          <div>
-            <dt>Email</dt>
-            <dd><a href="mailto:hello@dreamsign.co">hello@dreamsign.co</a></dd>
-          </div>
-          <div>
-            <dt>Phone</dt>
-            <dd><a href="tel:+1-555-018-2828">(555) 018-2828</a></dd>
-          </div>
-          <div>
-            <dt>Studio</dt>
-            <dd>4400 Kestrel Ave, Suite 210<br>Austin, TX 78745</dd>
-          </div>
-          <div>
-            <dt>Hours</dt>
-            <dd>Mon–Fri, 8:00–17:00 CT</dd>
-          </div>
-        </dl>
+        <div class="contact-detail">
+          <span class="label">Email</span>
+          <a href="mailto:hello@dreamsign.example">hello@dreamsign.example</a>
+        </div>
+        <div class="contact-detail">
+          <span class="label">Phone</span>
+          <a href="tel:+15551234567">(555) 123-4567</a>
+        </div>
+        <div class="contact-detail">
+          <span class="label">Hours</span>
+          <p>Mon–Fri, 8am–5pm</p>
+        </div>
       </div>
+
+      <form class="contact-form" aria-label="Project inquiry form" onsubmit="return false;">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="business">Business Name</label>
+          <input type="text" id="business" name="business">
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="message">Tell us about the project</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Send Inquiry</button>
+        <p class="form-note">We reply within one business day. No spam, ever.</p>
+      </form>
     </div>
   </section>
 
 </main>
 
-<footer class="site-footer">
-  <div class="wrap">
-    <div class="footer-row">
-      <span>&copy; 2026 DreamSign. All rights reserved.</span>
-      <nav class="footer-links">
-        <a href="#hero">Home</a>
-        <a href="#services">Services</a>
-        <a href="#process">Process</a>
-        <a href="#contact">Contact</a>
-      </nav>
-    </div>
-  </div>
+<footer>
+  <p>&copy; <strong>DreamSign</strong> — Signage &amp; Brand Identity. All rights reserved.</p>
 </footer>
 
 <script>
   (function(){
-    var toggle = document.getElementById('navToggle');
-    var links = document.getElementById('navLinks');
-    if(toggle && links){
-      toggle.addEventListener('click', function(){
-        var isOpen = links.classList.toggle('open');
-        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      });
-      links.querySelectorAll('a').forEach(function(a){
-        a.addEventListener('click', function(){
-          links.classList.remove('open');
-          toggle.setAttribute('aria-expanded', 'false');
-        });
-      });
+    var rows = document.querySelectorAll('.service-row');
+    if(!('IntersectionObserver' in window)){
+      rows.forEach(function(r){ r.classList.add('is-visible'); });
+      return;
     }
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          var el = entry.target;
+          var delay = parseInt(el.getAttribute('data-index'), 10) * 100;
+          setTimeout(function(){ el.classList.add('is-visible'); }, delay);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.15 });
+    rows.forEach(function(row, i){
+      row.setAttribute('data-index', i);
+      observer.observe(row);
+    });
   })();
 </script>
 

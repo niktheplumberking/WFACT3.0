@@ -2,8 +2,11 @@
   "name": "@wfact/frontend-loop",
   "version": "0.1.0",
   "private": true,
-  "description": "Phase 4 stand-in for the Motion Sites + 21st.dev front-end loop — see README.md for the fallbacks taken and CLAUDE.md §8 for the substitution-disclosure rule this follows.",
+  "description": "Phase 4 stand-in for the Motion Sites + 21st.dev front-end loop \u2014 see README.md for the fallbacks taken and CLAUDE.md \u00a78 for the substitution-disclosure rule this follows.",
   "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
   "scripts": {
     "build-page": "tsx src/cli.ts",
     "test": "tsx --test test/*.test.ts",

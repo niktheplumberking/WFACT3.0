@@ -1,0 +1,15 @@
+# gitleaks config for CI's "Secrets scan" step (.github/workflows/ci.yml). All default rules stay on.
+#
+# One narrow allowlist, added 2026-09-28 after CI run 36429819858 flagged 4 "generic-api-key" hits,
+# all in graphify-out/cache/stat-index.json. Investigated, not assumed: every flagged value is exactly
+# graphify's own `file_hash()` of a .claude/hooks/*token*.sh script (verified by recomputing it) —
+# the rule fires only because those file NAMES contain "token". That file is a derived
+# path -> content-hash index and never holds credentials. Do not widen this to all of graphify-out/:
+# the graph/wiki embed repo text and must stay scanned.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "graphify stat-index: file path -> content hash, derived, no secrets"
+paths = ['''^graphify-out/cache/stat-index\.json$''']

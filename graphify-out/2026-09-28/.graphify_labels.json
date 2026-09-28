@@ -1,5 +1,5 @@
 {
-  "0": "src/registry.ts",
+  "0": "verificationLoop.ts",
   "1": "WFACT 3.0 Law File (CLAUDE.md)",
   "2": "frontend-loop/src/cli.ts",
   "3": "App.tsx",
@@ -60,5 +60,8 @@
   "58": "graphify reference: incremental update and cluster-only",
   "59": "graphify reference: GitHub clone and cross-repo merge",
   "60": "graphify reference: transcribe video and audio",
-  "61": "extraction-spec.md"
+  "61": "extraction-spec.md",
+  "62": "agent-runtime/src/index.ts",
+  "63": "agent-runtime/package.json",
+  "64": "compilerOptions"
 }

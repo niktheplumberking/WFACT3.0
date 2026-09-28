@@ -64,6 +64,8 @@ names for every future run.)*
 |---|---|---|---|---|
 | 1 | 4_homepage_build | Hero includes an infinite-scrolling client-logo marquee, a glowing radial gradient blur, and fake avatar initials with an invented "500+ businesses served since 2011" stat — this reads as hype-driven flash, not the "clean, high-trust, restrained" tone the brand notes call for.; Fabricated client names (Northgate Retail, Pine & Co., Harbor Hotels, etc.) presented as past work/social proof are unverifiable claims for a services business — this undercuts the "credible and specific, not hype-driven" instruction rather than supporting it.; The oversized (up to 160px) animated "Services" heading and scroll-triggered fade-ins on every row/card add motion-heavy flourish that leans flashy rather than restrained, inconsistent with brand notes. | frontend-loop (builder: agent37, evaluator: claude) | 2026-09-22 |
 | 2 | 4_homepage_build | (approved, no issues) | frontend-loop (builder: agent37, evaluator: claude) | 2026-09-22 |
+| 1 | 4_homepage_build | Hero includes fabricated trust signals (initialed avatars "MK/JR/TS" and an unattributed "120+ businesses served" stat) with no way to verify — this reads as hype/manufactured social proof, which conflicts with the brand note to be credible and specific, not hype-driven.; Overall visual treatment (huge 900-weight uppercase display headlines, animated auto-scrolling logo marquee, heavy rounded-corner panel transitions) skews flashy/promotional rather than the "clean, restrained, high-trust" tone the brand notes call for. | workflow build-and-verify run cb59c6a4 | 2026-09-28 |
+| 2 | 4_homepage_build | (approved, no issues) | workflow build-and-verify run cb59c6a4 | 2026-09-28 |
 
 ## Notes
 

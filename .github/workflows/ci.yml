@@ -123,6 +123,29 @@ jobs:
       - name: Unit tests
         run: npm test
 
+  # Continuation Plan Stage 3: build-and-verify workflow — includes the Blueprint Phase 6 proof that
+  # a deliberately broken stage-1 output is caught before stage two, and checkpoint resume.
+  workflow:
+    name: Workflow (build → verify) — typecheck + unit tests
+    runs-on: ubuntu-latest
+    needs: guardrails
+    defaults:
+      run:
+        working-directory: packages/workflow
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install linked packages (audit, hermes, agent-runtime, frontend-loop, verification)
+        run: for p in audit hermes agent-runtime frontend-loop verification; do (cd ../$p && npm ci); done
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
   # Continuation Plan Stage 2: the shared agent lifecycle (Agent interface, runAgent, registry).
   agent-runtime:
     name: Agent runtime — typecheck + unit tests
@@ -197,7 +220,7 @@ jobs:
     name: Deploy Cockpit to Vercel (trunk only)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [guardrails, audit, hermes, agent-runtime, frontend-loop, verification, build]
+    needs: [guardrails, audit, hermes, agent-runtime, frontend-loop, verification, workflow, build]
     concurrency:
       group: deploy-cockpit
       cancel-in-progress: false

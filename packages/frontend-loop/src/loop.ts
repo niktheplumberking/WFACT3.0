@@ -68,7 +68,33 @@ export class FrontendLoop {
   }
 
   async run(brief: PilotBrief, template: PageTemplate): Promise<FrontendLoopResult> {
-    let html = await this.generate(brief, template);
+    return this.reviewUntilApproved(brief, template, await this.generate(brief, template));
+  }
+
+  /**
+   * Stage 3: revise an existing page against issues raised *outside* this loop (the QA agent's
+   * specific failed checks), then run the same bounded review rounds as `run()`. Blueprint Fig. 02:
+   * "Return to builder with the specific failed check" — not a regenerate-from-scratch, and not a
+   * vague "try again".
+   */
+  async revise(
+    brief: PilotBrief,
+    template: PageTemplate,
+    html: string,
+    issues: string[],
+  ): Promise<FrontendLoopResult> {
+    if (issues.length === 0) {
+      throw new Error("revise() needs at least one specific issue — a vague retry is not a revision.");
+    }
+    return this.reviewUntilApproved(brief, template, await this.fix(brief, template, html, issues));
+  }
+
+  private async reviewUntilApproved(
+    brief: PilotBrief,
+    template: PageTemplate,
+    initialHtml: string,
+  ): Promise<FrontendLoopResult> {
+    let html = initialHtml;
     const rounds: CorrectionRound[] = [];
 
     for (let round = 1; round <= this.maxRounds; round += 1) {

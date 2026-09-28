@@ -1,0 +1,26 @@
+{
+  "name": "@wfact/workflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stage 3 workflow engine v1 — build-and-verify with durable audit_log checkpoints. A hand-rolled stand-in for the Blueprint's durable engine (n8n/Temporal); see src/buildAndVerify.ts header.",
+  "type": "module",
+  "exports": {
+    ".": "./src/buildAndVerify.ts"
+  },
+  "scripts": {
+    "build-and-verify": "tsx src/cli.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@wfact/agent-runtime": "file:../agent-runtime",
+    "@wfact/audit": "file:../audit",
+    "@wfact/frontend-loop": "file:../frontend-loop",
+    "@wfact/verification": "file:../verification"
+  }
+}

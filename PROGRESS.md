@@ -271,7 +271,58 @@ specifically, not the whole repo yet.
   audit → hermes → agent-runtime first, verified by a clean-checkout simulation. The new
   `agent-runtime` job was added, and `deploy-cockpit` now needs it.
 
+## Stage 3 — Workflow engine v1: build → verify (BUILT + LIVE-PROVEN 2026-09-28, pending commit/CI)
+
+- [x] **`packages/workflow`, `buildAndVerify(brief)`**
+      - `front-end-builder` → a durable `workflow.checkpoint` row (stage `build`, artifact path +
+        sha256) → `qa-evaluator` against the **checkpointed** file, re-hashed first.
+      - On QA failure, the exact failed check IDs and evaluator issues go back to the builder via a
+        new additive `FrontendLoop.revise()` (bounded, default 2 revisions), then it halts with those
+        specifics.
+      - On pass: a `verified` checkpoint, then `workflow.gate` (`launch`, `hard-gate`). **It never
+        deploys.**
+      - Versioned (`build-and-verify@1.0.0`) in every row.
+- [x] **Checkpoint/rollback proven**, 7/7 tests:
+      - `broken.html` as the stage-1 output is caught before any verified checkpoint or gate, and
+        the builder's revision prompt contains every failed check ID.
+      - Broken-then-fixed passes in 2 cycles.
+      - A simulated crash right after the build checkpoint resumes via `resumeBuildAndVerify(runId)`
+        with **zero** builder calls.
+      - A tampered artifact is refused (`checkpoint_corrupt`).
+      - A finished run isn't re-opened.
+      - A malformed brief writes no rows.
+- [x] **One entry point**: `npm run build-and-verify -- <brief.json>` (or `--resume <run-id>`).
+      `packages/workflow/README.md`.
+- **Stand-in disclosed** (rule 2) in the file header, the README, and here: this is a hand-rolled
+  in-process workflow, NOT n8n/Temporal. No queue, no auto-restart; a human or CLI resumes a run.
+  Durability means only "checkpoints survive in Postgres".
+
+**Acceptance criteria**:
+- *One command runs build → verify against a real brief*: **MET, live.** Run `cb59c6a4…`: DreamSign
+  placeholder brief, Doppler as the only secrets source, Agent 37 builder (2 internal correction
+  rounds), Claude QA → `awaiting_launch_approval` in 1 cycle.
+  - Independently checked: the 9 audit rows were read back via SQL (start → builder → checkpoint
+    `build` → QA decision `approved` → checkpoint `verified` → gate `hard-gate`, one run_id).
+  - The file on disk re-hashes to the checkpoint's `6771ed270ff7…`.
+  - A separate verification-CLI process re-ran all 6 checks: PASS, evaluator APPROVED ($0.0143).
+- *Checkpoint is a real row, crash-recoverable*: **MET** (the rows above, plus the resume tests).
+- Caveat: the "real brief" is still the placeholder (`source: placeholder-2.0-case`). That stays
+  Nick-gated until Stage 7.
+
+**CI**: the Stage 2 push's run (`36429819858`) failed in gitleaks. I investigated rather than
+assumed; all 8 findings across the last 3 commits were in `graphify-out/cache/stat-index.json`.
+Each flagged value is exactly graphify's `file_hash()` of a `.claude/hooks/*token*.sh` script: file
+names containing "token", not secrets. A new `.gitleaks.toml` keeps every default rule and allowlists
+only that one file. Verified locally with gitleaks 8.30.1: default rules give 8 findings, the repo
+config gives 0, and a canary key placed elsewhere in `graphify-out/` is still caught. New `workflow`
+CI job; `deploy-cockpit` now needs it.
+
 **Gaps noticed**:
+- The live run overwrote `clients/dreamsign-pilot/pages/clean-agency.html` (the file behind the
+  earlier Vercel page) and appended 2 correction rows to its `memory.md`. That's the workflow's
+  intended output, but the deployed `dreamsign-deploy.vercel.app` still serves the older version.
+- Six linked `file:` packages now, installed in dependency order per CI job. The npm workspaces
+  question from Stage 2 is now worth deciding before Stage 4 adds more.
 - Lifecycle rows carry `entity_slug = null` when the caller doesn't set `task.entitySlug`. The QA CLI
   has a client slug but no entity slug, so it passes neither.
 - Four packages now link each other via `file:` with a manual install order in CI. If more packages

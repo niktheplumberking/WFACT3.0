@@ -131,15 +131,87 @@ export class SupabaseAuditSink implements AuditSink {
   }
 }
 
-/** Deterministic sink for tests — no network, fully inspectable. */
-export class InMemoryAuditSink implements AuditSink {
+/** A row read back out of audit_log. */
+export interface AuditRecord extends AuditEvent {
+  occurredAt: string;
+}
+
+/**
+ * Read side, added in Stage 3: a workflow's checkpoints ARE audit_log rows, so recovering from a
+ * crash means reading them back. Read-only by construction — there is still no update/delete path.
+ */
+export interface AuditReader {
+  /** Every row for one run, oldest first. */
+  listByRun(runId: string): Promise<AuditRecord[]>;
+}
+
+/** Deterministic sink (and reader) for tests — no network, fully inspectable. */
+export class InMemoryAuditSink implements AuditSink, AuditReader {
   readonly name = "memory";
   public readonly events: AuditEvent[] = [];
+  private readonly timestamps: string[] = [];
 
   async write(event: AuditEvent): Promise<void> {
     validateAuditEvent(event);
     this.events.push(structuredClone(event));
+    this.timestamps.push(new Date().toISOString());
   }
+
+  async listByRun(runId: string): Promise<AuditRecord[]> {
+    return this.events
+      .map((e, i) => ({ ...structuredClone(e), occurredAt: this.timestamps[i]! }))
+      .filter((e) => e.runId === runId);
+  }
+}
+
+export class SupabaseAuditReader implements AuditReader {
+  private readonly endpoint: string;
+
+  constructor(
+    url: string,
+    private readonly serviceRoleKey: string,
+    private readonly fetchImpl: typeof fetch = fetch,
+  ) {
+    this.endpoint = `${url.replace(/\/+$/, "")}/rest/v1/audit_log`;
+  }
+
+  async listByRun(runId: string): Promise<AuditRecord[]> {
+    if (!UUID_PATTERN.test(runId)) throw new AuditValidationError(`runId must be a UUID, got ${JSON.stringify(runId)}`);
+    const query = `?run_id=eq.${runId}&order=occurred_at.asc&select=*`;
+    const response = await this.fetchImpl(this.endpoint + query, {
+      headers: { apikey: this.serviceRoleKey, Authorization: `Bearer ${this.serviceRoleKey}` },
+    });
+    if (!response.ok) {
+      throw new AuditWriteError(`audit_log read failed (HTTP ${response.status})`, response.status);
+    }
+    type Row = {
+      occurred_at: string; actor: string; action: string; outcome: AuditOutcome;
+      task_id: string | null; run_id: string | null; entity_slug: string | null; payload: Record<string, unknown>;
+    };
+    return ((await response.json()) as Row[]).map((r) => ({
+      occurredAt: r.occurred_at,
+      actor: r.actor,
+      action: r.action,
+      outcome: r.outcome,
+      taskId: r.task_id,
+      runId: r.run_id,
+      entitySlug: r.entity_slug,
+      payload: r.payload,
+    }));
+  }
+}
+
+/** Same env contract (and same refusal to use the anon key) as `auditSinkFromEnv`. */
+export function auditReaderFromEnv(env: NodeJS.ProcessEnv = process.env): {
+  reader: AuditReader | null;
+  reason: string | null;
+} {
+  const url = env.SUPABASE_URL;
+  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    return { reader: null, reason: "SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are not both set — cannot read audit_log." };
+  }
+  return { reader: new SupabaseAuditReader(url, key), reason: null };
 }
 
 /**

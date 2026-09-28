@@ -2,8 +2,11 @@
   "name": "@wfact/verification",
   "version": "0.1.0",
   "private": true,
-  "description": "Phase 5 verification loop — 6 deterministic checks plus an independent evaluator step. See README.md for scope and CLAUDE.md §8 for the substitution-disclosure rule this follows.",
+  "description": "Phase 5 verification loop \u2014 6 deterministic checks plus an independent evaluator step. See README.md for scope and CLAUDE.md \u00a78 for the substitution-disclosure rule this follows.",
   "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
   "scripts": {
     "verify": "tsx src/cli.ts",
     "test": "tsx --test test/*.test.ts",

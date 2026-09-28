@@ -5,7 +5,7 @@
  * typed input, one bounded execution, and "hit the round cap" surfaced as an escalation instead of
  * a flag the caller has to remember to check.
  */
-import type { Agent } from "@wfact/agent-runtime";
+import { AgentInputError, type Agent } from "@wfact/agent-runtime";
 import { parseBrief, type PilotBrief } from "./brief.js";
 import { selectTemplate, type PageTemplate } from "./templates.js";
 import { FrontendLoop, type FrontendLoopResult } from "./loop.js";
@@ -16,6 +16,11 @@ export const FRONT_END_BUILDER_ROLE = "front-end-builder";
 export interface FrontendBuildInput {
   brief: PilotBrief;
   template: PageTemplate;
+  /**
+   * Stage 3: when present, revise this page against these specific issues (from the QA agent)
+   * instead of generating from scratch.
+   */
+  revision?: { html: string; issues: string[] };
 }
 
 export interface FrontendBuilderAgentOptions {
@@ -37,10 +42,23 @@ export function createFrontendBuilderAgent(
     // already bounds its own correction rounds. A task can raise this via retryBudget.
     retry: { maxAttempts: 1, baseDelayMs: 2000 },
     parseInput(raw: unknown): FrontendBuildInput {
-      const brief = parseBrief((raw as { brief?: unknown } | null)?.brief);
-      return { brief, template: selectTemplate(brief.templatePreference) };
+      const r = (raw ?? {}) as { brief?: unknown; revision?: unknown };
+      const brief = parseBrief(r.brief);
+      const input: FrontendBuildInput = { brief, template: selectTemplate(brief.templatePreference) };
+      if (r.revision !== undefined) {
+        const rev = r.revision as { html?: unknown; issues?: unknown };
+        if (typeof rev.html !== "string" || rev.html.length === 0) {
+          throw new AgentInputError("revision.html must be the non-empty page being revised");
+        }
+        if (!Array.isArray(rev.issues) || rev.issues.length === 0 || !rev.issues.every((i) => typeof i === "string" && i)) {
+          throw new AgentInputError("revision.issues must be a non-empty list of specific issues");
+        }
+        input.revision = { html: rev.html, issues: rev.issues as string[] };
+      }
+      return input;
     },
-    execute: ({ brief, template }) => loop.run(brief, template),
+    execute: ({ brief, template, revision }) =>
+      revision ? loop.revise(brief, template, revision.html, revision.issues) : loop.run(brief, template),
     escalationReason: (result) => (result.needsHuman ? result.escalationReason ?? "front-end loop needs a human" : null),
     summarize: (result) => ({
       approved: result.approved,
