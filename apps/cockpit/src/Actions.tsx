@@ -70,7 +70,8 @@ function ResultView({ job }: { job: JobRow }) {
       </p>
     );
   }
-  if (job.kind === "build_plan" || job.kind === "resume") {
+  // A job that failed before the pipeline ran (e.g. dispatch refused) has no result — show only its error.
+  if ((job.kind === "build_plan" || job.kind === "resume") && r.status !== undefined) {
     return (
       <div className="plan-sub">
         <p>
