@@ -15,7 +15,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
     "@wfact/agent-runtime": "file:../agent-runtime",
-    "@wfact/audit": "file:../audit"
+    "@wfact/audit": "file:../audit",
+    "@wfact/hermes-lite": "file:../hermes"
   },
   "devDependencies": {
     "@types/node": "^22.20.2",

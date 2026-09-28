@@ -14,14 +14,15 @@ import { loadBrief } from "./brief.js";
 import { selectTemplate } from "./templates.js";
 import { modelClientFromEnv, Agent37ModelClient, ClaudeModelClient } from "./modelClient.js";
 import { randomUUID } from "node:crypto";
-import { auditSinkFromEnv } from "@wfact/audit";
+import { auditSinkFromEnv, traceSinkFromEnv } from "@wfact/audit";
+import { costForModel } from "@wfact/hermes-lite/routing";
+import { traceModelClient } from "@wfact/hermes-lite/tracing";
 import { createSeedRegistry, runAgent } from "@wfact/agent-runtime";
 import { createFrontendBuilderAgent, FRONT_END_BUILDER_ROLE } from "./agent.js";
 import { appendCorrectionLogRows, formatCorrectionSummary } from "./correctionLog.js";
 import { repoRoot } from "./paths.js";
 
-// claude-sonnet-5 pricing, checked 2026-06-24 — see packages/hermes/src/cli.ts for the same note.
-const CLAUDE_PRICING_USD_PER_MTOK = { input: 2.0, output: 10.0 };
+// Stage 5: prices come from the one table in packages/hermes/config/model-routing.json (costForModel).
 
 async function main() {
   const briefPath = process.argv[2];
@@ -61,7 +62,13 @@ async function main() {
   // same FrontendLoop inside, plus typed-task validation, bounded retry and lifecycle audit rows.
   const { sink: auditSink, reason: auditReason } = auditSinkFromEnv();
   if (!auditSink) console.error(`NOTE (audit): ${auditReason}\n`);
-  const agent = createFrontendBuilderAgent({ builderModel, evaluatorModel });
+  // Stage 5: trace both models' calls (tagged with the front-end-builder task) when the store is available.
+  const { sink: traceSink, reason: traceReason } = traceSinkFromEnv();
+  if (!traceSink) console.error(`NOTE (traces): ${traceReason}\n`);
+  const agent = createFrontendBuilderAgent({
+    builderModel: traceSink ? traceModelClient(builderModel, traceSink, "cli:build-page") : builderModel,
+    evaluatorModel: traceSink ? traceModelClient(evaluatorModel, traceSink, "cli:build-page") : evaluatorModel,
+  });
   const run = await runAgent(
     agent,
     {
@@ -88,12 +95,10 @@ async function main() {
   ] as const) {
     if (client instanceof ClaudeModelClient) {
       const { inputTokens, outputTokens } = client.totalUsage;
-      const cost =
-        (inputTokens / 1_000_000) * CLAUDE_PRICING_USD_PER_MTOK.input +
-        (outputTokens / 1_000_000) * CLAUDE_PRICING_USD_PER_MTOK.output;
+      const { costUsd } = costForModel(client.modelIdUsed, { inputTokens, outputTokens });
       console.error(
         `(cost — ${role} (claude ${client.modelIdUsed}): ${inputTokens} in / ${outputTokens} out ` +
-          `tokens, $${cost.toFixed(4)})`,
+          `tokens, ${costUsd === null ? "price unknown" : `$${costUsd.toFixed(4)}`})`,
       );
     } else if (client instanceof Agent37ModelClient) {
       console.error(

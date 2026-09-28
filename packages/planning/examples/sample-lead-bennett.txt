@@ -1,0 +1,10 @@
+Form submission — bennettandco.example/contact
+Company: Harbor Street Bakery
+Name: Tomas
+Message: Hi Bennett & Co. We're opening a second bakery location next month and want a simple landing
+page for the launch: what's new at the new shop, opening day details, and a sign-up so people can get
+the opening-day offer. Warm and friendly, not corporate.
+
+---
+SYNTHETIC TEST REQUEST for WFACT Stage 5 (tracing proof). "Harbor Street Bakery" is fictional; not a
+real client. Real briefs come from Nick (see BLOCKED-ON-NICK.md).

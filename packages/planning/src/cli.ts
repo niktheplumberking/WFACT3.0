@@ -12,7 +12,8 @@
  *   doppler run -- npm run build-and-verify -- --plan <plan-id>     (packages/workflow)
  */
 import { readFileSync } from "node:fs";
-import { auditSinkFromEnv } from "@wfact/audit";
+import { auditSinkFromEnv, traceSinkFromEnv } from "@wfact/audit";
+import { traceModelClient } from "@wfact/hermes-lite/tracing";
 import { resolveModelRoute, estimateCostUsd } from "@wfact/hermes-lite/routing";
 import { ClaudeJsonClient } from "./modelClient.js";
 import { planStoreFromEnv } from "./planStore.js";
@@ -47,8 +48,11 @@ async function main() {
     `(routing ${intakeRoute.configVersion}: intake → ${intakeRoute.model} [${intakeRoute.tier}, ${intakeRoute.source}]; ` +
       `planner → ${plannerRoute.model} [${plannerRoute.tier}, ${plannerRoute.source}])`,
   );
-  const intakeModel = new ClaudeJsonClient(intakeRoute, apiKey);
-  const plannerModel = new ClaudeJsonClient(plannerRoute, apiKey);
+  // Stage 5: both agents' model calls are traced to model_traces, tagged with their task ids.
+  const { sink: traceSink, reason: traceReason } = traceSinkFromEnv();
+  if (!traceSink) blocked(`trace store unavailable — ${traceReason}`);
+  const intakeModel = traceModelClient(new ClaudeJsonClient(intakeRoute, apiKey), traceSink, "cli:intake");
+  const plannerModel = traceModelClient(new ClaudeJsonClient(plannerRoute, apiKey), traceSink, "cli:intake");
   const deps = { intakeModel, plannerModel, store, audit };
 
   let result: PlanningResult;

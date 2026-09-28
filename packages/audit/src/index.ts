@@ -13,6 +13,8 @@
  * for the action being audited — an unaudited agent action is exactly what Blueprint §16K rules out.
  */
 
+import { AsyncLocalStorage } from "node:async_hooks";
+
 export type AuditOutcome = "success" | "failure" | "rejected" | "info";
 
 export interface AuditEvent {
@@ -258,5 +260,179 @@ export async function recordAudit(
     action: event.action,
     outcome: event.outcome,
     payload: event.payload,
+  });
+}
+
+// =============================================================================================
+// Stage 5 — observability seed: per-model-call traces (public.model_traces, migration 0008).
+// Lives beside the audit writer because it shares its transport, its fail-closed rule and its
+// zero-dependency constraint; the TABLE is separate (Blueprint §2: observability reports, it doesn't
+// decide — and cost data is owner-only, unlike the audit trail).
+// =============================================================================================
+
+/**
+ * The run context an agent executes under. `runAgent` (packages/agent-runtime) enters it around
+ * every attempt, so a traced model client can tag each call with the task that made it — without
+ * threading ids through every model interface. Calls made outside any agent run (e.g. Hermes-lite's
+ * status answer) fall back to the tracer's own actor and carry no task_id.
+ */
+export interface RunContext {
+  taskId: string | null;
+  runId: string | null;
+  actor: string;
+  entitySlug: string | null;
+}
+export const runContext = new AsyncLocalStorage<RunContext>();
+
+export interface TraceEvent {
+  runId: string | null;
+  taskId: string | null;
+  actor: string;
+  provider: "anthropic" | "agent37";
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  /** null ⇔ basis "unpriced" (enforced by a table constraint too). */
+  costUsd: number | null;
+  priceBasis: "metered" | "unpriced";
+  pricingVersion: string | null;
+  latencyMs: number;
+  outcome: "success" | "error";
+  error: string | null;
+  entitySlug: string | null;
+}
+
+export interface TraceSink {
+  readonly name: string;
+  writeTrace(event: TraceEvent): Promise<void>;
+}
+
+export class SupabaseTraceSink implements TraceSink {
+  readonly name = "supabase";
+  private readonly endpoint: string;
+  constructor(url: string, private readonly serviceRoleKey: string, private readonly fetchImpl: typeof fetch = fetch) {
+    this.endpoint = `${url.replace(/\/+$/, "")}/rest/v1/model_traces`;
+  }
+  async writeTrace(e: TraceEvent): Promise<void> {
+    let res: Response;
+    try {
+      res = await this.fetchImpl(this.endpoint, {
+        method: "POST",
+        headers: {
+          apikey: this.serviceRoleKey,
+          Authorization: `Bearer ${this.serviceRoleKey}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({
+          run_id: e.runId, task_id: e.taskId, actor: e.actor, provider: e.provider, model: e.model,
+          input_tokens: e.inputTokens, output_tokens: e.outputTokens, cost_usd: e.costUsd,
+          price_basis: e.priceBasis, pricing_version: e.pricingVersion, latency_ms: e.latencyMs,
+          outcome: e.outcome, error: e.error, entity_slug: e.entitySlug,
+        }),
+      });
+    } catch (err) {
+      throw new AuditWriteError(`model_traces write failed before a response: ${String(err)}`, null);
+    }
+    if (!res.ok) {
+      throw new AuditWriteError(`model_traces write rejected (HTTP ${res.status}): ${(await res.text().catch(() => "")).slice(0, 300)}`, res.status);
+    }
+  }
+}
+
+export class InMemoryTraceSink implements TraceSink {
+  readonly name = "memory";
+  readonly traces: TraceEvent[] = [];
+  async writeTrace(e: TraceEvent): Promise<void> {
+    this.traces.push(structuredClone(e));
+  }
+}
+
+export function traceSinkFromEnv(env: NodeJS.ProcessEnv = process.env): { sink: TraceSink | null; reason: string | null } {
+  if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { sink: null, reason: "SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are not both set — model calls will NOT be traced." };
+  }
+  return { sink: new SupabaseTraceSink(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY), reason: null };
+}
+
+export interface TraceOptions {
+  sink: TraceSink;
+  /** Which async method to trace, e.g. "complete" or "completeJson". */
+  method: string;
+  provider: TraceEvent["provider"];
+  model: string;
+  /** Reads the client's cumulative, provider-reported token counters. */
+  usage: () => { inputTokens: number; outputTokens: number };
+  /** Price lookup — callers pass Hermes-lite's `costForModel` (the one price table). */
+  cost: (model: string, usage: { inputTokens: number; outputTokens: number }) => {
+    costUsd: number | null;
+    basis: "metered" | "unpriced";
+    pricingVersion: string | null;
+  };
+  /** Actor for calls made outside any agent run. */
+  fallbackActor: string;
+}
+
+/**
+ * Wrap a model client so every call to `opts.method` writes exactly one model_traces row: the
+ * token DELTA of that call (provider-reported counters, read before and after), cost from the price
+ * table, wall-clock latency, success/error — tagged with the current runContext's task.
+ *
+ * Fail closed, like the audit writer: if the trace can't be written, the call's result is not
+ * returned (an untraced paid call is what Stage 5 exists to prevent). Sequential use only: the delta
+ * is read from shared counters, so concurrent calls on ONE wrapped client would blur attribution —
+ * every pipeline in this repo calls each client sequentially.
+ */
+export function traceModelCalls<T extends object>(client: T, opts: TraceOptions): T {
+  const original = (client as Record<string, unknown>)[opts.method];
+  if (typeof original !== "function") throw new Error(`traceModelCalls: client has no method "${opts.method}"`);
+  // Snapshot the numbers: clients expose their live counter object, so holding the reference would
+  // make before === after and every delta 0 (caught by test/trace.test.ts before it shipped).
+  const readUsage = () => {
+    const u = opts.usage();
+    return { inputTokens: u.inputTokens, outputTokens: u.outputTokens };
+  };
+  const traced = async (...args: unknown[]) => {
+    const before = readUsage();
+    const started = Date.now();
+    const ctx = runContext.getStore();
+    let result: unknown;
+    let error: unknown = null;
+    try {
+      result = await (original as (...a: unknown[]) => Promise<unknown>).apply(client, args);
+    } catch (err) {
+      error = err;
+    }
+    const after = readUsage();
+    const usage = {
+      inputTokens: Math.max(0, after.inputTokens - before.inputTokens),
+      outputTokens: Math.max(0, after.outputTokens - before.outputTokens),
+    };
+    const price = opts.cost(opts.model, usage);
+    await opts.sink.writeTrace({
+      runId: ctx?.runId ?? null,
+      taskId: ctx?.taskId ?? null,
+      actor: ctx?.actor ?? opts.fallbackActor,
+      provider: opts.provider,
+      model: opts.model,
+      inputTokens: usage.inputTokens,
+      outputTokens: usage.outputTokens,
+      costUsd: price.basis === "metered" ? price.costUsd : null,
+      priceBasis: price.basis,
+      pricingVersion: price.pricingVersion,
+      latencyMs: Date.now() - started,
+      outcome: error ? "error" : "success",
+      error: error ? (error instanceof Error ? `${error.name}: ${error.message}` : String(error)).slice(0, 500) : null,
+      entitySlug: ctx?.entitySlug ?? null,
+    });
+    if (error) throw error;
+    return result;
+  };
+  return new Proxy(client, {
+    get(target, prop, receiver) {
+      if (prop === opts.method) return traced;
+      const value = Reflect.get(target, prop, receiver);
+      return typeof value === "function" ? value.bind(target) : value;
+    },
   });
 }

@@ -5,13 +5,15 @@ import { Login } from "./Login";
 import { Pipeline } from "./Pipeline";
 import { Approvals } from "./Approvals";
 import { Runs } from "./Runs";
+import { Models } from "./Models";
 
-type Room = "pipeline" | "approvals" | "runs";
+type Room = "pipeline" | "approvals" | "runs" | "models";
 
 const ROOMS: { id: Room; label: string; hint: string }[] = [
   { id: "pipeline", label: "Pipeline", hint: "Every project, by stage" },
   { id: "approvals", label: "Approvals", hint: "Gates waiting on a decision" },
   { id: "runs", label: "Runs", hint: "Correction rounds, logged" },
+  { id: "models", label: "Models", hint: "Usage, real cost, latency — owner only" },
 ];
 
 interface Stats {
@@ -119,6 +121,7 @@ export default function App() {
           {room === "pipeline" && <Pipeline />}
           {room === "approvals" && <Approvals />}
           {room === "runs" && <Runs />}
+          {room === "models" && <Models />}
         </section>
       </main>
     </div>

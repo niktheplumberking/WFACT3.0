@@ -13,13 +13,14 @@
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { auditReaderFromEnv, auditSinkFromEnv } from "@wfact/audit";
+import { auditReaderFromEnv, auditSinkFromEnv, traceSinkFromEnv } from "@wfact/audit";
 import { createSeedRegistry } from "@wfact/agent-runtime";
 import { createFrontendBuilderAgent } from "@wfact/frontend-loop/agent";
 import { modelClientFromEnv } from "@wfact/frontend-loop/modelClient";
 import { appendCorrectionLogRows, formatCorrectionSummary } from "@wfact/frontend-loop/correctionLog";
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
-import { evaluatorModelClientFromEnv, ClaudeModelClient } from "@wfact/verification/modelClient";
+import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
+import { traceModelClient } from "@wfact/hermes-lite/tracing";
 import { knownClientSlugs } from "@wfact/verification/paths";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
 import {
@@ -33,8 +34,6 @@ import {
 } from "./buildAndVerify.js";
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..", "..");
-// claude-sonnet-5 pricing, checked 2026-06-24 — same note as packages/hermes/src/cli.ts.
-const CLAUDE_USD_PER_MTOK = { input: 2.0, output: 10.0 };
 
 function blocked(msg: string): never {
   console.error(`BLOCKED: ${msg}`);
@@ -82,9 +81,18 @@ async function main() {
   if (!qa.client) console.error(`NOTE (QA evaluator): ${qa.reason}\n`);
   console.error(`(builder: ${builder.chose}; builder's reviewer: ${builderReviewer.chose}; QA evaluator: ${qa.client?.name ?? "none"})`);
 
+  // Stage 5: every model call is traced to model_traces (tokens, real cost, latency, outcome), tagged
+  // with the agent task that made it. Required, like the checkpoint store: an untraced run is exactly
+  // the "cost estimated, not measured" gap Blueprint §16K rules out.
+  const { sink: traceSink, reason: traceReason } = traceSinkFromEnv();
+  if (!traceSink) blocked(`trace store unavailable — ${traceReason}`);
+  const builderModel = traceModelClient(builder.client, traceSink, "cli:build-and-verify");
+  const reviewerModel = traceModelClient(builderReviewer.client, traceSink, "cli:build-and-verify");
+  const qaModel = qa.client ? traceModelClient(qa.client, traceSink, "cli:build-and-verify") : null;
+
   const deps: WorkflowDeps = {
-    frontEndAgent: createFrontendBuilderAgent({ builderModel: builder.client, evaluatorModel: builderReviewer.client }),
-    qaAgent: createQaEvaluatorAgent({ evaluatorModel: qa.client }),
+    frontEndAgent: createFrontendBuilderAgent({ builderModel, evaluatorModel: reviewerModel }),
+    qaAgent: createQaEvaluatorAgent({ evaluatorModel: qaModel }),
     registry: createSeedRegistry(),
     audit: sink,
     reader,
@@ -123,11 +131,7 @@ async function main() {
       }
     }
   }
-  if (qa.client instanceof ClaudeModelClient) {
-    const { inputTokens, outputTokens } = qa.client.totalUsage;
-    const cost = (inputTokens / 1e6) * CLAUDE_USD_PER_MTOK.input + (outputTokens / 1e6) * CLAUDE_USD_PER_MTOK.output;
-    console.error(`(cost — QA evaluator: ${inputTokens} in / ${outputTokens} out, $${cost.toFixed(4)})`);
-  }
+  console.error(`(every model call traced to model_traces under run ${result.workflowRunId} — Cockpit → Models)`);
 
   process.exitCode = result.status === "awaiting_launch_approval" ? 0 : 1;
 }

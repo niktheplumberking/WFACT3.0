@@ -7,7 +7,8 @@
   "exports": {
     "./escalation": "./src/escalation.ts",
     "./routing": "./src/routing.ts",
-    "./entities": "./src/controller.ts"
+    "./entities": "./src/controller.ts",
+    "./tracing": "./src/tracing.ts"
   },
   "scripts": {
     "ask": "tsx src/cli.ts",

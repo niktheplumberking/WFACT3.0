@@ -192,3 +192,20 @@ test("fail closed: an agent's own audit write failing propagates instead of beco
     AuditWriteError,
   );
 });
+
+test("Stage 5: a traced model call inside execute() is tagged with the agent's task and run", async () => {
+  const { InMemoryTraceSink, traceModelCalls } = await import("@wfact/audit");
+  const sink = new InMemoryTraceSink();
+  const model = { totalUsage: { inputTokens: 0, outputTokens: 0 }, async complete() { this.totalUsage.inputTokens += 10; return "ok"; } };
+  const traced = traceModelCalls(model, {
+    sink, method: "complete", provider: "anthropic", model: "claude-haiku-4-5",
+    usage: () => model.totalUsage, cost: () => ({ costUsd: 0.00001, basis: "metered", pricingVersion: "t" }), fallbackActor: "none",
+  });
+  const agent: Agent<{ text: string }, string> = { ...echoAgent(), execute: async () => traced.complete() };
+  const run = await runAgent(agent, { taskId: TASK_ID, role: "echo-test", input: { text: "x" }, entitySlug: "dreamsign" }, { registry: registryWithEcho() });
+  assert.equal(run.status, "completed");
+  assert.deepEqual(
+    [sink.traces[0]!.taskId, sink.traces[0]!.runId, sink.traces[0]!.actor, sink.traces[0]!.inputTokens],
+    [TASK_ID, run.runId, "agent:echo-test", 10],
+  );
+});

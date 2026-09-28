@@ -21,6 +21,7 @@
     "@wfact/agent-runtime": "file:../agent-runtime",
     "@wfact/audit": "file:../audit",
     "@wfact/frontend-loop": "file:../frontend-loop",
+    "@wfact/hermes-lite": "file:../hermes",
     "@wfact/planning": "file:../planning",
     "@wfact/verification": "file:../verification"
   }

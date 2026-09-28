@@ -10,7 +10,7 @@
  * (packages/audit): a run is never reported without its trail.
  */
 import { randomUUID } from "node:crypto";
-import { recordAudit, AuditWriteError, type AuditContext, type AuditSink } from "@wfact/audit";
+import { recordAudit, AuditWriteError, runContext, type AuditContext, type AuditSink } from "@wfact/audit";
 import { withBoundedRetry, EscalationError } from "@wfact/hermes-lite/escalation";
 import type { Agent, AgentRun, AgentRunStatus, AgentTask } from "./agent.js";
 import type { AgentRegistry } from "./registry.js";
@@ -116,7 +116,10 @@ export async function runAgent<I, O>(
     output = await withBoundedRetry(
       (attempt) => {
         attempts = attempt;
-        return agent.execute(input, { taskId: task.taskId, runId, attempt, entitySlug, audit });
+        // Stage 5: publish the task so traced model clients tag every call with it (runContext).
+        return runContext.run({ taskId: task.taskId, runId, actor: `agent:${agent.role}`, entitySlug }, () =>
+          agent.execute(input, { taskId: task.taskId, runId, attempt, entitySlug, audit }),
+        );
       },
       { maxAttempts, baseDelayMs: agent.retry?.baseDelayMs ?? DEFAULT_RETRY.baseDelayMs, sleep: opts.sleep },
     );

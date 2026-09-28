@@ -324,7 +324,20 @@ check (so that secret now exists). It failed at `vercel pull`. Reproduced locall
 and the same IDs: Vercel rejects the stored `VERCEL_TOKEN` ("User not found (404)" / "token
 rejected"). The workflow is right and the token value is bad; it needs a new token (Huraira).
 
-## Stage 4 — Intake + Planner (BUILT + LIVE-PROVEN 2026-09-28, owner approval pending, uncommitted)
+**Stage 1 CI auto-deploy — acceptance MET 2026-09-28** (run `36436468792`, the Stage 4 push to
+`main`): every check job green, then `deploy-cockpit` ran with secrets from Doppler only:
+- `vercel build` (77 modules), then a production deploy to
+  `wfact-cockpit-b8hwj3vo3-niktheplumberkings-projects.vercel.app`;
+- the job's own smoke-check got **HTTP 200**, and the production alias also answers 200.
+
+No manual step anywhere. This closes the "zero manual steps" exit check open since the sprint's
+Phase 1. It needed Huraira to replace the rejected `VERCEL_TOKEN`, which is done.
+
+Stage 1 remaining: the secrets criterion (`grep` finds no plaintext keys) is still NOT met while
+`.env.local` and `apps/cockpit/.env.local` exist on disk. Deleting them plus rotating the keys is
+Huraira's call.
+
+## Stage 4 — Intake + Planner (BUILT + LIVE-PROVEN 2026-09-28, owner approval pending)
 
 - [x] **Model routing as configuration** (Blueprint §6/§7):
       - `packages/hermes/config/model-routing.json`: `intake` → `claude-haiku-4-5` (fast tier,
@@ -394,7 +407,60 @@ rejected"). The workflow is right and the token value is bad; it needs a new tok
 - *Routing split is configuration*: **MET** (config file + env override, tested; live run used
   `[fast, config]` / `[mid, config]`).
 
+## Stage 5 — Observability seed (BUILT + LIVE-PROVEN 2026-09-28, uncommitted)
+
+- [x] **`model_traces`** (`packages/db/migrations/0008_model_traces.sql`, applied):
+      - One row per model call: run_id, task_id, agent role, provider/model, reported tokens,
+        `cost_usd`, `price_basis` (metered | unpriced), pricing version, latency and outcome.
+      - Append-only (same trigger as audit_log). The database refuses a metered row without a cost
+        and an unpriced row with one.
+      - **Owner-only read** (Blueprint §9: admins don't see raw cost).
+      - The `model_usage_by_actor` roll-up view is `security_invoker`, so the same RLS applies.
+      - Attack-tested live 8/8 (rolled back).
+- [x] **Cost math centralised**:
+      - One `models` price table in `packages/hermes/config/model-routing.json` (v1.1.0) and one
+        function, `costForModel()`. Slot routes read their price from it too.
+      - The four copied `PRICING` constants (hermes, verification, frontend-loop and workflow CLIs)
+        are gone; `grep` finds none.
+      - Agent 37's `hermes-agent` has no price on file, so it's recorded as `unpriced` with cost
+        NULL, never $0 or a guess.
+- [x] **Per-call tracing**:
+      - `traceModelCalls` (`@wfact/audit`) is fail-closed like the audit writer.
+      - `runAgent` publishes the task via an AsyncLocalStorage `runContext`, so every call inside an
+        agent is tagged with that agent's task.
+      - `traceModelClient` (`@wfact/hermes-lite/tracing`) wraps each existing client kind (Claude
+        text, Agent 37, Claude JSON) with no client changes.
+      - Wired into all five CLIs. Workflow and planning *require* the trace store, as they require
+        the checkpoint store.
+      - **A real bug was caught by the new tests before it shipped**: the first version held the
+        client's live counter object, so every token delta, and so every cost, would have been 0.
+        Fixed by snapshotting.
+- [x] **Cockpit Models room**: totals (metered spend, labelled a lower bound when unpriced calls
+      exist), cost per model per agent role, and the latest 25 calls. `npm run build` passes.
+- Tests: audit 14, hermes 40, agent-runtime 12, frontend-loop 25, verification 20, planning 12,
+  workflow 7. That's 130/130, all green in a clean-checkout CI simulation.
+
+**Acceptance criteria**:
+- *Every agent run produces a queryable trace row with a real, non-estimated dollar cost*: **MET
+  (live).** Planning run `345cf9ae…` (synthetic Bennett & Co lead, correctly routed to
+  `bennett-co`/`landing_page`) and one verification run gave three rows, read back via SQL:
+  - `agent:intake`, haiku-4-5: 785/170 tokens, $0.001635;
+  - `agent:planner`, sonnet-5: 1459/1301, $0.015928;
+  - `agent:qa-evaluator`, sonnet-5: 7085/13, $0.014300.
+
+  Each matches the CLI's own cost line, and each `task_id` joins to that agent's `agent.complete`
+  audit row. The cost is "real" in the sense that matters: provider-reported tokens × the current
+  list price. It is not an invoice reconciliation.
+- *Models room shows real data from a real run*: **data half MET**. The view queried *as the owner*
+  (RLS applied) returns exactly those three roles and costs. **Not yet viewed in a browser**: it
+  needs Huraira's magic-link login.
+
 **Gaps noticed**:
+- The second synthetic run created a second pending plan (`ba93ddae…`, Harbor Street Bakery) in
+  the Approvals room. It's fictional, so reject it there (a reject note is required) or leave it.
+- Traces cover model calls, not tool calls. Hermes-lite's tool calls are in `audit_log` with
+  latency, which is enough for now. Blueprint §3 names tool calls too; revisit if the simple tables
+  prove insufficient (the Langfuse trigger per §13).
 - Seven linked `file:` packages with a hand-ordered install per CI job. This now really is worth
   moving to npm workspaces, with the Vercel root-directory caveat from Phase 6.
 - The Planner produced both `process` and `how-it-works` sections, a near-duplicate the model

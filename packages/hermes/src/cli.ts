@@ -9,14 +9,11 @@ import { stateReaderFromEnv } from "./state.js";
 import { modelClientFromEnv, ClaudeModelClient } from "./modelClient.js";
 import { HermesLite } from "./controller.js";
 import { randomUUID } from "node:crypto";
-import { auditSinkFromEnv, recordAudit, type AuditContext } from "@wfact/audit";
+import { auditSinkFromEnv, recordAudit, traceSinkFromEnv, type AuditContext } from "@wfact/audit";
+import { costForModel } from "./routing.js";
+import { traceModelClient } from "./tracing.js";
 
-// Anthropic pricing per CLAUDE.md §6 ("re-verify anything time-sensitive before relying on it") —
-// checked 2026-06-24 (Claude API pricing table): claude-sonnet-5 is $2/1M input, $10/1M output.
-// Re-verify if ANTHROPIC_MODEL points at a different model than the default.
-const PRICING_USD_PER_MTOK: Record<string, { input: number; output: number }> = {
-  "claude-sonnet-5": { input: 2.0, output: 10.0 },
-};
+// Stage 5: prices come from the one table in config/model-routing.json (costForModel), not a copy here.
 
 async function main() {
   const question = process.argv.slice(2).join(" ").trim();
@@ -26,12 +23,17 @@ async function main() {
     return;
   }
 
-  const { client: modelClient, reason: modelReason } = modelClientFromEnv();
-  if (!modelClient) {
+  const { client: rawModelClient, reason: modelReason } = modelClientFromEnv();
+  if (!rawModelClient) {
     console.error(`BLOCKED: ${modelReason}`);
     process.exitCode = 1;
     return;
   }
+  // Stage 5: trace the call to model_traces when the store is available (Hermes' status answer isn't
+  // an agent run, so it is tagged with actor "hermes-lite" and no task id).
+  const { sink: traceSink, reason: traceReason } = traceSinkFromEnv();
+  if (!traceSink) console.error(`NOTE (traces): ${traceReason}\n`);
+  const modelClient = traceSink ? traceModelClient(rawModelClient, traceSink, "hermes-lite") : rawModelClient;
 
   const { reader: stateReader, reason: stateReason } = stateReaderFromEnv();
   if (!stateReader) {
@@ -55,7 +57,7 @@ async function main() {
 
   if (audit) {
     const usage = modelClient instanceof ClaudeModelClient ? modelClient.totalUsage : null;
-    const rate = modelClient instanceof ClaudeModelClient ? PRICING_USD_PER_MTOK[modelClient.modelIdUsed] : undefined;
+    const priced = usage && modelClient instanceof ClaudeModelClient ? costForModel(modelClient.modelIdUsed, usage) : null;
     await recordAudit(audit, {
       action: "hermes.answer",
       outcome: result.needsHuman ? "failure" : "success",
@@ -67,9 +69,7 @@ async function main() {
         escalationReason: result.escalationReason,
         model: modelClient instanceof ClaudeModelClient ? modelClient.modelIdUsed : modelClient.name,
         ...(usage ? { inputTokens: usage.inputTokens, outputTokens: usage.outputTokens } : {}),
-        ...(usage && rate
-          ? { costUsd: (usage.inputTokens / 1_000_000) * rate.input + (usage.outputTokens / 1_000_000) * rate.output }
-          : {}),
+        ...(priced ? { costUsd: priced.costUsd, priceBasis: priced.basis } : {}),
       },
     });
     console.error(`(audit: run_id ${runId} written to audit_log)`);
@@ -89,9 +89,8 @@ async function main() {
 
   if (modelClient instanceof ClaudeModelClient) {
     const { inputTokens, outputTokens } = modelClient.totalUsage;
-    const rate = PRICING_USD_PER_MTOK[modelClient.modelIdUsed];
-    if (rate) {
-      const cost = (inputTokens / 1_000_000) * rate.input + (outputTokens / 1_000_000) * rate.output;
+    const { costUsd: cost } = costForModel(modelClient.modelIdUsed, { inputTokens, outputTokens });
+    if (cost !== null) {
       console.error(
         `(cost: ${inputTokens} in / ${outputTokens} out tokens, model ${modelClient.modelIdUsed}, ` +
           `$${cost.toFixed(4)} — log this in BLOCKED-ON-NICK.md's budget tracking per the Fast-Track ` +
