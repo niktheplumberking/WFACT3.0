@@ -207,11 +207,77 @@ specifically, not the whole repo yet.
         - (a) `main` doesn't exist on the remote; the only branch is `huraira-work`, which is also
           the default.
         - (b) the `DOPPLER_TOKEN` GitHub secret.
-- [ ] **Secrets manager — decided (Doppler, Huraira 2026-09-28), not yet stood up.** The runbook is in
-      `docs/SECRETS.md`. The account, login, import and service token are Huraira-only steps.
-      `.env.local` is still the live source until those land.
+- [ ] **Secrets manager — Doppler stood up and proven 2026-09-28; plaintext not yet retired.**
+      - Workspace "WFACT 3.0", project `wfact-3-0-codebase`. The 9 non-empty `.env.local` values are
+        imported into `dev` and `prd`, hash-verified 9/9 identical in both.
+      - Proven as the real source: `env -i … doppler run -- npm run ask` (no `.env.local` loaded)
+        answered live from Claude + Supabase and wrote audit run `73e3cfc8…`.
+      - Still open: `VERCEL_TOKEN` (was empty in `.env.local`), the `DOPPLER_TOKEN` GitHub secret,
+        then deleting `.env.local` and `apps/cockpit/.env.local` plus rotating the keys that sat in
+        plaintext.
+      - **Incident**: this session printed the Doppler CLI token (`dp.ct…`) into its transcript
+        through a bad output filter. Huraira should revoke it (`doppler logout`, then log in again).
 
 **Acceptance status**: 1 of 3 criteria met (audit log). Deploy and secrets need their first real run.
+
+**Update 2026-09-28 (later)**:
+- Stage 1 committed (`78169e0`) and pushed. `main` now exists on the remote, created from
+  `huraira-work` at `77680c7`.
+- CI's first-ever run (`36421350704`) failed in `guardrails`. A real, pre-existing bug: the "no
+  tracked .env" regex also matched the intentionally tracked `.env.example` files. It went unnoticed
+  because CI had never run before; it only triggers on `main`.
+- Fixed to exempt exactly `.env.example`. Tested locally: the current repo passes, a leaked
+  `.env.local` or `.env` is blocked.
+- The fix is not yet pushed, so no job past `guardrails` has run in real CI yet.
+
+## Stage 2 — Generalize the agent runtime (BUILT 2026-09-28, pending CI + commit)
+
+- [x] **`packages/agent-runtime`**
+      - `Agent<I,O>` interface (typed input via `parseInput`, one `execute` per attempt, optional
+        `escalationReason` and `summarize`).
+      - `AgentTask` (UUID `taskId`, `role` = owner, `deadline`, `retryBudget`; Blueprint §3).
+      - `runAgent()` runs spawn → validate → execute → report → terminate. Retry/escalation
+        **imports Hermes-lite's `withBoundedRetry`/`EscalationError`** through a new
+        `@wfact/hermes-lite/escalation` subpath export; nothing is re-implemented.
+      - It never throws for agent outcomes (`completed` / `escalated` / `rejected`), and it
+        re-throws audit write failures (fail closed).
+      - Every lifecycle step writes `agent.spawn` / `agent.complete` / `agent.escalate` /
+        `agent.reject` to `audit_log` under the task ID.
+      - 11/11 tests.
+- [x] **Agent registry** (`packages/agent-runtime/src/registry.ts`, Blueprint §14): seeded with
+      exactly `front-end-builder` and `qa-evaluator`. An unregistered role is rejected, never
+      executed. `permissionScope` is descriptive only (not enforced — policy engine is "do not build
+      yet"), stated in the file header.
+- [x] **frontend-loop and verification re-pointed**
+      - `createFrontendBuilderAgent` wraps the unchanged `FrontendLoop`; hitting the round cap now
+        comes back as an `escalated` run.
+      - `createQaEvaluatorAgent` wraps the unchanged `VerificationLoop` and passes the run's audit
+        context, so `verification.decision` lands on the same task.
+      - Both CLIs now run via `runAgent` + `createSeedRegistry()`.
+
+**Acceptance criteria**:
+- *Existing suites pass unchanged*: **MET**. `git diff a57d977` shows no modification to any
+  pre-existing test file. frontend-loop 25/25 (20 original + 5 agent) and verification 20/20
+  (12 original + 4 audit + 4 agent). Hermes 33/33, audit 7/7.
+- *A new agent can be added without touching agent-runtime*: **MET at test level**. `echo-test` is
+  defined only in `test/runAgent.test.ts`: it implements `Agent`, registers a definition and runs
+  through the full audited lifecycle. Stage 4's Intake/Planner are the real proof.
+- *Live*: the verification CLI ran through the runtime against the real DreamSign page with the same
+  verdict as before (APPROVED, $0.0159). Queried back via SQL, run `b564fde3…` shows
+  `agent.spawn` → `verification.decision` → `agent.complete`, all on task `69e94fcf…`. The
+  front-end CLI was **not** re-run live (a multi-round Agent 37 + Claude build); it's covered by
+  unit tests against the unchanged `FrontendLoop`.
+- *CI*: linked `file:` packages don't get their own deps from `npm ci`. Jobs now install
+  audit → hermes → agent-runtime first, verified by a clean-checkout simulation. The new
+  `agent-runtime` job was added, and `deploy-cockpit` now needs it.
+
+**Gaps noticed**:
+- Lifecycle rows carry `entity_slug = null` when the caller doesn't set `task.entitySlug`. The QA CLI
+  has a client slug but no entity slug, so it passes neither.
+- Four packages now link each other via `file:` with a manual install order in CI. If more packages
+  join (Stage 3's `packages/workflow`), switch to npm workspaces with a root `package.json`, but
+  check first: the root has no `package.json` on purpose, because of the Vercel Root Directory
+  incident logged in Phase 6.
 
 **Gaps noticed**:
 - `tool.invoke` rows carry `entity_slug = null`. The registry doesn't know the entity, only the tool

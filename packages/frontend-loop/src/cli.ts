@@ -13,7 +13,10 @@ import { dirname, join } from "node:path";
 import { loadBrief } from "./brief.js";
 import { selectTemplate } from "./templates.js";
 import { modelClientFromEnv, Agent37ModelClient, ClaudeModelClient } from "./modelClient.js";
-import { FrontendLoop } from "./loop.js";
+import { randomUUID } from "node:crypto";
+import { auditSinkFromEnv } from "@wfact/audit";
+import { createSeedRegistry, runAgent } from "@wfact/agent-runtime";
+import { createFrontendBuilderAgent, FRONT_END_BUILDER_ROLE } from "./agent.js";
 import { appendCorrectionLogRows, formatCorrectionSummary } from "./correctionLog.js";
 import { repoRoot } from "./paths.js";
 
@@ -54,8 +57,28 @@ async function main() {
   }
   console.error(`(evaluator model: ${evaluatorChose})`);
 
-  const loop = new FrontendLoop({ builderModel, evaluatorModel });
-  const result = await loop.run(brief, template);
+  // Stage 2: the loop runs as the registered `front-end-builder` agent on the shared runtime —
+  // same FrontendLoop inside, plus typed-task validation, bounded retry and lifecycle audit rows.
+  const { sink: auditSink, reason: auditReason } = auditSinkFromEnv();
+  if (!auditSink) console.error(`NOTE (audit): ${auditReason}\n`);
+  const agent = createFrontendBuilderAgent({ builderModel, evaluatorModel });
+  const run = await runAgent(
+    agent,
+    {
+      taskId: process.env.WFACT_TASK_ID || randomUUID(),
+      role: FRONT_END_BUILDER_ROLE,
+      input: { brief },
+      entitySlug: brief.entitySlug,
+    },
+    { registry: createSeedRegistry(), audit: auditSink ? { sink: auditSink } : null },
+  );
+  console.error(`(agent run: task ${run.taskId}, run ${run.runId}, status ${run.status}, attempts ${run.attempts})`);
+  if (!run.output) {
+    console.error(`${run.status.toUpperCase()} — needs a human: ${run.reason}`);
+    process.exitCode = 1;
+    return;
+  }
+  const result = run.output;
 
   console.error(formatCorrectionSummary(result.rounds, result.approved));
 

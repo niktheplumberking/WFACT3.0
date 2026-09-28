@@ -98,13 +98,39 @@
   },
   "nodes": [
     {
+      "id": "packages_verification_src_agent_qaevaluatoragentoptions",
+      "label": "QaEvaluatorAgentOptions",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "qaevaluatoragentoptions",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L23"
+    },
+    {
+      "id": "packages_verification_src_agent_qainput",
+      "label": "QaInput",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "qainput",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L18"
+    },
+    {
       "id": "packages_verification_src_checks_secretsscan_secretpattern",
       "label": "SecretPattern",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "secretpattern",
       "source_file": "packages/verification/src/checks/secretsScan.ts",
@@ -117,7 +143,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "check",
       "source_file": "packages/verification/src/checks/types.ts",
@@ -130,7 +156,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "checkresult",
       "source_file": "packages/verification/src/checks/types.ts",
@@ -143,7 +169,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verificationcontext",
       "source_file": "packages/verification/src/checks/types.ts",
@@ -156,7 +182,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "evaluatorverdict",
       "source_file": "packages/verification/src/evaluator.ts",
@@ -169,7 +195,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "claudemodelclient",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -182,7 +208,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "mockmodelclient",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -195,7 +221,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "modelclient",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -208,7 +234,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "modelnotconfigurederror",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -221,7 +247,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "modelrequest",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -234,7 +260,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verificationloop",
       "source_file": "packages/verification/src/verificationLoop.ts",
@@ -247,7 +273,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verificationloopoptions",
       "source_file": "packages/verification/src/verificationLoop.ts",
@@ -260,7 +286,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verificationresult",
       "source_file": "packages/verification/src/verificationLoop.ts",
@@ -273,7 +299,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verificationstatus",
       "source_file": "packages/verification/src/verificationLoop.ts",
@@ -330,6 +356,32 @@
       "norm_label": "fakestatereader",
       "source_file": "packages/hermes/test/controller.test.ts",
       "source_location": "L8"
+    },
+    {
+      "id": "packages_frontend_loop_src_agent_frontendbuilderagentoptions",
+      "label": "FrontendBuilderAgentOptions",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "frontend-loop/src/cli.ts",
+      "file_type": "code",
+      "norm_label": "frontendbuilderagentoptions",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "packages_frontend_loop_src_agent_frontendbuildinput",
+      "label": "FrontendBuildInput",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "frontend-loop/src/cli.ts",
+      "file_type": "code",
+      "norm_label": "frontendbuildinput",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L16"
     },
     {
       "id": "packages_frontend_loop_src_brief_invalidbrieferror",
@@ -774,6 +826,136 @@
       "source_location": "L95"
     },
     {
+      "id": "packages_agent_runtime_src_agent_agent",
+      "label": "Agent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agent",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L43"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agentinputerror",
+      "label": "AgentInputError",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agentinputerror",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L77"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agentrun",
+      "label": "AgentRun",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agentrun",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L64"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agentruncontext",
+      "label": "AgentRunContext",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agentruncontext",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L31"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agentrunstatus",
+      "label": "AgentRunStatus",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agentrunstatus",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L61"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agenttask",
+      "label": "AgentTask",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agenttask",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L17"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentdefinition",
+      "label": "AgentDefinition",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agentdefinition",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L16"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentnotregisterederror",
+      "label": "AgentNotRegisteredError",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agentnotregisterederror",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L28"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentregistry",
+      "label": "AgentRegistry",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agentregistry",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L35"
+    },
+    {
+      "id": "packages_agent_runtime_src_runagent_runagentoptions",
+      "label": "RunAgentOptions",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "runagentoptions",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L21"
+    },
+    {
       "id": "packages_hermes_src_controller_hermeslite",
       "label": "HermesLite",
       "_callable": true,
@@ -930,12 +1112,36 @@
       "source_location": "L39"
     },
     {
+      "id": "packages_verification_src_agent_createqaevaluatoragent",
+      "label": "createQaEvaluatorAgent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "createqaevaluatoragent()",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L35"
+    },
+    {
+      "id": "packages_verification_src_agent_stringarray",
+      "label": "stringArray()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "stringarray()",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L28"
+    },
+    {
       "id": "packages_verification_src_checks_requiredsections_escaperegexp",
       "label": "escapeRegExp()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "escaperegexp()",
       "source_file": "packages/verification/src/checks/requiredSections.ts",
@@ -947,7 +1153,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "sectionpresent()",
       "source_file": "packages/verification/src/checks/requiredSections.ts",
@@ -959,7 +1165,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "visibletext()",
       "source_file": "packages/verification/src/checks/requiredSections.ts",
@@ -971,7 +1177,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".run()",
       "source_file": "packages/verification/src/checks/types.ts",
@@ -983,11 +1189,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "main()",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L24"
+      "source_location": "L26"
     },
     {
       "id": "packages_verification_src_evaluator_parseevaluatorresponse",
@@ -995,7 +1201,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "parseevaluatorresponse()",
       "source_file": "packages/verification/src/evaluator.ts",
@@ -1007,7 +1213,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "runevaluator()",
       "source_file": "packages/verification/src/evaluator.ts",
@@ -1019,7 +1225,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".complete()",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -1031,7 +1237,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -1043,7 +1249,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "evaluatormodelclientfromenv()",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -1055,7 +1261,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".complete()",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -1067,7 +1273,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -1079,7 +1285,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".complete()",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -1091,7 +1297,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -1103,7 +1309,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "knownclientslugs()",
       "source_file": "packages/verification/src/paths.ts",
@@ -1115,7 +1321,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "reporoot()",
       "source_file": "packages/verification/src/paths.ts",
@@ -1127,7 +1333,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "runchecks()",
       "source_file": "packages/verification/src/registry.ts",
@@ -1139,7 +1345,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "formatverificationsummary()",
       "source_file": "packages/verification/src/verificationLoop.ts",
@@ -1151,7 +1357,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "packages/verification/src/verificationLoop.ts",
@@ -1163,7 +1369,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".decide()",
       "source_file": "packages/verification/src/verificationLoop.ts",
@@ -1175,11 +1381,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": ".run()",
       "source_file": "packages/verification/src/verificationLoop.ts",
       "source_location": "L50"
+    },
+    {
+      "id": "packages_verification_test_agent_test_input",
+      "label": "input()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "input()",
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L12"
     },
     {
       "id": "packages_verification_test_audit_test_ctx",
@@ -1187,7 +1405,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "ctx()",
       "source_file": "packages/verification/test/audit.test.ts",
@@ -1199,7 +1417,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "loadfixture()",
       "source_file": "packages/verification/test/registry.test.ts",
@@ -1211,7 +1429,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "loadfixture()",
       "source_file": "packages/verification/test/verificationLoop.test.ts",
@@ -1326,6 +1544,18 @@
       "source_location": "L15"
     },
     {
+      "id": "packages_frontend_loop_src_agent_createfrontendbuilderagent",
+      "label": "createFrontendBuilderAgent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "frontend-loop/src/cli.ts",
+      "file_type": "code",
+      "norm_label": "createfrontendbuilderagent()",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L28"
+    },
+    {
       "id": "packages_frontend_loop_src_brief_invalidbrieferror_constructor",
       "label": ".constructor()",
       "_callable": true,
@@ -1371,7 +1601,7 @@
       "file_type": "code",
       "norm_label": "main()",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L23"
+      "source_location": "L26"
     },
     {
       "id": "packages_frontend_loop_src_correctionlog_appendcorrectionlogrows",
@@ -2046,6 +2276,210 @@
       "source_location": "L59"
     },
     {
+      "id": "packages_agent_runtime_src_agent_agent_escalationreason",
+      "label": ".escalationReason()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".escalationreason()",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L56"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agent_execute",
+      "label": ".execute()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".execute()",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L51"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agent_parseinput",
+      "label": ".parseInput()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".parseinput()",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L49"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agent_summarize",
+      "label": ".summarize()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".summarize()",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L58"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent_agentinputerror_constructor",
+      "label": ".constructor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".constructor()",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L78"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentnotregisterederror_constructor",
+      "label": ".constructor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".constructor()",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L29"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentregistry_constructor",
+      "label": ".constructor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".constructor()",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L38"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentregistry_get",
+      "label": ".get()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".get()",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L52"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentregistry_has",
+      "label": ".has()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".has()",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L58"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentregistry_list",
+      "label": ".list()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".list()",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L62"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_agentregistry_register",
+      "label": ".register()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": ".register()",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L42"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_createseedregistry",
+      "label": "createSeedRegistry()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "createseedregistry()",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L89"
+    },
+    {
+      "id": "packages_agent_runtime_src_runagent_runagent",
+      "label": "runAgent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "runagent()",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L32"
+    },
+    {
+      "id": "packages_agent_runtime_test_runagent_test_echoagent",
+      "label": "echoAgent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "echoagent()",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L27"
+    },
+    {
+      "id": "packages_agent_runtime_test_runagent_test_execute",
+      "label": "execute()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "execute()",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L185"
+    },
+    {
+      "id": "packages_agent_runtime_test_runagent_test_nosleep",
+      "label": "noSleep()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "nosleep()",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L15"
+    },
+    {
+      "id": "packages_agent_runtime_test_runagent_test_registrywithecho",
+      "label": "registryWithEcho()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "registrywithecho()",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L50"
+    },
+    {
       "id": "packages_hermes_src_cli_main",
       "label": "main()",
       "_callable": true,
@@ -2250,11 +2684,33 @@
       "source_location": "L35"
     },
     {
+      "id": "packages_verification_src_agent",
+      "label": "verification/src/agent.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "verification/src/agent.ts",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_verification_src_agent_qa_evaluator_role",
+      "label": "QA_EVALUATOR_ROLE",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "qa_evaluator_role",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L16"
+    },
+    {
       "id": "packages_verification_src_checks_imageoptimization",
       "label": "imageOptimization.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "imageoptimization.ts",
       "source_file": "packages/verification/src/checks/imageOptimization.ts",
@@ -2265,7 +2721,7 @@
       "label": "imageOptimizationCheck",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "imageoptimizationcheck",
       "source_file": "packages/verification/src/checks/imageOptimization.ts",
@@ -2276,7 +2732,7 @@
       "label": "isolation.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "isolation.ts",
       "source_file": "packages/verification/src/checks/isolation.ts",
@@ -2287,7 +2743,7 @@
       "label": "isolationCheck",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "isolationcheck",
       "source_file": "packages/verification/src/checks/isolation.ts",
@@ -2298,7 +2754,7 @@
       "label": "noConsoleErrors.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "noconsoleerrors.ts",
       "source_file": "packages/verification/src/checks/noConsoleErrors.ts",
@@ -2309,7 +2765,7 @@
       "label": "noConsoleErrorsCheck",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "noconsoleerrorscheck",
       "source_file": "packages/verification/src/checks/noConsoleErrors.ts",
@@ -2320,7 +2776,7 @@
       "label": "requiredSections.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "requiredsections.ts",
       "source_file": "packages/verification/src/checks/requiredSections.ts",
@@ -2331,7 +2787,7 @@
       "label": "requiredSectionsCheck",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "requiredsectionscheck",
       "source_file": "packages/verification/src/checks/requiredSections.ts",
@@ -2342,7 +2798,7 @@
       "label": "responsive.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "responsive.ts",
       "source_file": "packages/verification/src/checks/responsive.ts",
@@ -2353,7 +2809,7 @@
       "label": "responsiveCheck",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "responsivecheck",
       "source_file": "packages/verification/src/checks/responsive.ts",
@@ -2364,7 +2820,7 @@
       "label": "secretsScan.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "secretsscan.ts",
       "source_file": "packages/verification/src/checks/secretsScan.ts",
@@ -2375,7 +2831,7 @@
       "label": "SECRET_PATTERNS",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "secret_patterns",
       "source_file": "packages/verification/src/checks/secretsScan.ts",
@@ -2386,7 +2842,7 @@
       "label": "secretsScanCheck",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "secretsscancheck",
       "source_file": "packages/verification/src/checks/secretsScan.ts",
@@ -2397,7 +2853,7 @@
       "label": "types.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "types.ts",
       "source_file": "packages/verification/src/checks/types.ts",
@@ -2408,7 +2864,7 @@
       "label": "verification/src/cli.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verification/src/cli.ts",
       "source_file": "packages/verification/src/cli.ts",
@@ -2419,18 +2875,18 @@
       "label": "PRICING_USD_PER_MTOK",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "pricing_usd_per_mtok",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L22"
+      "source_location": "L24"
     },
     {
       "id": "packages_verification_src_evaluator",
       "label": "evaluator.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "evaluator.ts",
       "source_file": "packages/verification/src/evaluator.ts",
@@ -2441,7 +2897,7 @@
       "label": "RUBRIC",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "rubric",
       "source_file": "packages/verification/src/evaluator.ts",
@@ -2452,7 +2908,7 @@
       "label": "verification/src/modelClient.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verification/src/modelclient.ts",
       "source_file": "packages/verification/src/modelClient.ts",
@@ -2463,7 +2919,7 @@
       "label": "verification/src/paths.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verification/src/paths.ts",
       "source_file": "packages/verification/src/paths.ts",
@@ -2471,12 +2927,12 @@
     },
     {
       "id": "packages_verification_src_registry",
-      "label": "src/registry.ts",
+      "label": "verification/src/registry.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
-      "norm_label": "src/registry.ts",
+      "norm_label": "verification/src/registry.ts",
       "source_file": "packages/verification/src/registry.ts",
       "source_location": "L1"
     },
@@ -2485,7 +2941,7 @@
       "label": "CHECK_REGISTRY",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "check_registry",
       "source_file": "packages/verification/src/registry.ts",
@@ -2496,18 +2952,40 @@
       "label": "verificationLoop.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verificationloop.ts",
       "source_file": "packages/verification/src/verificationLoop.ts",
       "source_location": "L1"
     },
     {
+      "id": "packages_verification_test_agent_test",
+      "label": "verification/test/agent.test.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "verification/test/agent.test.ts",
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_verification_test_agent_test_fixtures_dir",
+      "label": "FIXTURES_DIR",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "verificationLoop.ts",
+      "file_type": "code",
+      "norm_label": "fixtures_dir",
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L11"
+    },
+    {
       "id": "packages_verification_test_audit_test",
       "label": "verification/test/audit.test.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verification/test/audit.test.ts",
       "source_file": "packages/verification/test/audit.test.ts",
@@ -2518,7 +2996,7 @@
       "label": "FIXTURES_DIR",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "fixtures_dir",
       "source_file": "packages/verification/test/audit.test.ts",
@@ -2529,7 +3007,7 @@
       "label": "evaluator.test.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "evaluator.test.ts",
       "source_file": "packages/verification/test/evaluator.test.ts",
@@ -2540,7 +3018,7 @@
       "label": "registry.test.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "registry.test.ts",
       "source_file": "packages/verification/test/registry.test.ts",
@@ -2551,7 +3029,7 @@
       "label": "FIXTURES_DIR",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "fixtures_dir",
       "source_file": "packages/verification/test/registry.test.ts",
@@ -2562,7 +3040,7 @@
       "label": "verificationLoop.test.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "verificationloop.test.ts",
       "source_file": "packages/verification/test/verificationLoop.test.ts",
@@ -2573,7 +3051,7 @@
       "label": "brokenCtx",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "brokenctx",
       "source_file": "packages/verification/test/verificationLoop.test.ts",
@@ -2584,7 +3062,7 @@
       "label": "cleanCtx",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "cleanctx",
       "source_file": "packages/verification/test/verificationLoop.test.ts",
@@ -2595,7 +3073,7 @@
       "label": "FIXTURES_DIR",
       "_origin": "ast",
       "community": 0,
-      "community_name": "src/registry.ts",
+      "community_name": "verificationLoop.ts",
       "file_type": "code",
       "norm_label": "fixtures_dir",
       "source_file": "packages/verification/test/verificationLoop.test.ts",
@@ -3207,6 +3685,28 @@
       "source_location": "L13"
     },
     {
+      "id": "packages_frontend_loop_src_agent",
+      "label": "frontend-loop/src/agent.ts",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "frontend-loop/src/cli.ts",
+      "file_type": "code",
+      "norm_label": "frontend-loop/src/agent.ts",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_frontend_loop_src_agent_front_end_builder_role",
+      "label": "FRONT_END_BUILDER_ROLE",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "frontend-loop/src/cli.ts",
+      "file_type": "code",
+      "norm_label": "front_end_builder_role",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L14"
+    },
+    {
       "id": "packages_frontend_loop_src_brief",
       "label": "brief.ts",
       "_origin": "ast",
@@ -3248,7 +3748,7 @@
       "file_type": "code",
       "norm_label": "claude_pricing_usd_per_mtok",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L21"
+      "source_location": "L24"
     },
     {
       "id": "packages_frontend_loop_src_correctionlog",
@@ -3315,6 +3815,28 @@
       "norm_label": "hand_picked_templates",
       "source_file": "packages/frontend-loop/src/templates.ts",
       "source_location": "L33"
+    },
+    {
+      "id": "packages_frontend_loop_test_agent_test",
+      "label": "frontend-loop/test/agent.test.ts",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "frontend-loop/src/cli.ts",
+      "file_type": "code",
+      "norm_label": "frontend-loop/test/agent.test.ts",
+      "source_file": "packages/frontend-loop/test/agent.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_frontend_loop_test_agent_test_rawbrief",
+      "label": "rawBrief",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "frontend-loop/src/cli.ts",
+      "file_type": "code",
+      "norm_label": "rawbrief",
+      "source_file": "packages/frontend-loop/test/agent.test.ts",
+      "source_location": "L9"
     },
     {
       "id": "packages_frontend_loop_test_brief_test",
@@ -3611,7 +4133,7 @@
       "file_type": "concept",
       "norm_label": "zod",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L17"
+      "source_location": "L20"
     },
     {
       "id": "auth_users",
@@ -5214,12 +5736,12 @@
     },
     {
       "id": "packages_audit_src_index",
-      "label": "index.ts",
+      "label": "audit/src/index.ts",
       "_origin": "ast",
       "community": 49,
       "community_name": "index.ts",
       "file_type": "code",
-      "norm_label": "index.ts",
+      "norm_label": "audit/src/index.ts",
       "source_file": "packages/audit/src/index.ts",
       "source_location": "L1"
     },
@@ -5265,7 +5787,7 @@
       "file_type": "code",
       "norm_label": "dependencies",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L13"
+      "source_location": "L16"
     },
     {
       "id": "packages_hermes_package_dependencies_anthropic_ai_sdk",
@@ -5276,7 +5798,7 @@
       "file_type": "code",
       "norm_label": "@anthropic-ai/sdk",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L14"
+      "source_location": "L17"
     },
     {
       "id": "packages_hermes_package_dependencies_supabase_supabase_js",
@@ -5287,7 +5809,7 @@
       "file_type": "code",
       "norm_label": "@supabase/supabase-js",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L15"
+      "source_location": "L18"
     },
     {
       "id": "packages_hermes_package_dependencies_wfact_audit",
@@ -5298,7 +5820,7 @@
       "file_type": "code",
       "norm_label": "@wfact/audit",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L16"
+      "source_location": "L19"
     },
     {
       "id": "packages_hermes_package_dependencies_zod",
@@ -5309,7 +5831,7 @@
       "file_type": "code",
       "norm_label": "zod",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L17"
+      "source_location": "L20"
     },
     {
       "id": "packages_hermes_package_description",
@@ -5331,7 +5853,7 @@
       "file_type": "code",
       "norm_label": "devdependencies",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L19"
+      "source_location": "L22"
     },
     {
       "id": "packages_hermes_package_devdependencies_tsx",
@@ -5342,7 +5864,7 @@
       "file_type": "code",
       "norm_label": "tsx",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L21"
+      "source_location": "L24"
     },
     {
       "id": "packages_hermes_package_devdependencies_types_node",
@@ -5353,7 +5875,7 @@
       "file_type": "code",
       "norm_label": "@types/node",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L20"
+      "source_location": "L23"
     },
     {
       "id": "packages_hermes_package_devdependencies_typescript",
@@ -5364,7 +5886,29 @@
       "file_type": "code",
       "norm_label": "typescript",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L22"
+      "source_location": "L25"
+    },
+    {
+      "id": "packages_hermes_package_exports",
+      "label": "exports",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "hermes/package.json",
+      "file_type": "code",
+      "norm_label": "exports",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L7"
+    },
+    {
+      "id": "packages_hermes_package_exports_escalation",
+      "label": "./escalation",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "hermes/package.json",
+      "file_type": "code",
+      "norm_label": "./escalation",
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L8"
     },
     {
       "id": "packages_hermes_package_name",
@@ -5397,7 +5941,7 @@
       "file_type": "code",
       "norm_label": "scripts",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L7"
+      "source_location": "L10"
     },
     {
       "id": "packages_hermes_package_scripts_ask",
@@ -5408,7 +5952,7 @@
       "file_type": "code",
       "norm_label": "ask",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L8"
+      "source_location": "L11"
     },
     {
       "id": "packages_hermes_package_scripts_test",
@@ -5419,7 +5963,7 @@
       "file_type": "code",
       "norm_label": "test",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L9"
+      "source_location": "L12"
     },
     {
       "id": "packages_hermes_package_scripts_typecheck",
@@ -5430,7 +5974,7 @@
       "file_type": "code",
       "norm_label": "typecheck",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L11"
+      "source_location": "L14"
     },
     {
       "id": "packages_hermes_package_scripts_verify_supabase",
@@ -5441,7 +5985,7 @@
       "file_type": "code",
       "norm_label": "verify:supabase",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L10"
+      "source_location": "L13"
     },
     {
       "id": "packages_hermes_package_type",
@@ -5474,7 +6018,7 @@
       "file_type": "concept",
       "norm_label": "@anthropic-ai/sdk",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L14"
+      "source_location": "L17"
     },
     {
       "id": "packages_hermes_package_json_ref_supabase_supabase_js",
@@ -5485,7 +6029,7 @@
       "file_type": "concept",
       "norm_label": "@supabase/supabase-js",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L15"
+      "source_location": "L18"
     },
     {
       "id": "packages_hermes_package_json_ref_tsx",
@@ -5496,7 +6040,7 @@
       "file_type": "concept",
       "norm_label": "tsx",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L21"
+      "source_location": "L24"
     },
     {
       "id": "packages_hermes_package_json_ref_types_node",
@@ -5507,7 +6051,7 @@
       "file_type": "concept",
       "norm_label": "@types/node",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L20"
+      "source_location": "L23"
     },
     {
       "id": "packages_hermes_package_json_ref_typescript",
@@ -5518,7 +6062,7 @@
       "file_type": "concept",
       "norm_label": "typescript",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L22"
+      "source_location": "L25"
     },
     {
       "id": "packages_hermes_package_json_ref_wfact_audit",
@@ -5529,7 +6073,7 @@
       "file_type": "concept",
       "norm_label": "@wfact/audit",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L16"
+      "source_location": "L19"
     },
     {
       "id": "packages_audit_package",
@@ -6376,6 +6920,28 @@
       "source_location": "L13"
     },
     {
+      "id": "packages_frontend_loop_package_dependencies_wfact_agent_runtime",
+      "label": "@wfact/agent-runtime",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "frontend-loop/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/agent-runtime",
+      "source_file": "packages/frontend-loop/package.json",
+      "source_location": "L14"
+    },
+    {
+      "id": "packages_frontend_loop_package_dependencies_wfact_audit",
+      "label": "@wfact/audit",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "frontend-loop/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/audit",
+      "source_file": "packages/frontend-loop/package.json",
+      "source_location": "L15"
+    },
+    {
       "id": "packages_frontend_loop_package_description",
       "label": "description",
       "_origin": "ast",
@@ -6395,7 +6961,7 @@
       "file_type": "code",
       "norm_label": "devdependencies",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L15"
+      "source_location": "L17"
     },
     {
       "id": "packages_frontend_loop_package_devdependencies_tsx",
@@ -6406,7 +6972,7 @@
       "file_type": "code",
       "norm_label": "tsx",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L17"
+      "source_location": "L19"
     },
     {
       "id": "packages_frontend_loop_package_devdependencies_types_node",
@@ -6417,7 +6983,7 @@
       "file_type": "code",
       "norm_label": "@types/node",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L16"
+      "source_location": "L18"
     },
     {
       "id": "packages_frontend_loop_package_devdependencies_typescript",
@@ -6428,7 +6994,7 @@
       "file_type": "code",
       "norm_label": "typescript",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L18"
+      "source_location": "L20"
     },
     {
       "id": "packages_frontend_loop_package_name",
@@ -6538,7 +7104,7 @@
       "file_type": "concept",
       "norm_label": "tsx",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L17"
+      "source_location": "L19"
     },
     {
       "id": "packages_frontend_loop_package_json_ref_types_node",
@@ -6549,7 +7115,7 @@
       "file_type": "concept",
       "norm_label": "@types/node",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L16"
+      "source_location": "L18"
     },
     {
       "id": "packages_frontend_loop_package_json_ref_typescript",
@@ -6560,7 +7126,29 @@
       "file_type": "concept",
       "norm_label": "typescript",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L18"
+      "source_location": "L20"
+    },
+    {
+      "id": "packages_frontend_loop_package_json_ref_wfact_agent_runtime",
+      "label": "@wfact/agent-runtime",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "frontend-loop/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/agent-runtime",
+      "source_file": "packages/frontend-loop/package.json",
+      "source_location": "L14"
+    },
+    {
+      "id": "packages_frontend_loop_package_json_ref_wfact_audit",
+      "label": "@wfact/audit",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "frontend-loop/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/audit",
+      "source_file": "packages/frontend-loop/package.json",
+      "source_location": "L15"
     },
     {
       "id": "claude_skills_graphify_references_transcribe",
@@ -6621,6 +7209,479 @@
       "norm_label": "graphify reference: extraction subagent prompt",
       "source_file": ".claude/skills/graphify/references/extraction-spec.md",
       "source_location": "L1"
+    },
+    {
+      "id": "packages_agent_runtime_src_agent",
+      "label": "agent-runtime/src/agent.ts",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agent-runtime/src/agent.ts",
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_agent_runtime_src_index",
+      "label": "agent-runtime/src/index.ts",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agent-runtime/src/index.ts",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry",
+      "label": "agent-runtime/src/registry.ts",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "agent-runtime/src/registry.ts",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_agent_runtime_src_registry_seed_agent_definitions",
+      "label": "SEED_AGENT_DEFINITIONS",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "seed_agent_definitions",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L68"
+    },
+    {
+      "id": "packages_agent_runtime_src_runagent",
+      "label": "runAgent.ts",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "runagent.ts",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_agent_runtime_src_runagent_default_retry",
+      "label": "DEFAULT_RETRY",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "default_retry",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "packages_agent_runtime_test_runagent_test",
+      "label": "runAgent.test.ts",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "runagent.test.ts",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_agent_runtime_test_runagent_test_echo_def",
+      "label": "ECHO_DEF",
+      "_origin": "ast",
+      "community": 62,
+      "community_name": "agent-runtime/src/index.ts",
+      "file_type": "code",
+      "norm_label": "echo_def",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "packages_agent_runtime_package",
+      "label": "agent-runtime/package.json",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "agent-runtime/package.json",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_agent_runtime_package_dependencies",
+      "label": "dependencies",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "dependencies",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L20"
+    },
+    {
+      "id": "packages_agent_runtime_package_dependencies_wfact_audit",
+      "label": "@wfact/audit",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/audit",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L21"
+    },
+    {
+      "id": "packages_agent_runtime_package_dependencies_wfact_hermes_lite",
+      "label": "@wfact/hermes-lite",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/hermes-lite",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L22"
+    },
+    {
+      "id": "packages_agent_runtime_package_description",
+      "label": "description",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "description",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L5"
+    },
+    {
+      "id": "packages_agent_runtime_package_devdependencies",
+      "label": "devDependencies",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "devdependencies",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L15"
+    },
+    {
+      "id": "packages_agent_runtime_package_devdependencies_tsx",
+      "label": "tsx",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "tsx",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L17"
+    },
+    {
+      "id": "packages_agent_runtime_package_devdependencies_types_node",
+      "label": "@types/node",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "@types/node",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L16"
+    },
+    {
+      "id": "packages_agent_runtime_package_devdependencies_typescript",
+      "label": "typescript",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "typescript",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L18"
+    },
+    {
+      "id": "packages_agent_runtime_package_exports",
+      "label": "exports",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "exports",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L7"
+    },
+    {
+      "id": "packages_agent_runtime_package_name",
+      "label": "name",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "name",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L2"
+    },
+    {
+      "id": "packages_agent_runtime_package_private",
+      "label": "private",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "private",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L4"
+    },
+    {
+      "id": "packages_agent_runtime_package_scripts",
+      "label": "scripts",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "scripts",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L11"
+    },
+    {
+      "id": "packages_agent_runtime_package_scripts_test",
+      "label": "test",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "test",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L12"
+    },
+    {
+      "id": "packages_agent_runtime_package_scripts_typecheck",
+      "label": "typecheck",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "typecheck",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L13"
+    },
+    {
+      "id": "packages_agent_runtime_package_type",
+      "label": "type",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "type",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L6"
+    },
+    {
+      "id": "packages_agent_runtime_package_types",
+      "label": "types",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "types",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L10"
+    },
+    {
+      "id": "packages_agent_runtime_package_version",
+      "label": "version",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "code",
+      "norm_label": "version",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L3"
+    },
+    {
+      "id": "packages_agent_runtime_package_json_ref_tsx",
+      "label": "tsx",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "concept",
+      "norm_label": "tsx",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L17"
+    },
+    {
+      "id": "packages_agent_runtime_package_json_ref_types_node",
+      "label": "@types/node",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "concept",
+      "norm_label": "@types/node",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L16"
+    },
+    {
+      "id": "packages_agent_runtime_package_json_ref_typescript",
+      "label": "typescript",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "concept",
+      "norm_label": "typescript",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L18"
+    },
+    {
+      "id": "packages_agent_runtime_package_json_ref_wfact_audit",
+      "label": "@wfact/audit",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/audit",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L21"
+    },
+    {
+      "id": "ref_wfact_hermes_lite",
+      "label": "@wfact/hermes-lite",
+      "_origin": "ast",
+      "community": 63,
+      "community_name": "agent-runtime/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/hermes-lite",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L22"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig",
+      "label": "agent-runtime/tsconfig.json",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "agent-runtime/tsconfig.json",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "compileroptions",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L2"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_esmoduleinterop",
+      "label": "esModuleInterop",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "esmoduleinterop",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L8"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_module",
+      "label": "module",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "module",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L4"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_moduleresolution",
+      "label": "moduleResolution",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "moduleresolution",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L5"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_nouncheckedindexedaccess",
+      "label": "noUncheckedIndexedAccess",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "nouncheckedindexedaccess",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L7"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_outdir",
+      "label": "outDir",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "outdir",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L11"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_resolvejsonmodule",
+      "label": "resolveJsonModule",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "resolvejsonmodule",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L10"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_skiplibcheck",
+      "label": "skipLibCheck",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "skiplibcheck",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L9"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_strict",
+      "label": "strict",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "strict",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L6"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_compileroptions_target",
+      "label": "target",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "target",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L3"
+    },
+    {
+      "id": "packages_agent_runtime_tsconfig_include",
+      "label": "include",
+      "_origin": "ast",
+      "community": 64,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "include",
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L13"
     },
     {
       "id": "packages_hermes_src_cli",
@@ -6777,6 +7838,17 @@
       "source_location": "L13"
     },
     {
+      "id": "packages_verification_package_dependencies_wfact_agent_runtime",
+      "label": "@wfact/agent-runtime",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "verification/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/agent-runtime",
+      "source_file": "packages/verification/package.json",
+      "source_location": "L14"
+    },
+    {
       "id": "packages_verification_package_dependencies_wfact_audit",
       "label": "@wfact/audit",
       "_origin": "ast",
@@ -6785,7 +7857,7 @@
       "file_type": "code",
       "norm_label": "@wfact/audit",
       "source_file": "packages/verification/package.json",
-      "source_location": "L14"
+      "source_location": "L15"
     },
     {
       "id": "packages_verification_package_description",
@@ -6807,7 +7879,7 @@
       "file_type": "code",
       "norm_label": "devdependencies",
       "source_file": "packages/verification/package.json",
-      "source_location": "L16"
+      "source_location": "L17"
     },
     {
       "id": "packages_verification_package_devdependencies_tsx",
@@ -6818,7 +7890,7 @@
       "file_type": "code",
       "norm_label": "tsx",
       "source_file": "packages/verification/package.json",
-      "source_location": "L18"
+      "source_location": "L19"
     },
     {
       "id": "packages_verification_package_devdependencies_types_node",
@@ -6829,7 +7901,7 @@
       "file_type": "code",
       "norm_label": "@types/node",
       "source_file": "packages/verification/package.json",
-      "source_location": "L17"
+      "source_location": "L18"
     },
     {
       "id": "packages_verification_package_devdependencies_typescript",
@@ -6840,7 +7912,7 @@
       "file_type": "code",
       "norm_label": "typescript",
       "source_file": "packages/verification/package.json",
-      "source_location": "L19"
+      "source_location": "L20"
     },
     {
       "id": "packages_verification_package_name",
@@ -6950,7 +8022,7 @@
       "file_type": "concept",
       "norm_label": "tsx",
       "source_file": "packages/verification/package.json",
-      "source_location": "L18"
+      "source_location": "L19"
     },
     {
       "id": "packages_verification_package_json_ref_types_node",
@@ -6961,7 +8033,7 @@
       "file_type": "concept",
       "norm_label": "@types/node",
       "source_file": "packages/verification/package.json",
-      "source_location": "L17"
+      "source_location": "L18"
     },
     {
       "id": "packages_verification_package_json_ref_typescript",
@@ -6972,7 +8044,18 @@
       "file_type": "concept",
       "norm_label": "typescript",
       "source_file": "packages/verification/package.json",
-      "source_location": "L19"
+      "source_location": "L20"
+    },
+    {
+      "id": "packages_verification_package_json_ref_wfact_agent_runtime",
+      "label": "@wfact/agent-runtime",
+      "_origin": "ast",
+      "community": 9,
+      "community_name": "verification/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/agent-runtime",
+      "source_file": "packages/verification/package.json",
+      "source_location": "L14"
     },
     {
       "id": "packages_verification_package_json_ref_wfact_audit",
@@ -6983,7 +8066,7 @@
       "file_type": "concept",
       "norm_label": "@wfact/audit",
       "source_file": "packages/verification/package.json",
-      "source_location": "L14"
+      "source_location": "L15"
     },
     {
       "id": "_github_workflows_ci_build",
@@ -9492,6 +10575,54 @@
       "weight": 1.0
     },
     {
+      "source": "packages_agent_runtime_src_registry_agentregistry_constructor",
+      "target": "packages_agent_runtime_src_registry_agentregistry_register",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry_agentregistry_get",
+      "target": "packages_agent_runtime_src_registry_agentnotregisterederror",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry_createseedregistry",
+      "target": "packages_agent_runtime_src_registry_agentregistry",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L90",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test_registrywithecho",
+      "target": "packages_agent_runtime_src_registry_createseedregistry",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
       "source": "packages_audit_src_index_auditsinkfromenv",
       "target": "packages_audit_src_index_supabaseauditsink",
       "relation": "calls",
@@ -9576,6 +10707,18 @@
       "weight": 1.0
     },
     {
+      "source": "packages_frontend_loop_src_agent_createfrontendbuilderagent",
+      "target": "packages_frontend_loop_src_loop_frontendloop",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
       "source": "packages_frontend_loop_src_brief_loadbrief",
       "target": "packages_frontend_loop_src_brief_parsebrief",
       "relation": "calls",
@@ -9601,66 +10744,6 @@
     },
     {
       "source": "packages_frontend_loop_src_cli_main",
-      "target": "packages_frontend_loop_src_brief_loadbrief",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L31",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_frontend_loop_src_cli_main",
-      "target": "packages_frontend_loop_src_templates_selecttemplate",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L39",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_frontend_loop_src_cli_main",
-      "target": "packages_frontend_loop_src_modelclient_modelclientfromenv",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L41",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_frontend_loop_src_cli_main",
-      "target": "packages_frontend_loop_src_loop_frontendloop",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L57",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_frontend_loop_src_cli_main",
-      "target": "packages_frontend_loop_src_correctionlog_formatcorrectionsummary",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L60",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_frontend_loop_src_cli_main",
       "target": "packages_frontend_loop_src_paths_reporoot",
       "relation": "calls",
       "_origin": "ast",
@@ -9668,7 +10751,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L90",
+      "source_location": "L113",
       "weight": 1.0
     },
     {
@@ -9680,7 +10763,67 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L97",
+      "source_location": "L120",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_cli_main",
+      "target": "packages_frontend_loop_src_brief_loadbrief",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/frontend-loop/src/cli.ts",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_cli_main",
+      "target": "packages_frontend_loop_src_templates_selecttemplate",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/frontend-loop/src/cli.ts",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_cli_main",
+      "target": "packages_frontend_loop_src_modelclient_modelclientfromenv",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/frontend-loop/src/cli.ts",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_cli_main",
+      "target": "packages_frontend_loop_src_agent_createfrontendbuilderagent",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/frontend-loop/src/cli.ts",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_cli_main",
+      "target": "packages_frontend_loop_src_correctionlog_formatcorrectionsummary",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/frontend-loop/src/cli.ts",
+      "source_location": "L83",
       "weight": 1.0
     },
     {
@@ -10068,6 +11211,18 @@
       "weight": 1.0
     },
     {
+      "source": "packages_verification_src_agent_createqaevaluatoragent",
+      "target": "packages_verification_src_verificationloop_verificationloop",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
       "source": "packages_verification_src_checks_requiredsections_sectionpresent",
       "target": "packages_verification_src_checks_requiredsections_escaperegexp",
       "relation": "calls",
@@ -10100,7 +11255,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0
     },
     {
@@ -10112,12 +11267,12 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L36",
+      "source_location": "L38",
       "weight": 1.0
     },
     {
       "source": "packages_verification_src_cli_main",
-      "target": "packages_verification_src_verificationloop_verificationloop",
+      "target": "packages_verification_src_agent_createqaevaluatoragent",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -10136,7 +11291,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L55",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -10248,6 +11403,43 @@
       "weight": 1.0
     },
     {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_agent",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L1",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_runagent",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_registry",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
       "source": "packages_verification_src_registry",
       "target": "packages_verification_src_checks_types",
       "relation": "re_exports",
@@ -10258,6 +11450,54 @@
       "source_file": "packages/verification/src/registry.ts",
       "source_location": "L30",
       "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent_runagentoptions",
+      "target": "packages_agent_runtime_src_registry_agentregistry",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent_frontendbuilderagentoptions",
+      "target": "packages_frontend_loop_src_modelclient_modelclient",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent_frontendbuildinput",
+      "target": "packages_frontend_loop_src_brief_pilotbrief",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent_frontendbuildinput",
+      "target": "packages_frontend_loop_src_templates_pagetemplate",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -10366,6 +11606,42 @@
       "context": "field",
       "source_file": "packages/hermes/src/controller.ts",
       "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent_qaevaluatoragentoptions",
+      "target": "packages_verification_src_modelclient_modelclient",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent_qaevaluatoragentoptions",
+      "target": "packages_verification_src_checks_types_check",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent_qainput",
+      "target": "packages_verification_src_checks_types_verificationcontext",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -10693,6 +11969,210 @@
       "weight": 1.0
     },
     {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_json_ref_types_node",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_json_ref_tsx",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_json_ref_typescript",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_json_ref_wfact_audit",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "ref_wfact_hermes_lite",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_agent_agent",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_agent_agentrun",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_agent_agentrunstatus",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_agent_agenttask",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_registry_agentregistry",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_src_agent_agent",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_src_agent_agentinputerror",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_src_registry_agentdefinition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_src_registry_agentregistry",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_src_registry_createseedregistry",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_src_registry_seed_agent_definitions",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_src_runagent_runagent",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
       "source": "packages_audit_package",
       "target": "packages_audit_package_json_ref_types_node",
       "relation": "imports",
@@ -10838,6 +12318,30 @@
     },
     {
       "source": "packages_frontend_loop_package",
+      "target": "packages_frontend_loop_package_json_ref_wfact_agent_runtime",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/package.json",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_package",
+      "target": "packages_frontend_loop_package_json_ref_wfact_audit",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/package.json",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_package",
       "target": "packages_frontend_loop_package_json_ref_types_node",
       "relation": "imports",
       "_origin": "ast",
@@ -10845,7 +12349,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L16",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -10857,7 +12361,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -10869,7 +12373,91 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L18",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_templates_pagetemplate",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_templates_selecttemplate",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_loop_frontendloop",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_loop_frontendloopresult",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_modelclient_modelclient",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_brief_parsebrief",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_brief_pilotbrief",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -10934,14 +12522,26 @@
     },
     {
       "source": "packages_frontend_loop_src_cli",
-      "target": "packages_frontend_loop_src_loop_frontendloop",
+      "target": "packages_frontend_loop_src_agent_createfrontendbuilderagent",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L16",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_cli",
+      "target": "packages_frontend_loop_src_agent_front_end_builder_role",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/cli.ts",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -10953,7 +12553,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L17",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -10965,7 +12565,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L17",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -10977,7 +12577,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L18",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -11026,6 +12626,42 @@
       "context": "import",
       "source_file": "packages/frontend-loop/src/loop.ts",
       "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_test_agent_test",
+      "target": "packages_frontend_loop_src_agent_createfrontendbuilderagent",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/test/agent.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_test_agent_test",
+      "target": "packages_frontend_loop_src_agent_front_end_builder_role",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/test/agent.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_test_agent_test",
+      "target": "packages_frontend_loop_src_modelclient_mockmodelclient",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/test/agent.test.ts",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -11205,7 +12841,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L14",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -11217,7 +12853,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L15",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -11229,7 +12865,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L16",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -11241,7 +12877,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L17",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -11253,7 +12889,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L20",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -11265,7 +12901,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L21",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -11277,7 +12913,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L22",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -11798,7 +13434,7 @@
     },
     {
       "source": "packages_verification_package",
-      "target": "packages_verification_package_json_ref_wfact_audit",
+      "target": "packages_verification_package_json_ref_wfact_agent_runtime",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -11810,19 +13446,19 @@
     },
     {
       "source": "packages_verification_package",
-      "target": "packages_verification_package_json_ref_types_node",
+      "target": "packages_verification_package_json_ref_wfact_audit",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/verification/package.json",
-      "source_location": "L17",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
       "source": "packages_verification_package",
-      "target": "packages_verification_package_json_ref_tsx",
+      "target": "packages_verification_package_json_ref_types_node",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -11834,7 +13470,7 @@
     },
     {
       "source": "packages_verification_package",
-      "target": "packages_verification_package_json_ref_typescript",
+      "target": "packages_verification_package_json_ref_tsx",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -11842,6 +13478,78 @@
       "context": "import",
       "source_file": "packages/verification/package.json",
       "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_package",
+      "target": "packages_verification_package_json_ref_typescript",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/package.json",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_checks_types_check",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_checks_types_verificationcontext",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_modelclient_modelclient",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_verificationloop_verificationloop",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_verificationloop_verificationresult",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -12074,14 +13782,26 @@
     },
     {
       "source": "packages_verification_src_cli",
-      "target": "packages_verification_src_verificationloop_verificationloop",
+      "target": "packages_verification_src_agent_createqaevaluatoragent",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L15",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_cli",
+      "target": "packages_verification_src_agent_qa_evaluator_role",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/cli.ts",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -12093,7 +13813,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L16",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -12105,7 +13825,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L16",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -12117,7 +13837,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -12346,6 +14066,42 @@
       "context": "import",
       "source_file": "packages/verification/src/verificationLoop.ts",
       "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_test_agent_test",
+      "target": "packages_verification_src_agent_createqaevaluatoragent",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_test_agent_test",
+      "target": "packages_verification_src_agent_qa_evaluator_role",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_test_agent_test",
+      "target": "packages_verification_src_modelclient_mockmodelclient",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -12697,6 +14453,44 @@
       "weight": 1.0
     },
     {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_agent",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L15",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_registry",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L16",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_src_index",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
       "source": "packages_audit_test_audit_test",
       "target": "packages_audit_src_index",
       "relation": "imports_from",
@@ -12706,6 +14500,55 @@
       "context": "import",
       "source_file": "packages/audit/test/audit.test.ts",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_templates",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_loop",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_modelclient",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L12",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_brief",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -12746,14 +14589,14 @@
     },
     {
       "source": "packages_frontend_loop_src_cli",
-      "target": "packages_frontend_loop_src_loop",
+      "target": "packages_frontend_loop_src_agent",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L16",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -12765,7 +14608,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L17",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -12777,7 +14620,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L18",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -12830,6 +14673,30 @@
       "source_file": "packages/frontend-loop/src/loop.ts",
       "source_location": "L17",
       "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_test_agent_test",
+      "target": "packages_frontend_loop_src_agent",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/test/agent.test.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_test_agent_test",
+      "target": "packages_frontend_loop_src_modelclient",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/frontend-loop/test/agent.test.ts",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -13322,6 +15189,44 @@
       "weight": 1.0
     },
     {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_checks_types",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L12",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_modelclient",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L13",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_verificationloop",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
       "source": "packages_verification_src_checks_imageoptimization",
       "target": "packages_verification_src_checks_types",
       "relation": "imports_from",
@@ -13413,6 +15318,18 @@
     },
     {
       "source": "packages_verification_src_cli",
+      "target": "packages_verification_src_agent",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/src/cli.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_cli",
       "target": "packages_verification_src_modelclient",
       "relation": "imports_from",
       "_origin": "ast",
@@ -13420,7 +15337,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L16",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -13432,7 +15349,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -13581,6 +15498,30 @@
       "context": "import",
       "source_file": "packages/verification/src/verificationLoop.ts",
       "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_test_agent_test",
+      "target": "packages_verification_src_agent",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_test_agent_test",
+      "target": "packages_verification_src_modelclient",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -13812,6 +15753,167 @@
       "context": "parameter_type",
       "source_file": "packages/verification/src/verificationLoop.ts",
       "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_agent_agent",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L1",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_agent_agentrun",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L1",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_agent_agentruncontext",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L1",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_agent_agentrunstatus",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L1",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_agent_agenttask",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L1",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_runagent_runagent",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_runagent_runagentoptions",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_agent_agentinputerror",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_registry_agentdefinition",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_registry_agentnotregisterederror",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_registry_agentregistry",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_registry_createseedregistry",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_index",
+      "target": "packages_agent_runtime_src_registry_seed_agent_definitions",
+      "relation": "re_exports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "re-export",
+      "source_file": "packages/agent-runtime/src/index.ts",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -15300,6 +17402,523 @@
       "weight": 1.0
     },
     {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_types",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_scripts",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_devdependencies",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_name",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_dependencies",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_version",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_private",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_description",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_type",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package",
+      "target": "packages_agent_runtime_package_exports",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package_dependencies",
+      "target": "packages_agent_runtime_package_dependencies_wfact_audit",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package_dependencies",
+      "target": "packages_agent_runtime_package_dependencies_wfact_hermes_lite",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package_devdependencies",
+      "target": "packages_agent_runtime_package_devdependencies_types_node",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package_devdependencies",
+      "target": "packages_agent_runtime_package_devdependencies_tsx",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package_devdependencies",
+      "target": "packages_agent_runtime_package_devdependencies_typescript",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package_scripts",
+      "target": "packages_agent_runtime_package_scripts_test",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_package_scripts",
+      "target": "packages_agent_runtime_package_scripts_typecheck",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/package.json",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent",
+      "target": "packages_agent_runtime_src_agent_agenttask",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent",
+      "target": "packages_agent_runtime_src_agent_agentruncontext",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent",
+      "target": "packages_agent_runtime_src_agent_agent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent",
+      "target": "packages_agent_runtime_src_agent_agentrunstatus",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L61",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent",
+      "target": "packages_agent_runtime_src_agent_agentrun",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent",
+      "target": "packages_agent_runtime_src_agent_agentinputerror",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry",
+      "target": "packages_agent_runtime_src_registry_agentdefinition",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry",
+      "target": "packages_agent_runtime_src_registry_agentnotregisterederror",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry",
+      "target": "packages_agent_runtime_src_registry_agentregistry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry",
+      "target": "packages_agent_runtime_src_registry_seed_agent_definitions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L68",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry",
+      "target": "packages_agent_runtime_src_registry_createseedregistry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L89",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_runagent_default_retry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_runagent_runagentoptions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_runagent",
+      "target": "packages_agent_runtime_src_runagent_runagent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/runAgent.ts",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_test_runagent_test_nosleep",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_test_runagent_test_execute",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L185",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_test_runagent_test_echo_def",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_test_runagent_test_echoagent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_test_runagent_test",
+      "target": "packages_agent_runtime_test_runagent_test_registrywithecho",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig",
+      "target": "packages_agent_runtime_tsconfig_include",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig",
+      "target": "packages_agent_runtime_tsconfig_compileroptions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_resolvejsonmodule",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_outdir",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_target",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_module",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_moduleresolution",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_strict",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_nouncheckedindexedaccess",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_esmoduleinterop",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_tsconfig_compileroptions",
+      "target": "packages_agent_runtime_tsconfig_compileroptions_skiplibcheck",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/tsconfig.json",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
       "source": "packages_audit_package",
       "target": "packages_audit_package_types",
       "relation": "contains",
@@ -16000,7 +18619,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L15",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -16081,6 +18700,28 @@
       "weight": 1.0
     },
     {
+      "source": "packages_frontend_loop_package_dependencies",
+      "target": "packages_frontend_loop_package_dependencies_wfact_agent_runtime",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend-loop/package.json",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_package_dependencies",
+      "target": "packages_frontend_loop_package_dependencies_wfact_audit",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend-loop/package.json",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
       "source": "packages_frontend_loop_package_devdependencies",
       "target": "packages_frontend_loop_package_devdependencies_types_node",
       "relation": "contains",
@@ -16088,7 +18729,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L16",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -16099,7 +18740,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -16110,7 +18751,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/frontend-loop/package.json",
-      "source_location": "L18",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -16144,6 +18785,50 @@
       "confidence_score": 1.0,
       "source_file": "packages/frontend-loop/package.json",
       "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_agent_front_end_builder_role",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_agent_frontendbuildinput",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_agent_frontendbuilderagentoptions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent",
+      "target": "packages_frontend_loop_src_agent_createfrontendbuilderagent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -16209,7 +18894,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L21",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -16220,7 +18905,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L23",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -16444,6 +19129,17 @@
       "weight": 1.0
     },
     {
+      "source": "packages_frontend_loop_test_agent_test",
+      "target": "packages_frontend_loop_test_agent_test_rawbrief",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/frontend-loop/test/agent.test.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
       "source": "packages_frontend_loop_test_brief_test",
       "target": "packages_frontend_loop_test_brief_test_validbrief",
       "relation": "contains",
@@ -16599,24 +19295,24 @@
     },
     {
       "source": "packages_hermes_package",
+      "target": "packages_hermes_package_scripts",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_hermes_package",
       "target": "packages_hermes_package_dependencies",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_hermes_package",
-      "target": "packages_hermes_package_devdependencies",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "packages/hermes/package.json",
-      "source_location": "L19",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -16628,6 +19324,17 @@
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
       "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_hermes_package",
+      "target": "packages_hermes_package_devdependencies",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -16676,7 +19383,7 @@
     },
     {
       "source": "packages_hermes_package",
-      "target": "packages_hermes_package_scripts",
+      "target": "packages_hermes_package_exports",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -16693,7 +19400,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L14",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -16704,7 +19411,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L15",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -16715,7 +19422,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L16",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -16726,7 +19433,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L17",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -16737,7 +19444,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L20",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -16748,7 +19455,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L21",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -16759,34 +19466,12 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L22",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
-      "source": "packages_hermes_package_scripts",
-      "target": "packages_hermes_package_scripts_verify_supabase",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "packages/hermes/package.json",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_hermes_package_scripts",
-      "target": "packages_hermes_package_scripts_typecheck",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "packages/hermes/package.json",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_hermes_package_scripts",
-      "target": "packages_hermes_package_scripts_ask",
+      "source": "packages_hermes_package_exports",
+      "target": "packages_hermes_package_exports_escalation",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -16797,13 +19482,46 @@
     },
     {
       "source": "packages_hermes_package_scripts",
+      "target": "packages_hermes_package_scripts_ask",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_hermes_package_scripts",
       "target": "packages_hermes_package_scripts_test",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L9",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_hermes_package_scripts",
+      "target": "packages_hermes_package_scripts_verify_supabase",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_hermes_package_scripts",
+      "target": "packages_hermes_package_scripts_typecheck",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -17518,7 +20236,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/verification/package.json",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -17600,13 +20318,24 @@
     },
     {
       "source": "packages_verification_package_dependencies",
-      "target": "packages_verification_package_dependencies_wfact_audit",
+      "target": "packages_verification_package_dependencies_wfact_agent_runtime",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/verification/package.json",
       "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_package_dependencies",
+      "target": "packages_verification_package_dependencies_wfact_audit",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/verification/package.json",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -17617,7 +20346,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/verification/package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -17628,7 +20357,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/verification/package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -17639,7 +20368,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/verification/package.json",
-      "source_location": "L19",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -17673,6 +20402,61 @@
       "confidence_score": 1.0,
       "source_file": "packages/verification/package.json",
       "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_agent_qa_evaluator_role",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_agent_qainput",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_agent_qaevaluatoragentoptions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_agent_stringarray",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_src_agent",
+      "target": "packages_verification_src_agent_createqaevaluatoragent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/verification/src/agent.ts",
+      "source_location": "L35",
       "weight": 1.0
     },
     {
@@ -17837,7 +20621,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L22",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -17848,7 +20632,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L24",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -18061,6 +20845,28 @@
       "weight": 1.0
     },
     {
+      "source": "packages_verification_test_agent_test",
+      "target": "packages_verification_test_agent_test_fixtures_dir",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_verification_test_agent_test",
+      "target": "packages_verification_test_agent_test_input",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/verification/test/agent.test.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
       "source": "packages_verification_test_audit_test",
       "target": "packages_verification_test_audit_test_fixtures_dir",
       "relation": "contains",
@@ -18267,6 +21073,127 @@
       "confidence_score": 1.0,
       "source_file": "packages/verification/tsconfig.json",
       "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent_agent",
+      "target": "packages_agent_runtime_src_agent_agent_parseinput",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent_agent",
+      "target": "packages_agent_runtime_src_agent_agent_execute",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent_agent",
+      "target": "packages_agent_runtime_src_agent_agent_escalationreason",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent_agent",
+      "target": "packages_agent_runtime_src_agent_agent_summarize",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_agent_agentinputerror",
+      "target": "packages_agent_runtime_src_agent_agentinputerror_constructor",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/agent.ts",
+      "source_location": "L78",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry_agentnotregisterederror",
+      "target": "packages_agent_runtime_src_registry_agentnotregisterederror_constructor",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry_agentregistry",
+      "target": "packages_agent_runtime_src_registry_agentregistry_constructor",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry_agentregistry",
+      "target": "packages_agent_runtime_src_registry_agentregistry_register",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry_agentregistry",
+      "target": "packages_agent_runtime_src_registry_agentregistry_get",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry_agentregistry",
+      "target": "packages_agent_runtime_src_registry_agentregistry_has",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_agent_runtime_src_registry_agentregistry",
+      "target": "packages_agent_runtime_src_registry_agentregistry_list",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/agent-runtime/src/registry.ts",
+      "source_location": "L62",
       "weight": 1.0
     },
     {
@@ -19161,15 +22088,27 @@
       "weight": 1.0
     },
     {
-      "source": "packages_frontend_loop_src_cli_main",
+      "source": "packages_agent_runtime_test_runagent_test_registrywithecho",
+      "target": "packages_agent_runtime_src_registry_agentregistry_register",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "packages/agent-runtime/test/runAgent.test.ts",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_frontend_loop_src_agent_createfrontendbuilderagent",
       "target": "packages_frontend_loop_src_loop_frontendloop_run",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "context": "call",
-      "source_file": "packages/frontend-loop/src/cli.ts",
-      "source_location": "L58",
+      "source_file": "packages/frontend-loop/src/agent.ts",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -19218,18 +22157,6 @@
       "context": "call",
       "source_file": "packages/hermes/test/audit.test.ts",
       "source_location": "L19",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_verification_src_cli_main",
-      "target": "packages_verification_src_verificationloop_verificationloop_run",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "context": "call",
-      "source_file": "packages/verification/src/cli.ts",
-      "source_location": "L53",
       "weight": 1.0
     },
     {
@@ -22395,5 +25322,5 @@
       "source_file": "docs/WFACT-3.0-Playbook.md"
     }
   ],
-  "built_at_commit": "a57d97793e81c1eed19aec0d77b55ada12f7d6fe"
+  "built_at_commit": "77680c70d90ecbaa0a8bc284c2edeceed199b371"
 }

@@ -10,8 +10,8 @@ be swapped for Infisical/Vault later without touching code, since every package 
 
 | Doppler project | Config | Used by |
 |---|---|---|
-| `wfact` | `dev` | Local runs: `doppler run -- npm run ask -- "…"`, `npm run verify`, `npm run build-page` |
-| `wfact` | `prd` | GitHub Actions `deploy-cockpit` job (via a **service token** in the `DOPPLER_TOKEN` GitHub secret) |
+| `wfact-3-0-codebase` | `dev` | Local runs: `doppler run -- npm run ask -- "…"`, `npm run verify`, `npm run build-page` |
+| `wfact-3-0-codebase` | `prd` | GitHub Actions `deploy-cockpit` job (via a **service token** in the `DOPPLER_TOKEN` GitHub secret) |
 
 Variable names are exactly `.env.example`'s (plus `AGENT37_BASE_URL`, `AGENT37_API_KEY`, `API_KEY_21ST`,
 `ANTHROPIC_MODEL` if overridden). No code change is needed — packages already read `process.env`.
@@ -24,12 +24,18 @@ public by design (RLS is the access control, see `apps/cockpit/src/supabaseClien
 
 ## One-time setup (Huraira — account-owner steps, can't be done by an agent)
 
-1. Create the Doppler workspace + project `wfact` with configs `dev` and `prd`.
+**Status 2026-09-28**: steps 1–3 DONE — workspace "WFACT 3.0", project `wfact-3-0-codebase`; the 9
+non-empty `.env.local` values imported into `dev` and `prd` (hash-verified 9/9 identical;
+`VERCEL_OIDC_TOKEN` deliberately skipped — short-lived, Vercel-generated). Proven as the real source:
+`env -i … doppler run -- npm run ask` answered live with no `.env.local` loaded. Steps 4–5 and
+`VERCEL_TOKEN` (empty in `.env.local`, needed by the deploy job) still open.
+
+1. Create the Doppler workspace + project `wfact-3-0-codebase` (configs `dev`, `stg`, `prd`, `dev_personal`).
 2. Install the CLI and log in locally: `brew install dopplerhq/cli/doppler && doppler login`, then in
-   the repo root: `doppler setup --project wfact --config dev`.
+   the repo root: `doppler setup --project wfact-3-0-codebase --config dev`.
 3. Import the current values (from the repo root):
-   `doppler secrets upload .env.local --project wfact --config dev` and the same for `--config prd`.
-4. Create a **service token** for `wfact/prd` (read-only) and add it as the GitHub repo secret
+   `doppler secrets upload .env.local --project wfact-3-0-codebase --config dev` and the same for `--config prd`.
+4. Create a **service token** for `wfact-3-0-codebase/prd` (read-only) and add it as the GitHub repo secret
    `DOPPLER_TOKEN` (repo Settings → Secrets and variables → Actions).
 5. In Vercel → `wfact-cockpit` → Settings → Git, set **Production Branch = `main`**. `apps/cockpit/vercel.json`
    already disables Git-triggered deploys on `main`, so CI (gated on every check job) is the only thing

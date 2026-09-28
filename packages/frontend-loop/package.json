@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.71.0"
+    "@anthropic-ai/sdk": "^0.71.0",
+    "@wfact/agent-runtime": "file:../agent-runtime",
+    "@wfact/audit": "file:../audit"
   },
   "devDependencies": {
     "@types/node": "^22.20.2",

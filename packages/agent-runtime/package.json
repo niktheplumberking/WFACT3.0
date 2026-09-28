@@ -1,0 +1,24 @@
+{
+  "name": "@wfact/agent-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stage 2 agent lifecycle (Blueprint §3/§14): typed Agent interface, runAgent executor (spawn → validate → execute with bounded retry → report → terminate), and the agent registry.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@wfact/audit": "file:../audit",
+    "@wfact/hermes-lite": "file:../hermes"
+  }
+}
