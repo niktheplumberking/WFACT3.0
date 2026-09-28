@@ -444,3 +444,16 @@ table.data-table tbody tr:hover { background: var(--panel-2); }
   font-size: 13px;
 }
 .plan-note:focus { outline: none; border-color: var(--amber); }
+
+/* ---- Cockpit jobs: Actions room (Actions.tsx) ---- */
+.action-textarea { width: 100%; box-sizing: border-box; resize: vertical; min-height: 110px; margin-top: 8px; }
+.action-row { align-items: center; justify-content: space-between; border-top: 1px solid var(--border-soft); padding-top: 10px; }
+.action-label { flex: 1 1 320px; font-size: 13px; color: var(--text); }
+.job-pill-queued, .job-pill-dispatched { color: var(--slate); }
+.job-pill-running { color: var(--cyan); border-color: rgba(94, 200, 192, 0.35); background: rgba(94, 200, 192, 0.1); }
+.job-pill-succeeded { color: var(--green); border-color: rgba(111, 207, 151, 0.35); background: rgba(111, 207, 151, 0.1); }
+.job-pill-failed { color: var(--rust); border-color: rgba(224, 104, 79, 0.35); background: rgba(224, 104, 79, 0.1); }
+.plan-card.job-succeeded { border-left-color: var(--green); }
+.plan-card.job-failed { border-left-color: var(--rust); }
+.plan-card.job-running, .plan-card.job-dispatched, .plan-card.job-queued { border-left-color: var(--cyan); }
+.plan-meta a { color: var(--cyan); }

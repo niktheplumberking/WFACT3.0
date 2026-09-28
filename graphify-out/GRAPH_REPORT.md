@@ -1,16 +1,16 @@
 # Graph Report - wfact-3.0-build  (2026-09-28)
 
 ## Corpus Check
-- 158 files · ~119,764 words
+- 170 files · ~127,672 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1142 nodes · 1760 edges · 74 communities (52 shown, 21 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 59 edges (avg confidence: 0.84)
+- 1261 nodes · 1930 edges · 80 communities (56 shown, 23 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 62 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1bcf6717`
+- Built from commit: `123970f4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -88,6 +88,12 @@
 - compilerOptions
 - routing.ts
 - 0007_plan_approvals.sql
+- handlers.test.ts
+- jobs/package.json
+- compilerOptions
+- Cockpit jobs — every pipeline action from the Cockpit
+- 0009_jobs.sql
+- dispatch-job/index.ts
 
 ## God Nodes (most connected - your core abstractions)
 1. `WFACT 3.0 Complete Ecosystem Blueprint` - 25 edges
@@ -124,7 +130,7 @@
 - **Never Trust Done, Only Verified: independent verification chain** — docs_wfact_3_0_continuation_build_plan_frontend_loop_pkg, docs_wfact_3_0_continuation_build_plan_verification_pkg, docs_wfact_3_0_ecosystem_blueprint_independent_evaluator, docs_wfact_3_0_fast_track_plan_the_eyes, docs_wfact_3_0_fast_track_plan_security_audit_50_point, docs_wfact_3_0_playbook_registry_78_check [INFERRED 0.85]
 - **WFACT memory stack feeding Hermes** — docs_wfact_3_0_playbook_flat_file_memory, docs_wfact_3_0_playbook_tone_filter, docs_wfact_3_0_ecosystem_blueprint_hermes_controller, docs_wfact_3_0_ecosystem_blueprint_second_brain, docs_wfact_3_0_continuation_build_plan_episodic_memory_v1_5, docs_wfact_sops_claude_outputs_wfact_sop_3_post_launch_automation_team_ops_post_mortem_lessons_ledger [INFERRED 0.85]
 
-## Communities (74 total, 21 thin omitted)
+## Communities (80 total, 23 thin omitted)
 
 ### Community 0 - "verificationLoop.ts"
 Cohesion: 0.06
@@ -139,8 +145,8 @@ Cohesion: 0.08
 Nodes (34): createFrontendBuilderAgent(), FRONT_END_BUILDER_ROLE, FrontendBuilderAgentOptions, FrontendBuildInput, BRIEF_SOURCES, InvalidBriefError, loadBrief(), parseBrief() (+26 more)
 
 ### Community 3 - "App.tsx"
-Cohesion: 0.08
-Nodes (32): App(), Room, ROOMS, Stats, useStats(), Approvals(), approve(), load() (+24 more)
+Cohesion: 0.07
+Nodes (42): Actions(), go(), KIND_LABEL, PlanLite, ResultView(), useJobs(), App(), Room (+34 more)
 
 ### Community 4 - "cockpit/package.json"
 Cohesion: 0.07
@@ -299,8 +305,8 @@ Cohesion: 0.17
 Nodes (11): compilerOptions, esModuleInterop, module, moduleResolution, noUncheckedIndexedAccess, outDir, resolveJsonModule, skipLibCheck (+3 more)
 
 ### Community 65 - "buildAndVerify.ts"
-Cohesion: 0.09
-Nodes (27): ArtifactStore, assertSafeRelPath(), buildAndVerify(), CheckpointIntegrityError, CheckpointState, FileArtifactStore, MemoryArtifactStore, QaFailure (+19 more)
+Cohesion: 0.08
+Nodes (29): ArtifactStore, assertSafeRelPath(), buildAndVerify(), CheckpointIntegrityError, CheckpointState, FileArtifactStore, MemoryArtifactStore, QaFailure (+21 more)
 
 ### Community 66 - "workflow/package.json"
 Cohesion: 0.06
@@ -334,6 +340,22 @@ Nodes (9): DEFAULT_CONFIG_PATH, estimateCostUsd(), loadRoutingTable(), ModelCost
 Cohesion: 0.25
 Nodes (6): plan_approvals_decision_guard, plan_approvals_no_delete, public.plan_approvals, auth.users, private.plan_approval_decision_guard, private.plan_approvals_no_delete
 
+### Community 74 - "handlers.test.ts"
+Cohesion: 0.08
+Nodes (23): handleJob(), HandlerDeps, JobOutcome, planningOutcome(), uuid(), workflowOutcome(), Job, JobKind (+15 more)
+
+### Community 75 - "jobs/package.json"
+Cohesion: 0.06
+Nodes (31): dependencies, @wfact/agent-runtime, @wfact/audit, @wfact/frontend-loop, @wfact/hermes-lite, @wfact/planning, @wfact/verification, @wfact/workflow (+23 more)
+
+### Community 76 - "compilerOptions"
+Cohesion: 0.17
+Nodes (11): compilerOptions, esModuleInterop, module, moduleResolution, noUncheckedIndexedAccess, outDir, resolveJsonModule, skipLibCheck (+3 more)
+
+### Community 77 - "Cockpit jobs — every pipeline action from the Cockpit"
+Cohesion: 0.40
+Nodes (4): Cockpit jobs — every pipeline action from the Cockpit, Guarantees (and where each is enforced), Known limits (honest), One-time setup (Huraira — needs a token only you can create)
+
 ## Ambiguous Edges - Review These
 - `Documentation Index` → `WFACT 3.0 Complete Ecosystem Blueprint`  [AMBIGUOUS]
   docs/INDEX.md · relation: conceptually_related_to
@@ -341,9 +363,9 @@ Nodes (6): plan_approvals_decision_guard, plan_approvals_no_delete, public.plan_
   docs/WFACT SOPS/WFACT SOP.pdf · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **433 isolated node(s):** `notification-token-display.sh script`, `post-write-token-diff.sh script`, `pre-tool-bash-guard.sh script`, `pre-tool-read-guard.sh script`, `pre-tool-token-guard.sh script` (+428 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 581 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **484 isolated node(s):** `notification-token-display.sh script`, `post-write-token-diff.sh script`, `pre-tool-bash-guard.sh script`, `pre-tool-read-guard.sh script`, `pre-tool-token-guard.sh script` (+479 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 647 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -353,12 +375,12 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `WFACT SOP (PDF)` and `WFact SOP 1 — Sales & Onboarding (PDF)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **Why does `WFACT 3.0 Continuation Build Plan` connect `WFACT 3.0 Continuation Build Plan` to `WFACT 3.0 Law File (CLAUDE.md)`, `WFACT 3.0 Execution Roadmap`, `WFACT 3.0 Complete Ecosystem Blueprint`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Why does `WFACT 3.0 Complete Ecosystem Blueprint` connect `WFACT 3.0 Complete Ecosystem Blueprint` to `WFACT 3.0 Execution Roadmap`, `WFACT 3.0 Fast-Track Plan`, `WFACT 3.0 Continuation Build Plan`, `Audit: WFACT 2.0 to 3.0 (KEEP/REPLACE classification)`?**
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+- **Why does `WFACT 3.0 Law File (CLAUDE.md)` connect `WFACT 3.0 Law File (CLAUDE.md)` to `WFACT 3.0 Continuation Build Plan`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `Sprint Progress tracker` connect `WFACT 3.0 Law File (CLAUDE.md)` to `WFACT 3.0 Continuation Build Plan`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **What connects `notification-token-display.sh script`, `post-write-token-diff.sh script`, `pre-tool-bash-guard.sh script` to the rest of the system?**
-  _433 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _484 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `verificationLoop.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.060939060939060936 - nodes in this community are weakly interconnected._

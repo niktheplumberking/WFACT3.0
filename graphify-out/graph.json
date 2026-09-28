@@ -644,6 +644,19 @@
       "source_location": "L68"
     },
     {
+      "id": "apps_cockpit_src_actions_planlite",
+      "label": "PlanLite",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "planlite",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L11"
+    },
+    {
       "id": "apps_cockpit_src_app_room",
       "label": "Room",
       "_callable": true,
@@ -654,7 +667,7 @@
       "file_type": "code",
       "norm_label": "room",
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L10"
+      "source_location": "L11"
     },
     {
       "id": "apps_cockpit_src_app_stats",
@@ -667,7 +680,7 @@
       "file_type": "code",
       "norm_label": "stats",
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L19"
+      "source_location": "L21"
     },
     {
       "id": "apps_cockpit_src_approvals_projectrow",
@@ -681,6 +694,32 @@
       "norm_label": "projectrow",
       "source_file": "apps/cockpit/src/Approvals.tsx",
       "source_location": "L17"
+    },
+    {
+      "id": "apps_cockpit_src_jobsclient_jobkind",
+      "label": "JobKind",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "jobkind",
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "apps_cockpit_src_jobsclient_jobrow",
+      "label": "JobRow",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "jobrow",
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L11"
     },
     {
       "id": "apps_cockpit_src_models_tracerow",
@@ -1294,6 +1333,19 @@
       "source_location": "L137"
     },
     {
+      "id": "packages_workflow_src_supabaseartifacts_supabaseartifactstore",
+      "label": "SupabaseArtifactStore",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 65,
+      "community_name": "buildAndVerify.ts",
+      "file_type": "code",
+      "norm_label": "supabaseartifactstore",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L17"
+    },
+    {
       "id": "packages_planning_src_intake_intakeresult",
       "label": "IntakeResult",
       "_callable": true,
@@ -1734,6 +1786,110 @@
       "norm_label": "routingfile",
       "source_file": "packages/hermes/src/routing.ts",
       "source_location": "L29"
+    },
+    {
+      "id": "packages_jobs_src_handlers_handlerdeps",
+      "label": "HandlerDeps",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "handlerdeps",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "packages_jobs_src_handlers_joboutcome",
+      "label": "JobOutcome",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "joboutcome",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L35"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_job",
+      "label": "Job",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "job",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_jobkind",
+      "label": "JobKind",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "jobkind",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_jobstatus",
+      "label": "JobStatus",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "jobstatus",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_jobstore",
+      "label": "JobStore",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "jobstore",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L17"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_memoryjobstore",
+      "label": "MemoryJobStore",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "memoryjobstore",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L56"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_supabasejobstore",
+      "label": "SupabaseJobStore",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "supabasejobstore",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L25"
     },
     {
       "id": "packages_hermes_src_controller_hermesanswer",
@@ -2724,6 +2880,54 @@
       "source_location": "L17"
     },
     {
+      "id": "apps_cockpit_src_actions_actions",
+      "label": "Actions()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "actions()",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L104"
+    },
+    {
+      "id": "apps_cockpit_src_actions_actions_go",
+      "label": "go()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "go()",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L127"
+    },
+    {
+      "id": "apps_cockpit_src_actions_resultview",
+      "label": "ResultView()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "resultview()",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L54"
+    },
+    {
+      "id": "apps_cockpit_src_actions_usejobs",
+      "label": "useJobs()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "usejobs()",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L29"
+    },
+    {
       "id": "apps_cockpit_src_app_app",
       "label": "App()",
       "_callable": true,
@@ -2733,7 +2937,7 @@
       "file_type": "code",
       "norm_label": "app()",
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L54"
+      "source_location": "L56"
     },
     {
       "id": "apps_cockpit_src_app_usestats",
@@ -2745,7 +2949,7 @@
       "file_type": "code",
       "norm_label": "usestats()",
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L25"
+      "source_location": "L27"
     },
     {
       "id": "apps_cockpit_src_app_usestats_load",
@@ -2757,7 +2961,7 @@
       "file_type": "code",
       "norm_label": "load()",
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L31"
+      "source_location": "L33"
     },
     {
       "id": "apps_cockpit_src_approvals_approvals",
@@ -2794,6 +2998,30 @@
       "norm_label": "load()",
       "source_file": "apps/cockpit/src/Approvals.tsx",
       "source_location": "L28"
+    },
+    {
+      "id": "apps_cockpit_src_jobsclient_previewurl",
+      "label": "previewUrl()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "previewurl()",
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L50"
+    },
+    {
+      "id": "apps_cockpit_src_jobsclient_requestjob",
+      "label": "requestJob()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "requestjob()",
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L24"
     },
     {
       "id": "apps_cockpit_src_login_login",
@@ -3720,6 +3948,78 @@
       "source_location": "L43"
     },
     {
+      "id": "packages_workflow_src_supabaseartifacts_sha256",
+      "label": "sha256()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 65,
+      "community_name": "buildAndVerify.ts",
+      "file_type": "code",
+      "norm_label": "sha256()",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L15"
+    },
+    {
+      "id": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_constructor",
+      "label": ".constructor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 65,
+      "community_name": "buildAndVerify.ts",
+      "file_type": "code",
+      "norm_label": ".constructor()",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L20"
+    },
+    {
+      "id": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_headers",
+      "label": ".headers()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 65,
+      "community_name": "buildAndVerify.ts",
+      "file_type": "code",
+      "norm_label": ".headers()",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L24"
+    },
+    {
+      "id": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_read",
+      "label": ".read()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 65,
+      "community_name": "buildAndVerify.ts",
+      "file_type": "code",
+      "norm_label": ".read()",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L40"
+    },
+    {
+      "id": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_readverified",
+      "label": ".readVerified()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 65,
+      "community_name": "buildAndVerify.ts",
+      "file_type": "code",
+      "norm_label": ".readverified()",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L48"
+    },
+    {
+      "id": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_write",
+      "label": ".write()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 65,
+      "community_name": "buildAndVerify.ts",
+      "file_type": "code",
+      "norm_label": ".write()",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L28"
+    },
+    {
       "id": "packages_workflow_test_buildandverify_test_actions",
       "label": "actions()",
       "_callable": true,
@@ -4378,6 +4678,306 @@
       "norm_label": ".constructor()",
       "source_file": "packages/hermes/src/routing.ts",
       "source_location": "L37"
+    },
+    {
+      "id": "packages_jobs_src_handlers_handlejob",
+      "label": "handleJob()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "handlejob()",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L98"
+    },
+    {
+      "id": "packages_jobs_src_handlers_planningoutcome",
+      "label": "planningOutcome()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "planningoutcome()",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L55"
+    },
+    {
+      "id": "packages_jobs_src_handlers_str",
+      "label": "str()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "str()",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L44"
+    },
+    {
+      "id": "packages_jobs_src_handlers_uuid",
+      "label": "uuid()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "uuid()",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L49"
+    },
+    {
+      "id": "packages_jobs_src_handlers_workflowoutcome",
+      "label": "workflowOutcome()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "workflowoutcome()",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L80"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_jobstore_finish",
+      "label": ".finish()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".finish()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L20"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_jobstore_get",
+      "label": ".get()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".get()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L18"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_jobstore_markrunning",
+      "label": ".markRunning()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".markrunning()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_memoryjobstore_finish",
+      "label": ".finish()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".finish()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L67"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_memoryjobstore_get",
+      "label": ".get()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".get()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L58"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_memoryjobstore_markrunning",
+      "label": ".markRunning()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".markrunning()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L62"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_supabasejobstore_constructor",
+      "label": ".constructor()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".constructor()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L27"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_supabasejobstore_finish",
+      "label": ".finish()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".finish()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L51"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_supabasejobstore_get",
+      "label": ".get()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".get()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L33"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_supabasejobstore_headers",
+      "label": ".headers()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".headers()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L30"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_supabasejobstore_markrunning",
+      "label": ".markRunning()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".markrunning()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L48"
+    },
+    {
+      "id": "packages_jobs_src_jobstore_supabasejobstore_patch",
+      "label": ".patch()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": ".patch()",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L40"
+    },
+    {
+      "id": "packages_jobs_src_run_builddeps",
+      "label": "buildDeps()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "builddeps()",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L52"
+    },
+    {
+      "id": "packages_jobs_src_run_ghrunurl",
+      "label": "ghRunUrl()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "ghrunurl()",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L45"
+    },
+    {
+      "id": "packages_jobs_src_run_main",
+      "label": "main()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "main()",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L105"
+    },
+    {
+      "id": "packages_jobs_src_run_need",
+      "label": "need()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "need()",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L39"
+    },
+    {
+      "id": "packages_jobs_test_handlers_test_deps",
+      "label": "deps()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "deps()",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L37"
+    },
+    {
+      "id": "packages_jobs_test_handlers_test_job",
+      "label": "job()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "job()",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L69"
+    },
+    {
+      "id": "supabase_functions_dispatch_job_index_allowedorigin",
+      "label": "allowedOrigin()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 79,
+      "community_name": "dispatch-job/index.ts",
+      "file_type": "code",
+      "norm_label": "allowedorigin()",
+      "source_file": "supabase/functions/dispatch-job/index.ts",
+      "source_location": "L18"
+    },
+    {
+      "id": "supabase_functions_dispatch_job_index_respond",
+      "label": "respond()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 79,
+      "community_name": "dispatch-job/index.ts",
+      "file_type": "code",
+      "norm_label": "respond()",
+      "source_file": "supabase/functions/dispatch-job/index.ts",
+      "source_location": "L25"
     },
     {
       "id": "packages_hermes_src_controller_detectentityslug",
@@ -6672,6 +7272,28 @@
       "source_location": "L49"
     },
     {
+      "id": "apps_cockpit_src_actions",
+      "label": "Actions.tsx",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "actions.tsx",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_cockpit_src_actions_kind_label",
+      "label": "KIND_LABEL",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "kind_label",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L20"
+    },
+    {
       "id": "apps_cockpit_src_app",
       "label": "App.tsx",
       "_origin": "ast",
@@ -6691,7 +7313,7 @@
       "file_type": "code",
       "norm_label": "rooms",
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L12"
+      "source_location": "L13"
     },
     {
       "id": "apps_cockpit_src_approvals",
@@ -6702,6 +7324,17 @@
       "file_type": "code",
       "norm_label": "approvals.tsx",
       "source_file": "apps/cockpit/src/Approvals.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "apps_cockpit_src_jobsclient",
+      "label": "jobsClient.ts",
+      "_origin": "ast",
+      "community": 3,
+      "community_name": "App.tsx",
+      "file_type": "code",
+      "norm_label": "jobsclient.ts",
+      "source_file": "apps/cockpit/src/jobsClient.ts",
       "source_location": "L1"
     },
     {
@@ -7656,7 +8289,7 @@
       "file_type": "code",
       "norm_label": "dependencies",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L19"
+      "source_location": "L20"
     },
     {
       "id": "packages_hermes_package_dependencies_anthropic_ai_sdk",
@@ -7667,7 +8300,7 @@
       "file_type": "code",
       "norm_label": "@anthropic-ai/sdk",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L20"
+      "source_location": "L21"
     },
     {
       "id": "packages_hermes_package_dependencies_supabase_supabase_js",
@@ -7678,7 +8311,7 @@
       "file_type": "code",
       "norm_label": "@supabase/supabase-js",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L21"
+      "source_location": "L22"
     },
     {
       "id": "packages_hermes_package_dependencies_wfact_audit",
@@ -7689,7 +8322,7 @@
       "file_type": "code",
       "norm_label": "@wfact/audit",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L22"
+      "source_location": "L23"
     },
     {
       "id": "packages_hermes_package_dependencies_zod",
@@ -7700,7 +8333,7 @@
       "file_type": "code",
       "norm_label": "zod",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L23"
+      "source_location": "L24"
     },
     {
       "id": "packages_hermes_package_description",
@@ -7722,7 +8355,7 @@
       "file_type": "code",
       "norm_label": "devdependencies",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L25"
+      "source_location": "L26"
     },
     {
       "id": "packages_hermes_package_devdependencies_tsx",
@@ -7733,7 +8366,7 @@
       "file_type": "code",
       "norm_label": "tsx",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L27"
+      "source_location": "L28"
     },
     {
       "id": "packages_hermes_package_devdependencies_types_node",
@@ -7744,7 +8377,7 @@
       "file_type": "code",
       "norm_label": "@types/node",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L26"
+      "source_location": "L27"
     },
     {
       "id": "packages_hermes_package_devdependencies_typescript",
@@ -7755,7 +8388,7 @@
       "file_type": "code",
       "norm_label": "typescript",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L28"
+      "source_location": "L29"
     },
     {
       "id": "packages_hermes_package_exports",
@@ -7843,7 +8476,7 @@
       "file_type": "code",
       "norm_label": "scripts",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L13"
+      "source_location": "L14"
     },
     {
       "id": "packages_hermes_package_scripts_ask",
@@ -7854,7 +8487,7 @@
       "file_type": "code",
       "norm_label": "ask",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L14"
+      "source_location": "L15"
     },
     {
       "id": "packages_hermes_package_scripts_test",
@@ -7865,7 +8498,7 @@
       "file_type": "code",
       "norm_label": "test",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L15"
+      "source_location": "L16"
     },
     {
       "id": "packages_hermes_package_scripts_typecheck",
@@ -7876,7 +8509,7 @@
       "file_type": "code",
       "norm_label": "typecheck",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L17"
+      "source_location": "L18"
     },
     {
       "id": "packages_hermes_package_scripts_verify_supabase",
@@ -7887,7 +8520,7 @@
       "file_type": "code",
       "norm_label": "verify:supabase",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L16"
+      "source_location": "L17"
     },
     {
       "id": "packages_hermes_package_type",
@@ -7920,7 +8553,7 @@
       "file_type": "concept",
       "norm_label": "@anthropic-ai/sdk",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L20"
+      "source_location": "L21"
     },
     {
       "id": "packages_hermes_package_json_ref_supabase_supabase_js",
@@ -7931,7 +8564,7 @@
       "file_type": "concept",
       "norm_label": "@supabase/supabase-js",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L21"
+      "source_location": "L22"
     },
     {
       "id": "packages_hermes_package_json_ref_tsx",
@@ -7942,7 +8575,7 @@
       "file_type": "concept",
       "norm_label": "tsx",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L27"
+      "source_location": "L28"
     },
     {
       "id": "packages_hermes_package_json_ref_types_node",
@@ -7953,7 +8586,7 @@
       "file_type": "concept",
       "norm_label": "@types/node",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L26"
+      "source_location": "L27"
     },
     {
       "id": "packages_hermes_package_json_ref_typescript",
@@ -7964,7 +8597,7 @@
       "file_type": "concept",
       "norm_label": "typescript",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L28"
+      "source_location": "L29"
     },
     {
       "id": "packages_hermes_package_json_ref_wfact_audit",
@@ -7975,7 +8608,7 @@
       "file_type": "concept",
       "norm_label": "@wfact/audit",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L22"
+      "source_location": "L23"
     },
     {
       "id": "packages_hermes_package_json_ref_zod",
@@ -7986,7 +8619,7 @@
       "file_type": "concept",
       "norm_label": "zod",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L23"
+      "source_location": "L24"
     },
     {
       "id": "packages_audit_package",
@@ -9696,6 +10329,17 @@
       "source_location": "L36"
     },
     {
+      "id": "packages_workflow_src_supabaseartifacts",
+      "label": "supabaseArtifacts.ts",
+      "_origin": "ast",
+      "community": 65,
+      "community_name": "buildAndVerify.ts",
+      "file_type": "code",
+      "norm_label": "supabaseartifacts.ts",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "packages_workflow_test_buildandverify_test",
       "label": "buildAndVerify.test.ts",
       "_origin": "ast",
@@ -9770,7 +10414,7 @@
       "file_type": "code",
       "norm_label": "dependencies",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L20"
+      "source_location": "L21"
     },
     {
       "id": "packages_workflow_package_dependencies_wfact_agent_runtime",
@@ -9781,7 +10425,7 @@
       "file_type": "code",
       "norm_label": "@wfact/agent-runtime",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L21"
+      "source_location": "L22"
     },
     {
       "id": "packages_workflow_package_dependencies_wfact_audit",
@@ -9792,7 +10436,7 @@
       "file_type": "code",
       "norm_label": "@wfact/audit",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L22"
+      "source_location": "L23"
     },
     {
       "id": "packages_workflow_package_dependencies_wfact_frontend_loop",
@@ -9803,7 +10447,7 @@
       "file_type": "code",
       "norm_label": "@wfact/frontend-loop",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L23"
+      "source_location": "L24"
     },
     {
       "id": "packages_workflow_package_dependencies_wfact_hermes_lite",
@@ -9814,7 +10458,7 @@
       "file_type": "code",
       "norm_label": "@wfact/hermes-lite",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L24"
+      "source_location": "L25"
     },
     {
       "id": "packages_workflow_package_dependencies_wfact_planning",
@@ -9825,7 +10469,7 @@
       "file_type": "code",
       "norm_label": "@wfact/planning",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L25"
+      "source_location": "L26"
     },
     {
       "id": "packages_workflow_package_dependencies_wfact_verification",
@@ -9836,7 +10480,7 @@
       "file_type": "code",
       "norm_label": "@wfact/verification",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L26"
+      "source_location": "L27"
     },
     {
       "id": "packages_workflow_package_description",
@@ -9858,7 +10502,7 @@
       "file_type": "code",
       "norm_label": "devdependencies",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L15"
+      "source_location": "L16"
     },
     {
       "id": "packages_workflow_package_devdependencies_tsx",
@@ -9869,7 +10513,7 @@
       "file_type": "code",
       "norm_label": "tsx",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L17"
+      "source_location": "L18"
     },
     {
       "id": "packages_workflow_package_devdependencies_types_node",
@@ -9880,7 +10524,7 @@
       "file_type": "code",
       "norm_label": "@types/node",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L16"
+      "source_location": "L17"
     },
     {
       "id": "packages_workflow_package_devdependencies_typescript",
@@ -9891,7 +10535,7 @@
       "file_type": "code",
       "norm_label": "typescript",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L18"
+      "source_location": "L19"
     },
     {
       "id": "packages_workflow_package_exports",
@@ -9935,7 +10579,7 @@
       "file_type": "code",
       "norm_label": "scripts",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L10"
+      "source_location": "L11"
     },
     {
       "id": "packages_workflow_package_scripts_build_and_verify",
@@ -9946,7 +10590,7 @@
       "file_type": "code",
       "norm_label": "build-and-verify",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L11"
+      "source_location": "L12"
     },
     {
       "id": "packages_workflow_package_scripts_test",
@@ -9957,7 +10601,7 @@
       "file_type": "code",
       "norm_label": "test",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L12"
+      "source_location": "L13"
     },
     {
       "id": "packages_workflow_package_scripts_typecheck",
@@ -9968,7 +10612,7 @@
       "file_type": "code",
       "norm_label": "typecheck",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L13"
+      "source_location": "L14"
     },
     {
       "id": "packages_workflow_package_type",
@@ -10001,7 +10645,7 @@
       "file_type": "concept",
       "norm_label": "tsx",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L17"
+      "source_location": "L18"
     },
     {
       "id": "packages_workflow_package_json_ref_types_node",
@@ -10012,7 +10656,7 @@
       "file_type": "concept",
       "norm_label": "@types/node",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L16"
+      "source_location": "L17"
     },
     {
       "id": "packages_workflow_package_json_ref_typescript",
@@ -10023,7 +10667,7 @@
       "file_type": "concept",
       "norm_label": "typescript",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L18"
+      "source_location": "L19"
     },
     {
       "id": "packages_workflow_package_json_ref_wfact_agent_runtime",
@@ -10034,7 +10678,7 @@
       "file_type": "concept",
       "norm_label": "@wfact/agent-runtime",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L21"
+      "source_location": "L22"
     },
     {
       "id": "packages_workflow_package_json_ref_wfact_audit",
@@ -10045,7 +10689,7 @@
       "file_type": "concept",
       "norm_label": "@wfact/audit",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L22"
+      "source_location": "L23"
     },
     {
       "id": "packages_workflow_package_json_ref_wfact_frontend_loop",
@@ -10056,7 +10700,7 @@
       "file_type": "concept",
       "norm_label": "@wfact/frontend-loop",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L23"
+      "source_location": "L24"
     },
     {
       "id": "packages_workflow_package_json_ref_wfact_hermes_lite",
@@ -10067,10 +10711,10 @@
       "file_type": "concept",
       "norm_label": "@wfact/hermes-lite",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L24"
+      "source_location": "L25"
     },
     {
-      "id": "ref_wfact_planning",
+      "id": "packages_workflow_package_json_ref_wfact_planning",
       "label": "@wfact/planning",
       "_origin": "ast",
       "community": 66,
@@ -10078,10 +10722,10 @@
       "file_type": "concept",
       "norm_label": "@wfact/planning",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L25"
+      "source_location": "L26"
     },
     {
-      "id": "ref_wfact_verification",
+      "id": "packages_workflow_package_json_ref_wfact_verification",
       "label": "@wfact/verification",
       "_origin": "ast",
       "community": 66,
@@ -10089,7 +10733,7 @@
       "file_type": "concept",
       "norm_label": "@wfact/verification",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L26"
+      "source_location": "L27"
     },
     {
       "id": "packages_workflow_tsconfig",
@@ -11162,6 +11806,737 @@
       "norm_label": "private.plan_approvals_no_delete",
       "source_file": "",
       "source_location": ""
+    },
+    {
+      "id": "packages_jobs_src_handlers",
+      "label": "handlers.ts",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "handlers.ts",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_jobs_src_jobstore",
+      "label": "jobStore.ts",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "jobstore.ts",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_jobs_src_run",
+      "label": "run.ts",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "run.ts",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_jobs_src_run_repo_root",
+      "label": "REPO_ROOT",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "repo_root",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L36"
+    },
+    {
+      "id": "packages_jobs_test_handlers_test",
+      "label": "handlers.test.ts",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "handlers.test.ts",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_jobs_test_handlers_test_broken",
+      "label": "BROKEN",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "broken",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L18"
+    },
+    {
+      "id": "packages_jobs_test_handlers_test_clean",
+      "label": "CLEAN",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "clean",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "packages_jobs_test_handlers_test_fixtures",
+      "label": "FIXTURES",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "fixtures",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L17"
+    },
+    {
+      "id": "packages_jobs_test_handlers_test_intakeout",
+      "label": "intakeOut",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "intakeout",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L24"
+    },
+    {
+      "id": "packages_jobs_test_handlers_test_planout",
+      "label": "planOut",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "code",
+      "norm_label": "planout",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L28"
+    },
+    {
+      "id": "ref_wfact_workflow",
+      "label": "@wfact/workflow",
+      "_origin": "ast",
+      "community": 74,
+      "community_name": "handlers.test.ts",
+      "file_type": "concept",
+      "norm_label": "@wfact/workflow",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L27"
+    },
+    {
+      "id": "packages_jobs_package",
+      "label": "jobs/package.json",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "jobs/package.json",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_jobs_package_dependencies",
+      "label": "dependencies",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "dependencies",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L20"
+    },
+    {
+      "id": "packages_jobs_package_dependencies_wfact_agent_runtime",
+      "label": "@wfact/agent-runtime",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/agent-runtime",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L21"
+    },
+    {
+      "id": "packages_jobs_package_dependencies_wfact_audit",
+      "label": "@wfact/audit",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/audit",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L22"
+    },
+    {
+      "id": "packages_jobs_package_dependencies_wfact_frontend_loop",
+      "label": "@wfact/frontend-loop",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/frontend-loop",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L23"
+    },
+    {
+      "id": "packages_jobs_package_dependencies_wfact_hermes_lite",
+      "label": "@wfact/hermes-lite",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/hermes-lite",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L24"
+    },
+    {
+      "id": "packages_jobs_package_dependencies_wfact_planning",
+      "label": "@wfact/planning",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/planning",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L25"
+    },
+    {
+      "id": "packages_jobs_package_dependencies_wfact_verification",
+      "label": "@wfact/verification",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/verification",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L26"
+    },
+    {
+      "id": "packages_jobs_package_dependencies_wfact_workflow",
+      "label": "@wfact/workflow",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "@wfact/workflow",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L27"
+    },
+    {
+      "id": "packages_jobs_package_description",
+      "label": "description",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "description",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L5"
+    },
+    {
+      "id": "packages_jobs_package_devdependencies",
+      "label": "devDependencies",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "devdependencies",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L15"
+    },
+    {
+      "id": "packages_jobs_package_devdependencies_tsx",
+      "label": "tsx",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "tsx",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L17"
+    },
+    {
+      "id": "packages_jobs_package_devdependencies_types_node",
+      "label": "@types/node",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "@types/node",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L16"
+    },
+    {
+      "id": "packages_jobs_package_devdependencies_typescript",
+      "label": "typescript",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "typescript",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L18"
+    },
+    {
+      "id": "packages_jobs_package_exports",
+      "label": "exports",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "exports",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L7"
+    },
+    {
+      "id": "packages_jobs_package_name",
+      "label": "name",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "name",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L2"
+    },
+    {
+      "id": "packages_jobs_package_private",
+      "label": "private",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "private",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L4"
+    },
+    {
+      "id": "packages_jobs_package_scripts",
+      "label": "scripts",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "scripts",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L10"
+    },
+    {
+      "id": "packages_jobs_package_scripts_run_job",
+      "label": "run-job",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "run-job",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L11"
+    },
+    {
+      "id": "packages_jobs_package_scripts_test",
+      "label": "test",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "test",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L12"
+    },
+    {
+      "id": "packages_jobs_package_scripts_typecheck",
+      "label": "typecheck",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "typecheck",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L13"
+    },
+    {
+      "id": "packages_jobs_package_type",
+      "label": "type",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "type",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L6"
+    },
+    {
+      "id": "packages_jobs_package_version",
+      "label": "version",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "code",
+      "norm_label": "version",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L3"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_tsx",
+      "label": "tsx",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "tsx",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L17"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_types_node",
+      "label": "@types/node",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "@types/node",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L16"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_typescript",
+      "label": "typescript",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "typescript",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L18"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_wfact_agent_runtime",
+      "label": "@wfact/agent-runtime",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/agent-runtime",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L21"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_wfact_audit",
+      "label": "@wfact/audit",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/audit",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L22"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_wfact_frontend_loop",
+      "label": "@wfact/frontend-loop",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/frontend-loop",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L23"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_wfact_hermes_lite",
+      "label": "@wfact/hermes-lite",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/hermes-lite",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L24"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_wfact_planning",
+      "label": "@wfact/planning",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/planning",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L25"
+    },
+    {
+      "id": "packages_jobs_package_json_ref_wfact_verification",
+      "label": "@wfact/verification",
+      "_origin": "ast",
+      "community": 75,
+      "community_name": "jobs/package.json",
+      "file_type": "concept",
+      "norm_label": "@wfact/verification",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L26"
+    },
+    {
+      "id": "packages_jobs_tsconfig",
+      "label": "jobs/tsconfig.json",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "jobs/tsconfig.json",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L1"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions",
+      "label": "compilerOptions",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "compileroptions",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L2"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_esmoduleinterop",
+      "label": "esModuleInterop",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "esmoduleinterop",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L8"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_module",
+      "label": "module",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "module",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L4"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_moduleresolution",
+      "label": "moduleResolution",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "moduleresolution",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L5"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_nouncheckedindexedaccess",
+      "label": "noUncheckedIndexedAccess",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "nouncheckedindexedaccess",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L7"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_outdir",
+      "label": "outDir",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "outdir",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L11"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_resolvejsonmodule",
+      "label": "resolveJsonModule",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "resolvejsonmodule",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L10"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_skiplibcheck",
+      "label": "skipLibCheck",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "skiplibcheck",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L9"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_strict",
+      "label": "strict",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "strict",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L6"
+    },
+    {
+      "id": "packages_jobs_tsconfig_compileroptions_target",
+      "label": "target",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "target",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L3"
+    },
+    {
+      "id": "packages_jobs_tsconfig_include",
+      "label": "include",
+      "_origin": "ast",
+      "community": 76,
+      "community_name": "compilerOptions",
+      "file_type": "code",
+      "norm_label": "include",
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L13"
+    },
+    {
+      "id": "docs_cockpit_jobs",
+      "label": "COCKPIT-JOBS.md",
+      "_origin": "ast",
+      "community": 77,
+      "community_name": "Cockpit jobs \u2014 every pipeline action from the Cockpit",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "cockpit-jobs.md",
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "docs_cockpit_jobs_cockpit_jobs_every_pipeline_action_from_the_cockpit",
+      "label": "Cockpit jobs \u2014 every pipeline action from the Cockpit",
+      "_origin": "ast",
+      "community": 77,
+      "community_name": "Cockpit jobs \u2014 every pipeline action from the Cockpit",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "cockpit jobs \u2014 every pipeline action from the cockpit",
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "docs_cockpit_jobs_guarantees_and_where_each_is_enforced",
+      "label": "Guarantees (and where each is enforced)",
+      "_origin": "ast",
+      "community": 77,
+      "community_name": "Cockpit jobs \u2014 every pipeline action from the Cockpit",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "guarantees (and where each is enforced)",
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L45"
+    },
+    {
+      "id": "docs_cockpit_jobs_known_limits_honest",
+      "label": "Known limits (honest)",
+      "_origin": "ast",
+      "community": 77,
+      "community_name": "Cockpit jobs \u2014 every pipeline action from the Cockpit",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "known limits (honest)",
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L56"
+    },
+    {
+      "id": "docs_cockpit_jobs_one_time_setup_huraira_needs_a_token_only_you_can_create",
+      "label": "One-time setup (Huraira \u2014 needs a token only you can create)",
+      "_origin": "ast",
+      "community": 77,
+      "community_name": "Cockpit jobs \u2014 every pipeline action from the Cockpit",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "one-time setup (huraira \u2014 needs a token only you can create)",
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L28"
+    },
+    {
+      "id": "packages_db_migrations_0009_jobs",
+      "label": "0009_jobs.sql",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "0009_jobs.sql",
+      "file_type": "code",
+      "norm_label": "0009_jobs.sql",
+      "source_file": "packages/db/migrations/0009_jobs.sql",
+      "source_location": null
+    },
+    {
+      "id": "packages_db_migrations_0009_jobs_private_jobs_progress_guard",
+      "label": "private.jobs_progress_guard()",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "0009_jobs.sql",
+      "file_type": "code",
+      "norm_label": "private.jobs_progress_guard()",
+      "source_file": "packages/db/migrations/0009_jobs.sql",
+      "source_location": "L115"
+    },
+    {
+      "id": "packages_db_migrations_0009_jobs_private_jobs_validate_request",
+      "label": "private.jobs_validate_request()",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "0009_jobs.sql",
+      "file_type": "code",
+      "norm_label": "private.jobs_validate_request()",
+      "source_file": "packages/db/migrations/0009_jobs.sql",
+      "source_location": "L38"
+    },
+    {
+      "id": "packages_db_migrations_0009_jobs_public_jobs",
+      "label": "public.jobs",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "0009_jobs.sql",
+      "file_type": "code",
+      "norm_label": "public.jobs",
+      "source_file": "packages/db/migrations/0009_jobs.sql",
+      "source_location": "L15"
+    },
+    {
+      "id": "packages_db_migrations_0009_jobs_sql_auth_users",
+      "label": "auth.users",
+      "_origin": "ast",
+      "community": 78,
+      "community_name": "0009_jobs.sql",
+      "file_type": "code",
+      "norm_label": "auth.users",
+      "source_file": "",
+      "source_location": ""
+    },
+    {
+      "id": "supabase_functions_dispatch_job_index",
+      "label": "dispatch-job/index.ts",
+      "_origin": "ast",
+      "community": 79,
+      "community_name": "dispatch-job/index.ts",
+      "file_type": "code",
+      "norm_label": "dispatch-job/index.ts",
+      "source_file": "supabase/functions/dispatch-job/index.ts",
+      "source_location": "L1"
     },
     {
       "id": "packages_hermes_src_controller",
@@ -14007,6 +15382,42 @@
   ],
   "links": [
     {
+      "source": "apps_cockpit_src_actions_actions",
+      "target": "apps_cockpit_src_actions_usejobs",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions_actions_go",
+      "target": "apps_cockpit_src_jobsclient_requestjob",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions_resultview",
+      "target": "apps_cockpit_src_jobsclient_previewurl",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
       "source": "apps_cockpit_src_app_app",
       "target": "apps_cockpit_src_app_usestats",
       "relation": "calls",
@@ -14015,7 +15426,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L57",
+      "source_location": "L59",
       "weight": 1.0
     },
     {
@@ -14907,6 +16318,162 @@
       "weight": 1.0
     },
     {
+      "source": "packages_jobs_src_handlers_handlejob",
+      "target": "packages_jobs_src_handlers_planningoutcome",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L102",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers_handlejob",
+      "target": "packages_jobs_src_handlers_uuid",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers_handlejob",
+      "target": "packages_jobs_src_handlers_workflowoutcome",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore_finish",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_patch",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore_get",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_headers",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore_markrunning",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_patch",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore_patch",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_headers",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_builddeps",
+      "target": "packages_jobs_src_run_need",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L53",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_main",
+      "target": "packages_jobs_src_jobstore_supabasejobstore",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L108",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_main",
+      "target": "packages_jobs_src_run_need",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L108",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_main",
+      "target": "packages_jobs_src_run_ghrunurl",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_main",
+      "target": "packages_jobs_src_handlers_handlejob",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_main",
+      "target": "packages_jobs_src_run_builddeps",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L125",
+      "weight": 1.0
+    },
+    {
       "source": "packages_planning_src_cli_main",
       "target": "packages_planning_src_cli_blocked",
       "relation": "calls",
@@ -15711,6 +17278,102 @@
       "weight": 1.0
     },
     {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_read",
+      "target": "packages_workflow_src_buildandverify_checkpointintegrityerror",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_read",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_headers",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_readverified",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_read",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_readverified",
+      "target": "packages_workflow_src_buildandverify_checkpointintegrityerror",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_readverified",
+      "target": "packages_workflow_src_supabaseartifacts_sha256",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_write",
+      "target": "packages_workflow_src_buildandverify_checkpointintegrityerror",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_write",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_headers",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L32",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_write",
+      "target": "packages_workflow_src_supabaseartifacts_sha256",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
       "source": "packages_workflow_test_buildandverify_test_setup",
       "target": "packages_workflow_src_buildandverify_memoryartifactstore",
       "relation": "calls",
@@ -15723,6 +17386,30 @@
       "weight": 1.0
     },
     {
+      "source": "supabase_functions_dispatch_job_index_respond",
+      "target": "supabase_functions_dispatch_job_index_allowedorigin",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "supabase/functions/dispatch-job/index.ts",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions_actions",
+      "target": "apps_cockpit_src_actions_actions_go",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
       "source": "apps_cockpit_src_app_usestats",
       "target": "apps_cockpit_src_app_usestats_load",
       "relation": "contains",
@@ -15731,7 +17418,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L31",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -16205,6 +17892,18 @@
       "weight": 1.0
     },
     {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_write",
+      "target": "packages_workflow_src_buildandverify_storedartifact",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "generic_arg",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
       "source": "apps_cockpit_package",
       "target": "apps_cockpit_package_json_ref_supabase_supabase_js",
       "relation": "imports",
@@ -16301,6 +18000,66 @@
       "weight": 1.0
     },
     {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_supabaseclient_supabase",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_jobsclient_jobkind",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_jobsclient_jobrow",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_jobsclient_previewurl",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_jobsclient_requestjob",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
       "source": "apps_cockpit_src_app",
       "target": "apps_cockpit_src_supabaseclient_supabase",
       "relation": "imports",
@@ -16373,6 +18132,18 @@
       "weight": 1.0
     },
     {
+      "source": "apps_cockpit_src_app",
+      "target": "apps_cockpit_src_actions_actions",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/App.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
       "source": "apps_cockpit_src_approvals",
       "target": "apps_cockpit_src_supabaseclient_supabase",
       "relation": "imports",
@@ -16406,6 +18177,18 @@
       "context": "import",
       "source_file": "apps/cockpit/src/Approvals.tsx",
       "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_jobsclient",
+      "target": "apps_cockpit_src_supabaseclient_supabase",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -17449,7 +19232,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -17461,7 +19244,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -17473,7 +19256,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -17485,7 +19268,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -17497,7 +19280,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L26",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -17509,7 +19292,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L27",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -17521,7 +19304,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/hermes/package.json",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -18122,6 +19905,210 @@
       "context": "import",
       "source_file": "packages/hermes/test/toneFilter.test.ts",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_types_node",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_tsx",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_typescript",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_wfact_agent_runtime",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_wfact_audit",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_wfact_frontend_loop",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_wfact_hermes_lite",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_wfact_planning",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_json_ref_wfact_verification",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "ref_wfact_workflow",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_jobstore_job",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_jobstore_supabasejobstore",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_handlers_handlejob",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_handlers_handlerdeps",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_src_handlers_handlejob",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_src_handlers_handlerdeps",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_src_jobstore_job",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -19513,7 +21500,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -19525,7 +21512,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -19537,7 +21524,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -19549,7 +21536,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -19561,7 +21548,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -19573,7 +21560,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -19585,24 +21572,12 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "packages/workflow/package.json",
-      "source_location": "L24",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_workflow_package",
-      "target": "ref_wfact_planning",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "packages/workflow/package.json",
       "source_location": "L25",
       "weight": 1.0
     },
     {
       "source": "packages_workflow_package",
-      "target": "ref_wfact_verification",
+      "target": "packages_workflow_package_json_ref_wfact_planning",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -19610,6 +21585,18 @@
       "context": "import",
       "source_file": "packages/workflow/package.json",
       "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_package",
+      "target": "packages_workflow_package_json_ref_wfact_verification",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/workflow/package.json",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -19697,6 +21684,42 @@
       "weight": 1.0
     },
     {
+      "source": "packages_workflow_src_supabaseartifacts",
+      "target": "packages_workflow_src_buildandverify_artifactstore",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts",
+      "target": "packages_workflow_src_buildandverify_checkpointintegrityerror",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts",
+      "target": "packages_workflow_src_buildandverify_storedartifact",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
       "source": "packages_workflow_test_buildandverify_test",
       "target": "packages_workflow_src_buildandverify_buildandverify",
       "relation": "imports",
@@ -19742,6 +21765,42 @@
       "context": "import",
       "source_file": "packages/workflow/test/buildAndVerify.test.ts",
       "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "ref_react",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_supabaseclient",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_jobsclient",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -19829,6 +21888,18 @@
       "weight": 1.0
     },
     {
+      "source": "apps_cockpit_src_app",
+      "target": "apps_cockpit_src_actions",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/App.tsx",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
       "source": "apps_cockpit_src_approvals",
       "target": "ref_react",
       "relation": "imports_from",
@@ -19874,6 +21945,18 @@
       "context": "import",
       "source_file": "apps/cockpit/src/Approvals.tsx",
       "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_jobsclient",
+      "target": "apps_cockpit_src_supabaseclient",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -20781,6 +22864,92 @@
       "weight": 1.0
     },
     {
+      "source": "packages_jobs_src_handlers",
+      "target": "ref_wfact_workflow",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_jobstore",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L19",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_jobstore",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_handlers",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L34",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "ref_wfact_workflow",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_src_handlers",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_src_jobstore",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L15",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
       "source": "packages_planning_src_cli",
       "target": "packages_planning_src_modelclient",
       "relation": "imports_from",
@@ -21448,6 +23617,18 @@
       "weight": 1.0
     },
     {
+      "source": "packages_workflow_src_supabaseartifacts",
+      "target": "packages_workflow_src_buildandverify",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
       "source": "packages_workflow_test_buildandverify_test",
       "target": "packages_workflow_src_buildandverify",
       "relation": "imports_from",
@@ -21649,6 +23830,18 @@
       "context": "parameter_type",
       "source_file": "packages/verification/src/verificationLoop.ts",
       "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_readverified",
+      "target": "packages_workflow_src_buildandverify_storedartifact",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -21969,6 +24162,30 @@
       "weight": 1.0
     },
     {
+      "source": "packages_jobs_src_jobstore_memoryjobstore",
+      "target": "packages_jobs_src_jobstore_jobstore",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "type",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore",
+      "target": "packages_jobs_src_jobstore_jobstore",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "type",
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
       "source": "packages_planning_src_modelclient_claudejsonclient",
       "target": "packages_planning_src_modelclient_jsonmodelclient",
       "relation": "implements",
@@ -22062,6 +24279,18 @@
       "context": "type",
       "source_file": "packages/workflow/src/buildAndVerify.ts",
       "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore",
+      "target": "packages_workflow_src_buildandverify_artifactstore",
+      "relation": "implements",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "type",
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -22297,6 +24526,61 @@
       "weight": 1.0
     },
     {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_actions_actions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L104",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_actions_planlite",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_actions_kind_label",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_actions_usejobs",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_actions",
+      "target": "apps_cockpit_src_actions_resultview",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/Actions.tsx",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
       "source": "apps_cockpit_src_app",
       "target": "apps_cockpit_src_app_room",
       "relation": "contains",
@@ -22304,7 +24588,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -22315,7 +24599,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -22326,7 +24610,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -22337,7 +24621,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L25",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -22348,7 +24632,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/cockpit/src/App.tsx",
-      "source_location": "L54",
+      "source_location": "L56",
       "weight": 1.0
     },
     {
@@ -22371,6 +24655,50 @@
       "confidence_score": 1.0,
       "source_file": "apps/cockpit/src/Approvals.tsx",
       "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_jobsclient",
+      "target": "apps_cockpit_src_jobsclient_jobrow",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_jobsclient",
+      "target": "apps_cockpit_src_jobsclient_requestjob",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_jobsclient",
+      "target": "apps_cockpit_src_jobsclient_previewurl",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L50",
+      "weight": 1.0
+    },
+    {
+      "source": "apps_cockpit_src_jobsclient",
+      "target": "apps_cockpit_src_jobsclient_jobkind",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cockpit/src/jobsClient.ts",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -23526,6 +25854,50 @@
       "confidence_score": 1.0,
       "source_file": ".claude/skills/graphify/SKILL.md",
       "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_cockpit_jobs",
+      "target": "docs_cockpit_jobs_cockpit_jobs_every_pipeline_action_from_the_cockpit",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_cockpit_jobs_cockpit_jobs_every_pipeline_action_from_the_cockpit",
+      "target": "docs_cockpit_jobs_one_time_setup_huraira_needs_a_token_only_you_can_create",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_cockpit_jobs_cockpit_jobs_every_pipeline_action_from_the_cockpit",
+      "target": "docs_cockpit_jobs_guarantees_and_where_each_is_enforced",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_cockpit_jobs_cockpit_jobs_every_pipeline_action_from_the_cockpit",
+      "target": "docs_cockpit_jobs_known_limits_honest",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/COCKPIT-JOBS.md",
+      "source_location": "L56",
       "weight": 1.0
     },
     {
@@ -25003,6 +27375,39 @@
       "weight": 1.0
     },
     {
+      "source": "packages_db_migrations_0009_jobs",
+      "target": "packages_db_migrations_0009_jobs_private_jobs_progress_guard",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/db/migrations/0009_jobs.sql",
+      "source_location": "L115",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_db_migrations_0009_jobs",
+      "target": "packages_db_migrations_0009_jobs_public_jobs",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/db/migrations/0009_jobs.sql",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_db_migrations_0009_jobs",
+      "target": "packages_db_migrations_0009_jobs_private_jobs_validate_request",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/db/migrations/0009_jobs.sql",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
       "source": "packages_frontend_loop_package",
       "target": "packages_frontend_loop_package_scripts",
       "relation": "contains",
@@ -25725,18 +28130,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "packages_hermes_package",
-      "target": "packages_hermes_package_dependencies",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "packages/hermes/package.json",
-      "source_location": "L19",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -25752,13 +28146,24 @@
     },
     {
       "source": "packages_hermes_package",
+      "target": "packages_hermes_package_dependencies",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/hermes/package.json",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_hermes_package",
       "target": "packages_hermes_package_devdependencies",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -25824,7 +28229,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -25835,7 +28240,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -25846,7 +28251,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -25857,7 +28262,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -25868,7 +28273,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L26",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -25879,7 +28284,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L27",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -25890,7 +28295,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L28",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -25945,7 +28350,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L14",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -25956,7 +28361,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -25967,7 +28372,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -25978,7 +28383,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -26792,6 +29197,644 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/hermes/tsconfig.json",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_scripts",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_devdependencies",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_name",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_dependencies",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_version",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_private",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_description",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_type",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package",
+      "target": "packages_jobs_package_exports",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_dependencies",
+      "target": "packages_jobs_package_dependencies_wfact_agent_runtime",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_dependencies",
+      "target": "packages_jobs_package_dependencies_wfact_audit",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_dependencies",
+      "target": "packages_jobs_package_dependencies_wfact_frontend_loop",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_dependencies",
+      "target": "packages_jobs_package_dependencies_wfact_hermes_lite",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_dependencies",
+      "target": "packages_jobs_package_dependencies_wfact_planning",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_dependencies",
+      "target": "packages_jobs_package_dependencies_wfact_verification",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_dependencies",
+      "target": "packages_jobs_package_dependencies_wfact_workflow",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_devdependencies",
+      "target": "packages_jobs_package_devdependencies_types_node",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_devdependencies",
+      "target": "packages_jobs_package_devdependencies_tsx",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_devdependencies",
+      "target": "packages_jobs_package_devdependencies_typescript",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_scripts",
+      "target": "packages_jobs_package_scripts_run_job",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_scripts",
+      "target": "packages_jobs_package_scripts_test",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_package_scripts",
+      "target": "packages_jobs_package_scripts_typecheck",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/package.json",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_handlers_handlerdeps",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_handlers_joboutcome",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L35",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_handlers_str",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_handlers_uuid",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L49",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_handlers_planningoutcome",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_handlers_workflowoutcome",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L80",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_handlers",
+      "target": "packages_jobs_src_handlers_handlejob",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/handlers.ts",
+      "source_location": "L98",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore",
+      "target": "packages_jobs_src_jobstore_jobstore",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore",
+      "target": "packages_jobs_src_jobstore_supabasejobstore",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L25",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore",
+      "target": "packages_jobs_src_jobstore_memoryjobstore",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore",
+      "target": "packages_jobs_src_jobstore_jobkind",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore",
+      "target": "packages_jobs_src_jobstore_jobstatus",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore",
+      "target": "packages_jobs_src_jobstore_job",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_run_main",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L105",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_run_repo_root",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_run_need",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L39",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_run_ghrunurl",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run",
+      "target": "packages_jobs_src_run_builddeps",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L52",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_test_handlers_test_fixtures",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_test_handlers_test_broken",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_test_handlers_test_clean",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_test_handlers_test_intakeout",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_test_handlers_test_planout",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_test_handlers_test_deps",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_test_handlers_test",
+      "target": "packages_jobs_test_handlers_test_job",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/test/handlers.test.ts",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig",
+      "target": "packages_jobs_tsconfig_include",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig",
+      "target": "packages_jobs_tsconfig_compileroptions",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_resolvejsonmodule",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_outdir",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_target",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_module",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_moduleresolution",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_strict",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_nouncheckedindexedaccess",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_esmoduleinterop",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_tsconfig_compileroptions",
+      "target": "packages_jobs_tsconfig_compileroptions_skiplibcheck",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/tsconfig.json",
       "source_location": "L9",
       "weight": 1.0
     },
@@ -28651,7 +31694,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -28662,7 +31705,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -28684,7 +31727,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -28750,7 +31793,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -28761,7 +31804,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L22",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -28772,7 +31815,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0
     },
     {
@@ -28783,7 +31826,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -28794,7 +31837,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -28805,7 +31848,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L26",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -28816,7 +31859,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -28827,7 +31870,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L17",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -28838,7 +31881,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L18",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -28849,7 +31892,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L11",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -28860,7 +31903,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -28871,7 +31914,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/workflow/package.json",
-      "source_location": "L13",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -29161,6 +32204,28 @@
       "weight": 1.0
     },
     {
+      "source": "packages_workflow_src_supabaseartifacts",
+      "target": "packages_workflow_src_supabaseartifacts_sha256",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
       "source": "packages_workflow_test_buildandverify_test",
       "target": "packages_workflow_test_buildandverify_test_fixtures",
       "relation": "contains",
@@ -29345,6 +32410,28 @@
       "confidence_score": 1.0,
       "source_file": "packages/workflow/tsconfig.json",
       "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "supabase_functions_dispatch_job_index",
+      "target": "supabase_functions_dispatch_job_index_allowedorigin",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/functions/dispatch-job/index.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "supabase_functions_dispatch_job_index",
+      "target": "supabase_functions_dispatch_job_index_respond",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "supabase/functions/dispatch-job/index.ts",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -30116,6 +33203,138 @@
       "weight": 1.0
     },
     {
+      "source": "packages_jobs_src_jobstore_jobstore",
+      "target": "packages_jobs_src_jobstore_jobstore_get",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_jobstore",
+      "target": "packages_jobs_src_jobstore_jobstore_markrunning",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_jobstore",
+      "target": "packages_jobs_src_jobstore_jobstore_finish",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_memoryjobstore",
+      "target": "packages_jobs_src_jobstore_memoryjobstore_get",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_memoryjobstore",
+      "target": "packages_jobs_src_jobstore_memoryjobstore_markrunning",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_memoryjobstore",
+      "target": "packages_jobs_src_jobstore_memoryjobstore_finish",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_constructor",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_headers",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_get",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_patch",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_markrunning",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_jobstore_supabasejobstore",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_finish",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/jobs/src/jobStore.ts",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
       "source": "packages_planning_src_modelclient_claudejsonclient",
       "target": "packages_planning_src_modelclient_claudejsonclient_constructor",
       "relation": "method",
@@ -30567,6 +33786,61 @@
       "weight": 1.0
     },
     {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_constructor",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_headers",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_write",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_read",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L40",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_workflow_src_supabaseartifacts_supabaseartifactstore",
+      "target": "packages_workflow_src_supabaseartifacts_supabaseartifactstore_readverified",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/workflow/src/supabaseArtifacts.ts",
+      "source_location": "L48",
+      "weight": 1.0
+    },
+    {
       "source": "packages_db_migrations_0002_entity_consistency_triggers_public_enforce_project_entity_matches_client",
       "target": "packages_db_migrations_0002_entity_consistency_triggers_sql_public_clients",
       "relation": "reads_from",
@@ -30831,6 +34105,17 @@
       "weight": 1.0
     },
     {
+      "source": "packages_db_migrations_0009_jobs_public_jobs",
+      "target": "packages_db_migrations_0009_jobs_sql_auth_users",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "packages/db/migrations/0009_jobs.sql",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
       "source": "progress_sprint_progress",
       "target": "docs_wfact_3_0_continuation_build_plan",
       "relation": "references",
@@ -31011,6 +34296,42 @@
       "context": "call",
       "source_file": "packages/hermes/test/audit.test.ts",
       "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_main",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_get",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L109",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_main",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_finish",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L114",
+      "weight": 1.0
+    },
+    {
+      "source": "packages_jobs_src_run_main",
+      "target": "packages_jobs_src_jobstore_supabasejobstore_markrunning",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "context": "call",
+      "source_file": "packages/jobs/src/run.ts",
+      "source_location": "L122",
       "weight": 1.0
     },
     {
@@ -34176,5 +37497,5 @@
       "source_file": "docs/WFACT-3.0-Playbook.md"
     }
   ],
-  "built_at_commit": "1bcf6717541a7453d7fdd49443d1c3350373468b"
+  "built_at_commit": "123970f47f4f8cd6c69028cb6f214f469ba63560"
 }

@@ -72,5 +72,11 @@
   "70": "planning/package.json",
   "71": "compilerOptions",
   "72": "routing.ts",
-  "73": "0007_plan_approvals.sql"
+  "73": "0007_plan_approvals.sql",
+  "74": "handlers.test.ts",
+  "75": "jobs/package.json",
+  "76": "compilerOptions",
+  "77": "Cockpit jobs — every pipeline action from the Cockpit",
+  "78": "0009_jobs.sql",
+  "79": "dispatch-job/index.ts"
 }

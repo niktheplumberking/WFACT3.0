@@ -1,0 +1,69 @@
+name: Cockpit job
+
+# Runs ONE Cockpit-requested job (public.jobs, migration 0009): intake, replan, build_plan, resume,
+# verify or ask. Dispatched only by the `dispatch-job` Supabase Edge Function after it has checked the
+# requester is an owner/admin and the job is theirs and still queued.
+#
+# Injection safety: the only input is `job_id`. It is passed through `env` (never interpolated into a
+# script with ${{ }}), validated as a UUID before anything else runs, and the runner reads every other
+# parameter from the database row the jobs trigger already validated. Secrets come from Doppler
+# (DOPPLER_TOKEN, prd config) exactly like the deploy job — nothing else is stored in GitHub.
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: "public.jobs id (UUID) — set by the dispatch-job Edge Function"
+        required: true
+        type: string
+
+run-name: "Cockpit job ${{ inputs.job_id }}"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cockpit-job-${{ inputs.job_id }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    name: Run Cockpit job
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JOB_ID: ${{ inputs.job_id }}
+      DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+    steps:
+      - name: Validate job id (UUID only)
+        run: |
+          if [[ ! "$JOB_ID" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ ]]; then
+            echo "::error::job_id is not a UUID — refusing to run."
+            exit 1
+          fi
+          if [ -z "$DOPPLER_TOKEN" ]; then
+            echo "::error::DOPPLER_TOKEN secret is not set — see docs/SECRETS.md."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: dopplerhq/cli-action@v3
+
+      - name: "Install packages (dependency order; file: links don't install linked deps)"
+        run: for p in audit hermes agent-runtime frontend-loop verification planning workflow jobs; do (cd "packages/$p" && npm ci --no-audit --no-fund); done
+
+      - name: Run job
+        working-directory: packages/jobs
+        run: doppler run -- npx tsx src/run.ts "$JOB_ID"
+
+      # Safety net: if anything above crashed before the runner recorded an outcome, the job must not
+      # sit in "running" forever in the Cockpit.
+      - name: Mark job failed if it never finished
+        if: failure()
+        working-directory: packages/jobs
+        run: doppler run -- npx tsx src/run.ts "$JOB_ID" --mark-failed

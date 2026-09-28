@@ -6,12 +6,14 @@ import { Pipeline } from "./Pipeline";
 import { Approvals } from "./Approvals";
 import { Runs } from "./Runs";
 import { Models } from "./Models";
+import { Actions } from "./Actions";
 
-type Room = "pipeline" | "approvals" | "runs" | "models";
+type Room = "pipeline" | "approvals" | "actions" | "runs" | "models";
 
 const ROOMS: { id: Room; label: string; hint: string }[] = [
   { id: "pipeline", label: "Pipeline", hint: "Every project, by stage" },
   { id: "approvals", label: "Approvals", hint: "Gates waiting on a decision" },
+  { id: "actions", label: "Actions", hint: "Run intake, builds, checks, questions" },
   { id: "runs", label: "Runs", hint: "Correction rounds, logged" },
   { id: "models", label: "Models", hint: "Usage, real cost, latency — owner only" },
 ];
@@ -120,6 +122,7 @@ export default function App() {
         <section className="room-content">
           {room === "pipeline" && <Pipeline />}
           {room === "approvals" && <Approvals />}
+          {room === "actions" && <Actions />}
           {room === "runs" && <Runs />}
           {room === "models" && <Models />}
         </section>

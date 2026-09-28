@@ -407,7 +407,63 @@ Huraira's call.
 - *Routing split is configuration*: **MET** (config file + env override, tested; live run used
   `[fast, config]` / `[mid, config]`).
 
-## Stage 5 — Observability seed (BUILT + LIVE-PROVEN 2026-09-28, uncommitted)
+## Cockpit-driven actions — every pipeline action from the Cockpit (BUILT 2026-09-28, uncommitted)
+
+Huraira's direction: all actions run from the Cockpit app; the worker is GitHub Actions. Full design
+and setup are in `docs/COCKPIT-JOBS.md`. The Cockpit only *requests* work (Blueprint §2); the
+pipelines run with secrets on GitHub.
+
+- [x] **`public.jobs` queue** (migration 0009, applied), plus a private `artifacts` Storage bucket
+      (Blueprint §14 artifact store).
+      - Params are validated per kind in the database.
+      - `build_plan` is only allowed for an owner-*approved* plan, and `replan` only for a rejected
+        one.
+      - Status is forward-only, the request is immutable, there are no deletes, and requests are
+        audited.
+      - **Attack-tested live, rolled back:**
+        - spoofed creator, pre-marked success, path traversal, a shell-injection string as an id,
+          oversize text, an owner forging a result, a stranger reading, status moving backwards,
+          editing the request, and deleting were all refused;
+        - building a *pending* plan and re-planning an *approved* one were refused;
+        - building the *approved* one was accepted.
+      - (The first run showed the approved-plan build "allowed"; I checked before assuming, and
+        Huraira had approved that plan at 14:33, so it was correct. The refusal was then proven
+        against the pending plan.)
+- [x] **`dispatch-job` Edge Function** (deployed, `verify_jwt`):
+      - It re-checks owner/admin, that the job is the caller's, and that it's still queued, then
+        calls GitHub `workflow_dispatch` with the job id only.
+      - The GitHub token lives only in the function's secrets.
+      - Live tests: no token gives 401, the anon key gives "not signed in", and a foreign-origin
+        preflight gets no CORS header.
+      - **A real bug was caught live**: the CORS preflight returned 500 because a 204 response had
+        a JSON body, which would have broken every Cockpit click. Fixed and redeployed; the
+        Cockpit's origin now gets its CORS header.
+- [x] **`.github/workflows/cockpit-job.yml`**:
+      - `job_id` is the only input. It goes through `env`, is UUID-validated first, and never
+        appears in a script.
+      - Secrets come from Doppler `prd`.
+      - A `--mark-failed` safety net covers crashes.
+      - YAML validation caught a real parse error (an unquoted `file: links` step name) before push.
+- [x] **`packages/jobs` runner**: one handler per kind, calling the *same* pipeline code the CLIs use.
+      Built pages go to `SupabaseArtifactStore` (live round trip: write, verified read, tamper
+      refused, missing → null). 8/8 tests.
+- [x] **Cockpit Actions room**: new request (paste) → intake + plan; Build + verify for approved
+      plans; Re-plan from the note for rejected ones; Resume on failed builds; Verify a page; Ask
+      Hermes. There's a live job list (polls while in flight) with results, GitHub run links and
+      built-page previews (signed URLs). There's **no deploy button**: Launch stays human.
+- **Live proof, without GitHub yet**: a real `ask` job was inserted as the owner through RLS, then
+  the exact runner ran locally with Doppler `prd`.
+  - It went queued → running → **succeeded**, with Hermes' real answer and sources on the row.
+  - It produced 1 traced model call and the `job.requested` audit row.
+  - Running it a second time was refused.
+- Tests: 138/138 across 8 packages in a clean-checkout simulation; the Cockpit builds.
+
+**Not yet proven**:
+- The GitHub dispatch leg needs Huraira's `GITHUB_DISPATCH_TOKEN` (runbook in
+  `docs/COCKPIT-JOBS.md`), and needs this code pushed so `cockpit-job.yml` exists on `main`.
+- The Actions room hasn't been viewed in a browser (magic-link login).
+
+## Stage 5 — Observability seed (BUILT + LIVE-PROVEN 2026-09-28, committed `123970f`)
 
 - [x] **`model_traces`** (`packages/db/migrations/0008_model_traces.sql`, applied):
       - One row per model call: run_id, task_id, agent role, provider/model, reported tokens,

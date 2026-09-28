@@ -1,15 +1,14 @@
 {
-  "name": "@wfact/workflow",
+  "name": "@wfact/jobs",
   "version": "0.1.0",
   "private": true,
-  "description": "Stage 3 workflow engine v1 — build-and-verify with durable audit_log checkpoints. A hand-rolled stand-in for the Blueprint's durable engine (n8n/Temporal); see src/buildAndVerify.ts header.",
+  "description": "Cockpit job runner: executes a jobs row (intake, replan, build_plan, resume, verify, ask) with the same pipeline code the CLIs use. Invoked by .github/workflows/cockpit-job.yml.",
   "type": "module",
   "exports": {
-    ".": "./src/buildAndVerify.ts",
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "build-and-verify": "tsx src/cli.ts",
+    "run-job": "tsx src/run.ts",
     "test": "tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
@@ -24,6 +23,7 @@
     "@wfact/frontend-loop": "file:../frontend-loop",
     "@wfact/hermes-lite": "file:../hermes",
     "@wfact/planning": "file:../planning",
-    "@wfact/verification": "file:../verification"
+    "@wfact/verification": "file:../verification",
+    "@wfact/workflow": "file:../workflow"
   }
 }

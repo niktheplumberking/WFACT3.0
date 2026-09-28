@@ -90,9 +90,9 @@
     "semantic_hash": "b5e51a15315763989f898aceb103d311"
   },
   "apps/cockpit/src/App.tsx": {
-    "mtime": 1790606280.6138773,
-    "seen": 1790606433.709964,
-    "ast_hash": "e3171c03ac28dbf235f74f55c4273df1",
+    "mtime": 1790607862.4634135,
+    "seen": 1790608002.613834,
+    "ast_hash": "57bb66ba539acd20e4e89278870949b1",
     "semantic_hash": ""
   },
   "apps/cockpit/src/Approvals.tsx": {
@@ -264,9 +264,9 @@
     "semantic_hash": "6839de2b1e9ea7b22e5bbc58e8de5810"
   },
   "packages/hermes/package.json": {
-    "mtime": 1790606133.3171744,
-    "seen": 1790606433.7099898,
-    "ast_hash": "6f7c17b05a186b2b5f64f4df9bf5a9c5",
+    "mtime": 1790607526.1330822,
+    "seen": 1790608002.613858,
+    "ast_hash": "11283ce018bf02adeee5a81f17fe88de",
     "semantic_hash": ""
   },
   "packages/hermes/scripts/verify-supabase-connection.ts": {
@@ -510,9 +510,9 @@
     "semantic_hash": "942d5a1d48b00f128c3db72a29f7d614"
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1790605300.5906994,
-    "seen": 1790605427.678499,
-    "ast_hash": "d5e7220c567ed4899a6c3e7d6beaa231",
+    "mtime": 1790607907.921771,
+    "seen": 1790608002.6138911,
+    "ast_hash": "723797f45dc4cca9532f5766cf88fd4d",
     "semantic_hash": ""
   },
   "BLOCKED-ON-NICK.md": {
@@ -528,9 +528,9 @@
     "semantic_hash": "1f3181085b89030041c7e4216947df4f"
   },
   "PROGRESS.md": {
-    "mtime": 1790606430.9620788,
-    "seen": 1790606433.710023,
-    "ast_hash": "532d67787f213504a8556f781d96b222",
+    "mtime": 1790608000.043107,
+    "seen": 1790608002.613892,
+    "ast_hash": "ef715d44adb64d829e3c73c617b9b87b",
     "semantic_hash": ""
   },
   "README.md": {
@@ -900,9 +900,9 @@
     "semantic_hash": ""
   },
   "packages/workflow/package.json": {
-    "mtime": 1790606153.264039,
-    "seen": 1790606433.710013,
-    "ast_hash": "6d28854b7ba5d6890848a0708505c5ee",
+    "mtime": 1790607360.3588336,
+    "seen": 1790608002.613882,
+    "ast_hash": "e17dabe9e64d1862ec3d827487d660a6",
     "semantic_hash": ""
   },
   "packages/workflow/src/buildAndVerify.ts": {
@@ -1053,6 +1053,84 @@
     "mtime": 1790606297.7016065,
     "seen": 1790606433.7100348,
     "ast_hash": "80f9adff6743f67eb51ed83977eae2c3",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/Actions.tsx": {
+    "mtime": 1790607851.6540372,
+    "seen": 1790608002.613833,
+    "ast_hash": "d0ada4c7550ee0deb3a038b392474d40",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/jobsClient.ts": {
+    "mtime": 1790607788.3724458,
+    "seen": 1790608002.613837,
+    "ast_hash": "6f46eb08d08f589c0b186b0c4d508702",
+    "semantic_hash": ""
+  },
+  "packages/db/migrations/0009_jobs.sql": {
+    "mtime": 1790607238.8697097,
+    "seen": 1790608002.6138508,
+    "ast_hash": "f4a09df9027a520ccc7215766b5d9920",
+    "semantic_hash": ""
+  },
+  "packages/jobs/package.json": {
+    "mtime": 1790607531.002105,
+    "seen": 1790608002.613867,
+    "ast_hash": "efa190bcb002dab8f8b38e0752d28503",
+    "semantic_hash": ""
+  },
+  "packages/jobs/src/handlers.ts": {
+    "mtime": 1790607465.6558995,
+    "seen": 1790608002.613868,
+    "ast_hash": "b344a7a62de145bbad125da5604f18ea",
+    "semantic_hash": ""
+  },
+  "packages/jobs/src/jobStore.ts": {
+    "mtime": 1790607412.055712,
+    "seen": 1790608002.613868,
+    "ast_hash": "4802c6b2c2bd231552c0450976ff9209",
+    "semantic_hash": ""
+  },
+  "packages/jobs/src/run.ts": {
+    "mtime": 1790607521.124247,
+    "seen": 1790608002.613868,
+    "ast_hash": "1e3e29c052f0873e56d838c09e7210ec",
+    "semantic_hash": ""
+  },
+  "packages/jobs/test/handlers.test.ts": {
+    "mtime": 1790607582.6615522,
+    "seen": 1790608002.613869,
+    "ast_hash": "377bb10de69ccaacd72fd9cf61e7d0a5",
+    "semantic_hash": ""
+  },
+  "packages/jobs/tsconfig.json": {
+    "mtime": 1790607526.1376555,
+    "seen": 1790608002.613869,
+    "ast_hash": "6839de2b1e9ea7b22e5bbc58e8de5810",
+    "semantic_hash": ""
+  },
+  "packages/workflow/src/supabaseArtifacts.ts": {
+    "mtime": 1790607353.8354986,
+    "seen": 1790608002.6138828,
+    "ast_hash": "9424e47b797908b679288a1c3ed88dac",
+    "semantic_hash": ""
+  },
+  "supabase/functions/dispatch-job/index.ts": {
+    "mtime": 1790607719.3162503,
+    "seen": 1790608002.613885,
+    "ast_hash": "8916c0d53b587651c0b57d54a5c14584",
+    "semantic_hash": ""
+  },
+  ".github/workflows/cockpit-job.yml": {
+    "mtime": 1790607979.8127553,
+    "seen": 1790608002.6138911,
+    "ast_hash": "000440c3786755efbe23a432106db74d",
+    "semantic_hash": ""
+  },
+  "docs/COCKPIT-JOBS.md": {
+    "mtime": 1790607939.2633994,
+    "seen": 1790608002.613895,
+    "ast_hash": "a9532e64f348879af1930ef0a0131aad",
     "semantic_hash": ""
   }
 }
