@@ -101,16 +101,27 @@ the `Cockpit job` workflow has zero runs.
     cannot have body").
   - Seen in function logs at 15:01:44–15:01:53 UTC. It would have broken every Cockpit click.
   - Fixed and redeployed (function version 2). Preflights return 204 from 15:02:37 on.
-- **Cockpit jobs never dispatched (2026-09-28, open).**
+- **Cockpit jobs never dispatched (2026-09-28, cause fixed; end-to-end still unproven).**
   - The owner created `build_plan` jobs `a2a41d2d` (15:34 UTC) and `cbf8bf7b` (15:39 UTC) from the
     Cockpit. Both are still `queued`, with `dispatched_at` null.
   - Function logs show an `OPTIONS | 204` preflight for each and **no `POST`**, so the browser never
     sent the request.
-  - Cause unconfirmed. Candidates:
-    - the calling origin isn't matched by `allowedOrigin()` (a 204 with no CORS header), e.g. a Vercel
-      branch alias like `wfact-cockpit-git-main-…`;
-    - a request header outside the allow-list.
-  - Needs the browser console from the click to decide.
+  - **Cause confirmed:** `allowedOrigin()` didn't accept the Cockpit's Git branch-preview host,
+    `wfact-cockpit-git-huraira-work-…`.
+    - The logged responses carried only `vary: Accept-Encoding`, with no `Vary: Origin` or
+      `Access-Control-Allow-Origin`, so no allowed origin was seen.
+    - Reproduced with curl: production got the CORS header; the branch preview didn't.
+    - Both hosts serve the same bundle (`index-CA9VfGbA.js`).
+    - Headers were ruled out: supabase-js 2.117's `invoke` sends only allow-listed headers, and
+      tracing is off.
+  - **Fix:**
+    - `dispatch-job` v3 also accepts `wfact-cockpit-git-<branch>-…`. Checked with curl after deploy:
+      the branch origin now gets the CORS header, `evil.example.com` doesn't, and a POST without a
+      token gets 401.
+    - The Cockpit also gets a **Start** button on `queued` jobs, so a dispatch that never landed can
+      be retried instead of stranded. Polling stops for jobs left `queued` over 2 minutes.
+  - Still unknown: whether `GITHUB_DISPATCH_TOKEN` is set. If it isn't, the next click will now fail
+    the job visibly rather than silently.
 - **Magic-link redirect fell back to `localhost:3000` (2026-09-22, fixed).** Huraira's first sign-in
   used an expired link pointing at `localhost`. Supabase Auth's Site URL was never set for production,
   and Huraira fixed it in the dashboard. Details are in Phase 6.
@@ -467,9 +478,11 @@ Huraira's direction; see "Unplanned work done". Design and runbook are in `docs/
         cockpit-job.yml`).
       - The owner requested `build_plan` jobs `a2a41d2d` and `cbf8bf7b` (plan `8f03181f`) from the
         Cockpit at 15:34 and 15:39 UTC. Both are still `queued`.
-      - Function logs show a 204 preflight each time and no `POST`. Cause unconfirmed; see Incidents.
-      - It's also unconfirmed whether `GITHUB_DISPATCH_TOKEN` is set in the function's secrets.
-      - Waiting on: debugging (this repo) plus Huraira's browser console and token.
+      - Function logs show a 204 preflight each time and no `POST`. The cause was the branch-preview
+        origin missing from the CORS allow-list. It's fixed in `dispatch-job` v3; see Incidents.
+      - It's still unconfirmed whether `GITHUB_DISPATCH_TOKEN` is set in the function's secrets.
+      - Waiting on: Huraira clicking **Start** (or Build + verify) once, signed in, and a
+        `cockpit-job.yml` run appearing.
 - [x] **Cockpit Actions room built**: new request → intake + plan, Build + verify (approved plans),
       Re-plan (rejected), Resume, Verify a page, Ask Hermes, and a live job list. There's **no deploy
       button**; Launch stays human. The Cockpit build job is green on `36443734844`.

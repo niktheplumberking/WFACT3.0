@@ -6,7 +6,12 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
-import { previewUrl, requestJob, type JobKind, type JobRow } from "./jobsClient";
+import { dispatchJob, previewUrl, requestJob, type JobKind, type JobRow } from "./jobsClient";
+
+// A job still `queued` after this long was never dispatched (the function flips it to `dispatched` or
+// `failed` within seconds) — stop polling for it and offer Start instead.
+const STALE_QUEUED_MS = 2 * 60 * 1000;
+const isStaleQueued = (j: JobRow) => j.status === "queued" && Date.now() - new Date(j.created_at).getTime() > STALE_QUEUED_MS;
 
 interface PlanLite {
   id: string;
@@ -43,7 +48,7 @@ function useJobs() {
   }, [load]);
   // Poll while anything is in flight — jobs take ~30s (intake) to a few minutes (build).
   useEffect(() => {
-    const active = jobs?.some((j) => ["queued", "dispatched", "running"].includes(j.status));
+    const active = jobs?.some((j) => ["queued", "dispatched", "running"].includes(j.status) && !isStaleQueued(j));
     if (!active) return;
     const t = setInterval(load, 5000);
     return () => clearInterval(t);
@@ -138,6 +143,19 @@ export function Actions() {
     await reload();
   }
 
+  async function start(job: JobRow) {
+    setBusy(true);
+    setMessage(null);
+    const error = await dispatchJob(job.id);
+    setBusy(false);
+    setMessage(
+      error
+        ? { text: `Not started: ${error}`, isError: true }
+        : { text: `${KIND_LABEL[job.kind]} started — it runs on GitHub Actions; status updates below.`, isError: false },
+    );
+    await reload();
+  }
+
   return (
     <div>
       {message && <p className={message.isError ? "error-state" : "plan-sub"}>{message.text}</p>}
@@ -225,6 +243,14 @@ export function Actions() {
             </div>
           </header>
           {j.error && <p className="error-state">{j.error}</p>}
+          {j.status === "queued" && (
+            <div className="plan-actions">
+              {isStaleQueued(j) && <span className="plan-sub">Never reached GitHub.</span>}
+              <button className="btn" disabled={busy} onClick={() => start(j)}>
+                Start
+              </button>
+            </div>
+          )}
           <ResultView job={j} />
           {(j.kind === "build_plan" || j.kind === "resume") && j.status === "failed" && typeof j.result?.workflowRunId === "string" && (
             <div className="plan-actions">

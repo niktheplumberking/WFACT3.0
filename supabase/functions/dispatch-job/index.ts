@@ -15,10 +15,16 @@ const WORKFLOW_FILE = "cockpit-job.yml";
 const REF = Deno.env.get("GITHUB_DISPATCH_REF") ?? "main";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// The Cockpit's own Vercel hosts: the production alias, per-deployment URLs (`wfact-cockpit-<hash>-…`)
+// and Git branch previews (`wfact-cockpit-git-<branch>-…`). Branch previews were missing until
+// 2026-09-28: their preflight got a 204 with no CORS headers, so the browser silently dropped the POST
+// and the job stayed `queued`. CORS is not the access control here — the caller's JWT is (below).
+const COCKPIT_ORIGIN = /^https:\/\/wfact-cockpit(-git-[a-z0-9-]+|-[a-z0-9]+)?-niktheplumberkings-projects\.vercel\.app$/;
+
 function allowedOrigin(origin: string | null): string | null {
   if (!origin) return null;
   if (origin === "http://localhost:5173") return origin;
-  if (/^https:\/\/wfact-cockpit(-[a-z0-9]+)?-niktheplumberkings-projects\.vercel\.app$/.test(origin)) return origin;
+  if (COCKPIT_ORIGIN.test(origin)) return origin;
   return null;
 }
 

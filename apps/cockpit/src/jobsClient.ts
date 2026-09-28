@@ -29,7 +29,18 @@ export async function requestJob(kind: JobKind, params: Record<string, unknown>)
   const { data, error } = await supabase.from("jobs").insert({ created_by: userId, kind, params }).select("id").single();
   if (error || !data) return { jobId: null, error: error?.message ?? "Could not create the job." };
 
-  const { error: fnError } = await supabase.functions.invoke("dispatch-job", { body: { jobId: data.id } });
+  const dispatchError = await dispatchJob(data.id);
+  return { jobId: data.id, error: dispatchError ? `Job created but not started: ${dispatchError} — use Start on the job below to retry.` : null };
+}
+
+/**
+ * Ask `dispatch-job` to start an existing `queued` job on GitHub Actions. Split out of `requestJob` so a
+ * job whose dispatch never landed (e.g. a network or CORS failure — the row stays `queued` because the
+ * function never saw the request) can be started again instead of being stranded. The function itself
+ * refuses anything that isn't the caller's own still-queued job.
+ */
+export async function dispatchJob(jobId: string): Promise<string | null> {
+  const { error: fnError } = await supabase.functions.invoke("dispatch-job", { body: { jobId } });
   if (fnError) {
     // The function records the reason on the job row (e.g. dispatcher not configured) — surface both.
     let detail = fnError.message;
@@ -42,9 +53,9 @@ export async function requestJob(kind: JobKind, params: Record<string, unknown>)
         /* keep the generic message */
       }
     }
-    return { jobId: data.id, error: `Job created but not started: ${detail}` };
+    return detail;
   }
-  return { jobId: data.id, error: null };
+  return null;
 }
 
 export async function previewUrl(path: string): Promise<string | null> {
