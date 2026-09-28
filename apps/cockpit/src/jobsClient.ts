@@ -58,7 +58,14 @@ export async function dispatchJob(jobId: string): Promise<string | null> {
   return null;
 }
 
-export async function previewUrl(path: string): Promise<string | null> {
-  const { data } = await supabase.storage.from("artifacts").createSignedUrl(path, 600);
-  return data?.signedUrl ?? null;
+/**
+ * Fetch a built page's HTML for an in-Cockpit preview. Supabase Storage deliberately serves every
+ * .html object as `text/plain` with `Content-Security-Policy: sandbox` (so its shared domain can't host
+ * live pages), so opening the signed URL shows source, not a page. The caller renders this text in a
+ * sandboxed iframe instead (Actions.tsx).
+ */
+export async function previewHtml(path: string): Promise<{ html: string | null; error: string | null }> {
+  const { data, error } = await supabase.storage.from("artifacts").download(path);
+  if (error || !data) return { html: null, error: error?.message ?? "Could not load the built page." };
+  return { html: await data.text(), error: null };
 }

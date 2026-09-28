@@ -6,7 +6,7 @@
  */
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
-import { dispatchJob, previewUrl, requestJob, type JobKind, type JobRow } from "./jobsClient";
+import { dispatchJob, previewHtml, requestJob, type JobKind, type JobRow } from "./jobsClient";
 
 // A job still `queued` after this long was never dispatched (the function flips it to `dispatched` or
 // `failed` within seconds) — stop polling for it and offer Start instead.
@@ -56,9 +56,54 @@ function useJobs() {
   return { jobs, error, reload: load };
 }
 
+/**
+ * A built page, rendered inside the Cockpit. The iframe is sandboxed WITHOUT allow-same-origin: the page
+ * gets an opaque origin, so its scripts (animations etc.) run but can never read the Cockpit's signed-in
+ * session. Built pages are model output — treat them as untrusted.
+ */
+function PagePreview({ path }: { path: string }) {
+  const [html, setHtml] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [full, setFull] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    setError(null);
+    const res = await previewHtml(path);
+    setLoading(false);
+    setHtml(res.html);
+    setError(res.error);
+  }
+
+  if (html === null) {
+    return (
+      <p>
+        <button className="btn" disabled={loading} onClick={load}>
+          {loading ? "Loading…" : "Preview built page"}
+        </button>
+        {error && <span className="error-state"> {error}</span>}
+      </p>
+    );
+  }
+  return (
+    <div className={full ? "page-preview full" : "page-preview"}>
+      <div className="plan-actions page-preview-bar">
+        <code>{path}</code>
+        <button className="btn" onClick={() => setFull(!full)}>
+          {full ? "Exit full screen" : "Full screen"}
+        </button>
+        <button className="btn" onClick={() => { setHtml(null); setFull(false); }}>
+          Close preview
+        </button>
+      </div>
+      <iframe title={`Preview of ${path}`} sandbox="allow-scripts" srcDoc={html} className="page-preview-frame" />
+    </div>
+  );
+}
+
 function ResultView({ job }: { job: JobRow }) {
   const r = job.result ?? {};
-  const [preview, setPreview] = useState<string | null>(null);
   const checkpoint = r.lastCheckpoint as { path?: string; stage?: string } | null | undefined;
 
   if (job.kind === "ask" && typeof r.answer === "string") return <p className="plan-goal">{r.answer}</p>;
@@ -80,18 +125,7 @@ function ResultView({ job }: { job: JobRow }) {
         {Array.isArray(r.qaIssues) && r.qaIssues.length > 0 && (
           <ul>{(r.qaIssues as string[]).slice(0, 8).map((i, n) => <li key={n}>{i}</li>)}</ul>
         )}
-        {checkpoint?.path && (
-          <p>
-            <button className="btn" onClick={async () => setPreview(await previewUrl(checkpoint.path!))}>
-              Preview built page
-            </button>{" "}
-            {preview && (
-              <a href={preview} target="_blank" rel="noreferrer">
-                open (link valid 10 min)
-              </a>
-            )}
-          </p>
-        )}
+        {checkpoint?.path && <PagePreview path={checkpoint.path} />}
         {r.status === "awaiting_launch_approval" && <p>Verified. Launch is a human decision — nothing was deployed.</p>}
       </div>
     );
