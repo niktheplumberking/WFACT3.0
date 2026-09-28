@@ -11,6 +11,7 @@ import type { Check, CheckResult, VerificationContext } from "./checks/types.js"
 import { CHECK_REGISTRY, runChecks } from "./registry.js";
 import type { ModelClient } from "./modelClient.js";
 import { runEvaluator, type EvaluatorVerdict } from "./evaluator.js";
+import { recordAudit, type AuditContext } from "@wfact/audit";
 
 export type VerificationStatus =
   | "failed_checks"
@@ -27,18 +28,46 @@ export interface VerificationResult {
 export interface VerificationLoopOptions {
   checks?: Check[];
   evaluatorModel?: ModelClient | null;
+  /**
+   * When set, every pass/fail decision writes one `verification.decision` row to `audit_log`
+   * (Continuation Plan Stage 1). Fails closed: an audit write error propagates, so a decision is
+   * never returned without its row.
+   */
+  audit?: AuditContext;
 }
 
 export class VerificationLoop {
   private readonly checks: Check[];
   private readonly evaluatorModel: ModelClient | null;
+  private readonly audit: AuditContext | null;
 
   constructor(opts: VerificationLoopOptions = {}) {
     this.checks = opts.checks ?? CHECK_REGISTRY;
     this.evaluatorModel = opts.evaluatorModel ?? null;
+    this.audit = opts.audit ?? null;
   }
 
   async run(ctx: VerificationContext, goal: string): Promise<VerificationResult> {
+    const result = await this.decide(ctx, goal);
+    if (this.audit) {
+      await recordAudit(this.audit, {
+        action: "verification.decision",
+        // Only an approval is a success; blocked_no_evaluator is not "verified" (CLAUDE.md §1).
+        outcome: result.status === "approved" ? "success" : "failure",
+        entitySlug: ctx.clientSlug,
+        payload: {
+          status: result.status,
+          goal,
+          checks: result.checkResults.map(({ checkId, passed, details }) => ({ checkId, passed, details })),
+          evaluator: result.evaluator,
+          evaluatorModel: this.evaluatorModel?.name ?? null,
+        },
+      });
+    }
+    return result;
+  }
+
+  private async decide(ctx: VerificationContext, goal: string): Promise<VerificationResult> {
     const checkResults = runChecks(ctx, this.checks);
     const checksPassed = checkResults.every((r) => r.passed);
 

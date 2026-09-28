@@ -10,6 +10,17 @@
  * result either.
  */
 import { z } from "zod";
+import { recordAudit, type AuditContext } from "@wfact/audit";
+
+const AUDIT_INPUT_CAP = 2000;
+
+function safeJson(value: unknown): string {
+  try {
+    return JSON.stringify(value) ?? "undefined";
+  } catch {
+    return String(value);
+  }
+}
 
 export class ToolNotAllowlistedError extends Error {
   constructor(public readonly toolName: string) {
@@ -54,8 +65,22 @@ export interface ToolDefinition<InputSchema extends z.ZodTypeAny, OutputSchema e
   handler: (input: z.infer<InputSchema>) => Promise<z.infer<OutputSchema>>;
 }
 
+export interface ToolRegistryOptions {
+  /**
+   * When set, every invoke() — including refused and failed ones — writes one `tool.invoke` row to
+   * `audit_log` (Continuation Plan Stage 1). Fails closed: if the audit write throws, the call
+   * throws too, so no tool result is ever handed back without its audit row.
+   */
+  audit?: AuditContext;
+}
+
 export class ToolRegistry {
   private readonly tools = new Map<string, ToolDefinition<z.ZodTypeAny, z.ZodTypeAny>>();
+  private readonly audit: AuditContext | null;
+
+  constructor(opts: ToolRegistryOptions = {}) {
+    this.audit = opts.audit ?? null;
+  }
 
   /** Register a tool. Call sites are the only allowlist — there is no dynamic registration path. */
   register<InputSchema extends z.ZodTypeAny, OutputSchema extends z.ZodTypeAny>(
@@ -72,6 +97,23 @@ export class ToolRegistry {
   }
 
   async invoke(toolName: string, rawInput: unknown): Promise<unknown> {
+    const startedAt = Date.now();
+    let output: unknown;
+    try {
+      output = await this.invokeUnaudited(toolName, rawInput);
+    } catch (err) {
+      // Refusals (not allowlisted, bad input) are "rejected" — the boundary did its job. Anything
+      // else (handler threw, output broke contract) is a "failure". Both get a row, then rethrow.
+      const outcome =
+        err instanceof ToolNotAllowlistedError || err instanceof ToolInputValidationError ? "rejected" : "failure";
+      await this.recordInvoke(toolName, rawInput, outcome, startedAt, err);
+      throw err;
+    }
+    await this.recordInvoke(toolName, rawInput, "success", startedAt, null, output);
+    return output;
+  }
+
+  private async invokeUnaudited(toolName: string, rawInput: unknown): Promise<unknown> {
     const tool = this.tools.get(toolName);
     if (!tool) {
       throw new ToolNotAllowlistedError(toolName);
@@ -90,5 +132,30 @@ export class ToolRegistry {
     }
 
     return parsedOutput.data;
+  }
+
+  private async recordInvoke(
+    toolName: string,
+    rawInput: unknown,
+    outcome: "success" | "failure" | "rejected",
+    startedAt: number,
+    err: unknown,
+    output?: unknown,
+  ): Promise<void> {
+    if (!this.audit) return;
+    // Input is logged (capped): it may be model-supplied, which is exactly what an audit needs to
+    // show. Output is logged by size only — memory files and state rows don't belong in the trail.
+    const inputJson = safeJson(rawInput);
+    await recordAudit(this.audit, {
+      action: "tool.invoke",
+      outcome,
+      payload: {
+        tool: toolName,
+        input: inputJson.length > AUDIT_INPUT_CAP ? `${inputJson.slice(0, AUDIT_INPUT_CAP)}…(truncated)` : rawInput,
+        durationMs: Date.now() - startedAt,
+        ...(output !== undefined ? { outputBytes: safeJson(output).length } : {}),
+        ...(err ? { error: err instanceof Error ? `${err.name}: ${err.message}`.slice(0, 500) : String(err) } : {}),
+      },
+    });
   }
 }

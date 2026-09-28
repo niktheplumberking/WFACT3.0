@@ -4,7 +4,9 @@ Source: `docs/wfact-3.0-operator-manual.html`, sequenced per `docs/WFACT-3.0-Fas
 top to bottom. Nothing gets checked as done until its **exit check** actually passed, not attempted.
 
 Last synced: 2026-09-22, via `/progress-sync` — rebuilt from git history and direct repo verification,
-not from self-report. See `git log` for the full commit trail this reflects.
+not from self-report. See `git log` for the full commit trail this reflects. Re-synced same day to fold
+in two commits made after the prior sync (`06babd6` confirming login end-to-end, `a57d977` a Cockpit
+dark-theme restyle) — both verified directly against the repo, not taken on their commit messages alone.
 
 **Status summary**: Phases 1–6 are functionally complete with real, independently-verified evidence —
 including the Cockpit MVP, live at a real URL with real data and a genuinely tested RLS-gated write.
@@ -12,10 +14,15 @@ Only Phase 7 (the proof-run writeup and Nick's own review/decisions) remains, an
 Nick-only steps this session can't close on its own. No hard blocker remains; the open Phase 1 items
 (CI-automated deploys, a real secrets manager) have tracked workarounds, not open stops.
 
+**2026-09-28 — work has moved to [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md)**
+(dependency-gated stages against the Blueprint, not sprint days). Its status lives in the
+"Continuation Build Plan" section at the bottom of this file. Blueprint (`docs/wfact-3.0-blueprint.html`)
+is the scope source of truth.
+
 **Next up**:
-1. Phase 7: write the honest results report (what's proven, what's not) and get Nick to actually look at the Cockpit and the live DreamSign page.
-2. Phase 1: automate the Vercel deploy through CI — every deploy this sprint has been a manual CLI call, not "zero manual steps."
-3. Once Nick reviews: agree the next sprint's scope (a second/third real client, per the Execution Roadmap's own Phase 2).
+1. Stage 1 (in progress): Huraira's account steps in `docs/SECRETS.md` (Doppler workspace + `DOPPLER_TOKEN` GitHub secret + Vercel production branch), and creating `main` as trunk — then the first real CI deploy closes the "zero manual steps" check.
+2. Stage 2: generalize the agent runtime (`packages/agent-runtime`), refactoring frontend-loop + verification onto it with their test suites unchanged.
+3. Still owed from the sprint: Phase 7 results report, and Nick's actual look at the Cockpit.
 
 **Gaps noticed**:
 - Phase 1's exit check ("zero manual steps") is not met even though every access item now is — the CI pipeline doesn't auto-deploy yet; this session's Vercel deploy was manual.
@@ -25,6 +32,13 @@ Nick-only steps this session can't close on its own. No hard blocker remains; th
 - Real usage/cost instrumentation added to both `packages/hermes` and `packages/frontend-loop`'s model clients (`totalUsage` tracking, real dollar cost computed from real Anthropic pricing) — not a plan checklist item, but structurally required by the Fast-Track Plan's routing rule, which the code previously couldn't satisfy at all.
 - `Agent37ModelClient` added as a new model adapter, with a routing split (builder → Agent 37, evaluator → Claude) — not in the original Manual, driven by the Fast-Track Plan's later routing rule and a real vendor-independence gap CLAUDE.md §6 had flagged since Phase 4 started.
 - The 3 SOP PDFs + Factory Book/Audit added to `docs/WFACT SOPS/`.
+- Cockpit restyled to a real WFACT dark-theme brand system (`a57d977`) — sidebar-shell layout, a
+  Supabase-backed stat strip (projects/active/correction rounds), and `apps/cockpit/src/theme.css`
+  (verified present, 7.6K, amber/cyan/green accents, Space Grotesk + IBM Plex). Not a plan checklist
+  item — pure presentation, no change to query logic, the RLS-gated approval write, or the magic-link
+  auth flow. Commit message claims typecheck/build both verified clean — re-run independently this
+  sync (`npm run build` in `apps/cockpit`): `tsc -b && vite build` passes, 76 modules transformed,
+  clean production bundle.
 
 ---
 
@@ -133,7 +147,9 @@ to `localhost:3000` anyway. No available tool in this session could change that 
 dashboard/Management-API config, not reachable via the service-role key or SQL) — Huraira updated
 Site URL + Redirect URLs in the Supabase dashboard directly. Re-verified after: a fresh generated
 link now correctly resolves to the production URL, and the full verify step was completed end-to-end
-(real access token issued) before telling Huraira to try again for real.
+(real access token issued) before telling Huraira to try again for real. **Closed out 2026-09-22**:
+Huraira's real retry succeeded — login confirmed working end-to-end, logged in `BLOCKED-ON-NICK.md`.
+Still open: his own actual review of Pipeline/Approvals/Runs content, separate from login working.
 
 **A real regression happened and got fixed, logged honestly rather than smoothed over**: pushing this
 phase's commit to GitHub triggered Vercel's Git integration to auto-build from the repo root (this
@@ -153,3 +169,57 @@ specifically, not the whole repo yet.
 
 - [ ] Not started. Largely a documentation/presentation pass over what Phases 1–6 already proved
       for real, plus Nick attending the review and deciding next steps — both Nick-only.
+
+---
+
+# Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
+
+## Stage 1 — Close the Phase 0/1 debt (IN PROGRESS, started 2026-09-28)
+
+- [x] **Audit log — acceptance MET 2026-09-28.**
+      - `packages/db/migrations/0006_audit_log.sql` applied to `mcaxxhgjptwowwrluhra` (listed by
+        `list_migrations`). Append-only is enforced by trigger for every role, service_role included.
+        Attack-tested live: UPDATE, DELETE and TRUNCATE were all refused, and malformed action names
+        were rejected. RLS: `anon` insert was refused ("violates row-level security policy") and
+        `anon` saw 0 rows. `get_advisors` (security) found nothing new; only the pre-existing
+        `rls_auto_enable()` and leaked-password items remain.
+      - New `packages/audit` (zero runtime deps, fail-closed, 7/7 tests). Wired into Hermes-lite's
+        `ToolRegistry` (every call audited, including refused and failed ones; 33/33 tests, the 26
+        originals unchanged) and into `VerificationLoop.run` (every decision audited; 16/16 tests, the
+        12 originals unchanged). frontend-loop is untouched, 20/20.
+      - Live evidence, queried back independently via SQL, not the CLIs' own output:
+        - Hermes run `bbcefba8…` wrote 3 `tool.invoke` success rows (`memory.readContext`,
+          `memory.readClient`, `state.projectStatus`) plus 1 `hermes.answer` row (cost $0.0093).
+        - Verification run `c762b467…` against `clients/dreamsign-pilot/pages/clean-agency.html`
+          wrote 1 `verification.decision` row: `approved`, all 6 checks recorded, evaluator cost
+          $0.0159.
+- [ ] **CI auto-deploy — code done, not yet proven.**
+      - `.github/workflows/ci.yml` gains an `audit` job and a real Cockpit `build` job, replacing the
+        Day-1 placeholder.
+      - It also gains `deploy-cockpit`: push to `main` only, `needs` every check job, pulls
+        `VERCEL_TOKEN` from Doppler, then `vercel build` → `deploy --prebuilt --prod` → curl
+        smoke-check for 200.
+      - `apps/cockpit/vercel.json` disables Git-triggered deploys on `main`, so CI is the sole
+        production deployer.
+      - Verified locally: the YAML parses, the Cockpit build passes, and a clean-checkout `npm ci` +
+        typecheck + tests passes for audit, hermes and verification (simulating the CI jobs).
+      - **Not yet run in real CI.** Blocked on:
+        - (a) `main` doesn't exist on the remote; the only branch is `huraira-work`, which is also
+          the default.
+        - (b) the `DOPPLER_TOKEN` GitHub secret.
+- [ ] **Secrets manager — decided (Doppler, Huraira 2026-09-28), not yet stood up.** The runbook is in
+      `docs/SECRETS.md`. The account, login, import and service token are Huraira-only steps.
+      `.env.local` is still the live source until those land.
+
+**Acceptance status**: 1 of 3 criteria met (audit log). Deploy and secrets need their first real run.
+
+**Gaps noticed**:
+- `tool.invoke` rows carry `entity_slug = null`. The registry doesn't know the entity, only the tool
+  input does, which is still logged. Pass entity context through when Stage 2's runtime owns the audit
+  context.
+- The `verification.decision` row doesn't carry evaluator cost; the CLI prints it separately. Stage 5's
+  trace row is the planned home for cost, so it's not duplicated here.
+- Knowledge graph built 2026-09-28 (`graphify-out/`, 612 nodes / 972 edges / 49 communities, plus
+  wiki). 52 dangling edges were flagged by the health check (semantic edges to IDs the AST didn't
+  produce), and PDF content wasn't extracted (no PDF tooling on this machine). The SOP PDFs are
+  covered by their markdown twins; Factory Book and Factory Audit are title-only in the graph.

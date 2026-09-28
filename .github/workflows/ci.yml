@@ -114,13 +114,93 @@ jobs:
       - name: Unit tests
         run: npm test
 
-  # Placeholder — becomes real once apps/cockpit has a package.json (Phase 6).
-  # Never delete this job silently; replace its body when there's something to build.
-  build:
-    name: Build (placeholder until Phase 6)
+  # Continuation Plan Stage 1: the append-only audit writer hermes + verification link via
+  # file:../audit. Zero runtime deps, no network, no credentials — same pattern as the jobs above.
+  audit:
+    name: Audit writer — typecheck + unit tests
     runs-on: ubuntu-latest
     needs: guardrails
+    defaults:
+      run:
+        working-directory: packages/audit
     steps:
       - uses: actions/checkout@v4
-      - name: No build target yet
-        run: echo "No app to build yet — apps/cockpit lands in Phase 6. This job exists so CI is wired from Day 1."
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
+  # Replaces the Day-1 placeholder now that apps/cockpit exists (Phase 6). Builds without any
+  # env vars on purpose — VITE_SUPABASE_* are only needed at runtime, and the real deploy below
+  # pulls them from the Vercel project, not from CI.
+  build:
+    name: Cockpit — typecheck + production build
+    runs-on: ubuntu-latest
+    needs: guardrails
+    defaults:
+      run:
+        working-directory: apps/cockpit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npm ci
+      - name: Build (tsc -b && vite build)
+        run: npm run build
+
+  # Continuation Plan Stage 1 / Blueprint Phase 0 acceptance: "a commit can go from a laptop to a
+  # deployed preview through CI with zero manual steps." Runs only on a push to trunk (main), and
+  # only after every check job above passed — registry gates are required, not advisory (§15).
+  #
+  # Secrets: the only GitHub secret is DOPPLER_TOKEN (a Doppler service token scoped to the
+  # wfact/prd config). VERCEL_TOKEN lives in Doppler, never in GitHub or the repo (Blueprint §12).
+  # Org/project IDs are identifiers, not secrets — same values as apps/cockpit/.vercel/project.json.
+  deploy-cockpit:
+    name: Deploy Cockpit to Vercel (trunk only)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [guardrails, audit, hermes, frontend-loop, verification, build]
+    concurrency:
+      group: deploy-cockpit
+      cancel-in-progress: false
+    env:
+      VERCEL_ORG_ID: team_59lA2tP4DaHNBErHnfnggRdc
+      VERCEL_PROJECT_ID: prj_wUFAYfzJtFgX7SG7XC7ptKDoOWrb
+      DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Require the Doppler token (fail loudly, never skip silently)
+        run: |
+          if [ -z "$DOPPLER_TOKEN" ]; then
+            echo "::error::DOPPLER_TOKEN secret is not set — see docs/SECRETS.md. Refusing to deploy."
+            exit 1
+          fi
+      - uses: dopplerhq/cli-action@v3
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel production settings + env
+        run: doppler run --command 'vercel pull --yes --environment=production --token "$VERCEL_TOKEN"'
+      - name: Build
+        run: doppler run --command 'vercel build --prod --token "$VERCEL_TOKEN"'
+      - name: Deploy
+        id: deploy
+        run: |
+          url=$(doppler run --command 'vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"')
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed: $url"
+      # Never trust done, only verified (CLAUDE.md §1): the deploy isn't done until it answers.
+      - name: Smoke-check the live deployment
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' --retry 5 --retry-delay 5 --retry-all-errors "${{ steps.deploy.outputs.url }}")
+          echo "HTTP $code from ${{ steps.deploy.outputs.url }}"
+          test "$code" = "200"

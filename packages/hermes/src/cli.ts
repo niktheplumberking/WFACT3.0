@@ -8,6 +8,8 @@ import { buildToolRegistry } from "./tools/registry.js";
 import { stateReaderFromEnv } from "./state.js";
 import { modelClientFromEnv, ClaudeModelClient } from "./modelClient.js";
 import { HermesLite } from "./controller.js";
+import { randomUUID } from "node:crypto";
+import { auditSinkFromEnv, recordAudit, type AuditContext } from "@wfact/audit";
 
 // Anthropic pricing per CLAUDE.md §6 ("re-verify anything time-sensitive before relying on it") —
 // checked 2026-06-24 (Claude API pricing table): claude-sonnet-5 is $2/1M input, $10/1M output.
@@ -37,10 +39,41 @@ async function main() {
     console.error("Continuing with memory files only.\n");
   }
 
-  const registry = buildToolRegistry(stateReader);
+  // Stage 1 audit log: every tool call below, plus the final answer, lands in public.audit_log
+  // under one run_id. No sink → say so loudly, never pretend the run was audited.
+  const { sink: auditSink, reason: auditReason } = auditSinkFromEnv();
+  const runId = randomUUID();
+  const audit: AuditContext | undefined = auditSink ? { sink: auditSink, actor: "hermes-lite", runId } : undefined;
+  if (!audit) {
+    console.error(`NOTE (audit): ${auditReason}\n`);
+  }
+
+  const registry = buildToolRegistry(stateReader, audit);
   const hermes = new HermesLite({ toolRegistry: registry, modelClient });
 
   const result = await hermes.answerStatusQuestion(question);
+
+  if (audit) {
+    const usage = modelClient instanceof ClaudeModelClient ? modelClient.totalUsage : null;
+    const rate = modelClient instanceof ClaudeModelClient ? PRICING_USD_PER_MTOK[modelClient.modelIdUsed] : undefined;
+    await recordAudit(audit, {
+      action: "hermes.answer",
+      outcome: result.needsHuman ? "failure" : "success",
+      entitySlug: result.entitySlug,
+      payload: {
+        question,
+        sourcesUsed: result.sourcesUsed,
+        needsHuman: result.needsHuman,
+        escalationReason: result.escalationReason,
+        model: modelClient instanceof ClaudeModelClient ? modelClient.modelIdUsed : modelClient.name,
+        ...(usage ? { inputTokens: usage.inputTokens, outputTokens: usage.outputTokens } : {}),
+        ...(usage && rate
+          ? { costUsd: (usage.inputTokens / 1_000_000) * rate.input + (usage.outputTokens / 1_000_000) * rate.output }
+          : {}),
+      },
+    });
+    console.error(`(audit: run_id ${runId} written to audit_log)`);
+  }
 
   if (result.needsHuman) {
     console.error(`ESCALATED — needs a human: ${result.escalationReason}`);

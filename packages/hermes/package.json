@@ -13,6 +13,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
     "@supabase/supabase-js": "^2.58.0",
+    "@wfact/audit": "file:../audit",
     "zod": "^3.25.76"
   },
   "devDependencies": {

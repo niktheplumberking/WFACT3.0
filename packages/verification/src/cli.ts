@@ -15,6 +15,8 @@ import { readFileSync } from "node:fs";
 import { VerificationLoop, formatVerificationSummary } from "./verificationLoop.js";
 import { evaluatorModelClientFromEnv, ClaudeModelClient } from "./modelClient.js";
 import { knownClientSlugs } from "./paths.js";
+import { randomUUID } from "node:crypto";
+import { auditSinkFromEnv } from "@wfact/audit";
 
 // claude-sonnet-5 pricing, checked 2026-06-24 — see packages/hermes/src/cli.ts for the same note.
 const PRICING_USD_PER_MTOK = { input: 2.0, output: 10.0 };
@@ -36,7 +38,18 @@ async function main() {
     console.error(`NOTE (evaluator): ${reason}\n`);
   }
 
-  const loop = new VerificationLoop({ evaluatorModel });
+  // Stage 1 audit log: the pass/fail decision lands in public.audit_log. WFACT_TASK_ID (optional)
+  // ties it to a task; Stage 3's workflow sets it, a hand-run leaves it null.
+  const { sink: auditSink, reason: auditReason } = auditSinkFromEnv();
+  const runId = randomUUID();
+  if (!auditSink) {
+    console.error(`NOTE (audit): ${auditReason}\n`);
+  }
+  const audit = auditSink
+    ? { sink: auditSink, actor: "verification-loop", runId, taskId: process.env.WFACT_TASK_ID || null }
+    : undefined;
+
+  const loop = new VerificationLoop({ evaluatorModel, audit });
   const result = await loop.run({ html, clientSlug, requiredSections, otherClientSlugs }, goal);
 
   console.log(formatVerificationSummary(result));
@@ -50,6 +63,10 @@ async function main() {
       `(cost — evaluator (claude ${evaluatorModel.modelIdUsed}): ${inputTokens} in / ` +
         `${outputTokens} out tokens, $${cost.toFixed(4)})`,
     );
+  }
+
+  if (audit) {
+    console.error(`(audit: run_id ${runId} written to audit_log)`);
   }
 
   process.exitCode = result.status === "approved" ? 0 : 1;
