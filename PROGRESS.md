@@ -120,6 +120,16 @@ the `Cockpit job` workflow has zero runs.
       token gets 401.
     - The Cockpit also gets a **Start** button on `queued` jobs, so a dispatch that never landed can
       be retried instead of stranded. Polling stops for jobs left `queued` over 2 minutes.
+  - **v3 wasn't enough.** Huraira's Start click at 16:49 UTC failed the same way ("Failed to send a
+    request to the Edge Function"; 3 preflights on v3, none with CORS headers).
+    - `vercel inspect` shows the production deployment has a second alias,
+      `dist-rho-lime-95.vercel.app`, left over from the 09-22 manual `dist` deploy.
+    - It serves the same current bundle and doesn't fit the pattern. By elimination, that's the origin
+      in use.
+    - `dispatch-job` v4 allows it by exact match, and now logs any refused origin by name. The edge
+      logs don't record `Origin`, which is why this took two rounds.
+    - Checked after deploy: all four Cockpit hosts plus `localhost:5173` are allowed, a foreign origin
+      is refused and logged, and an unsigned POST gets 401.
   - Still unknown: whether `GITHUB_DISPATCH_TOKEN` is set. If it isn't, the next click will now fail
     the job visibly rather than silently.
 - **Magic-link redirect fell back to `localhost:3000` (2026-09-22, fixed).** Huraira's first sign-in

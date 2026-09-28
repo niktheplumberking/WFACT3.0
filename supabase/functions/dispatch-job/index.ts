@@ -20,11 +20,13 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // 2026-09-28: their preflight got a 204 with no CORS headers, so the browser silently dropped the POST
 // and the job stayed `queued`. CORS is not the access control here — the caller's JWT is (below).
 const COCKPIT_ORIGIN = /^https:\/\/wfact-cockpit(-git-[a-z0-9-]+|-[a-z0-9]+)?-niktheplumberkings-projects\.vercel\.app$/;
+// Exact extra hosts: local dev, and `dist-rho-lime-95` — a second production alias of the
+// wfact-cockpit project (left over from the 2026-09-22 manual `dist` deploy) that doesn't fit the pattern.
+const EXTRA_ORIGINS = new Set(["http://localhost:5173", "https://dist-rho-lime-95.vercel.app"]);
 
 function allowedOrigin(origin: string | null): string | null {
   if (!origin) return null;
-  if (origin === "http://localhost:5173") return origin;
-  if (COCKPIT_ORIGIN.test(origin)) return origin;
+  if (EXTRA_ORIGINS.has(origin) || COCKPIT_ORIGIN.test(origin)) return origin;
   return null;
 }
 
@@ -48,7 +50,13 @@ function respond(req: Request, status: number, body: Record<string, unknown>): R
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return respond(req, 204, {});
+  if (req.method === "OPTIONS") {
+    // Edge logs don't record the Origin header, so name a refused one here — otherwise a browser
+    // silently dropping the POST is invisible from the server side.
+    const origin = req.headers.get("origin");
+    if (origin && !allowedOrigin(origin)) console.warn(`dispatch-job: CORS refused origin ${JSON.stringify(origin.slice(0, 200))}`);
+    return respond(req, 204, {});
+  }
   if (req.method !== "POST") return respond(req, 405, { error: "POST only" });
 
   const url = Deno.env.get("SUPABASE_URL")!;
