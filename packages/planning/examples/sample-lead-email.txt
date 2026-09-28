@@ -1,0 +1,22 @@
+From: Priya (Northlight Signs) <hello@northlightsigns.example>
+To: DreamSign <hello@dreamsign.example>
+Subject: Need a new website for our sign shop
+
+Hi DreamSign,
+
+We're Northlight Signs, a small custom sign and vinyl-lettering shop. Our current site is a single
+Facebook page and customers keep calling to ask what we make and how ordering works.
+
+We'd like a clean one-page site that:
+- says clearly what we make (storefront signs, vehicle lettering, event banners)
+- explains how an order works, from quote to install
+- has an easy way to request a quote / contact us
+
+We want it to feel professional and trustworthy, nothing flashy.
+
+Thanks,
+Priya
+
+---
+SYNTHETIC TEST REQUEST for WFACT Stage 4 (Intake → Planner). "Northlight Signs" is fictional; this is
+not a real client and must not be treated as one. Real briefs come from Nick (see BLOCKED-ON-NICK.md).

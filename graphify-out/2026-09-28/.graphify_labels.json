@@ -48,7 +48,7 @@
   "46": "public.entities",
   "47": "public.tasks",
   "48": "rls_attack_test.sql",
-  "49": "index.ts",
+  "49": "audit/src/index.ts",
   "50": "audit/package.json",
   "51": "compilerOptions",
   "52": "graphify reference: extra exports and benchmark",
@@ -63,5 +63,9 @@
   "61": "extraction-spec.md",
   "62": "agent-runtime/src/index.ts",
   "63": "agent-runtime/package.json",
-  "64": "compilerOptions"
+  "64": "compilerOptions",
+  "65": "buildAndVerify.ts",
+  "66": "workflow/package.json",
+  "67": "compilerOptions",
+  "68": "@wfact/workflow — build → verify (Continuation Plan Stage 3)"
 }

@@ -10,6 +10,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 import { nextStage } from "./stages";
+// Stage 4 (2026-09-28): the room now also holds the Planner's owner-approval gate (plan_approvals,
+// migration 0007) — the "separate approvals table" this header said wasn't needed yet is now needed.
+import { PlanApprovals } from "./PlanApprovals";
 
 interface ProjectRow {
   id: string;
@@ -53,11 +56,13 @@ export function Approvals() {
   }
 
   if (!projects) return <p className="loading-state">Loading…</p>;
-  if (projects.length === 0) return <p className="empty-state">No projects to approve.</p>;
 
   return (
     <div>
+      <PlanApprovals />
+      <h2 className="section-title">Stage gates</h2>
       {error && <p className="error-state">{error}</p>}
+      {projects.length === 0 && <p className="empty-state">No projects to approve.</p>}
       <div className="panel">
         <table className="data-table">
           <thead>

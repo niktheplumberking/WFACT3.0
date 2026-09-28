@@ -1,14 +1,14 @@
 {
-  "name": "@wfact/workflow",
+  "name": "@wfact/planning",
   "version": "0.1.0",
   "private": true,
-  "description": "Stage 3 workflow engine v1 — build-and-verify with durable audit_log checkpoints. A hand-rolled stand-in for the Blueprint's durable engine (n8n/Temporal); see src/buildAndVerify.ts header.",
+  "description": "Stage 4 Intake (fast tier) + Planner (mid tier) agents on the shared runtime; model choice comes from Hermes-lite's routing config, plans go to the Cockpit Approvals room.",
   "type": "module",
   "exports": {
-    ".": "./src/buildAndVerify.ts"
+    "./*": "./src/*.ts"
   },
   "scripts": {
-    "build-and-verify": "tsx src/cli.ts",
+    "intake": "tsx src/cli.ts",
     "test": "tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
@@ -18,10 +18,11 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
     "@wfact/agent-runtime": "file:../agent-runtime",
     "@wfact/audit": "file:../audit",
     "@wfact/frontend-loop": "file:../frontend-loop",
-    "@wfact/planning": "file:../planning",
-    "@wfact/verification": "file:../verification"
+    "@wfact/hermes-lite": "file:../hermes",
+    "zod": "^4.6.5"
   }
 }

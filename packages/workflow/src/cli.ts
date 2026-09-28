@@ -21,6 +21,7 @@ import { appendCorrectionLogRows, formatCorrectionSummary } from "@wfact/fronten
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
 import { evaluatorModelClientFromEnv, ClaudeModelClient } from "@wfact/verification/modelClient";
 import { knownClientSlugs } from "@wfact/verification/paths";
+import { planStoreFromEnv } from "@wfact/planning/planStore";
 import {
   buildAndVerify,
   resumeBuildAndVerify,
@@ -44,11 +45,28 @@ async function main() {
   const args = process.argv.slice(2);
   const resumeIdx = args.indexOf("--resume");
   const resumeRunId = resumeIdx >= 0 ? args[resumeIdx + 1] : undefined;
-  const briefPath = resumeIdx >= 0 ? undefined : args[0];
-  if (!briefPath && !resumeRunId) {
-    console.error("Usage: npm run build-and-verify -- <path/to/brief.json>   |   -- --resume <run-id>");
+  const planIdx = args.indexOf("--plan");
+  const planId = planIdx >= 0 ? args[planIdx + 1] : undefined;
+  const briefPath = resumeIdx >= 0 || planIdx >= 0 ? undefined : args[0];
+  if (!briefPath && !resumeRunId && !planId) {
+    console.error(
+      "Usage: npm run build-and-verify -- <path/to/brief.json>  |  -- --plan <approved-plan-id>  |  -- --resume <run-id>",
+    );
     process.exitCode = 1;
     return;
+  }
+
+  // Stage 4: build from an owner-APPROVED Planner plan. The approval is a human decision recorded by
+  // the database (plan_approvals, migration 0007) — this refuses anything not approved.
+  let planBrief: unknown = undefined;
+  if (planId) {
+    const { store, reason } = planStoreFromEnv();
+    if (!store) blocked(reason!);
+    const stored = await store.get(planId);
+    if (!stored) blocked(`plan ${planId} not found`);
+    if (stored.status !== "approved") blocked(`plan ${planId} is "${stored.status}" — only an owner-approved plan is built`);
+    console.error(`(building from approved plan ${planId}, decided ${stored.decidedAt}; brief source "${stored.plan.brief.source}")`);
+    planBrief = stored.plan.brief;
   }
 
   const { sink, reason: sinkReason } = auditSinkFromEnv();
@@ -76,7 +94,7 @@ async function main() {
 
   const result = resumeRunId
     ? await resumeBuildAndVerify(resumeRunId, deps)
-    : await buildAndVerify(JSON.parse(readFileSync(briefPath!, "utf-8")), deps);
+    : await buildAndVerify(planBrief ?? JSON.parse(readFileSync(briefPath!, "utf-8")), deps);
 
   console.log(`${WORKFLOW_ID}@${WORKFLOW_VERSION} — run ${result.workflowRunId}`);
   console.log(`STATUS: ${result.status} after ${result.cycles} build→QA cycle(s)`);
@@ -95,7 +113,7 @@ async function main() {
   if (result.builderRounds.length > 0) {
     console.error(formatCorrectionSummary(result.builderRounds, result.status === "awaiting_launch_approval"));
     if (!resumeRunId) {
-      const brief = JSON.parse(readFileSync(briefPath!, "utf-8")) as { clientSlug: string };
+      const brief = (planBrief ?? JSON.parse(readFileSync(briefPath!, "utf-8"))) as { clientSlug: string };
       const memoryPath = path.join(REPO_ROOT, "clients", brief.clientSlug, "memory.md");
       try {
         appendCorrectionLogRows(memoryPath, result.builderRounds, "4_homepage_build", `workflow ${WORKFLOW_ID} run ${result.workflowRunId.slice(0, 8)}`);

@@ -317,7 +317,88 @@ only that one file. Verified locally with gitleaks 8.30.1: default rules give 8 
 config gives 0, and a canary key placed elsewhere in `graphify-out/` is still caught. New `workflow`
 CI job; `deploy-cockpit` now needs it.
 
+**CI update (Stage 3 push, run `36433582813`)**: **every check job passed in real GitHub CI for the
+first time**: guardrails incl. gitleaks, audit, hermes, agent-runtime, frontend-loop, verification,
+workflow, and the Cockpit build. Only `deploy-cockpit` failed, and it got past the `DOPPLER_TOKEN`
+check (so that secret now exists). It failed at `vercel pull`. Reproduced locally with Doppler `prd`
+and the same IDs: Vercel rejects the stored `VERCEL_TOKEN` ("User not found (404)" / "token
+rejected"). The workflow is right and the token value is bad; it needs a new token (Huraira).
+
+## Stage 4 — Intake + Planner (BUILT + LIVE-PROVEN 2026-09-28, owner approval pending, uncommitted)
+
+- [x] **Model routing as configuration** (Blueprint §6/§7):
+      - `packages/hermes/config/model-routing.json`: `intake` → `claude-haiku-4-5` (fast tier,
+        $1/$5 per MTok) and `planner` → `claude-sonnet-5` (mid tier, $2/$10). Prices re-checked
+        against the current Claude pricing table.
+      - `resolveModelRoute(slot)` reads the config, with a per-run override
+        `WFACT_ROUTE_<SLOT>=anthropic:<model>`. It refuses an unknown slot rather than defaulting,
+        and an override to an unpriced model reports cost as unknown, never a guess.
+      - Only these two slots read from it. The Phase 4 builder/evaluator and Hermes-lite's own
+        model are still chosen in their packages: a disclosed gap, written in the config's `_doc`.
+      - Hermes 39/39 (+6 routing tests).
+- [x] **Intake agent** (`packages/planning/src/intake.ts`):
+      - Input is a raw request (a pasted email, a short form or loose JSON). The raw text is fenced
+        as data in the prompt.
+      - Output uses Claude structured outputs (`output_config.format`, SDK 0.128) and is
+        re-validated with zod.
+      - Entity assignment is cross-checked against Hermes-lite's own `detectEntitySlug`/
+        `KNOWN_ENTITIES`, reused (now exported) rather than duplicated.
+      - Ambiguity triggers one re-classification, then escalates to a human (Blueprint §5).
+      - The client slug is derived deterministically.
+- [x] **Planner agent** (`packages/planning/src/planner.ts`):
+      - The model picks a template from the real hand-picked list, the sections, a sharpened goal,
+        risks and open questions.
+      - Code then enforces the structure:
+        - the brief must pass frontend-loop's own `parseBrief`, with new provenance
+          `source: "intake-planner"`;
+        - sections the client asked for are always kept;
+        - tasks must be exactly the stages `build-and-verify@1` runs, in order, with registered
+          roles.
+      - An unexecutable plan is retried once, then escalated.
+- [x] **Registered without touching agent-runtime**: `registryWithPlanning()` adds `intake` and
+      `planner` at composition time; the seed registry is unchanged (tested). This is Stage 2's
+      "generalizes" criterion, proven with two real agents.
+- [x] **Owner-approval gate** (`packages/db/migrations/0007_plan_approvals.sql`, applied):
+      - Only the pipeline inserts plans (service role). Only an owner/admin decides, once,
+        `pending` → `approved | rejected`, stamped from the session.
+      - The plan body can never be edited. A rejection needs a note. There are no deletes.
+      - Every decision writes `audit_log` (`plan.decision`).
+      - **Attack-tested live (9/9, rolled back)**: anon insert refused; a stranger sees and updates
+        0 rows; an owner editing the plan refused; reject-without-note refused; owner approve works
+        and is stamped; re-decide changes 0 rows; delete refused even for the service role; exactly
+        1 audit row.
+      - Security advisors show nothing new.
+- [x] **Cockpit Approvals room extended** (not rebuilt): `PlanApprovals.tsx` shows pending plans
+      (template, sections, tasks, open questions, risks) with Approve / Reject-with-note.
+      `npm run build` passes. **Not yet viewed in a browser**: it needs a magic-link login, which is
+      Huraira's inbox.
+- [x] **Re-plan once, then escalate**: `npm run intake -- --replan <rejected-id>` re-plans from the
+      owner's note (revision 2, `supersedes`). A second rejection gives `replan_limit_reached`.
+- [x] **Chain to Stage 3**: `npm run build-and-verify -- --plan <id>` builds only an **approved**
+      plan. Live negative test: the pending plan was refused before any model call.
+- Tests: planning 12/12. Clean-checkout CI simulation of all 7 packages: 121/121. New `planning` CI
+  job.
+
+**Acceptance criteria**:
+- *Raw brief in → Planner task list out, no hand-written intermediate*: **MET (live).**
+  `examples/sample-lead-email.txt` is a synthetic, clearly labelled pasted email ("Northlight Signs",
+  fictional).
+  - Run `d189d25c…`: Intake on `claude-haiku-4-5` gave `dreamsign` (certain), `new_website`,
+    `northlight-signs` ($0.0017).
+  - Planner on `claude-sonnet-5` gave template `clean-agency`, 5 sections, the 2 executable tasks
+    and 9 open questions ($0.0094).
+  - Stored as plan `8f03181f…`, **pending**. SQL confirms 4 lifecycle audit rows on the run and
+    the pending row with source `intake-planner`.
+- *"Planner-APPROVED"*: **awaiting the owner.** By design, no code path can approve a plan. Huraira
+  approves in the Cockpit, then `build-and-verify --plan 8f03181f…` runs Stage 3 on it.
+- *Routing split is configuration*: **MET** (config file + env override, tested; live run used
+  `[fast, config]` / `[mid, config]`).
+
 **Gaps noticed**:
+- Seven linked `file:` packages with a hand-ordered install per CI job. This now really is worth
+  moving to npm workspaces, with the Vercel root-directory caveat from Phase 6.
+- The Planner produced both `process` and `how-it-works` sections, a near-duplicate the model
+  introduced. It's harmless, but a candidate for a section-normalisation rule later.
 - The live run overwrote `clients/dreamsign-pilot/pages/clean-agency.html` (the file behind the
   earlier Vercel page) and appended 2 correction rows to its `memory.md`. That's the workflow's
   intended output, but the deployed `dreamsign-deploy.vercel.app` still serves the older version.

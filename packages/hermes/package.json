@@ -5,7 +5,9 @@
   "description": "Phase 3 stand-in for the self-hosted Hermes Agent — see README.md for why, and CLAUDE.md §8 for the substitution-disclosure rule this follows.",
   "type": "module",
   "exports": {
-    "./escalation": "./src/escalation.ts"
+    "./escalation": "./src/escalation.ts",
+    "./routing": "./src/routing.ts",
+    "./entities": "./src/controller.ts"
   },
   "scripts": {
     "ask": "tsx src/cli.ts",

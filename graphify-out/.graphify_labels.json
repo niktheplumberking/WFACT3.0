@@ -6,7 +6,7 @@
   "4": "cockpit/package.json",
   "5": "hermes/package.json",
   "6": "frontend-loop/package.json",
-  "7": "hermes/src/cli.ts",
+  "7": "controller.test.ts",
   "8": "controller.ts",
   "9": "verification/package.json",
   "10": "compilerOptions",
@@ -15,8 +15,8 @@
   "13": "WFACT 3.0 Fast-Track Plan",
   "14": "WFACT 3.0 Continuation Build Plan",
   "15": "Audit: WFACT 2.0 to 3.0 (KEEP/REPLACE classification)",
-  "16": "controller.test.ts",
-  "17": "memoryTools.ts",
+  "16": "state.ts",
+  "17": "schema.ts",
   "18": "compilerOptions",
   "19": "compilerOptions",
   "20": "compilerOptions",
@@ -67,5 +67,10 @@
   "65": "buildAndVerify.ts",
   "66": "workflow/package.json",
   "67": "compilerOptions",
-  "68": "@wfact/workflow — build → verify (Continuation Plan Stage 3)"
+  "68": "@wfact/workflow — build → verify (Continuation Plan Stage 3)",
+  "69": "planner.ts",
+  "70": "planning/package.json",
+  "71": "compilerOptions",
+  "72": "routing.ts",
+  "73": "0007_plan_approvals.sql"
 }

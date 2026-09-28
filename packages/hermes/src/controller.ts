@@ -18,7 +18,7 @@ import { withBoundedRetry, EscalationError } from "./escalation.js";
 // Placeholder entities per memory/context.md §2 and BLOCKED-ON-NICK.md — swap for the real,
 // confirmed list once Nick closes that decision. Aliases exist because a founder will type
 // "Bennett" or "Bennett & Co", not the slug "bennett-co".
-const KNOWN_ENTITIES: { slug: string; aliases: string[] }[] = [
+export const KNOWN_ENTITIES: { slug: string; aliases: string[] }[] = [
   { slug: "dreamsign", aliases: ["dreamsign"] },
   { slug: "bennett-co", aliases: ["bennett", "bennett & co", "bennett and co", "bennett-co"] },
 ];

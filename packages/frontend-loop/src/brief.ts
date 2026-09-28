@@ -17,8 +17,12 @@ export interface PilotBrief {
   brandNotes: string;
   templatePreference?: string;
   /** Provenance — never silently treat a placeholder brief as Nick's real one. */
-  source: "nick" | "placeholder-2.0-case";
+  source: "nick" | "placeholder-2.0-case" | "intake-planner";
 }
+
+// "intake-planner" (Stage 4): the brief was written by the Planner agent from a raw request, then
+// owner-approved in the Cockpit — not hand-authored by Nick. Kept distinct so provenance stays honest.
+const BRIEF_SOURCES = ["nick", "placeholder-2.0-case", "intake-planner"] as const;
 
 const REQUIRED_STRING_FIELDS: (keyof PilotBrief)[] = [
   "clientSlug",
@@ -47,8 +51,8 @@ export function parseBrief(raw: unknown): PilotBrief {
       throw new InvalidBriefError(`Brief is missing required string field "${field}".`);
     }
   }
-  if (record.source !== "nick" && record.source !== "placeholder-2.0-case") {
-    throw new InvalidBriefError('Brief "source" must be "nick" or "placeholder-2.0-case".');
+  if (!BRIEF_SOURCES.includes(record.source as (typeof BRIEF_SOURCES)[number])) {
+    throw new InvalidBriefError(`Brief "source" must be one of: ${BRIEF_SOURCES.join(", ")}.`);
   }
   if (
     !Array.isArray(record.requiredSections) ||
@@ -68,7 +72,7 @@ export function parseBrief(raw: unknown): PilotBrief {
     requiredSections: record.requiredSections as string[],
     brandNotes: record.brandNotes as string,
     templatePreference: record.templatePreference as string | undefined,
-    source: record.source as "nick" | "placeholder-2.0-case",
+    source: record.source as PilotBrief["source"],
   };
 }
 
