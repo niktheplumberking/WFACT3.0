@@ -12,11 +12,11 @@ to anyone as a real client record.
 `bennett-co`, per `memory/context.md` §2 (the assignment is provisional, R-01 and R-13; Nick has not
 confirmed the two active entities). Entity law: one client per entity. Bennett & Co has no other client
 folder. There is **no `bennett-co` row in Supabase `entities` yet** (checked 2026-09-30), so no DB rows
-exist for this client; registration is left to Step 4.
+exist for this client. Step 4 showed none are needed: `plan_approvals` has no foreign key to entities or clients.
 
 ## Stage
 
-`1 Intake`. Raw request written, not yet run through the Intake agent.
+`4 Homepage build`. Intake, Planner and owner approval done (2026-09-30); the build attempt failed, see the Step 4 run log below.
 
 - Current stage: **4 Homepage build (attempted, failed, not complete)**
 - Entered this stage on: 2026-09-30
