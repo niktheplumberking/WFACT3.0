@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `f74b0bc` (Factory Completion Plan Step 3,
-secrets retired) and fix drift from the previous edits, against git, GitHub Actions (latest run
-`36458405540`), live Supabase (row counts, `jobs`, `audit_log`) and a re-run of the grep criterion.
+Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in the account sign-up work (migration `0010`,
+Cockpit login/approval code) on top of `5d9405c`, against live Supabase (attack test 32/32, advisors),
+a local Cockpit typecheck/build and a browser check of the new screens.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -23,15 +23,16 @@ run is `36458405540` on `6e72020` (11 of 11 jobs); the 6 newer commits (`4dfd07b
 unpushed, and have no CI run. Stage 1 is 3 of 3; across Stages 1–5 that's roughly 93%. **Biggest
 blockers**: Nick's real brief and business-rules session, which the provisional drafts only stand in for.
 
-**Next up** (from the Factory Completion Plan):
-1. Step 4: run the full pipeline on `clients/summit-line-roofing/` through the Cockpit. First it must
-   register the `bennett-co` entity and client in Supabase (today `entities` has 1 row, `clients` 1). Needs
-   Huraira's plan approval, and a yes before any preview deploy.
-2. Finish Step 3's open verifications: push `huraira-work` and open a PR so CI runs with the new keys
-   (Huraira's call to push), re-set or confirm the `DOPPLER_TOKEN` GitHub secret, and check in the Doppler
-   dashboard that the old CLI token is gone (see Incidents).
-3. Step 5 / Continuation Stage 6: the Documentation agent writing structured episodic memory per task
-   ID. Also close the two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which needs Huraira's OK.
+**Next up**:
+1. Password sign-in / approvals (done in code, not live): Huraira sets the Supabase Auth options (email +
+   password provider on, **Confirm email on**, min password length, leaked-password protection,
+   optionally CAPTCHA), then decides whether to push `huraira-work` (a PR gets CI; `main` is a production
+   deploy). Then one real sign-up and approval proves it end to end.
+2. Step 4 (paused by Huraira's request): run the full pipeline on `clients/summit-line-roofing/` through the
+   Cockpit. No `bennett-co` DB rows are needed (`plan_approvals` has no FK to entities). Needs sign-in,
+   plan approval, and a yes before any preview deploy. Expected cost about $0.10 to $0.30.
+3. Finish Step 3's open verifications (CI with the new keys, `DOPPLER_TOKEN` GitHub secret, old CLI token
+   revoked per the dashboard) and close the two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`).
 
 **Gaps noticed**:
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
@@ -70,6 +71,16 @@ blockers**: Nick's real brief and business-rules session, which the provisional 
   worker). The plan doesn't ask for it, and it arguably edges into the plan's "do not build yet: a task
   queue" item. It's disclosed here rather than folded into a stage. Design is in
   `docs/COCKPIT-JOBS.md`.
+- **Email + password sign-in with approval-gated sign-up** (Huraira's request, 2026-09-30; migration
+  `0010`, applied; Cockpit code written, **not deployed**). New sign-ups create a pending `account_requests`
+  row and no profile, so they see nothing until an owner approves them (an admin may approve `pm` only).
+  Files: `packages/db/migrations/0010_account_requests.sql`, `apps/cockpit/src/{Login,AccessPending,AccessRequests}.tsx`
+  plus edits to `App.tsx`, `Approvals.tsx`, `theme.css`. Attack test `scripts/rls_attack_test_accounts.sql`:
+  32/32 (`RLS_ATTACK_TEST_RESULTS.md`, Run 3). Cockpit typecheck and build pass and the bundle has no
+  `service_role`; the login and sign-up screens were checked in the browser pane (locally served) and
+  client-side validation blocks a short password with zero auth requests. **Not yet proven:** a real
+  sign-up, email confirmation, approval and first sign-in end to end (needs a real account, Huraira's
+  action), and the deployed Cockpit (deploy is CI on `main`, so it waits on a push decision).
 - **`parseBrief` allows a new provenance value** (`2c188d0`): `synthetic-provisional-2026-09-30` was added
   to the allowed brief `source` values in `packages/frontend-loop/src/brief.ts`, with a test, so the
   Step 2 synthetic brief can be labelled honestly instead of posing as `placeholder-2.0-case`.
@@ -92,6 +103,13 @@ blockers**: Nick's real brief and business-rules session, which the provisional 
   - **Not verified:** that the old token is dead. Its value isn't available to test, so no rejected-call
     proof exists. Huraira can confirm in the Doppler dashboard (Access → CLI tokens) that only the
     09-30 token is listed.
+- **Admins could write any profile, including promoting themselves to owner (found and fixed 2026-09-30).**
+  - What: since migration `0005`, policy `profiles_owner_manage` allowed `owner` or `admin` to insert,
+    update or delete any `profiles` row.
+  - Found by: reading the migration while designing account approval, not by an attack test or an incident.
+  - Fix: migration `0010` replaces it with owner-only write policies. After the fix, the attack check
+    "admin promotes self to owner" affects 0 rows. The old behaviour was reasoned from the policy text and
+    never exploited or demonstrated. Only one profile (yours, owner) exists, so there was no admin to abuse it.
 - **CI guardrails false positive (2026-09-28, fixed).** CI's first-ever run (`36421350704`) failed
   because the "no tracked .env" regex matched the intentionally tracked `.env.example` files. The bug
   was latent since Day 1 because CI had never run on `main`. It was fixed to exempt exactly

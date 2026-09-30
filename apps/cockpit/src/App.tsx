@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabaseClient";
 import { Login } from "./Login";
+import { AccessPending } from "./AccessPending";
 import { Pipeline } from "./Pipeline";
 import { Approvals } from "./Approvals";
 import { Runs } from "./Runs";
@@ -53,10 +54,40 @@ function useStats(): Stats {
   return stats;
 }
 
+/**
+ * Does the signed-in account have a profile (i.e. has an owner/admin approved it — migration 0010)?
+ * null = not known yet. Only a clean "no row" answer shows the pending screen; a failed lookup falls
+ * through to the normal shell, which is safe because RLS, not this hook, is what withholds data.
+ */
+function useHasProfile(session: Session | null | undefined): boolean | null {
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+  const userId = session?.user.id ?? null;
+
+  useEffect(() => {
+    setHasProfile(null);
+    if (!userId) return;
+    let cancelled = false;
+    supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", userId)
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (!cancelled) setHasProfile(error ? true : data !== null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  return hasProfile;
+}
+
 export default function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [room, setRoom] = useState<Room>("pipeline");
   const stats = useStats();
+  const hasProfile = useHasProfile(session);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -66,6 +97,8 @@ export default function App() {
 
   if (session === undefined) return null;
   if (session === null) return <Login />;
+  if (hasProfile === null) return null;
+  if (hasProfile === false) return <AccessPending email={session.user.email ?? ""} />;
 
   const activeRoom = ROOMS.find((r) => r.id === room)!;
 

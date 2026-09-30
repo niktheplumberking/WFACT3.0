@@ -102,3 +102,31 @@ whoever manages the real production project, same as the item above.
 -- scripts/rls_attack_test.sql end to end. Expect every row above to match, and the final
 -- INSERT to be rejected with an "entity law violation" error, not succeed.
 ```
+
+---
+
+## Run 3: 2026-09-30, migration 0010 (account requests, approval function, owner-only profiles)
+
+**Run against**: `mcaxxhgjptwowwrluhra`, after applying `0010_account_requests` via `apply_migration`.
+**Script**: `scripts/rls_attack_test_accounts.sql`. It builds synthetic users inside a sub-transaction
+that is always rolled back, impersonates each role via `request.jwt.claims` + `SET LOCAL ROLE`, and
+compares 32 checks to expected values.
+
+**Result: PASS, 32 of 32.** Failures list empty; afterwards `auth.users` = 1, `profiles` = 1,
+`account_requests` = 0 (nothing persisted). Covered: a pending user reads nothing but their own request
+and cannot self-approve, forge a request, insert a profile or call the decision function; a pm cannot
+decide; an admin can approve only `pm`, cannot approve `admin`/`owner`, cannot decide their own request,
+cannot write profiles directly and cannot promote themselves; an owner can approve any role and rejects
+an invalid one; a request is decided once; the audit trail records each decision by its actor; `anon`
+can neither read requests nor call the function.
+
+**Pre-existing hole found and fixed by this migration**: `profiles_owner_manage` (from `0005`) was a
+`FOR ALL` policy on `is_owner_or_admin()`, so an **admin could write any profiles row, including
+promoting themselves to owner**. It is now replaced by owner-only insert/update/delete policies. The
+check "admin promotes self to owner" returned 0 rows affected after the fix. (It was not run against the
+old policy, so the exploit itself was reasoned from the policy text, not demonstrated.)
+
+**Advisor output after the migration**: the only findings are `public.decide_account_request`
+executable by `authenticated` (intentional: it is the approval endpoint and checks the caller's role
+itself, attack-tested above), the pre-existing platform function `rls_auto_enable`, and Auth's
+leaked-password protection being off (a dashboard setting; now relevant because passwords exist).

@@ -388,6 +388,44 @@ table.data-table tbody tr:hover { background: var(--panel-2); }
   margin-top: 10px;
 }
 
+.login-card .login-sub {
+  color: var(--text);
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+
+.login-card .login-notice {
+  color: var(--text);
+  margin: 0 0 16px;
+}
+
+.login-card .login-fine {
+  font-size: 12px;
+  margin: 14px 0 0;
+}
+
+.login-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 16px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 6px 0;
+  min-height: 32px;
+  color: var(--amber);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.link-btn:hover { color: var(--text); }
+.link-btn:focus-visible, .login-input:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
 /* Responsive */
 
 @media (max-width: 760px) {

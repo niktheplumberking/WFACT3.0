@@ -13,6 +13,8 @@ import { nextStage } from "./stages";
 // Stage 4 (2026-09-28): the room now also holds the Planner's owner-approval gate (plan_approvals,
 // migration 0007) — the "separate approvals table" this header said wasn't needed yet is now needed.
 import { PlanApprovals } from "./PlanApprovals";
+// 2026-09-30 (migration 0010): owners/admins also review new account sign-ups here.
+import { AccessRequests } from "./AccessRequests";
 
 interface ProjectRow {
   id: string;
@@ -59,6 +61,7 @@ export function Approvals() {
 
   return (
     <div>
+      <AccessRequests />
       <PlanApprovals />
       <h2 className="section-title">Stage gates</h2>
       {error && <p className="error-state">{error}</p>}
