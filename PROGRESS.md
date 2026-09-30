@@ -1,9 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in the Factory Completion Plan Step 4 attempt
-(`cf75ddd`, `9b8670b`: Intake, Plan, re-plan and approval worked through the Cockpit; the build failed on Agent 37
-credits) against live Supabase (`jobs`, `plan_approvals`, `model_traces`), GitHub Actions runs `36699803027`,
-`36700769803`, `36701102701` and the Cockpit Actions room in the browser pane.
+Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `31f045f` (Step 4 build succeeded on retry) and `a07d902`
+(Step 4B front-end upgrade design, Option B) against git, GitHub Actions (build run `36743601290`) and live Supabase (`jobs`, row counts).
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -21,8 +19,9 @@ Cockpit the synthetic pilot went request → Intake → plan → reject → re-p
 `81c8607b`: 3 rounds, 2 requesting changes, 8m38s, $0.1741 priced plus 3 unpriced Agent 37 calls) and the artifact re-hashes
 identically to its checkpoint. But **the verification stack approved a page that a human review found defective**: agent-tool text
 leaked after `</html>` and renders under the footer, testimonials are not labelled SAMPLE, and phone, hours and neighbourhoods are
-invented. Preview deploy is waiting on Huraira. `main` is at `856e483` (CI `36699308136`); `huraira-work` is several docs-only commits
-ahead, unpushed. Across Stages 1–5 that's roughly 94%. **Biggest blockers**: the verification gap (Step 7 scope), Nick's real brief
+invented. Huraira chose **Option B** (a real built, multi-page site with images, motion and rendered QA) as a new Step 4B before Steps 5-8; its
+design `docs/FRONTEND-UPGRADE-DESIGN.md` awaits GO and inputs. `main` is at `856e483` (CI `36699308136`); `huraira-work` is 6 commits
+ahead (`ea4b29a` to `a07d902`, docs/logs only), unpushed. Across Stages 1–5 that's roughly 94%. **Biggest blockers**: Step 4B's go-ahead and inputs (reference sites, image policy, builder model, budget), the verification gap, Nick's real brief
 and business rules, and Huraira's own steps on the new login.
 
 **Next up**:
@@ -332,8 +331,8 @@ specifically, not the whole repo yet.
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 
-Everything below is committed. `main` = `856e483`; `huraira-work` is 3 docs-only commits ahead and unpushed
-(`ea4b29a`, `cf75ddd`, `9b8670b`), plus one untracked file (the Factory Completion Plan). CI history on `main`:
+Everything below is committed. `main` = `856e483`; `huraira-work` is 6 commits ahead and unpushed (`ea4b29a` to `a07d902`,
+all docs/logs), plus one untracked file (the Factory Completion Plan). CI history on `main`:
 
 | Run | Commit | Result |
 |---|---|---|
@@ -350,6 +349,7 @@ Everything below is committed. `main` = `856e483`; `huraira-work` is 3 docs-only
 | `36699308136` | `856e483` | success, all 11 jobs incl. deploy (forgot-password flow) |
 | `36699803027` | `856e483` | success (`Cockpit job`, Step 4 `intake` `1dd90f25`; not CI) |
 | `36700769803` | `856e483` | success (`Cockpit job`, Step 4 `replan` `c62e24a4`; not CI) |
+| `36743601290` | `856e483` | success (`Cockpit job`, Step 4 `build_plan` `81c8607b` retry: built and QA-approved; not CI) |
 | `36701102701` | `856e483` | workflow run succeeded, job **failed** (`Cockpit job`, Step 4 `build_plan` `31c965ff`, Agent 37 HTTP 402) |
 | `36455639903` | `2e4a911` | success (`Cockpit job` workflow, `build_plan` `b952aaba`; not CI) |
 
