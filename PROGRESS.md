@@ -1,8 +1,9 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `2223344` (account sign-up) and `856e483`
-(forgot-password flow), both now on `main` with CI green (`36698432470`, `36699308136`), against live
-Supabase (row counts, migrations), the live Cockpit bundle and GitHub Actions.
+Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in the Factory Completion Plan Step 4 attempt
+(`cf75ddd`, `9b8670b`: Intake, Plan, re-plan and approval worked through the Cockpit; the build failed on Agent 37
+credits) against live Supabase (`jobs`, `plan_approvals`, `model_traces`), GitHub Actions runs `36699803027`,
+`36700769803`, `36701102701` and the Cockpit Actions room in the browser pane.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -14,21 +15,23 @@ sync) sits **on top of** the Continuation plan, not in place of it: it maps the 
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: Continuation Stages 1–5 are built, committed and green in real CI, the Cockpit →
-GitHub dispatch leg is proven live (run `36455639903`), and Factory Completion Plan Steps 1–3 are done apart
-from three small unproven items (see Stage 1). Step 2's provisional rules and synthetic pilot mean Stage 7's
-prerequisites exist in stand-in form only. Everything is pushed: `main` and `huraira-work` are both at
-`856e483`, and the latest `main` CI runs `36698432470` and `36699308136` passed all 11 jobs including the
-Cockpit deploy, which proves the rotated keys and the `DOPPLER_TOKEN` GitHub secret work in CI. Across
-Stages 1–5 that's roughly 94%. **Biggest blockers**: Nick's real brief and business-rules session, plus
-Huraira's own steps (Supabase Auth settings, a real sign-up/reset to prove the new login).
+**Status summary**: Continuation Stages 1–5 are built, committed and green in real CI, and Factory Completion
+Plan Steps 1–3 are done apart from a few small unproven items (see Stage 1). **Step 4 is blocked**: through the
+real Cockpit the synthetic pilot went request → Intake → plan → your reject → re-plan → approval, all working,
+but Build + verify (job `31c965ff`, run `36701102701`) failed when Agent 37, the builder's provider, returned
+HTTP 402 "AI credits exhausted", so there is no page, no independent verification and no correction count
+yet. `main` is at `856e483` (CI `36699308136`, 11 of 11 jobs); `huraira-work` is 3 docs-only commits ahead
+(`ea4b29a` to `9b8670b`, unpushed, no CI). Across Stages 1–5 that's roughly 94%. **Biggest blockers**:
+Agent 37 credits (Huraira, money), Nick's real brief and business rules, and Huraira's own steps on the new
+login (Supabase Auth settings, a real sign-up/reset).
 
 **Next up**:
 1. Prove the new login live (Huraira): set the Supabase Auth options (email + password provider on, **Confirm
    email on**, min password length, leaked-password protection, optionally CAPTCHA), use **Forgot password?** to
    set your own password, then do one real sign-up and approve it in Approvals. As of this sync the DB still
    shows 1 user, 1 profile, 0 requests, so none of this has happened yet.
-2. Step 4 (blocked): Intake, Plan and owner approval are done through the Cockpit; the build failed on Agent 37
+2. Step 4 (blocked on **Huraira**: top up Agent 37 billing, or approve rerouting the builder, which is Step 11
+   scope): Intake, Plan and owner approval are done through the Cockpit; the build failed on Agent 37
    credits (HTTP 402). After Huraira tops up Agent 37 billing, run a fresh Build + verify on approved plan
    `825cfff6` (Resume won't help, there is no checkpoint), then independent verification, visual check, and a
    yes before any preview deploy.
@@ -324,8 +327,8 @@ specifically, not the whole repo yet.
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 
-Everything below is committed and pushed. `main` = `huraira-work` = `856e483`, with one untracked file (the Factory
-Completion Plan, not committed). CI history on `main`:
+Everything below is committed. `main` = `856e483`; `huraira-work` is 3 docs-only commits ahead and unpushed
+(`ea4b29a`, `cf75ddd`, `9b8670b`), plus one untracked file (the Factory Completion Plan). CI history on `main`:
 
 | Run | Commit | Result |
 |---|---|---|
@@ -340,6 +343,9 @@ Completion Plan, not committed). CI history on `main`:
 | `36458405540` | `6e72020` | success, 11 of 11 jobs |
 | `36698432470` | `2223344` | success, all 11 jobs incl. deploy (account sign-up, rotated keys in CI) |
 | `36699308136` | `856e483` | success, all 11 jobs incl. deploy (forgot-password flow) |
+| `36699803027` | `856e483` | success (`Cockpit job`, Step 4 `intake` `1dd90f25`; not CI) |
+| `36700769803` | `856e483` | success (`Cockpit job`, Step 4 `replan` `c62e24a4`; not CI) |
+| `36701102701` | `856e483` | workflow run succeeded, job **failed** (`Cockpit job`, Step 4 `build_plan` `31c965ff`, Agent 37 HTTP 402) |
 | `36455639903` | `2e4a911` | success (`Cockpit job` workflow, `build_plan` `b952aaba`; not CI) |
 
 All 10 migrations (`0001`–`0010`) are listed as applied on `mcaxxhgjptwowwrluhra`, checked via
@@ -555,9 +561,12 @@ Huraira's direction; see "Unplanned work done". Design and runbook are in `docs/
       Re-plan (rejected), Resume, Verify a page, Ask Hermes, and a live job list. There's **no deploy
       button**; Launch stays human. Built-page previews render in a sandboxed iframe (`6e72020`). The
       Cockpit build job is green on `36458405540`; the live URL returns HTTP 200 (2026-09-30).
-- [ ] **Actions room checked in a browser with live data**: the `job.requested` → `job.dispatched` pair
-      10 s apart shows the user's JWT reached the function, but no function-log POST was captured (logs
-      cover 24 h only) and nobody has verified the live status display. Waiting on: Huraira signing in.
+- [x] **Actions room checked in a browser with live data (2026-09-30)**: on the `dist-rho-lime-95` alias, signed in as
+      the owner, a paste of the raw request created job `1dd90f25` and it was dispatched 8 s later (10:01:13,
+      run `36699803027`, success). The room showed each job's true status with its real reason, including
+      the failed build `31c965ff` ("builder escalated: … HTTP 402 …") and the approved-plan list. Two rough
+      edges: it offers "Resume from last checkpoint" on a failed build that has no checkpoint, and reports
+      "0 builder correction rounds" though the evaluator had requested one.
 
 ## Stage 6 — Real second brain v1.5: episodic memory tied to task IDs (NOT STARTED)
 
