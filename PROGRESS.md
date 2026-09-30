@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in the account sign-up work (migration `0010`,
-Cockpit login/approval code) on top of `5d9405c`, against live Supabase (attack test 32/32, advisors),
-a local Cockpit typecheck/build and a browser check of the new screens.
+Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `2223344` (account sign-up) and `856e483`
+(forgot-password flow), both now on `main` with CI green (`36698432470`, `36699308136`), against live
+Supabase (row counts, migrations), the live Cockpit bundle and GitHub Actions.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -14,25 +14,25 @@ sync) sits **on top of** the Continuation plan, not in place of it: it maps the 
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: Continuation Stages 2–5 are built, committed, and green in real CI, the Cockpit →
-GitHub dispatch leg is proven live (run `36455639903`), and Factory Completion Plan Steps 1 and 2 are done.
-Step 3 is partly done: Stage 1's secrets criterion is now met (both `.env.local` files deleted, grep criterion
-passes, keys work from Doppler), but four checks are still unproven (see Stage 1). Step 2's provisional
-rules and synthetic pilot mean Stage 7's prerequisites exist in stand-in form only. The latest `main` CI
-run is `36458405540` on `6e72020` (11 of 11 jobs); the 6 newer commits (`4dfd07b` to `f74b0bc`) are local,
-unpushed, and have no CI run. Stage 1 is 3 of 3; across Stages 1–5 that's roughly 93%. **Biggest
-blockers**: Nick's real brief and business-rules session, which the provisional drafts only stand in for.
+**Status summary**: Continuation Stages 1–5 are built, committed and green in real CI, the Cockpit →
+GitHub dispatch leg is proven live (run `36455639903`), and Factory Completion Plan Steps 1–3 are done apart
+from three small unproven items (see Stage 1). Step 2's provisional rules and synthetic pilot mean Stage 7's
+prerequisites exist in stand-in form only. Everything is pushed: `main` and `huraira-work` are both at
+`856e483`, and the latest `main` CI runs `36698432470` and `36699308136` passed all 11 jobs including the
+Cockpit deploy, which proves the rotated keys and the `DOPPLER_TOKEN` GitHub secret work in CI. Across
+Stages 1–5 that's roughly 94%. **Biggest blockers**: Nick's real brief and business-rules session, plus
+Huraira's own steps (Supabase Auth settings, a real sign-up/reset to prove the new login).
 
 **Next up**:
-1. Password sign-in / approvals (done in code, not live): Huraira sets the Supabase Auth options (email +
-   password provider on, **Confirm email on**, min password length, leaked-password protection,
-   optionally CAPTCHA), then decides whether to push `huraira-work` (a PR gets CI; `main` is a production
-   deploy). Then one real sign-up and approval proves it end to end.
+1. Prove the new login live (Huraira): set the Supabase Auth options (email + password provider on, **Confirm
+   email on**, min password length, leaked-password protection, optionally CAPTCHA), use **Forgot password?** to
+   set your own password, then do one real sign-up and approve it in Approvals. As of this sync the DB still
+   shows 1 user, 1 profile, 0 requests, so none of this has happened yet.
 2. Step 4 (paused by Huraira's request): run the full pipeline on `clients/summit-line-roofing/` through the
    Cockpit. No `bennett-co` DB rows are needed (`plan_approvals` has no FK to entities). Needs sign-in,
    plan approval, and a yes before any preview deploy. Expected cost about $0.10 to $0.30.
-3. Finish Step 3's open verifications (CI with the new keys, `DOPPLER_TOKEN` GitHub secret, old CLI token
-   revoked per the dashboard) and close the two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`).
+3. Close Step 3's last items: check in the Doppler dashboard that the old CLI token is gone, and close the
+   two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which needs Huraira's OK.
 
 **Gaps noticed**:
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
@@ -72,15 +72,18 @@ blockers**: Nick's real brief and business-rules session, which the provisional 
   queue" item. It's disclosed here rather than folded into a stage. Design is in
   `docs/COCKPIT-JOBS.md`.
 - **Email + password sign-in with approval-gated sign-up** (Huraira's request, 2026-09-30; migration
-  `0010`, applied; Cockpit code written, **not deployed**). New sign-ups create a pending `account_requests`
+  `0010`, applied; Cockpit code deployed on `main`, CI `36698432470`). New sign-ups create a pending `account_requests`
   row and no profile, so they see nothing until an owner approves them (an admin may approve `pm` only).
   Files: `packages/db/migrations/0010_account_requests.sql`, `apps/cockpit/src/{Login,AccessPending,AccessRequests}.tsx`
   plus edits to `App.tsx`, `Approvals.tsx`, `theme.css`. Attack test `scripts/rls_attack_test_accounts.sql`:
   32/32 (`RLS_ATTACK_TEST_RESULTS.md`, Run 3). Cockpit typecheck and build pass and the bundle has no
   `service_role`; the login and sign-up screens were checked in the browser pane (locally served) and
-  client-side validation blocks a short password with zero auth requests. **Not yet proven:** a real
-  sign-up, email confirmation, approval and first sign-in end to end (needs a real account, Huraira's
-  action), and the deployed Cockpit (deploy is CI on `main`, so it waits on a push decision).
+  client-side validation blocks a short password with zero auth requests. Live bundle `index-BhS0QsT3.js`
+  contains the new screens. **Follow-up `856e483`** (Huraira couldn't reset a password because no reset flow
+  existed): a **Forgot password?** link (`resetPasswordForEmail`) and a "choose a new password" screen on the
+  `PASSWORD_RECOVERY` event, deployed in CI `36699308136`. **Not yet proven:** a real reset email and
+  password set, a real sign-up, email confirmation, approval and first sign-in end to end. All need real
+  accounts or emails (Huraira's actions); the Redirect URL allow-list for reset links is also unchecked.
 - **`parseBrief` allows a new provenance value** (`2c188d0`): `synthetic-provisional-2026-09-30` was added
   to the allowed brief `source` values in `packages/frontend-loop/src/brief.ts`, with a test, so the
   Step 2 synthetic brief can be labelled honestly instead of posing as `placeholder-2.0-case`.
@@ -315,8 +318,8 @@ specifically, not the whole repo yet.
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 
-Everything below is committed. CI's latest `main` run is on `6e72020`; local `huraira-work` is 6 commits ahead of
-`origin/huraira-work` (`4dfd07b` to `f74b0bc`; unpushed) and has one untracked file (the Factory Completion Plan). CI history on `main`:
+Everything below is committed and pushed. `main` = `huraira-work` = `856e483`, with one untracked file (the Factory
+Completion Plan, not committed). CI history on `main`:
 
 | Run | Commit | Result |
 |---|---|---|
@@ -329,12 +332,14 @@ Everything below is committed. CI's latest `main` run is on `6e72020`; local `hu
 | `36453515469` | `a2ada14` | success |
 | `36455388336` | `2e4a911` | success |
 | `36458405540` | `6e72020` | success, 11 of 11 jobs |
+| `36698432470` | `2223344` | success, all 11 jobs incl. deploy (account sign-up, rotated keys in CI) |
+| `36699308136` | `856e483` | success, all 11 jobs incl. deploy (forgot-password flow) |
 | `36455639903` | `2e4a911` | success (`Cockpit job` workflow, `build_plan` `b952aaba`; not CI) |
 
-All 9 migrations (`0001`–`0009`) are listed as applied on `mcaxxhgjptwowwrluhra`, checked via
+All 10 migrations (`0001`–`0010`) are listed as applied on `mcaxxhgjptwowwrluhra`, checked via
 `list_migrations`.
 
-## Stage 1 — Close the Phase 0/1 debt (3 of 3 criteria MET as of 2026-09-30; CI path re-check pending)
+## Stage 1 — Close the Phase 0/1 debt (3 of 3 criteria MET as of 2026-09-30; CI path proven on `main`)
 
 - [x] **Audit log — acceptance MET 2026-09-28** (`78169e0`).
       - `packages/db/migrations/0006_audit_log.sql` is applied. It's append-only by trigger for every
@@ -377,8 +382,9 @@ All 9 migrations (`0001`–`0009`) are listed as applied on `mcaxxhgjptwowwrluhr
         equals Doppler's and returns 200.
       - **Not independently proven:** (1) that each key actually changed (the old values weren't saved to
         compare; rotation is Huraira's report); (2) that the old Doppler CLI token is revoked (see
-        Incidents); (3) the CI path with the new keys, since CI only runs on `main` pushes and PRs and the
-        `DOPPLER_TOKEN` GitHub secret still dates from 2026-09-28 (not re-set); (4) the `dispatch-job`
+        Incidents); (3) ~~the CI path with the new keys~~ now PROVEN: `main` CI runs `36698432470` and `36699308136` passed the
+        deploy job, which reads `VERCEL_TOKEN` from Doppler via the `DOPPLER_TOKEN` GitHub secret (still dated
+        2026-09-28, i.e. never re-set, and it works); (4) the `dispatch-job`
         Edge Function's own `SUPABASE_SERVICE_ROLE_KEY` after rotation (an anon call still returns 401,
         but the service-key path needs a signed-in call).
       - Local hygiene: the two tracked `.env.example` files had also been deleted from disk and were
