@@ -26,16 +26,18 @@ ahead, unpushed. Across Stages 1–5 that's roughly 94%. **Biggest blockers**: t
 and business rules, and Huraira's own steps on the new login.
 
 **Next up**:
-1. Step 4 close-out (Huraira decides): whether to deploy a Vercel **preview** of the synthetic page (not a client site) despite the
-   defects, or fix first. The page has a leaked tool-output footer, unlabelled SAMPLE testimonials and invented contact facts.
-2. Prove the new login live (Huraira): set the Supabase Auth options (email + password provider on, **Confirm email on**, min password
-   length, leaked-password protection, optionally CAPTCHA), use **Forgot password?**, then one real sign-up and approval. As of the last
-   check the DB showed 1 user, 1 profile, 0 requests.
-3. Steps 5-8 with Step 4's findings as input: checkpoint the first draft and persist evaluator feedback, retry policy for provider errors,
-   pass business rules (`memory/context.md`) to the Planner, and above all new checks for leaked tool text, SAMPLE labels and invented facts
-   (Step 7). Also close Step 3's last items (old Doppler CLI token; orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b`).
+1. **Step 4B, front-end upgrade (Option B, decided by Huraira 2026-09-30, before Steps 5-8)**: approve the design in
+   `docs/FRONTEND-UPGRADE-DESIGN.md` (built multi-page site, images, motion, rendered screenshot QA; milestones M0-M5), and settle its
+   inputs: reference sites, image policy/Higgsfield, builder model, spend ceiling. Nothing is built yet.
+2. Step 4 close-out: the preview deploy of the text-only synthetic page is now moot unless Huraira wants it; Step 4's findings
+   (leaked tool text, unlabelled SAMPLE testimonials, invented facts, text-only checks) feed Step 4B's rendered QA and Step 7.
+3. Huraira's own items: Supabase Auth settings and a real sign-up/reset to prove the new login; old Doppler CLI token check; OK to close
+   the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b`.
 
 **Gaps noticed**:
+- **The Factory Completion Plan has no step for richer or multi-page output.** The builder is limited by design to one text-only HTML
+  file (`frontend-loop/src/loop.ts:140`, `planner.ts:93`) and every check reads text only. Added as Step 4B (Option B), design in
+  `docs/FRONTEND-UPGRADE-DESIGN.md`; the plan file itself is untracked and not edited.
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
   moment Stage 6 finishes". The rows exist ("One real pilot project brief", "business rules session")
   but are still framed as sprint Day 3–9 items.

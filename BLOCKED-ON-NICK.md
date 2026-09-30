@@ -38,6 +38,15 @@ rows, mark them done so there's a record of when they closed.
 |---|---|
 | Enable "leaked password protection" in Supabase Auth settings | Flagged by `get_advisors` on the sandbox; a project-level Auth toggle (dashboard, not SQL), not a schema issue. Apply when the real production Supabase project is configured. |
 
+## Front-end upgrade (Step 4B, Option B decided 2026-09-30 by Huraira)
+
+| Item | Needed by | Status |
+|---|---|---|
+| 2-3 reference sites that show the quality bar | Before M1 | **OPEN** |
+| Image policy (AI-generated allowed if labelled?) and Higgsfield access and budget | Before M3 | **OPEN** |
+| Builder model: stay on Agent 37 or approve a second provider | Before M1 | **OPEN** |
+| Spend ceiling for builds (proposal: ask before any single build over $5) | Before M1 | **OPEN** |
+
 ## Budget & spend approval
 
 | Item | Needed by | Status |
