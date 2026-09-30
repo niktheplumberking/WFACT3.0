@@ -1,6 +1,6 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `2c188d0` (Factory Completion Plan
+Last synced: 2026-09-30, via `/progress-sync`, plus Step 3 edits — folded in `2c188d0` (Factory Completion Plan
 Step 2) on top of the earlier `6e72020` sync, against git, GitHub Actions, live Supabase (row counts,
 `jobs`) and a local re-run of the frontend-loop suite (26/26).
 
@@ -19,16 +19,16 @@ GitHub dispatch leg is proven live (run `36455639903`), and Factory Completion P
 Step 2 added provisional business rules and a synthetic pilot client, so Stage 7's prerequisites now exist
 in stand-in form only. The latest `main` CI run is `36458405540` on `6e72020` (11 of 11 jobs); the 3 newer
 commits (`4dfd07b`, `2368252`, `2c188d0`) are local, unpushed and docs/test-level, so they have no CI run.
-Stage 1 is still 2 of 3 (both `.env.local` files are still on disk, checked 2026-09-30); across Stages 1–5
-that's roughly 92%. **Biggest blockers**: Stage 1's secrets clean-up (Huraira's account actions) and
-Nick's real brief and business-rules session, which the provisional drafts only stand in for.
+Stage 1 is now 3 of 3 (plaintext `.env.local` files deleted and verified 2026-09-30, Step 3); across Stages 1–5
+that's roughly 92%. **Biggest blockers**: Nick's real brief and business-rules session, which the provisional drafts only stand in for.
 
 **Next up** (from the Factory Completion Plan):
 1. Step 4: run the full pipeline on `clients/summit-line-roofing/` through the Cockpit. First it must
    register the `bennett-co` entity and client in Supabase (today `entities` has 1 row, `clients` 1). Needs
    Huraira's plan approval, and a yes before any preview deploy.
-2. Step 3, in parallel: retire plaintext secrets. Huraira deletes both `.env.local` files, rotates the
-   keys that sat in plaintext, and revokes the leaked Doppler CLI token (see Incidents).
+2. Finish Step 3's open verifications: push `huraira-work` and open a PR so CI runs with the new keys
+   (Huraira's call to push), re-set or confirm the `DOPPLER_TOKEN` GitHub secret, and check in the Doppler
+   dashboard that the old CLI token is gone (see Incidents).
 3. Step 5 / Continuation Stage 6: the Documentation agent writing structured episodic memory per task
    ID. Also close the two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which needs Huraira's OK.
 
@@ -82,12 +82,15 @@ Nick's real brief and business-rules session, which the provisional drafts only 
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
-- **Doppler CLI token exposed (2026-09-28, open).**
+- **Doppler CLI token exposed (2026-09-28, remediated 2026-09-30; revocation of the old token not independently verified).**
   - What happened: a bad output filter printed the Doppler CLI token (`dp.ct…`) into a session
     transcript.
   - Found by: the same session.
-  - Fix owed by Huraira: `doppler logout`, then log in again, which revokes it.
-  - Not verified revoked by this sync.
+  - Fix: Huraira reports revoking it and logging in again on 2026-09-30. Evidence: `doppler me` shows a
+    CLI token created 2026-09-30T09:26Z (after the exposure), and `doppler run` works with it.
+  - **Not verified:** that the old token is dead. Its value isn't available to test, so no rejected-call
+    proof exists. Huraira can confirm in the Doppler dashboard (Access → CLI tokens) that only the
+    09-30 token is listed.
 - **CI guardrails false positive (2026-09-28, fixed).** CI's first-ever run (`36421350704`) failed
   because the "no tracked .env" regex matched the intentionally tracked `.env.example` files. The bug
   was latent since Day 1 because CI had never run on `main`. It was fixed to exempt exactly
@@ -164,8 +167,8 @@ written at the sprint's close; later changes appear only as dated inline notes.
 - [x] Base CI skeleton with zero-manual-step deploy — *closed 2026-09-28 under Continuation Stage 1*:
       `deploy-cockpit` in `.github/workflows/ci.yml`, first green on run `36436468792`. (At sprint
       close, no deploy automation existed and the Vercel deploy was a manual CLI call.)
-- [ ] Secrets manager wired, nothing in plaintext — *2026-09-28*: Doppler now stood up and used by CI,
-      but `.env.local` still holds plaintext keys, so still unchecked. See Continuation Stage 1.
+- [x] Secrets manager wired, nothing in plaintext — *closed 2026-09-30 under Continuation Stage 1*:
+      `.env.local` files deleted, grep criterion passes, everything runs from Doppler. See Stage 1.
 - [x] GitHub access confirmed — dedicated `niktheplumberking/WFACT3.0` repo, verified via `gh auth status`
 - [x] Supabase project access confirmed — `mcaxxhgjptwowwrluhra`, migrated (`0001`–`0005`) and RLS-attack-tested for real, 2026-09-22
 - [x] Vercel access confirmed — `vercel whoami` → `niktheplumberking`, verified in this environment
@@ -312,7 +315,7 @@ Everything below is committed. CI's latest `main` run is on `6e72020`; local `hu
 All 9 migrations (`0001`–`0009`) are listed as applied on `mcaxxhgjptwowwrluhra`, checked via
 `list_migrations`.
 
-## Stage 1 — Close the Phase 0/1 debt (2 of 3 criteria MET)
+## Stage 1 — Close the Phase 0/1 debt (3 of 3 criteria MET as of 2026-09-30; CI path re-check pending)
 
 - [x] **Audit log — acceptance MET 2026-09-28** (`78169e0`).
       - `packages/db/migrations/0006_audit_log.sql` is applied. It's append-only by trigger for every
@@ -336,21 +339,30 @@ All 9 migrations (`0001`–`0009`) are listed as applied on `mcaxxhgjptwowwrluhr
       - Production alias `wfact-cockpit-niktheplumberkings-projects.vercel.app`: HTTP 200 via curl,
         this sync.
       - Closes the sprint's Phase 1 "zero manual steps" exit check.
-- [ ] **Secrets manager — Doppler is the real source; plaintext not retired (NOT MET).** Waiting on
-      Huraira.
-      - Doppler workspace "WFACT 3.0", project `wfact-3-0-codebase`. The 9 `.env.local` values are in
-        `dev`/`prd`, hash-verified identical.
-      - Proven live: `env -i … doppler run -- npm run ask` wrote audit run `73e3cfc8…`. CI and deploy
-        run from Doppler only, and the `DOPPLER_TOKEN` GitHub secret exists (the deploy job passed its
-        check).
-      - **Still failing the plan's `grep` criterion (checked this sync):**
-        - `.env.local` (modified 2026-09-28 18:30) still holds non-empty `SUPABASE_SERVICE_ROLE_KEY`,
-          `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `AGENT37_API_KEY`, `VERCEL_TOKEN` and others.
-        - `apps/cockpit/.env.local` still exists.
-        - Both are gitignored and untracked (`git ls-files` confirms). The only tracked `grep` hit,
-          `docs/SECRETS.md`, is the documented grep command itself, not a value.
-      - Remaining steps (Huraira): delete both files, rotate the keys that sat in plaintext, and
-        revoke the leaked Doppler CLI token (see Incidents).
+- [x] **Secrets manager — plaintext retired, MET 2026-09-30** (Factory Completion Plan Step 3; Huraira
+      did the account actions, the agent verified).
+      - Doppler workspace "WFACT 3.0", project `wfact-3-0-codebase`, configs `dev`/`prd`.
+      - Both `.env.local` files are gone (`ls` errors, `find . -name ".env*"` finds only the tracked
+        `.env.example` files, which hold 0 non-empty assignments).
+      - The plan's grep criterion passes: `/usr/bin/grep -rlE "SUPABASE_SERVICE_ROLE_KEY=.+|ANTHROPIC_API_KEY=.+" .
+        --exclude-dir=node_modules --exclude-dir=.git --exclude=SECRETS.md` returns nothing (exit 1). A wider
+        secret-shape scan hits only `packages/verification/test/fixtures/broken.html`, a deliberate fake key
+        (`sk-ant-fakekey…`).
+      - Runs from Doppler only: `doppler run -- npm run ask` wrote audit run `8baee338-88cf-4be5-8f46-5c2e33c17300`
+        (3 `tool.invoke` + 1 `hermes.answer` rows, read back by SQL) with no env file present; the Cockpit
+        builds from Doppler values (`index-DypAz2VC.js`, same hash as the live bundle), and the built bundle has
+        no `service_role` string.
+      - Rotated keys authenticate by HTTP status: Anthropic 200, OpenAI 200, Agent 37 200, Supabase service
+        key 200 via REST, `VERCEL_TOKEN` resolves to `niktheplumberking`. Live Cockpit's baked anon key
+        equals Doppler's and returns 200.
+      - **Not independently proven:** (1) that each key actually changed (the old values weren't saved to
+        compare; rotation is Huraira's report); (2) that the old Doppler CLI token is revoked (see
+        Incidents); (3) the CI path with the new keys, since CI only runs on `main` pushes and PRs and the
+        `DOPPLER_TOKEN` GitHub secret still dates from 2026-09-28 (not re-set); (4) the `dispatch-job`
+        Edge Function's own `SUPABASE_SERVICE_ROLE_KEY` after rotation (an anon call still returns 401,
+        but the service-key path needs a signed-in call).
+      - Local hygiene: the two tracked `.env.example` files had also been deleted from disk and were
+        recreated from `HEAD` (git status clean).
 
 **Stand-in disclosed**: the plan asks for "a cloud provider's secrets manager, or HashiCorp Vault";
 Doppler is a hosted third option. Setup is in `docs/SECRETS.md`.
