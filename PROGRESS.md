@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-30, via `/progress-sync`, plus Step 3 edits — folded in `2c188d0` (Factory Completion Plan
-Step 2) on top of the earlier `6e72020` sync, against git, GitHub Actions, live Supabase (row counts,
-`jobs`) and a local re-run of the frontend-loop suite (26/26).
+Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `f74b0bc` (Factory Completion Plan Step 3,
+secrets retired) and fix drift from the previous edits, against git, GitHub Actions (latest run
+`36458405540`), live Supabase (row counts, `jobs`, `audit_log`) and a re-run of the grep criterion.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -16,11 +16,12 @@ steps; this file tracks the Continuation Stages.
 
 **Status summary**: Continuation Stages 2–5 are built, committed, and green in real CI, the Cockpit →
 GitHub dispatch leg is proven live (run `36455639903`), and Factory Completion Plan Steps 1 and 2 are done.
-Step 2 added provisional business rules and a synthetic pilot client, so Stage 7's prerequisites now exist
-in stand-in form only. The latest `main` CI run is `36458405540` on `6e72020` (11 of 11 jobs); the 3 newer
-commits (`4dfd07b`, `2368252`, `2c188d0`) are local, unpushed and docs/test-level, so they have no CI run.
-Stage 1 is now 3 of 3 (plaintext `.env.local` files deleted and verified 2026-09-30, Step 3); across Stages 1–5
-that's roughly 92%. **Biggest blockers**: Nick's real brief and business-rules session, which the provisional drafts only stand in for.
+Step 3 is partly done: Stage 1's secrets criterion is now met (both `.env.local` files deleted, grep criterion
+passes, keys work from Doppler), but four checks are still unproven (see Stage 1). Step 2's provisional
+rules and synthetic pilot mean Stage 7's prerequisites exist in stand-in form only. The latest `main` CI
+run is `36458405540` on `6e72020` (11 of 11 jobs); the 6 newer commits (`4dfd07b` to `f74b0bc`) are local,
+unpushed, and have no CI run. Stage 1 is 3 of 3; across Stages 1–5 that's roughly 93%. **Biggest
+blockers**: Nick's real brief and business-rules session, which the provisional drafts only stand in for.
 
 **Next up** (from the Factory Completion Plan):
 1. Step 4: run the full pipeline on `clients/summit-line-roofing/` through the Cockpit. First it must
@@ -296,8 +297,8 @@ specifically, not the whole repo yet.
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 
-Everything below is committed. CI's latest `main` run is on `6e72020`; local `huraira-work` is 4 commits ahead of
-`origin/huraira-work` (`4dfd07b`, `2368252`, `2c188d0`, `c803c47`; unpushed) and has one untracked file (the Factory Completion Plan). CI history on `main`:
+Everything below is committed. CI's latest `main` run is on `6e72020`; local `huraira-work` is 6 commits ahead of
+`origin/huraira-work` (`4dfd07b` to `f74b0bc`; unpushed) and has one untracked file (the Factory Completion Plan). CI history on `main`:
 
 | Run | Commit | Result |
 |---|---|---|
@@ -344,8 +345,9 @@ All 9 migrations (`0001`–`0009`) are listed as applied on `mcaxxhgjptwowwrluhr
       - Doppler workspace "WFACT 3.0", project `wfact-3-0-codebase`, configs `dev`/`prd`.
       - Both `.env.local` files are gone (`ls` errors, `find . -name ".env*"` finds only the tracked
         `.env.example` files, which hold 0 non-empty assignments).
-      - The plan's grep criterion passes: `/usr/bin/grep -rlE "SUPABASE_SERVICE_ROLE_KEY=.+|ANTHROPIC_API_KEY=.+" .
-        --exclude-dir=node_modules --exclude-dir=.git --exclude=SECRETS.md` returns nothing (exit 1). A wider
+      - The plan's grep criterion passes: the plan's grep for non-empty service-role and Anthropic key assignments (exact command in
+        `docs/SECRETS.md`; run with the real `/usr/bin/grep`, excluding `node_modules`, `.git` and `SECRETS.md`)
+        returns nothing (exit 1). This file is worded so it doesn't match its own pattern. A wider
         secret-shape scan hits only `packages/verification/test/fixtures/broken.html`, a deliberate fake key
         (`sk-ant-fakekey…`).
       - Runs from Doppler only: `doppler run -- npm run ask` wrote audit run `8baee338-88cf-4be5-8f46-5c2e33c17300`
