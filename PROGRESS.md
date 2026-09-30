@@ -1,38 +1,36 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-28, via `/progress-sync` — re-synced to fold in `78169e0`…`4653c67` (Stages 1–5
-+ Cockpit jobs) against git, GitHub Actions, live Supabase and live URLs. Merged duplicated sections
-and updated stage statuses that had gone stale.
+Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `a2ada14`…`6e72020` (Cockpit
+dispatch fixes) and the corrected dispatch evidence (`4dfd07b`) against git, GitHub Actions run
+`36455639903`, live Supabase (`jobs`, `audit_log`, `list_edge_functions`, `list_migrations`) and the live
+Cockpit URL (HTTP 200).
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
 force since 2026-09-28, with the Blueprint (`docs/wfact-3.0-blueprint.html`) as the scope source of
 truth. The Phases 1–7 section above it is the historical record of the superseded 100-hour sprint
 (`docs/wfact-3.0-operator-manual.html` / `docs/WFACT-3.0-Fast-Track-Plan.md`). Its checkboxes are not
-restructured to fit the new plan.
+restructured to fit the new plan. `docs/WFACT-3.0-Factory-Completion-Plan.md` (untracked as of this
+sync) sits **on top of** the Continuation plan, not in place of it: it maps the remaining Blueprint
+phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
+steps; this file tracks the Continuation Stages.
 
-**Status summary**: Continuation Stages 2–5 are built, committed, and green in real CI. The latest
-`main` run is `36443734844` on `4653c67`, and all 11 jobs passed, including the automated Cockpit
-deploy. Stage 1 is 2 of 3: the audit log and CI auto-deploy are met, but plaintext keys are still on
-disk. Stage 4's owner approval has now happened, so it is fully met. Across Stages 1–5 that's roughly
-90%; Stages 6 and 7 have not started. **Cockpit → GitHub job dispatch (corrected 2026-09-30):** it
-DOES work end to end. Job `b952aaba` (`build_plan`, plan `8f03181f`) was requested from the Cockpit on
-2026-09-28 17:05, dispatched by `dispatch-job` 10 s later, ran as `cockpit-job.yml` run `36455639903`
-(success, 6m38s) and ended `awaiting_launch_approval`. Two older duplicates (`a2a41d2d`, `cbf8bf7b`)
-are still `queued`, orphaned from before the CORS fixes. This paragraph previously said dispatch had
-never worked; that was true only until the token was set and v4 deployed.
+**Status summary**: Continuation Stages 2–5 are built, committed, and green in real CI, and the
+Cockpit → GitHub dispatch leg is now proven live, so the Cockpit-jobs work is done apart from a browser
+check. The latest `main` CI run is `36458405540` on `6e72020` (11 of 11 jobs passed, including the Cockpit
+deploy). Stage 1 is still 2 of 3: plaintext `.env.local` files are still on disk (both present on
+2026-09-30). Across Stages 1–5 that's roughly 92%; Stages 6 and 7 have not started. **Biggest blocker
+now**: Stage 1's secrets clean-up (Huraira's account actions) and Stage 7's real Nick inputs (real
+brief, business rules), which are still owed. (The old "dispatch has never worked" blocker was wrong
+and is corrected below: job `b952aaba` ran end to end via `cockpit-job.yml` run `36455639903`.)
 
-**Next up**:
-1. Get Cockpit → GitHub dispatch working. Find why the browser sent the CORS preflight but never the
-   `POST` (see Cockpit jobs below). Confirm `GITHUB_DISPATCH_TOKEN` is set. Then re-dispatch one of
-   the queued `build_plan` jobs for approved plan `8f03181f` and watch `cockpit-job.yml` run. This
-   also runs Stage 3 on the first Intake→Planner plan.
-2. Close Stage 1's secrets criterion (Huraira's call): delete `.env.local` and
-   `apps/cockpit/.env.local`, rotate the keys that sat in plaintext, and revoke the Doppler CLI token
-   leaked in the transcript (see Incidents).
-3. Start Stage 6: the Documentation agent writing structured episodic memory per task ID, then a
-   time-boxed Cognee trial write-up. In parallel, add the two Stage 7 Nick inputs (real pilot brief,
-   business-rules session) to `BLOCKED-ON-NICK.md` now, as the plan asks, not when Stage 7 starts.
+**Next up** (from the Factory Completion Plan):
+1. Steps 2 and 4: write the provisional pilot brief and business rules (Step 2), then run the full
+   pipeline on it through the Cockpit (Step 4). The dispatch prerequisite is now met.
+2. Step 3, in parallel: retire plaintext secrets. Huraira deletes both `.env.local` files, rotates the
+   keys that sat in plaintext, and revokes the leaked Doppler CLI token (see Incidents).
+3. Step 5 / Continuation Stage 6: the Documentation agent writing structured episodic memory per task
+   ID. Also mark the two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which need Huraira's OK.
 
 **Gaps noticed**:
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
@@ -104,7 +102,7 @@ never worked; that was true only until the token was set and v4 deployed.
     cannot have body").
   - Seen in function logs at 15:01:44–15:01:53 UTC. It would have broken every Cockpit click.
   - Fixed and redeployed (function version 2). Preflights return 204 from 15:02:37 on.
-- **Cockpit jobs never dispatched (2026-09-28, cause fixed; end-to-end still unproven).**
+- **Cockpit jobs never dispatched (2026-09-28, fixed; end-to-end proven by run `36455639903`).**
   - The owner created `build_plan` jobs `a2a41d2d` (15:34 UTC) and `cbf8bf7b` (15:39 UTC) from the
     Cockpit. Both are still `queued`, with `dispatched_at` null.
   - Function logs show an `OPTIONS | 204` preflight for each and **no `POST`**, so the browser never
@@ -292,8 +290,8 @@ specifically, not the whole repo yet.
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 
-Everything below is committed and pushed. `main` = `huraira-work` = `4653c67`, and the working tree is
-clean (checked this sync). CI history on `main`:
+Everything below is committed. CI's latest `main` run is on `6e72020`; local `huraira-work` is 1 commit ahead of
+`origin/huraira-work` (`4dfd07b`, docs only, unpushed) and has one untracked file (the Factory Completion Plan). CI history on `main`:
 
 | Run | Commit | Result |
 |---|---|---|
@@ -303,6 +301,10 @@ clean (checked this sync). CI history on `main`:
 | `36436468792` | `1bcf671` | success |
 | `36439020452` | `123970f` | success |
 | `36443734844` | `4653c67` | success, all 11 jobs incl. `Deploy Cockpit to Vercel` |
+| `36453515469` | `a2ada14` | success |
+| `36455388336` | `2e4a911` | success |
+| `36458405540` | `6e72020` | success, 11 of 11 jobs |
+| `36455639903` | `2e4a911` | success (`Cockpit job` workflow, `build_plan` `b952aaba`; not CI) |
 
 All 9 migrations (`0001`–`0009`) are listed as applied on `mcaxxhgjptwowwrluhra`, checked via
 `list_migrations`.
@@ -471,7 +473,7 @@ and no auto-restart. It's disclosed in the file header, the README and here.
   returns those rows. Browser rendering has **not been independently verified by this sync**, even
   though the owner was demonstrably signed into the Cockpit today (plan decisions and job requests).
 
-## Cockpit jobs — every pipeline action from the Cockpit (unplanned; committed `4653c67`, CI green on `36443734844`) — NOT YET WORKING END TO END
+## Cockpit jobs — every pipeline action from the Cockpit (unplanned; committed `4653c67`, CI green on `36443734844`) — DISPATCH PROVEN LIVE 2026-09-28; browser check pending
 
 Huraira's direction; see "Unplanned work done". Design and runbook are in `docs/COCKPIT-JOBS.md`.
 
@@ -482,30 +484,33 @@ Huraira's direction; see "Unplanned work done". Design and runbook are in `docs/
         audited.
       - Attack-tested live (spoofing, path traversal, injection strings, a stranger reading, backwards
         status, edits, deletes all refused).
-- [x] **`dispatch-job` Edge Function**: deployed and `ACTIVE`, version 2, `verify_jwt: true` (checked
-      via `list_edge_functions` this sync). Live negative tests pass (no token gives 401; the anon key
-      gives "not signed in").
+- [x] **`dispatch-job` Edge Function**: `ACTIVE`, **version 5**, `verify_jwt: true` (`list_edge_functions`
+      2026-09-30). Deployed source is identical to the repo copy at `aac412b` (v4 source); v5 has no commit
+      of its own. Live negative tests pass (no token gives 401; the anon key gives "not signed in").
 - [x] **`packages/jobs` runner** and **`.github/workflows/cockpit-job.yml`**: UUID-validated
       `job_id` via `env`, secrets from Doppler `prd`, and a `--mark-failed` safety net.
 - [x] **Local live proof**: `ask` job `1141b711` went queued → running → succeeded (15:04 UTC) with
       the runner run locally on Doppler `prd`. It was not dispatched through GitHub (`dispatched_at`
       null).
-- [ ] **GitHub dispatch leg — never worked.**
-      - The `Cockpit job` workflow is active but has **0 runs** (`gh run list --workflow
-        cockpit-job.yml`).
-      - The owner requested `build_plan` jobs `a2a41d2d` and `cbf8bf7b` (plan `8f03181f`) from the
-        Cockpit at 15:34 and 15:39 UTC. Both are still `queued`.
-      - Function logs show a 204 preflight each time and no `POST`. The cause was the branch-preview
-        origin missing from the CORS allow-list. It's fixed in `dispatch-job` v3; see Incidents.
-      - It's still unconfirmed whether `GITHUB_DISPATCH_TOKEN` is set in the function's secrets.
-      - Waiting on: Huraira clicking **Start** (or Build + verify) once, signed in, and a
-        `cockpit-job.yml` run appearing.
+- [x] **GitHub dispatch leg — MET 2026-09-28.** Job `b952aaba` (`build_plan`, plan `8f03181f`): requested
+      17:05:06 UTC, `dispatched_at` 17:05:15, run `36455639903` on `2e4a911` (success, 6m38s, all steps
+      green, `--mark-failed` skipped), finished 17:11:49 with `awaiting_launch_approval` and `qaIssues: []`.
+      `audit_log` shows `job.requested`, `job.dispatched`, `workflow.start`, two `workflow.checkpoint`
+      rows and the `workflow.gate` (launch, hard-gate; "this workflow never deploys"), all read back by SQL.
+- [x] **Failure path proven**: `e5d29358` failed visibly (16:52 UTC, 09-28) with "Dispatcher not
+      configured: GITHUB_DISPATCH_TOKEN is not set", so a broken dispatcher never leaves a job looking
+      queued. Token is set now (the next dispatch got GitHub's 204). Its presence by name could not be
+      listed (`supabase secrets list` errored), so this is inferred from behaviour.
+- [ ] **Two orphaned jobs**: `a2a41d2d` and `cbf8bf7b` (15:34 and 15:39 UTC, 09-28) are still `queued`
+      with `dispatched_at` null, left from before the CORS fixes. Waiting on: Huraira's OK to mark them
+      failed/cancelled (a DB write), or to click **Start** on one.
 - [x] **Cockpit Actions room built**: new request → intake + plan, Build + verify (approved plans),
       Re-plan (rejected), Resume, Verify a page, Ask Hermes, and a live job list. There's **no deploy
-      button**; Launch stays human. The Cockpit build job is green on `36443734844`.
-- [ ] **Actions room working in a browser**: the owner evidently used it (the two `build_plan`
-      requests came with a browser preflight), but those clicks never dispatched, and no rendering
-      check has been done.
+      button**; Launch stays human. Built-page previews render in a sandboxed iframe (`6e72020`). The
+      Cockpit build job is green on `36458405540`; the live URL returns HTTP 200 (2026-09-30).
+- [ ] **Actions room checked in a browser with live data**: the `job.requested` → `job.dispatched` pair
+      10 s apart shows the user's JWT reached the function, but no function-log POST was captured (logs
+      cover 24 h only) and nobody has verified the live status display. Waiting on: Huraira signing in.
 
 ## Stage 6 — Real second brain v1.5: episodic memory tied to task IDs (NOT STARTED)
 
