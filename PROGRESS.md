@@ -15,28 +15,25 @@ sync) sits **on top of** the Continuation plan, not in place of it: it maps the 
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: Continuation Stages 1–5 are built, committed and green in real CI, and Factory Completion
-Plan Steps 1–3 are done apart from a few small unproven items (see Stage 1). **Step 4 is blocked**: through the
-real Cockpit the synthetic pilot went request → Intake → plan → your reject → re-plan → approval, all working,
-but Build + verify (job `31c965ff`, run `36701102701`) failed when Agent 37, the builder's provider, returned
-HTTP 402 "AI credits exhausted", so there is no page, no independent verification and no correction count
-yet. `main` is at `856e483` (CI `36699308136`, 11 of 11 jobs); `huraira-work` is 3 docs-only commits ahead
-(`ea4b29a` to `9b8670b`, unpushed, no CI). Across Stages 1–5 that's roughly 94%. **Biggest blockers**:
-Agent 37 credits (Huraira, money), Nick's real brief and business rules, and Huraira's own steps on the new
-login (Supabase Auth settings, a real sign-up/reset).
+**Status summary**: Continuation Stages 1–5 are built, committed and green in real CI, and Factory Completion Plan Steps 1–3
+are done apart from a few small unproven items (see Stage 1). **Step 4 is mostly done, with a serious finding**: through the real
+Cockpit the synthetic pilot went request → Intake → plan → reject → re-plan → approval → build → QA approval (attempt 2, job
+`81c8607b`: 3 rounds, 2 requesting changes, 8m38s, $0.1741 priced plus 3 unpriced Agent 37 calls) and the artifact re-hashes
+identically to its checkpoint. But **the verification stack approved a page that a human review found defective**: agent-tool text
+leaked after `</html>` and renders under the footer, testimonials are not labelled SAMPLE, and phone, hours and neighbourhoods are
+invented. Preview deploy is waiting on Huraira. `main` is at `856e483` (CI `36699308136`); `huraira-work` is several docs-only commits
+ahead, unpushed. Across Stages 1–5 that's roughly 94%. **Biggest blockers**: the verification gap (Step 7 scope), Nick's real brief
+and business rules, and Huraira's own steps on the new login.
 
 **Next up**:
-1. Prove the new login live (Huraira): set the Supabase Auth options (email + password provider on, **Confirm
-   email on**, min password length, leaked-password protection, optionally CAPTCHA), use **Forgot password?** to
-   set your own password, then do one real sign-up and approve it in Approvals. As of this sync the DB still
-   shows 1 user, 1 profile, 0 requests, so none of this has happened yet.
-2. Step 4 (blocked on **Huraira**: top up Agent 37 billing, or approve rerouting the builder, which is Step 11
-   scope): Intake, Plan and owner approval are done through the Cockpit; the build failed on Agent 37
-   credits (HTTP 402). After Huraira tops up Agent 37 billing, run a fresh Build + verify on approved plan
-   `825cfff6` (Resume won't help, there is no checkpoint), then independent verification, visual check, and a
-   yes before any preview deploy.
-3. Close Step 3's last items: check in the Doppler dashboard that the old CLI token is gone, and close the
-   two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which needs Huraira's OK.
+1. Step 4 close-out (Huraira decides): whether to deploy a Vercel **preview** of the synthetic page (not a client site) despite the
+   defects, or fix first. The page has a leaked tool-output footer, unlabelled SAMPLE testimonials and invented contact facts.
+2. Prove the new login live (Huraira): set the Supabase Auth options (email + password provider on, **Confirm email on**, min password
+   length, leaked-password protection, optionally CAPTCHA), use **Forgot password?**, then one real sign-up and approval. As of the last
+   check the DB showed 1 user, 1 profile, 0 requests.
+3. Steps 5-8 with Step 4's findings as input: checkpoint the first draft and persist evaluator feedback, retry policy for provider errors,
+   pass business rules (`memory/context.md`) to the Planner, and above all new checks for leaked tool text, SAMPLE labels and invented facts
+   (Step 7). Also close Step 3's last items (old Doppler CLI token; orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b`).
 
 **Gaps noticed**:
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
@@ -101,7 +98,13 @@ login (Supabase Auth settings, a real sign-up/reset).
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
-- **Builder provider out of credits (2026-09-30, open).** The Step 4 build (job `31c965ff`) failed when Agent 37
+- **Verification approved a defective page (2026-09-30, open; input to Step 7).** The Step 4 artifact passed all 6 deterministic checks, the
+  in-loop evaluator (round 3) and the QA evaluator, and re-verified clean in a separate CLI run (`4a73fa57`). A human read of the file and
+  the rendered page then found: agent-tool text after `</html>` ("File-mutation verifier: 2 file edit(s) FAILED…") shown under the footer;
+  testimonials with 5-star ratings and no SAMPLE label although the approved plan required it; an invented phone number, opening hours,
+  six neighbourhoods and response-time promises. Found by the Step 4 human review, not by any check. Nothing shipped (the workflow stops at the
+  launch hard-gate). Fix is Step 7 (checks for content after the closing tag, required SAMPLE labels, and unsupported factual claims).
+- **Builder provider out of credits (2026-09-30, resolved: credits restored, build re-run succeeded).** The Step 4 build (job `31c965ff`) failed when Agent 37
   returned HTTP 402 "AI credits exhausted" after the first draft was produced and the Claude evaluator had
   requested changes. The workflow escalated to a human and stopped after 1 attempt, as designed (`agent.escalate`
   and `workflow.halt` rows in `audit_log`, run `353b9945`); the Cockpit showed the real reason. The draft was lost
@@ -591,7 +594,10 @@ plus the Cognee write-up exists.
       pilot attempt 2026-09-30 (Factory Completion Plan Step 4): Intake + Plan + owner approval worked through the
       Cockpit (jobs `1dd90f25`, `c62e24a4`; plan `825cfff6` approved 10:13:11 UTC); Build + verify (job `31c965ff`,
       run `36701102701`) FAILED: Agent 37 returned HTTP 402 "AI credits exhausted" on the builder's second call.
-      Waiting on Huraira to top up Agent 37 credits. No page, no correction count.** A live
+      Waiting on Huraira to top up Agent 37 credits. No page, no correction count.** **Update (attempt 2, job `81c8607b`,
+      run `36743601290`): Agent 37 credits were restored and the build completed: 3 rounds (2 changes requested), QA approved,
+      artifact sha256 `960b61ba…` re-verified independently (6/6 deterministic checks + evaluator). A human review then found
+      defects all checks missed (leaked tool text after `</html>`, unlabelled SAMPLE testimonials, invented facts). Not deployed.** A live
       Intake run on the synthetic raw email (claude-haiku-4-5, $0.0029, no DB writes) classified entity
       `bennett-co` and flagged both planted ambiguities; that is a check of Intake alone, not the pipeline.
 

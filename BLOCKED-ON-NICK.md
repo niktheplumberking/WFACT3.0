@@ -44,7 +44,7 @@ rows, mark them done so there's a record of when they closed.
 |---|---|---|
 | API spend ceiling for the sprint (Claude, Kimi K3, GPT-5.6 calls) | Day 1 — blocking | **OPEN** |
 | Vercel plan upgrade (fixes the 12-function serverless ceiling) | Day 16 | **OPEN** |
-| Agent 37 credits (the front-end builder's provider returned HTTP 402 "AI credits exhausted" on 2026-09-30) | **Now**, blocks Factory Completion Plan Step 4 | **OPEN** - Huraira/Nick to top up or enable auto top-up at agent37.com billing; or approve routing the builder to another provider (Step 11) |
+| Agent 37 credits (the front-end builder's provider returned HTTP 402 "AI credits exhausted" on 2026-09-30) | **Now**, blocks Factory Completion Plan Step 4 | **CLOSED 2026-09-30** - credits restored (1-token call returned HTTP 200 and the re-run build completed, job `81c8607b`). Consider enabling auto top-up. |
 | Where the self-hosted second brain + Hermes run (infra, budget) | Day 3 | **OPEN** |
 
 ## Nick's time
