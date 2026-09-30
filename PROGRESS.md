@@ -1,9 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `a2ada14`…`6e72020` (Cockpit
-dispatch fixes) and the corrected dispatch evidence (`4dfd07b`) against git, GitHub Actions run
-`36455639903`, live Supabase (`jobs`, `audit_log`, `list_edge_functions`, `list_migrations`) and the live
-Cockpit URL (HTTP 200).
+Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `2c188d0` (Factory Completion Plan
+Step 2) on top of the earlier `6e72020` sync, against git, GitHub Actions, live Supabase (row counts,
+`jobs`) and a local re-run of the frontend-loop suite (26/26).
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -15,31 +14,23 @@ sync) sits **on top of** the Continuation plan, not in place of it: it maps the 
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: Continuation Stages 2–5 are built, committed, and green in real CI, and the
-Cockpit → GitHub dispatch leg is now proven live, so the Cockpit-jobs work is done apart from a browser
-check. The latest `main` CI run is `36458405540` on `6e72020` (11 of 11 jobs passed, including the Cockpit
-deploy). Stage 1 is still 2 of 3: plaintext `.env.local` files are still on disk (both present on
-2026-09-30). Across Stages 1–5 that's roughly 92%; Stages 6 and 7 have not started. **Biggest blocker
-now**: Stage 1's secrets clean-up (Huraira's account actions) and Stage 7's real Nick inputs (real
-brief, business rules), which are still owed. (The old "dispatch has never worked" blocker was wrong
-and is corrected below: job `b952aaba` ran end to end via `cockpit-job.yml` run `36455639903`.)
+**Status summary**: Continuation Stages 2–5 are built, committed, and green in real CI, the Cockpit →
+GitHub dispatch leg is proven live (run `36455639903`), and Factory Completion Plan Steps 1 and 2 are done.
+Step 2 added provisional business rules and a synthetic pilot client, so Stage 7's prerequisites now exist
+in stand-in form only. The latest `main` CI run is `36458405540` on `6e72020` (11 of 11 jobs); the 3 newer
+commits (`4dfd07b`, `2368252`, `2c188d0`) are local, unpushed and docs/test-level, so they have no CI run.
+Stage 1 is still 2 of 3 (both `.env.local` files are still on disk, checked 2026-09-30); across Stages 1–5
+that's roughly 92%. **Biggest blockers**: Stage 1's secrets clean-up (Huraira's account actions) and
+Nick's real brief and business-rules session, which the provisional drafts only stand in for.
 
 **Next up** (from the Factory Completion Plan):
-1. Steps 2 and 4: write the provisional pilot brief and business rules (Step 2), then run the full
-   pipeline on it through the Cockpit (Step 4). The dispatch prerequisite is now met.
+1. Step 4: run the full pipeline on `clients/summit-line-roofing/` through the Cockpit. First it must
+   register the `bennett-co` entity and client in Supabase (today `entities` has 1 row, `clients` 1). Needs
+   Huraira's plan approval, and a yes before any preview deploy.
 2. Step 3, in parallel: retire plaintext secrets. Huraira deletes both `.env.local` files, rotates the
    keys that sat in plaintext, and revokes the leaked Doppler CLI token (see Incidents).
 3. Step 5 / Continuation Stage 6: the Documentation agent writing structured episodic memory per task
-   ID. Also mark the two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which need Huraira's OK.
-
-**Step 2 of the Factory Completion Plan (2026-09-30):** provisional business rules and a synthetic pilot
-client are in place. `memory/context.md` has concrete rules with a 13-row Provisional-rule register
-(R-01…R-13); `clients/summit-line-roofing/` (fictional roofing company, entity `bennett-co`) holds
-`brief.json`, `raw-request.txt` and `memory.md`. `parseBrief` needed one allowed `source` value added
-(`synthetic-provisional-2026-09-30`); the brief passes and the frontend-loop suite is 26/26. A live Intake
-run on the raw email (claude-haiku-4-5, $0.0029, no DB writes) returned a valid classification and flagged
-both planted ambiguities. The two Nick rows in `BLOCKED-ON-NICK.md` stay OPEN, marked provisional. Step 4
-still has to register the `bennett-co` entity and client in Supabase (only `dreamsign` exists).
+   ID. Also close the two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which needs Huraira's OK.
 
 **Gaps noticed**:
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
@@ -78,6 +69,9 @@ still has to register the `bennett-co` entity and client in Supabase (only `drea
   worker). The plan doesn't ask for it, and it arguably edges into the plan's "do not build yet: a task
   queue" item. It's disclosed here rather than folded into a stage. Design is in
   `docs/COCKPIT-JOBS.md`.
+- **`parseBrief` allows a new provenance value** (`2c188d0`): `synthetic-provisional-2026-09-30` was added
+  to the allowed brief `source` values in `packages/frontend-loop/src/brief.ts`, with a test, so the
+  Step 2 synthetic brief can be labelled honestly instead of posing as `placeholder-2.0-case`.
 - **Knowledge graph** (`77680c7`): `graphify-out/` plus a `.gitleaks.toml` allowlisting only its cache
   file.
 - **From the sprint era**:
@@ -299,8 +293,8 @@ specifically, not the whole repo yet.
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 
-Everything below is committed. CI's latest `main` run is on `6e72020`; local `huraira-work` is 1 commit ahead of
-`origin/huraira-work` (`4dfd07b`, docs only, unpushed) and has one untracked file (the Factory Completion Plan). CI history on `main`:
+Everything below is committed. CI's latest `main` run is on `6e72020`; local `huraira-work` is 3 commits ahead of
+`origin/huraira-work` (`4dfd07b`, `2368252`, `2c188d0`, unpushed) and has one untracked file (the Factory Completion Plan). CI history on `main`:
 
 | Run | Commit | Result |
 |---|---|---|
@@ -532,12 +526,18 @@ Huraira's direction; see "Unplanned work done". Design and runbook are in `docs/
 answer sourced from the structured memory file, written by the Documentation agent, not by a human"*,
 plus the Cognee write-up exists.
 
-## Stage 7 — A real pilot, not a placeholder one (NOT STARTED — waiting on Nick)
+## Stage 7 — A real pilot, not a placeholder one (NOT STARTED — waiting on Nick; provisional stand-ins in use since 2026-09-30)
 
-- [ ] Real pilot brief: **Nick** (`BLOCKED-ON-NICK.md` "One real pilot project brief", OPEN).
-- [ ] Business-rules session for `memory/context.md`: **Nick** (`BLOCKED-ON-NICK.md`, OPEN). The file
-      is still placeholder.
-- [ ] Run Intake → Planner → build → verify on the real brief, and log the correction-batch count.
+- [ ] Real pilot brief: **Nick** (`BLOCKED-ON-NICK.md` "One real pilot project brief", OPEN, marked
+      "PROVISIONAL DRAFT IN USE"). Stand-in: `clients/summit-line-roofing/brief.json` (fictional, entity
+      `bennett-co`), loads through `parseBrief` (`2c188d0`). It does not close this item.
+- [ ] Business-rules session for `memory/context.md`: **Nick** (`BLOCKED-ON-NICK.md`, OPEN, marked
+      provisional). The file now holds concrete provisional rules with a 13-row register (R-01…R-13),
+      no `[PLACEHOLDER]` tags left (`2c188d0`); Nick still has to keep or change each.
+- [ ] Run Intake → Planner → build → verify on the real brief, and log the correction-batch count. A live
+      Intake run on the synthetic raw email (claude-haiku-4-5, $0.0029, no DB writes) classified entity
+      `bennett-co` and flagged both planted ambiguities; that is a check of Intake alone, not the pipeline.
 
 **Acceptance** (not met): Blueprint §16K item 1: one real client, the full pipeline, a measured
-correction count below 40+, independently verified against the deployed output.
+correction count below 40+, independently verified against the deployed output. A synthetic run (Step 4)
+demonstrates the factory but does not count against DreamSign's 40+.
