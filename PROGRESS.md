@@ -15,9 +15,12 @@ restructured to fit the new plan.
 `main` run is `36443734844` on `4653c67`, and all 11 jobs passed, including the automated Cockpit
 deploy. Stage 1 is 2 of 3: the audit log and CI auto-deploy are met, but plaintext keys are still on
 disk. Stage 4's owner approval has now happened, so it is fully met. Across Stages 1–5 that's roughly
-90%; Stages 6 and 7 have not started. **The biggest live blocker**: Cockpit → GitHub job dispatch has
-never worked end to end. Two real `build_plan` requests from the Cockpit are stuck in `queued`, and
-the `Cockpit job` workflow has zero runs.
+90%; Stages 6 and 7 have not started. **Cockpit → GitHub job dispatch (corrected 2026-09-30):** it
+DOES work end to end. Job `b952aaba` (`build_plan`, plan `8f03181f`) was requested from the Cockpit on
+2026-09-28 17:05, dispatched by `dispatch-job` 10 s later, ran as `cockpit-job.yml` run `36455639903`
+(success, 6m38s) and ended `awaiting_launch_approval`. Two older duplicates (`a2a41d2d`, `cbf8bf7b`)
+are still `queued`, orphaned from before the CORS fixes. This paragraph previously said dispatch had
+never worked; that was true only until the token was set and v4 deployed.
 
 **Next up**:
 1. Get Cockpit → GitHub dispatch working. Find why the browser sent the CORS preflight but never the
@@ -130,7 +133,11 @@ the `Cockpit job` workflow has zero runs.
       logs don't record `Origin`, which is why this took two rounds.
     - Checked after deploy: all four Cockpit hosts plus `localhost:5173` are allowed, a foreign origin
       is refused and logged, and an unsigned POST gets 401.
-  - Still unknown: whether `GITHUB_DISPATCH_TOKEN` is set. If it isn't, the next click will now fail
+  - **Resolved (2026-09-30 check):** `GITHUB_DISPATCH_TOKEN` is set (job `e5d29358` failed visibly
+  with "not set" at 16:52 on 09-28; job `b952aaba` then dispatched successfully at 17:05, GitHub
+  returned 204). `dispatch-job` is now v5 and its deployed source matches the repo. Failure path
+  proven live by `e5d29358`. The original "still unknown" note follows.
+- (Superseded) Still unknown: whether `GITHUB_DISPATCH_TOKEN` is set. If it isn't, the next click will now fail
     the job visibly rather than silently.
 - **Magic-link redirect fell back to `localhost:3000` (2026-09-22, fixed).** Huraira's first sign-in
   used an expired link pointing at `localhost`. Supabase Auth's Site URL was never set for production,
