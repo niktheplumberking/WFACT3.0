@@ -44,3 +44,11 @@ test("loadBrief reads and parses the real placeholder pilot brief on disk", () =
   assert.equal(brief.source, "placeholder-2.0-case");
   assert.ok(brief.requiredSections.length > 0);
 });
+
+test("loadBrief reads and parses the synthetic provisional Summit Line Roofing brief", () => {
+  const brief = loadBrief(join(repoRoot(), "clients", "summit-line-roofing", "brief.json"));
+  assert.equal(brief.clientSlug, "summit-line-roofing");
+  assert.equal(brief.entitySlug, "bennett-co");
+  assert.equal(brief.source, "synthetic-provisional-2026-09-30");
+  assert.deepEqual(brief.requiredSections, ["hero", "services", "packages", "process", "proof", "faq", "contact"]);
+});

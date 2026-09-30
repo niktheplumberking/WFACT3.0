@@ -1,0 +1,50 @@
+From: Dana Reyes (Summit Line Roofing) <hello@summitlineroofing.example>
+To: Bennett & Co <hello@bennettandco.example>
+Subject: New website for the roofing company
+
+Hi Bennett & Co,
+
+I run Summit Line Roofing, a small roofing and gutter company. There are five of us. Right now we have
+a Facebook page and a Google listing and that's it, and people keep phoning to ask what we actually do
+and roughly what it costs. I want a proper website that answers that so we stop repeating ourselves.
+
+What we do: roof repairs, full roof replacements, and gutter cleaning and repair. We also do a yearly
+roof check for people who want us to keep an eye on things, we call that our Care visit.
+
+What I'd like on the site:
+- a top section that says who we are and what we do
+- our services
+- the three packages: Repair, Replace and Care
+- how a job works from first call to clean-up
+- what customers say about us (I have a few quotes saved in a Facebook group, I'll dig them out later,
+  use something for now)
+- common questions
+- a way to get in touch
+
+Prices: I want the package prices on there so people stop asking. Actually, hold on, every roof is
+different so I don't really want numbers that will hold us to something. My brother-in-law says the
+competition just copies whatever we put up anyway. Maybe put "from" prices? Or maybe none, I'm not sure.
+Your call, tell me what you'd do.
+
+Booking: I'd love people to be able to book an inspection online and pick their own time slot, like the
+big companies do. We don't have a booking system though, it's just me and the office phone, and I only
+pick up in the mornings because we're on roofs all afternoon. Could be a form and I ring them back,
+could be just the phone number. Whatever works.
+
+I'd like to say we're licensed and insured, and that we've been doing this about 20 years, maybe 25, I'd
+have to check. And put "best roofer in the county" and "lifetime warranty" on there because that's what
+everyone else says.
+
+It should look solid and trustworthy, not flashy. Green and a warm cream colour, something like that.
+Lots of our customers are older and read on their phones, so nothing tiny or hard to read. Needs to load
+fast too, the signal is bad out in the valley.
+
+Can you let me know timings and what you need from me?
+
+Thanks,
+Dana
+
+---
+SYNTHETIC PROVISIONAL TEST REQUEST for WFACT (Factory Completion Plan, Step 2, written 2026-09-30).
+"Summit Line Roofing", "Dana Reyes" and every fact above are FICTIONAL; this is not a real client and
+must not be treated as one. Real briefs come from Nick (see BLOCKED-ON-NICK.md).

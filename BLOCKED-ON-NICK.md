@@ -50,8 +50,8 @@ rows, mark them done so there's a record of when they closed.
 
 | Item | When | Status |
 |---|---|---|
-| 30–60 min session on business rules (pricing bands, entity specifics, standing rules) | Day 3–5 | **OPEN** |
-| One real pilot project brief | Day 9 | **OPEN** |
+| 30–60 min session on business rules (pricing bands, entity specifics, standing rules) | Day 3–5 | **OPEN — PROVISIONAL DRAFT IN USE since 2026-09-30 - Nick to replace.** `memory/context.md` now holds concrete provisional rules; every one is listed in its Provisional-rule register (R-01…R-13), which is the checklist for this session (keep / change to ___). |
+| One real pilot project brief | Day 9 | **OPEN — PROVISIONAL DRAFT IN USE since 2026-09-30 - Nick to replace.** A fictional stand-in, `clients/summit-line-roofing/` (`source: "synthetic-provisional-2026-09-30"`, entity `bennett-co`), is used for Step 4. It is not a real client and its result does not count against DreamSign's 40+. |
 | Same-day answers during the front-end build | Day 9–12 | not yet due |
 | 10–15 min looking at the cockpit MVP | Day 16–18 | **LOGIN CONFIRMED WORKING 2026-09-22** — live at `https://wfact-cockpit-niktheplumberkings-projects.vercel.app`, sign in with `abuhuraira2129@gmail.com` via magic link. Two real issues surfaced and fixed along the way (both caught by Huraira actually trying it, not by this session's own checks): a git-triggered deploy that silently built empty (missing Root Directory / env vars, fixed in Vercel project settings) and a magic-link redirect that defaulted to `localhost:3000` (Supabase Auth Site URL/Redirect URLs weren't configured for the production domain, fixed by Huraira in the dashboard, no tool in this session could reach that setting). Login itself now confirmed working by Huraira directly. Still open: his own actual review of Pipeline/Approvals/Runs, and the 10-15 minutes to give real reaction per the exit check. |
 | Attend the proof-run review | Day 19–20 | not yet due |

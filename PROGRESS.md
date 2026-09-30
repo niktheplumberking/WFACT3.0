@@ -32,6 +32,15 @@ and is corrected below: job `b952aaba` ran end to end via `cockpit-job.yml` run 
 3. Step 5 / Continuation Stage 6: the Documentation agent writing structured episodic memory per task
    ID. Also mark the two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which need Huraira's OK.
 
+**Step 2 of the Factory Completion Plan (2026-09-30):** provisional business rules and a synthetic pilot
+client are in place. `memory/context.md` has concrete rules with a 13-row Provisional-rule register
+(R-01…R-13); `clients/summit-line-roofing/` (fictional roofing company, entity `bennett-co`) holds
+`brief.json`, `raw-request.txt` and `memory.md`. `parseBrief` needed one allowed `source` value added
+(`synthetic-provisional-2026-09-30`); the brief passes and the frontend-loop suite is 26/26. A live Intake
+run on the raw email (claude-haiku-4-5, $0.0029, no DB writes) returned a valid classification and flagged
+both planted ambiguities. The two Nick rows in `BLOCKED-ON-NICK.md` stay OPEN, marked provisional. Step 4
+still has to register the `bennett-co` entity and client in Supabase (only `dreamsign` exists).
+
 **Gaps noticed**:
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
   moment Stage 6 finishes". The rows exist ("One real pilot project brief", "business rules session")

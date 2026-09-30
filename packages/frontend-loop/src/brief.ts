@@ -17,12 +17,14 @@ export interface PilotBrief {
   brandNotes: string;
   templatePreference?: string;
   /** Provenance — never silently treat a placeholder brief as Nick's real one. */
-  source: "nick" | "placeholder-2.0-case" | "intake-planner";
+  source: "nick" | "placeholder-2.0-case" | "intake-planner" | "synthetic-provisional-2026-09-30";
 }
 
 // "intake-planner" (Stage 4): the brief was written by the Planner agent from a raw request, then
 // owner-approved in the Cockpit — not hand-authored by Nick. Kept distinct so provenance stays honest.
-const BRIEF_SOURCES = ["nick", "placeholder-2.0-case", "intake-planner"] as const;
+// "synthetic-provisional-2026-09-30": a fictional brief written by the coding agent (Factory Completion
+// Plan, Step 2) so the pipeline can run before Nick's real brief lands. Never confuse it with "nick".
+const BRIEF_SOURCES = ["nick", "placeholder-2.0-case", "intake-planner", "synthetic-provisional-2026-09-30"] as const;
 
 const REQUIRED_STRING_FIELDS: (keyof PilotBrief)[] = [
   "clientSlug",
