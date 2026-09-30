@@ -28,9 +28,10 @@ Huraira's own steps (Supabase Auth settings, a real sign-up/reset to prove the n
    email on**, min password length, leaked-password protection, optionally CAPTCHA), use **Forgot password?** to
    set your own password, then do one real sign-up and approve it in Approvals. As of this sync the DB still
    shows 1 user, 1 profile, 0 requests, so none of this has happened yet.
-2. Step 4 (paused by Huraira's request): run the full pipeline on `clients/summit-line-roofing/` through the
-   Cockpit. No `bennett-co` DB rows are needed (`plan_approvals` has no FK to entities). Needs sign-in,
-   plan approval, and a yes before any preview deploy. Expected cost about $0.10 to $0.30.
+2. Step 4 (blocked): Intake, Plan and owner approval are done through the Cockpit; the build failed on Agent 37
+   credits (HTTP 402). After Huraira tops up Agent 37 billing, run a fresh Build + verify on approved plan
+   `825cfff6` (Resume won't help, there is no checkpoint), then independent verification, visual check, and a
+   yes before any preview deploy.
 3. Close Step 3's last items: check in the Doppler dashboard that the old CLI token is gone, and close the
    two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`), which needs Huraira's OK.
 
@@ -97,6 +98,11 @@ Huraira's own steps (Supabase Auth settings, a real sign-up/reset to prove the n
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
+- **Builder provider out of credits (2026-09-30, open).** The Step 4 build (job `31c965ff`) failed when Agent 37
+  returned HTTP 402 "AI credits exhausted" after the first draft was produced and the Claude evaluator had
+  requested changes. The workflow escalated to a human and stopped after 1 attempt, as designed (`agent.escalate`
+  and `workflow.halt` rows in `audit_log`, run `353b9945`); the Cockpit showed the real reason. The draft was lost
+  (no checkpoint, `lastCheckpoint` null). Fix owed by Huraira: top up Agent 37 billing (money, human only).
 - **Doppler CLI token exposed (2026-09-28, remediated 2026-09-30; revocation of the old token not independently verified).**
   - What happened: a bad output filter printed the Doppler CLI token (`dp.ct…`) into a session
     transcript.
@@ -572,7 +578,11 @@ plus the Cognee write-up exists.
 - [ ] Business-rules session for `memory/context.md`: **Nick** (`BLOCKED-ON-NICK.md`, OPEN, marked
       provisional). The file now holds concrete provisional rules with a 13-row register (R-01…R-13),
       no `[PLACEHOLDER]` tags left (`2c188d0`); Nick still has to keep or change each.
-- [ ] Run Intake → Planner → build → verify on the real brief, and log the correction-batch count. A live
+- [ ] Run Intake → Planner → build → verify on the real brief, and log the correction-batch count. **Synthetic
+      pilot attempt 2026-09-30 (Factory Completion Plan Step 4): Intake + Plan + owner approval worked through the
+      Cockpit (jobs `1dd90f25`, `c62e24a4`; plan `825cfff6` approved 10:13:11 UTC); Build + verify (job `31c965ff`,
+      run `36701102701`) FAILED: Agent 37 returned HTTP 402 "AI credits exhausted" on the builder's second call.
+      Waiting on Huraira to top up Agent 37 credits. No page, no correction count.** A live
       Intake run on the synthetic raw email (claude-haiku-4-5, $0.0029, no DB writes) classified entity
       `bennett-co` and flagged both planted ambiguities; that is a check of Intake alone, not the pipeline.
 

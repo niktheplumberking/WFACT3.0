@@ -18,9 +18,9 @@ exist for this client; registration is left to Step 4.
 
 `1 Intake`. Raw request written, not yet run through the Intake agent.
 
-- Current stage: **1 Intake (not started)**
+- Current stage: **4 Homepage build (attempted, failed, not complete)**
 - Entered this stage on: 2026-09-30
-- Waiting on (human or agent): Step 4 run (Cockpit: new request → Intake → Planner → owner approval)
+- Waiting on: Huraira to top up Agent 37 credits (the builder's provider returned HTTP 402), then a fresh Build + verify
 
 ## What's been decided
 
@@ -43,9 +43,20 @@ exist for this client; registration is left to Step 4.
 
 | Round | Stage | What was flagged | Fixed by | Date |
 |---|---|---|---|---|
+| 1 | 4 Homepage build (**synthetic pilot**, job `31c965ff`, workflow run `353b9945`) | The Claude evaluator reviewed the builder's first draft and requested changes (938 output tokens; the content of the request was not stored anywhere). | **Not fixed.** The builder's round-2 call failed with Agent 37 HTTP 402 (credits exhausted), the workflow escalated to a human, and the draft was lost (no checkpoint). Cockpit shows "0 builder correction rounds", which understates it. | 2026-09-30 |
 
 ## Notes
 
 - The correction count from a run on this brief demonstrates the factory but does **not** count against
   DreamSign 2.0's 40+ batches (synthetic input; Factory Completion Plan, Step 4).
 - The Provisional-rule register in `memory/context.md` applies (prices, timelines, banned claims).
+
+## Step 4 run log (synthetic pilot, 2026-09-30)
+
+- Intake + Plan via the Cockpit (job `1dd90f25`): entity `bennett-co` (certain), lead `new_website`, both planted
+  ambiguities flagged; $0.0150 total (Intake $0.0027, Planner $0.0123), about 47 s.
+- Owner rejected revision 1 (`cd5145f9`) with a note; re-plan (job `c62e24a4`) produced revision 2 (`825cfff6`),
+  which carried the banned-claims list and SAMPLE testimonials; approved 2026-09-30 10:13:11 UTC.
+- Build + verify (job `31c965ff`): **FAILED** after 1m49s. Builder draft 1 (Agent 37, 96 s, unpriced), evaluator
+  requested changes (Claude, $0.0351), builder draft 2 call returned HTTP 402. No page was produced.
+- No correction-count comparison to DreamSign 2.0's 40+ is possible from this run. It is synthetic in any case.
