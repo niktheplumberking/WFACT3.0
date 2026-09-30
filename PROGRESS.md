@@ -293,8 +293,8 @@ specifically, not the whole repo yet.
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 
-Everything below is committed. CI's latest `main` run is on `6e72020`; local `huraira-work` is 3 commits ahead of
-`origin/huraira-work` (`4dfd07b`, `2368252`, `2c188d0`, unpushed) and has one untracked file (the Factory Completion Plan). CI history on `main`:
+Everything below is committed. CI's latest `main` run is on `6e72020`; local `huraira-work` is 4 commits ahead of
+`origin/huraira-work` (`4dfd07b`, `2368252`, `2c188d0`, `c803c47`; unpushed) and has one untracked file (the Factory Completion Plan). CI history on `main`:
 
 | Run | Commit | Result |
 |---|---|---|
