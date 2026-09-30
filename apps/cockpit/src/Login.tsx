@@ -12,7 +12,7 @@
 import { useState } from "react";
 import { supabase } from "./supabaseClient";
 
-type Mode = "signin" | "signup" | "magic";
+type Mode = "signin" | "signup" | "magic" | "forgot";
 export const MIN_PASSWORD_LENGTH = 12;
 
 export function Login() {
@@ -62,6 +62,12 @@ export function Login() {
             "Account requested. Confirm your email using the link we sent, then an owner will review your request. You'll be able to sign in once it's approved.",
           );
         }
+      } else if (mode === "forgot") {
+        // Works for accounts that never had a password too (e.g. created via magic link): the emailed
+        // link signs them in and App.tsx then shows the "choose a new password" screen.
+        await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+        // Same message whether or not the account exists (no account enumeration).
+        setNotice(`If ${email} has an account, a password reset link is on its way.`);
       } else {
         // shouldCreateUser:false — a magic link can only sign in an existing account, never create one.
         await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
@@ -73,8 +79,10 @@ export function Login() {
     }
   }
 
-  const title = mode === "signin" ? "Sign in" : mode === "signup" ? "Create an account" : "Email me a sign-in link";
-  const submitLabel = mode === "signin" ? "Sign in" : mode === "signup" ? "Request account" : "Send magic link";
+  const title =
+    mode === "signin" ? "Sign in" : mode === "signup" ? "Create an account" : mode === "forgot" ? "Reset your password" : "Email me a sign-in link";
+  const submitLabel =
+    mode === "signin" ? "Sign in" : mode === "signup" ? "Request account" : mode === "forgot" ? "Send reset link" : "Send magic link";
 
   return (
     <div className="login-shell">
@@ -114,7 +122,7 @@ export function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            {mode !== "magic" && (
+            {mode !== "magic" && mode !== "forgot" && (
               <input
                 className="login-input"
                 type="password"
@@ -138,6 +146,7 @@ export function Login() {
             {mode !== "signin" && <button type="button" className="link-btn" onClick={() => switchMode("signin")}>Sign in with password</button>}
             {mode !== "signup" && <button type="button" className="link-btn" onClick={() => switchMode("signup")}>Create an account</button>}
             {mode !== "magic" && <button type="button" className="link-btn" onClick={() => switchMode("magic")}>Email me a link instead</button>}
+            {mode !== "forgot" && <button type="button" className="link-btn" onClick={() => switchMode("forgot")}>Forgot password?</button>}
           </div>
         )}
         {mode === "signup" && !notice && (

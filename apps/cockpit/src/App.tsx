@@ -3,6 +3,7 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabaseClient";
 import { Login } from "./Login";
 import { AccessPending } from "./AccessPending";
+import { SetPassword } from "./SetPassword";
 import { Pipeline } from "./Pipeline";
 import { Approvals } from "./Approvals";
 import { Runs } from "./Runs";
@@ -86,17 +87,24 @@ function useHasProfile(session: Session | null | undefined): boolean | null {
 export default function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [room, setRoom] = useState<Room>("pipeline");
+  const [recovering, setRecovering] = useState(false);
   const stats = useStats();
   const hasProfile = useHasProfile(session);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+      // A password-reset link signs the browser in and fires PASSWORD_RECOVERY: hold on the
+      // "choose a new password" screen until it's saved, rather than dropping into the app.
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
+      setSession(s);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
   if (session === undefined) return null;
   if (session === null) return <Login />;
+  if (recovering) return <SetPassword onDone={() => setRecovering(false)} />;
   if (hasProfile === null) return null;
   if (hasProfile === false) return <AccessPending email={session.user.email ?? ""} />;
 
