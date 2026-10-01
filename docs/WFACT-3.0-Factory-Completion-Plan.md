@@ -7,6 +7,9 @@
 (Stages 1–7). It does not replace it. It maps every remaining Blueprint phase, every Cockpit expectation
 (Blueprint §9) and every Definition-of-Done goal (Blueprint §16K) to a numbered step. Where a step maps
 to a Continuation Stage, that is noted.
+**Revised 2026-10-01**: added **Step 4B** (front-end upgrade: two build tracks, chosen per client) and **Step 4C** (Cockpit UI/UX
+redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
+parallel with Steps 5-8 because it only touches `apps/cockpit`.
 
 ## How to use this file
 
@@ -45,6 +48,7 @@ to a Continuation Stage, that is noted.
 | Business / Product | missing | 23 |
 | Alerts (push / Telegram) and role tiers | missing | 17 |
 | Serverless-ceiling fix | open | 20 |
+| Overall UI/UX: clear navigation, plain copy, no clutter, every factory action reachable from the Cockpit | partial | 4C (rooms added later by 9, 10, 14, 17 follow its design system) |
 
 ---
 
@@ -59,6 +63,8 @@ the goals · **P3** later or depends on Nick.
 | 2 | Write pilot brief and business rules | Drafts a realistic fictional client brief and provisional business rules | Unblocks Stage 7 and the real-memory test | `brief.json` and `memory/context.md`, both flagged provisional | P0 |
 | 3 | Retire plaintext secrets (Huraira acts, agent verifies) | Deletes `.env.local` files, rotates keys, revokes the leaked Doppler token | Stage 1 is unmet and a token is exposed | The plan's `grep` check passes | P0 |
 | 4 | Full run on the pilot brief | Intake → plan → approval → build → verify → human Launch | Proves the factory end to end; measures corrections | Verified live page, correction count, audit and trace rows | P0 |
+| 4B | Front-end upgrade: two build tracks | Track A (local business, conversion-first, multi-page static) and Track B (motion-rich, Next.js); a direction step detects niche, requirements and brand direction and recommends a track; the owner picks per build in the Cockpit; rendered screenshot QA; anti-slop design rulebook | Step 4 output was one text-only page and checks never looked at the rendered page | Both tracks build multi-page sites that pass rendered QA; track choice in the Cockpit; Summit Line rebuilt | P0 |
+| 4C | Cockpit UI/UX redesign | Information architecture, navigation, design system, plain copy, every factory action reachable, accessible and responsive | The Cockpit is the control room; today it grew room by room | A redesigned Cockpit verified in the browser at desktop and phone, with a usability walkthrough | P1 |
 | 5 | Stage 6: Documentation agent | Writes structured episodic memory per stage, tied to task IDs | Blueprint wants machine-written memory | Auto-written `memory.md` entries; a passing "what happened" query | P1 |
 | 6 | Enforce agent permissions | Makes each agent's permission scope enforced, not descriptive | Must land before more agents or concurrency | Out-of-scope calls denied and audited | P1 |
 | 7 | Expand the evaluation registry | Grows 6 checks toward the 78-check registry and 50-point audit; adds cross-model review and the "tells" gate | Highest-priority Blueprint component; goal 3 | Larger check set, re-run results | P1 |
@@ -110,6 +116,18 @@ Every step prompt below says "Follow the Standard Operating Rules". Those rules 
 - **Git.** Work on branch `huraira-work`. Make small, clear commits. **Do not push to `main`** and do not
   merge to `main`; pushing `main` triggers a production deploy. Push `huraira-work` only if Huraira says so.
 - **Docs.** Update `PROGRESS.md` (status, evidence, date) and `BLOCKED-ON-NICK.md` when the step changes them.
+- **Design quality (client sites and the Cockpit), Huraira's rule 2026-10-01.** Nothing we build may look AI-generated
+  ("AI slop"), basic, or like an unmodified template. Banned by default: purple/blue gradient heroes, the generic three-card
+  feature row, emoji used as icons, centred-everything layouts, one default font with no pairing, fake "trusted by" logos or
+  initials avatars, filler copy ("unlock your potential", "seamless", "cutting-edge"), glassmorphism everywhere, the same section
+  rhythm repeated, gratuitous animation, thin low-contrast grey text. Every design starts from an explicit art direction (from the
+  client's brand direction, or for the Cockpit from its design system), with deliberate type pairing, layout variety and real
+  content hierarchy. **Coding agents must load these installed skills before any design work**: `impeccable` (design, critique,
+  audit, polish), `design-taste-frontend` (anti-slop), `high-end-visual-design`, `ecc:frontend-design-direction`; for motion
+  `ecc:motion-foundations` and `ecc:motion-patterns`; for accessibility `ecc:frontend-a11y`; for existing screens
+  `redesign-existing-projects` and `ecc:make-interfaces-feel-better`. The factory's own builder cannot load Claude skills at run
+  time, so the same rules live in the repo as a versioned **design rulebook** that is given to the builder and checked by the
+  screenshot reviewer (Step 4B). A page or screen that trips the rulebook fails verification like any other check.
 - **Stop conditions.** Stop and ask Huraira when a step needs money, an account, a credential you don't
   have, a destructive action, or a decision only a human can make. Do not guess.
 
@@ -321,6 +339,161 @@ ACCEPTANCE
 - Correction count, cost and time recorded; caveat stated.
 
 REPORT in the Part C format, then STOP.
+```
+
+---
+
+### STEP 4B — Front-end upgrade: two build tracks, chosen per client (P0)
+
+**Depends on**: Step 4. Design approved by Huraira 2026-10-01: `docs/FRONTEND-UPGRADE-DESIGN.md` (v2 + Next.js for Track B).
+**Maps to**: Blueprint Phase 6-7 front-end loop, Playbook "Motion Sites + GSAP" and Stage 3 Assets; fixes the Step 4 finding that every
+check read text and never looked at the rendered page. **Do milestones in order and STOP after each one for GO.**
+
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C, including the design-quality rule. Do ONLY Step 4B,
+ONE milestone at a time (M0..M6 below). After each milestone, report in the Part C format and STOP for GO.
+
+READ FIRST
+docs/FRONTEND-UPGRADE-DESIGN.md (the approved design), clients/summit-line-roofing/memory.md (Step 4 run
+log and the defects the checks missed), packages/frontend-loop (loop.ts, templates.ts), packages/planning,
+packages/verification, packages/workflow, apps/cockpit, memory/context.md (banned claims, tone).
+Before any design or front-end work, load the skills named in Part C's design-quality rule.
+
+THE TWO TRACKS
+- Track A, local business, conversion-first: multi-page static site (plain HTML/CSS/JS files, no
+  framework), real images, gentle motion, click-to-call, quote/booking forms, LocalBusiness schema,
+  consistent name/address/phone, service-area pages. Budgets: LCP < 2.0 s on mobile, total JS < 50 KB,
+  CLS < 0.1.
+- Track B, motion-rich brand site: Next.js (App Router, TypeScript) with `output: 'export'` so the result
+  is plain static files that any host (Hostinger for live, Vercel only for previews) can serve. Tailwind
+  CSS; shadcn/ui on Radix primitives for accessible components; Motion (formerly Framer Motion) for
+  component and layout animation; GSAP with ScrollTrigger for scroll-driven sequences; Lenis for smooth
+  scrolling; Lucide icons; React Three Fiber + drei ONLY when the brand direction calls for 3D. Every
+  animation respects prefers-reduced-motion. Budgets: LCP < 2.5 s on mobile, CLS < 0.1, JS within a
+  stated budget per page.
+- Shared: one site map, one content-as-data JSON format, one asset pipeline, one rendered-QA stack.
+  Each track has ONE committed, human-reviewed starter. The builder fills a starter; it may not add
+  packages (pinned allow-list, lockfile committed) and may not change the stack.
+
+DESIGN RULEBOOK (anti AI-slop)
+Create packages/frontend-loop/design/rulebook.json (versioned data) plus a short README: the banned
+patterns and required qualities from Part C's design-quality rule, each with an ID, how it is detected
+(DOM/CSS rule, screenshot review question, or both) and a failing fixture. Give the rulebook to the
+builder in its prompt, and make the screenshot reviewer check it. Distil it from the named skills; do
+not copy any third-party prompt text verbatim.
+
+MILESTONES
+M0  Record the inputs Huraira/Nick gave (reference sites per track, niche taxonomy, image policy,
+    builder model, spend ceiling) in docs/FRONTEND-UPGRADE-DESIGN.md. If any is missing, STOP and ask.
+M1  Rendered QA + claims gate on TODAY's builder. Headless Chromium (Playwright) screenshots at
+    1440/768/375; axe accessibility; Lighthouse performance; link and asset crawl; console errors; text
+    checks for content after </html>, required SAMPLE labels, banned claims, and factual claims with no
+    source field. Add a screenshot review by a model from a different vendor than the builder.
+    Acceptance: re-checking the Step 4 artifact (sha256 960b61ba...) FAILS on the leaked tool text, the
+    unlabelled testimonials and the invented phone/hours; clean fixtures pass. Results are exact check
+    IDs that FrontendLoop.revise() can act on.
+M2  Direction step + track choice. A new agent registered without editing agent-runtime runs after
+    Intake: niche (fixed, versioned taxonomy), audience, primary conversion goal, requirements, brand
+    direction (each point quoting the request), recommended track + confidence + reasons, open
+    questions; no recommendation when confidence is low. Build 10-15 labelled synthetic fixtures across
+    niches and report per-case results. Cockpit: plan card shows the direction summary and the
+    recommended track pre-selected; owner chooses or overrides; stored on the plan (append-only
+    migration, RLS attack-tested) and audited; no build can start without a track.
+M3  Track A starter + multi-page build through the pipeline. Acceptance: a 3+ page local-business site
+    builds, passes rendered QA, the rulebook and its budgets; a broken-link fixture and an over-budget
+    fixture fail.
+M4  Track B starter (Next.js static export) + multi-page build. The build runs in CI with no secrets in
+    the build step and no network beyond the package cache; artifact = static output + source in the
+    private artifacts bucket with a checkpoint hash. Acceptance as M3, plus reduced-motion respected and
+    an over-budget animation fixture fails.
+M5  Assets: generated or supplied images, always labelled, never presented as the client's own work,
+    alt text required, size/format budgets. Use the image tool only with the access and budget Huraira
+    approved in M0. An unlabelled generated image fixture is caught.
+M6  Full runs through the Cockpit: Summit Line Roofing (expected Track A) and a second synthetic,
+    motion-led client (expected Track B). Record rounds, failed checks per round, model calls and cost
+    per call, wall-clock time. Human review at desktop and phone with screenshots attached; list every
+    defect the checks missed. Preview deploy ONLY after Huraira's explicit yes.
+
+ACCEPTANCE (whole step)
+- Both tracks produce multi-page sites that pass rendered QA, the claims gate and the design rulebook,
+  verified independently (separate process, re-hash against the checkpoint, screenshots).
+- The owner chooses the track per build in the Cockpit; the recommendation is shown with reasons; the
+  choice is audited.
+- Each planted defect class (leaked text, missing SAMPLE label, invented fact, banned claim, slop
+  pattern, broken link, over budget) is caught by at least one failing fixture.
+- Existing suites pass unchanged; no production deploy path exists.
+
+REPORT in the Part C format after each milestone, then STOP.
+```
+
+---
+
+### STEP 4C — Cockpit UI/UX redesign: the control room (P1)
+
+**Depends on**: none hard. Best after Step 4B M2 (so the track choice is designed in). Must land **before** Steps 9, 10, 14 and 17,
+which then build their rooms inside this design system. Can run in parallel with Steps 5-8 (it only touches `apps/cockpit`).
+**Maps to**: Blueprint §9 (founder-glanceable control room, category dashboards, drill-down), CLAUDE.md pillar 4 ("held to a
+SaaS-sellable bar, not an internal-tool pass").
+
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/apps/cockpit. Follow the Standard
+Operating Rules in docs/WFACT-3.0-Factory-Completion-Plan.md Part C, including the design-quality rule.
+Do ONLY Step 4C. Before any design work, load the skills named in Part C (impeccable,
+design-taste-frontend, high-end-visual-design, ecc:frontend-design-direction, redesign-existing-projects,
+ecc:make-interfaces-feel-better, ecc:frontend-a11y, ecc:design-system).
+
+CONTEXT
+The Cockpit is the founders' control room. It grew room by room (Pipeline, Approvals incl. plan and
+account approvals, Actions, Runs, Models, login/sign-up/reset). Huraira wants it to be the ONE place where
+every factory feature, option and action is available, with a clean, uncluttered, well-designed UI, easy
+navigation and clear plain-language copy. Nick (non-technical) must be able to use it without help.
+
+PHASE 1 — Audit and plan (no code). STOP for GO at the end.
+1. Inventory every capability: each room and action today; every job kind in packages/jobs; every CLI
+   command in packages/* that has no Cockpit equivalent; every planned room in this plan (Steps 9, 10,
+   12, 14, 17, 23). Produce a table: capability, who uses it (owner/admin/pm), where it lives today,
+   where it should live.
+2. Heuristic review of the current UI with screenshots at desktop and phone: navigation, hierarchy,
+   clutter, copy, empty states, error states, loading states, contrast, focus, tap targets.
+3. Propose the information architecture: top-level navigation (few, clearly named areas), what goes in
+   each, primary action per screen, and how future rooms slot in. A "home" view that answers "is
+   everything OK and what needs me?" first.
+4. Propose the design system: tokens (colour, type pairing, spacing, radius, elevation, motion), core
+   components (nav, page header, card, table, status badge, form controls, dialogs, toasts, empty and
+   error states), dark theme first with a light theme, and a copy guide (plain language, verbs on
+   buttons, no jargon, every error says what happened and what to do).
+5. Provide 3-5 key screen mockups (HTML or images) applying the design-quality rule. STOP and send
+   the audit, IA, design system and mockups to Huraira for GO.
+
+PHASE 2 — Build, after GO.
+6. Implement the design system and the new navigation shell; migrate every existing room onto it
+   without losing any behaviour; keep RLS as the only access control and never put a service key in the
+   bundle.
+7. Make every capability from the inventory reachable in the Cockpit (or listed as deliberately
+   CLI-only with a reason). Do not fake data: a future room appears only when its step builds it, or as
+   an honest "coming in Step N" entry if Huraira prefers.
+8. Accessibility WCAG 2.2 AA (contrast, keyboard, focus visible, labels, reduced motion), responsive
+   from 360 px, installable PWA, fast (lazy-load rooms, no layout shift).
+9. Tests: component and interaction tests for navigation and the main flows; Cockpit typecheck and
+   production build pass; CI green.
+
+VERIFY (independently, in the browser pane, with screenshots at 1440 and 375 px)
+- Usability walkthrough with timed tasks, each in <= 3 clicks from home: start intake from a pasted
+  request; approve or reject a plan (with track choice); start a build; open a run and see why it
+  failed; approve an account request; sign out. Report clicks and any confusion honestly.
+- Lighthouse accessibility >= 95 and no axe violations on every room; no horizontal scroll at 375 px.
+- Before/after screenshots of every room; the design-quality rule passes (list each banned pattern
+  checked).
+- grep the built bundle for "service_role" (must be 0); existing behaviour preserved (list each room
+  and action checked live).
+
+ACCEPTANCE
+- Huraira approved the IA and design direction before build; every capability is reachable or
+  deliberately excluded with a reason; the walkthrough passes; accessibility and responsiveness proven
+  with evidence; CI green; no production client deploy path added.
+
+REPORT in the Part C format (Phase 1 report first, then the build report), then STOP.
 ```
 
 ---
@@ -1163,10 +1336,12 @@ REPORT in the Part C format after each sub-part, then STOP.
 
 | # | Step | Status | Reported | Approved by Huraira |
 |---|---|---|---|---|
-| 1 | Fix Cockpit → GitHub dispatch | not started | | |
-| 2 | Pilot brief and business rules | not started | | |
-| 3 | Retire plaintext secrets | not started | | |
-| 4 | Full run on the pilot brief | not started | | |
+| 1 | Fix Cockpit → GitHub dispatch | done (job `b952aaba`, run `36455639903`; browser leg job `1dd90f25`) | 2026-09-30 | |
+| 2 | Pilot brief and business rules | done, provisional (`2c188d0`) | 2026-09-30 | |
+| 3 | Retire plaintext secrets | done; old CLI token revocation not independently verified (`f74b0bc`) | 2026-09-30 | |
+| 4 | Full run on the pilot brief | partial: built and QA-approved (job `81c8607b`); human review found defects; no preview | 2026-09-30 | |
+| 4B | Front-end upgrade: two build tracks | design approved 2026-10-01; not started | | 2026-10-01 (design) |
+| 4C | Cockpit UI/UX redesign | not started | | |
 | 5 | Documentation agent | not started | | |
 | 6 | Enforce agent permissions | not started | | |
 | 7 | Evaluation registry | not started | | |

@@ -1,6 +1,7 @@
 # Front-end upgrade (Step 4B) — two build tracks, chosen per client — design for approval
 
-**Status**: DRAFT v2, awaiting GO. Nothing below is built.
+**Status**: v3, **APPROVED by Huraira 2026-10-01** with one change: Track B uses Next.js plus the animation and design libraries below.
+Nothing is built yet. Work runs as Step 4B in `docs/WFACT-3.0-Factory-Completion-Plan.md`, milestone by milestone.
 **Decisions so far**: 2026-09-30 Huraira chose Option B. **Revised 2026-10-01 (Huraira): keep BOTH options as build tracks.** For each
 build the Cockpit asks the owner to choose a track, and a new direction step reads the client's request, works out their niche,
 requirements and brand direction, and **recommends** one track with its reasons. The owner's choice is final and recorded.
@@ -18,10 +19,15 @@ wins on speed, clarity and calls/bookings; a brand-led client wants a motion-ric
 | | **Track A — Local business, conversion-first** | **Track B — Motion-rich brand site** |
 |---|---|---|
 | For | Trades, clinics, salons, restaurants, local services | Agencies, product launches, premium/lifestyle brands, portfolios |
-| Output | Multi-page static site (plain HTML/CSS/JS files), real images, gentle motion | Built project (Vite + React + Tailwind + router + GSAP), compiled to static files |
+| Output | Multi-page static site (plain HTML/CSS/JS files), real images, gentle motion | Next.js (App Router, TypeScript) with `output: 'export'`, so the result is plain static files any host can serve |
 | Optimised for | Load speed on weak mobile signal, click-to-call, booking/quote forms, local search basics (business schema, NAP, service-area pages), trust and clarity | Visual impact, scroll-driven motion, rich sections, premium feel |
 | Budgets (proposed) | LCP < 2.0 s mobile, total JS < 50 KB, no layout shift | LCP < 2.5 s mobile, motion respects reduced-motion, JS within a set budget |
 | Effort (rough guess) | Smaller, built first | Larger, built second |
+
+**Track B libraries** (pinned, allow-listed; the builder cannot add others): Tailwind CSS; shadcn/ui on Radix primitives (accessible
+components); Motion, formerly Framer Motion (component and layout animation); GSAP with ScrollTrigger (scroll-driven sequences); Lenis
+(smooth scrolling); Lucide icons; React Three Fiber + drei only when the brand direction calls for 3D. All motion respects
+prefers-reduced-motion.
 
 Both tracks share one site map, one content-as-data format, one asset pipeline and one rendered-QA stack, so a client can move between
 tracks without rewriting content.
@@ -57,6 +63,16 @@ A new agent, registered without editing `agent-runtime` (same pattern as Intake/
 5. **Rendered QA**: headless-browser screenshots at 1440/768/375, accessibility, performance against the track's budget, link and asset
    crawl, console errors, and text checks for content after the closing tag, required SAMPLE labels, banned claims and unsourced claims;
    plus a review of the screenshots by a model from a different vendor than the builder.
+
+## 5b. Design quality: no AI slop (Huraira's rule, 2026-10-01)
+
+Sites must not look AI-generated, basic, or like an unmodified template. A versioned **design rulebook**
+(`packages/frontend-loop/design/rulebook.json`) lists banned patterns (purple/blue gradient heroes, generic three-card rows, emoji
+icons, centred-everything layouts, one default font, fake logos or initials avatars, filler copy, glassmorphism everywhere, repeated
+section rhythm, gratuitous animation, thin low-contrast text) and required qualities (art direction from the brand direction,
+deliberate type pairing, layout variety, real content hierarchy). It is given to the builder and checked on screenshots; a hit fails
+verification. Coding agents load the installed design skills named in the plan's Part C before design work; the factory's builder
+cannot load skills at run time, which is why the rules live in the repo.
 
 ## 6. Milestones (each verified independently before the next)
 

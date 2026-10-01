@@ -92,6 +92,10 @@ information already on file (2.0's intake law, carried over).
   checkpoint after three consecutive zero-correction projects; Launch and Money never flip.
 - **Correction-batch benchmark**: DreamSign 2.0 took 40+ batches; 3.0 must be measured against that
   honestly, never assumed better.
+- **Design quality** (Huraira's decision, 2026-10-01): no site we build may look AI-generated ("AI slop"), basic, or like an
+  unmodified template. Every design starts from an explicit art direction drawn from the client's brand direction. The banned
+  patterns and required qualities are in `packages/frontend-loop/design/rulebook.json` (built in Step 4B) and
+  `docs/WFACT-3.0-Factory-Completion-Plan.md` Part C. Final design call stays with Nick (`CLAUDE.md` §3).
 - **Lessons and memory**: any agent-proposed write to semantic or organizational memory needs human
   approval before it lands (Blueprint §8).
 

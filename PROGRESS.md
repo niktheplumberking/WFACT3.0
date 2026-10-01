@@ -25,10 +25,11 @@ ahead (`ea4b29a` to `a07d902`, docs/logs only), unpushed. Across Stages 1–5 th
 and business rules, and Huraira's own steps on the new login.
 
 **Next up**:
-1. **Step 4B, front-end upgrade (revised 2026-10-01 by Huraira: keep BOTH tracks, A local-business conversion-first and B
-   motion-rich, chosen per build in the Cockpit, with a direction step that detects niche, requirements and brand direction and
-   recommends a track)**: approve design v2 in `docs/FRONTEND-UPGRADE-DESIGN.md` (milestones M0-M6) and settle its inputs:
-   reference sites per track, niche taxonomy, image policy/Higgsfield, builder model, spend ceiling. Nothing is built yet.
+1. **Step 4B, front-end upgrade, design APPROVED 2026-10-01** (two tracks chosen per build: A local business, B motion-rich on Next.js
+   static export with Tailwind, shadcn/ui, Motion, GSAP, Lenis; direction step recommends a track; rendered QA; anti-slop design
+   rulebook). Start with M0 inputs (reference sites per track, niche taxonomy, image policy/Higgsfield, builder model, spend ceiling),
+   then M1. Prompt: `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 4B. **Step 4C** (Cockpit UI/UX redesign, P1) follows, before
+   Steps 9/10/14/17, and can run alongside Steps 5-8.
 2. Step 4 close-out: the preview deploy of the text-only synthetic page is now moot unless Huraira wants it; Step 4's findings
    (leaked tool text, unlabelled SAMPLE testimonials, invented facts, text-only checks) feed Step 4B's rendered QA and Step 7.
 3. Huraira's own items: Supabase Auth settings and a real sign-up/reset to prove the new login; old Doppler CLI token check; OK to close
