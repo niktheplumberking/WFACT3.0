@@ -18,8 +18,8 @@ steps; this file tracks the Continuation Stages.
 (3A = password sign-in with approval-gated accounts, added to the plan), Step 4 is **partial** (full synthetic run built and
 QA-approved, but a human review found defects the checks missed; its preview is superseded by Step 4B M6), and **Step 4B is in progress**:
 design approved 2026-10-01 (two build tracks chosen per client, Track B on Next.js, anti-slop design rulebook, rendered QA), M0 has 5 of 7
-inputs decided, **M1 is PARTIAL** (2026-10-01, `c1345de`, `47cef2c`; see the Step 4B M1 entry below). `main` is at `4ecfe4a` (CI
-`36750897743` green); `huraira-work` is 8 commits ahead, unpushed. **Biggest blockers**: OpenAI credits for the screenshot reviewer (now),
+inputs decided, **M1 is PARTIAL** (2026-10-01, `c1345de`, `47cef2c`; see the Step 4B M1 entry below). `main` is at `eaea97b` (CI
+`36859122425` green, Cockpit redeployed); `huraira-work` is 1 commit ahead (`5641f45`, unpushed). **Biggest blockers**: OpenAI credits for the screenshot reviewer (now),
 builder model (before 4B M3) and image tool (before M5), Nick's real brief and business rules, and a real sign-up to prove Step 3A live.
 
 **Step 4B M1 — rendered QA + claims gate (2026-10-01, PARTIAL).** Built: a claims gate in `packages/verification` (`claims.after-html`,
@@ -40,7 +40,16 @@ Cockpit jobs and the workflow CLI with no off switch. Evidence:
   audit 14, all passing, from a fresh clone of `47cef2c` with `npm ci`; fixtures regenerate with no drift; gitleaks clean on both commits.
 - **Not done**: the live screenshot review returned OpenAI **HTTP 429 "You have no credits remaining"**, so it reported NOT RUN (correctly,
   never a pass). Until credits are added, every Cockpit build ends "not verified". The new CI job and the Chromium step in `cockpit-job.yml`
-  have not run on GitHub (branch unpushed). Reviewer calls are cost-logged in the CLI and `report.json`, not yet in `model_traces`.
+  ran on GitHub in `main` CI run `36859122425` (12:02 UTC): `rendered-qa` passed (Chromium install 21 s, browser tests 2m03s), every other
+  job passed and `deploy-cockpit` redeployed the Cockpit (no `apps/cockpit` change in M1). The Chromium step in `cockpit-job.yml` has not run
+  yet (no Cockpit job since). Reviewer calls are cost-logged in the CLI and `report.json`, not yet in `model_traces`.
+- **How M1 reached `main`**: not by the coding agent. This checkout pushed `huraira-work` (17:02:01 +05) and `main` (17:02:03 +05) right
+  after another session's commit `03138d9` (which also folded in the agent's then-uncommitted M1 entry in this file); the agent's docs commit
+  `eaea97b` landed in that two-second gap and went to `main` with it. Evidence: `git reflog show origin/main` ("update by push"). No hook or
+  push config exists in the checkout. Same pattern as `289ec00` at 16:10. Prevention: one session at a time per checkout, or push named
+  commits only (`git push origin <sha>:main`).
+- **Correction**: commit `5641f45`'s message says the first `rendered-qa` run "sat 20+ minutes"; that is false (the agent misread a watch
+  command that returned early). The job passed in 2m03s. The commit's timeouts are kept as a safeguard only.
 
 **Next up**:
 1. **Huraira: OpenAI credits** for the screenshot reviewer (money, human only), or choose another reviewer vendor. Then re-run
@@ -48,7 +57,7 @@ Cockpit jobs and the workflow CLI with no off switch. Evidence:
 2. **Step 4B M2** (direction step + track choice) after Huraira's GO on the M1 report.
 3. **Huraira decisions**: builder model (before M3) and image tool / Higgsfield access (before M5); how to tidy commit `0fbdfce` (see
    Incidents). The archive-path fixes were committed in `289ec00`.
-4. **Huraira actions**: push `huraira-work` when ready (runs the new `rendered-qa` CI job); Supabase Auth settings and one real sign-up to
+4. **Huraira actions**: push `5641f45` (hang safeguard) when ready; Supabase Auth settings and one real sign-up to
    prove Step 3A live; the old Doppler CLI token check; OK to close the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b`.
 
 **Gaps noticed**:
