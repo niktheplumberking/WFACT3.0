@@ -1,39 +1,35 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-09-30, via `/progress-sync` — re-synced to fold in `31f045f` (Step 4 build succeeded on retry) and `a07d902`
-(Step 4B front-end upgrade design, Option B) against git, GitHub Actions (build run `36743601290`) and live Supabase (`jobs`, row counts).
+Last synced: 2026-10-01, via `/progress-sync` — re-synced to fold in `79a0c67`…`1ccae2b` (Factory Completion Plan committed and
+revised with Steps 3A, 4B, 4C; Step 4B design approved, M0 decisions) against git, GitHub Actions (`main` run `36750897743`), live Supabase
+(`jobs`, row counts) and the working tree (uncommitted archive-path fixes by another editor, kept as found).
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
 force since 2026-09-28, with the Blueprint (`docs/wfact-3.0-blueprint.html`) as the scope source of
 truth. The Phases 1–7 section above it is the historical record of the superseded 100-hour sprint
-(`docs/wfact-3.0-operator-manual.html` / `docs/WFACT-3.0-Fast-Track-Plan.md`). Its checkboxes are not
-restructured to fit the new plan. `docs/WFACT-3.0-Factory-Completion-Plan.md` (untracked as of this
-sync) sits **on top of** the Continuation plan, not in place of it: it maps the remaining Blueprint
+(`docs/archive/sprint-100-hour/wfact-3.0-operator-manual.html` / `docs/archive/sprint-100-hour/WFACT-3.0-Fast-Track-Plan.md`). Its checkboxes are not
+restructured to fit the new plan. `docs/WFACT-3.0-Factory-Completion-Plan.md` (committed `4ecfe4a`,
+revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in place of it: it maps the remaining Blueprint
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: Continuation Stages 1–5 are built, committed and green in real CI, and Factory Completion Plan Steps 1–3
-are done apart from a few small unproven items (see Stage 1). **Step 4 is mostly done, with a serious finding**: through the real
-Cockpit the synthetic pilot went request → Intake → plan → reject → re-plan → approval → build → QA approval (attempt 2, job
-`81c8607b`: 3 rounds, 2 requesting changes, 8m38s, $0.1741 priced plus 3 unpriced Agent 37 calls) and the artifact re-hashes
-identically to its checkpoint. But **the verification stack approved a page that a human review found defective**: agent-tool text
-leaked after `</html>` and renders under the footer, testimonials are not labelled SAMPLE, and phone, hours and neighbourhoods are
-invented. Step 4B (before Steps 5-8) now keeps **both build tracks**, A (local business, conversion-first) and B (motion-rich), picked per build
-in the Cockpit with a recommended track from a new direction step (Huraira, 2026-10-01); design v2 `docs/FRONTEND-UPGRADE-DESIGN.md` awaits GO. `main` is at `856e483` (CI `36699308136`); `huraira-work` is 6 commits
-ahead (`ea4b29a` to `a07d902`, docs/logs only), unpushed. Across Stages 1–5 that's roughly 94%. **Biggest blockers**: Step 4B's go-ahead and inputs (reference sites, image policy, builder model, budget), the verification gap, Nick's real brief
-and business rules, and Huraira's own steps on the new login.
+**Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**
+(3A = password sign-in with approval-gated accounts, added to the plan), Step 4 is **partial** (full synthetic run built and
+QA-approved, but a human review found defects the checks missed; its preview is superseded by Step 4B M6), and **Step 4B is in progress**:
+design approved 2026-10-01 (two build tracks chosen per client, Track B on Next.js, anti-slop design rulebook, rendered QA), M0 has 5 of 7
+inputs decided, **M1 is next**. `main` is at `4ecfe4a` (CI `36750897743` green); `huraira-work` is 5 commits ahead (`4cba33b`…`1ccae2b`, docs
+only), unpushed. **Biggest blockers**: builder model (before 4B M3) and image tool (before M5), Nick's real brief and business rules, and a
+real sign-up to prove Step 3A live.
 
 **Next up**:
-1. **Step 4B, front-end upgrade, design APPROVED 2026-10-01** (two tracks chosen per build: A local business, B motion-rich on Next.js
-   static export with Tailwind, shadcn/ui, Motion, GSAP, Lenis; direction step recommends a track; rendered QA; anti-slop design
-   rulebook). Start with M0 inputs (reference sites per track, niche taxonomy, image policy/Higgsfield, builder model, spend ceiling),
-   then M1. Prompt: `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 4B. **Step 4C** (Cockpit UI/UX redesign, P1) follows, before
-   Steps 9/10/14/17, and can run alongside Steps 5-8.
-2. Step 4 close-out: the preview deploy of the text-only synthetic page is now moot unless Huraira wants it; Step 4's findings
-   (leaked tool text, unlabelled SAMPLE testimonials, invented facts, text-only checks) feed Step 4B's rendered QA and Step 7.
-3. Huraira's own items: Supabase Auth settings and a real sign-up/reset to prove the new login; old Doppler CLI token check; OK to close
-   the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b`.
+1. **Step 4B M1** (prompt in `docs/WFACT-3.0-Factory-Completion-Plan.md`): rendered screenshot QA plus the claims gate on today's builder;
+   it must fail the Step 4 page on the leaked tool text, unlabelled SAMPLE testimonials and invented phone/hours. Waits on Huraira's GO.
+2. **Huraira decisions**: builder model (before M3) and image tool / Higgsfield access (before M5); how to tidy commit `0fbdfce` (see
+   Incidents) and whether to commit the uncommitted archive-path fixes in `CLAUDE.md`, `README.md`, `docs/INDEX.md`, the Continuation plan
+   and `PROGRESS.md`.
+3. **Huraira actions**: Supabase Auth settings and one real sign-up to prove Step 3A live; the old Doppler CLI token check; OK to close
+   the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b` (still 2 queued as of this sync).
 
 **Gaps noticed**:
 - **The Factory Completion Plan has no step for richer or multi-page output.** The builder is limited by design to one text-only HTML
@@ -101,6 +97,13 @@ and business rules, and Huraira's own steps on the new login.
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
+- **Unrelated staged changes swept into an agent commit (2026-10-01, open).** Commit `0fbdfce` ("Step 4B M0: researched reference
+  sites…") also contains 12 pure renames into `docs/archive/` (graphify snapshot, old reports, the 100-hour sprint docs) that another
+  editor had staged; the agent committed with a plain `git commit` without checking the index. Contents are unchanged (0 lines), the
+  commit is unpushed, and `main` is unaffected, but the renames are mis-attributed and the matching link fixes are still uncommitted, so
+  the committed tree has stale paths until they land. Found by this sync (`git show --stat 0fbdfce`). Fix owed: Huraira decides whether
+  to keep it and commit the path fixes on top, or split it. Prevention: commit only named paths (`git commit -- <paths>`) and check
+  `git diff --cached` first.
 - **Verification approved a defective page (2026-09-30, open; input to Step 7).** The Step 4 artifact passed all 6 deterministic checks, the
   in-loop evaluator (round 3) and the QA evaluator, and re-verified clean in a separate CLI run (`4a73fa57`). A human read of the file and
   the rendered page then found: agent-tool text after `</html>` ("File-mutation verifier: 2 file edit(s) FAILED…") shown under the footer;
@@ -195,7 +198,7 @@ and business rules, and Huraira's own steps on the new login.
 
 # 100-Hour Sprint (superseded 2026-09-28 — historical record)
 
-Source: `docs/wfact-3.0-operator-manual.html`, sequenced per `docs/WFACT-3.0-Fast-Track-Plan.md`. Kept as
+Source: `docs/archive/sprint-100-hour/wfact-3.0-operator-manual.html`, sequenced per `docs/archive/sprint-100-hour/WFACT-3.0-Fast-Track-Plan.md`. Kept as
 written at the sprint's close; later changes appear only as dated inline notes.
 
 ## Phase 1: Foundation & Access (Days 1–2 · 8 hrs)
@@ -333,8 +336,8 @@ specifically, not the whole repo yet.
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 
-Everything below is committed. `main` = `856e483`; `huraira-work` is 6 commits ahead and unpushed (`ea4b29a` to `a07d902`,
-all docs/logs), plus one untracked file (the Factory Completion Plan). CI history on `main`:
+Everything below is committed. `main` = `huraira-work`'s `4ecfe4a` (CI `36750897743`); `huraira-work` is 5 docs-only commits
+ahead and unpushed (`4cba33b`…`1ccae2b`); other editors' archive-path fixes are uncommitted in the working tree. CI history on `main`:
 
 | Run | Commit | Result |
 |---|---|---|
@@ -351,6 +354,8 @@ all docs/logs), plus one untracked file (the Factory Completion Plan). CI histor
 | `36699308136` | `856e483` | success, all 11 jobs incl. deploy (forgot-password flow) |
 | `36699803027` | `856e483` | success (`Cockpit job`, Step 4 `intake` `1dd90f25`; not CI) |
 | `36700769803` | `856e483` | success (`Cockpit job`, Step 4 `replan` `c62e24a4`; not CI) |
+| `36750858892` | `79a0c67` | success (docs push) |
+| `36750897743` | `4ecfe4a` | success (Factory Completion Plan added) |
 | `36743601290` | `856e483` | success (`Cockpit job`, Step 4 `build_plan` `81c8607b` retry: built and QA-approved; not CI) |
 | `36701102701` | `856e483` | workflow run succeeded, job **failed** (`Cockpit job`, Step 4 `build_plan` `31c965ff`, Agent 37 HTTP 402) |
 | `36455639903` | `2e4a911` | success (`Cockpit job` workflow, `build_plan` `b952aaba`; not CI) |
