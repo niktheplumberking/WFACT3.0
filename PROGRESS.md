@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-01 (17:55 +05), via `/progress-sync` — re-synced to fold in `289ec00`…`899e425` plus the M1 close-out (Agent 37
-reviewer, redesigned clean fixture, live reviews) against git and reflog, GitHub Actions (`main` runs `36859122425`, `36860220959`), the live
-Cockpit (HTTP 200), live Supabase (`jobs` by status) and live Agent 37 reviews. Test counts are from this session's runs.
+Last synced: 2026-10-01 (19:10 +05), via `/progress-sync` — folds in Step 4B M2 (direction step, migration 0011, Cockpit track choice,
+14-case evaluation) against git, live Supabase (migration applied, attack test 19/19, advisors, plan `b5a45a8e`), live model runs and a
+browser check of the plan card. Earlier syncs: `289ec00`…`019ab16`.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -15,14 +15,15 @@ phases to numbered steps 1–24 and is the source for "Next up" below. Its Part 
 steps; this file tracks the Continuation Stages.
 
 **Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
-Step 4 is **partial** (its preview is superseded by Step 4B M6), and **Step 4B is in progress**: M0 has 5 of 7 inputs decided and **M1 is
-done** (2026-10-01), with one recorded deviation: the screenshot reviewer is Agent 37, the builder's own vendor, by Huraira's decision,
-because OpenAI has no credits. See the Step 4B section at the end. `main` is at `eaea97b` (CI `36859122425` green, Cockpit redeployed); `huraira-work` is 2 commits ahead
+Step 4 is **partial** (its preview is superseded by Step 4B M6), and **Step 4B is in progress**: M0 has 5 of 7 inputs decided, **M1 is
+done** (reviewer on the builder's vendor by Huraira's recorded decision) and **M2 is done** (2026-10-01): a direction step recommends a
+track, the owner chooses it in the Cockpit, and no build starts without one. See the Step 4B section at the end. `main` is at `eaea97b` (CI `36859122425` green, Cockpit redeployed); `huraira-work` is 2 commits ahead
 (`5641f45`, `6a296f8`) plus this sync. **Biggest open items**: the builder model (before M3; also decides whether the
 reviewer can return to a different vendor), image tool (before M5), Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
-1. **Step 4B M2** (direction step + track choice) on Huraira's GO after the M1 report.
+1. **Huraira: approve plan `b5a45a8e` in the Cockpit** (Summit Line, recommended Track A) to prove the track choice live, then GO for
+   **Step 4B M3** (Track A starter + multi-page build).
 2. **Huraira**: builder model before M3. If the builder stays on Agent 37, decide whether the reviewer stays same-vendor
    (`packages/rendered-qa/config/reviewer.json`) or moves to OpenAI once it has credits.
 3. **Huraira**: image tool (before M5); Supabase Auth settings and one real sign-up for Step 3A; the old
@@ -629,7 +630,7 @@ demonstrates the factory but does not count against DreamSign's 40+.
 
 Steps 1–4 and 3A are summarised at the top and in the plan's Part E; from Step 4B on, each milestone gets its checklist here.
 
-## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 5 of 7 inputs, M1 DONE 2026-10-01 with a recorded deviation)
+## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 5 of 7 inputs, M1 DONE with a recorded deviation, M2 DONE 2026-10-01)
 
 **M0 — inputs** (`docs/FRONTEND-UPGRADE-DESIGN.md` §10)
 - [x] Reference sites per track, niche taxonomy, labelled-AI-images policy, $5 per-build ceiling — `0fbdfce`, `0bfb19c`
@@ -672,4 +673,31 @@ invented phone/hours; clean fixtures pass. Results are exact check IDs that Fron
 The milestone also asks for *"a screenshot review by a model from a different vendor than the builder"*: a live screenshot review runs and
 works, but on the builder's own vendor by Huraira's recorded decision, so this part is **MET WITH A DEVIATION**, not met as written.
 
-**M2–M6**: not started. M2 waits on Huraira's GO after M1.
+**M2 — direction step + track choice** (DONE 2026-10-01)
+- [x] Direction agent `packages/planning/src/direction.ts`, registered at composition (`registryWithPlanningAndDirection`), agent-runtime
+      untouched; fixed taxonomy `packages/planning/config/direction-taxonomy.json` v1.0.0; model slot `direction` (claude-sonnet-5,
+      routing v1.3.0). Every point must quote the request verbatim or it is dropped; no recommendation below 0.6 confidence, for "other",
+      without a niche quote, or on conflicting signals below 0.8. Planning tests 25/25 (12 original unchanged + 13 new).
+- [x] Runs after Intake on the original request; stored with the plan; reused on re-plan; a failed step still yields a plan with the reason.
+      Live: `npm run intake` on the Summit Line request wrote pending plan `b5a45a8e` (local-trade, goal booking, Track A at 0.88, 3 brand
+      points, 0 dropped; 2 `agent:direction` audit rows), $0.0406 total ($0.0248 direction), 41 s.
+- [x] 14 labelled SYNTHETIC cases across all 7 niches (`packages/planning/test/fixtures/direction/cases.json`, labels written before the
+      run), live `npm run eval-direction`: **track 14/14 strict, niche 13/14** (design agency classified creative-portfolio, label said
+      professional-services), both no-recommendation cases withheld, the prompt-injection case ignored, $0.2821. Per-case table:
+      `packages/planning/test/fixtures/direction/RESULTS.md`. Caveat: one run on cases written by the same agent; not a production accuracy claim.
+- [x] Migration `0011_plan_build_track.sql` (append-only, applied): `build_track` decision column, approval requires a track,
+      `track_overridden` computed by the trigger, audited in `plan.decision`; jobs trigger refuses `build_plan` without a track.
+      Attack test `scripts/rls_attack_test_tracks.sql` 19/19 (Run 4 in `RLS_ATTACK_TEST_RESULTS.md`); `get_advisors`: nothing new.
+- [x] Cockpit: plan card shows the direction summary (with the client's words) and the recommendation with reasons; recommended track
+      pre-selected, overridable; approve disabled until a track is chosen; Actions builds Track A only (Track B waits for M4). Checked in the
+      browser with the real component and stubbed data (desktop + 375 px: no overflow, 76 px options, approve sends `build_track`).
+- [x] Jobs handler refuses no-track and Track B builds (jobs 10/10; 2 existing tests now approve with Track A, as M2 requires).
+- [ ] Live owner choice in the deployed Cockpit: waiting on **Huraira** (approve `b5a45a8e`); the database side is proven by the attack test.
+- Known effects: the 2 plans approved before 0011 cannot be built (no track); all 14 eval requests were entity-ambiguous at Intake (they
+  name no WFACT entity), which in the live pipeline stops before Direction until a human assigns the entity.
+
+**Exit check**: *"Fixture set run with per-case results; owner can choose/override a track; choice stored and audited; no build without a
+track"* — **MET** for the fixture run, storage, audit and the build gate (attack test + jobs tests); the owner's choice is proven in the
+browser against stubbed data and in the database by the attack test; a live click in the deployed Cockpit is still owed (Huraira).
+
+**M3–M6**: not started. M3 needs the builder-model decision first (`BLOCKED-ON-NICK.md`).

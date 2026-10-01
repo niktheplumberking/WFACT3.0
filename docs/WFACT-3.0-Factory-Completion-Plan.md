@@ -409,13 +409,14 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 4B — Front-end upgrade: two build tracks, chosen per client (P0) — IN PROGRESS (M0 mostly done, M1 done)
+### STEP 4B — Front-end upgrade: two build tracks, chosen per client (P0) — IN PROGRESS (M0 mostly done, M1 and M2 done)
 
 **Status: IN PROGRESS.** Design approved 2026-10-01. M0 decisions recorded in `docs/FRONTEND-UPGRADE-DESIGN.md` §10: reference sites
 per track (researched and checked live), niche taxonomy kept, AI images allowed if clearly labelled, $5 per-build spend ceiling.
 **Still open**: builder model (needed by M3) and image tool (needed by M5). **M1 DONE 2026-10-01**: claims gate, design rulebook v1.0.0,
 rendered QA and a live screenshot review. Deviation: the reviewer is Agent 37 (the builder's vendor), by Huraira's decision while OpenAI has no
-credits; recorded in `packages/rendered-qa/config/reviewer.json`. See `PROGRESS.md`. **Next: M2 on GO.**
+credits; recorded in `packages/rendered-qa/config/reviewer.json`. See `PROGRESS.md`. **M2 DONE 2026-10-01**: direction step, migration 0011 (owner's track, audited, no build without one), Cockpit
+track choice, 14-case evaluation (track 14/14, niche 13/14). **Next: M3 on GO (needs the builder-model decision).**
 
 **Depends on**: Step 4. Design approved by Huraira 2026-10-01: `docs/FRONTEND-UPGRADE-DESIGN.md` (v2 + Next.js for Track B).
 **Maps to**: Blueprint Phase 6-7 front-end loop, Playbook "Motion Sites + GSAP" and Stage 3 Assets; fixes the Step 4 finding that every
@@ -1415,7 +1416,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 3 | Retire plaintext secrets | **DONE** (`f74b0bc`); old CLI token listed as not verified, per the step's acceptance | 2026-09-30 | yes |
 | 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove | 2026-09-30 | yes |
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
-| 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 5 of 7 inputs decided; M1 done (reviewer on the builder's vendor by Huraira's decision) | 2026-10-01 | 2026-10-01 (design) |
+| 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 5 of 7 inputs decided; M1 and M2 done | 2026-10-01 | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | not started | | |
 | 5 | Documentation agent | not started | | |
 | 6 | Enforce agent permissions | not started | | |
