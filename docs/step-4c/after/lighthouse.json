@@ -1,0 +1,342 @@
+[
+ {
+  "name": "home",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 77,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "home",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 83,
+  "bp": 100,
+  "lcpMs": 3601,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "decisions",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 65,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "decisions",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3924,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "plan",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 61,
+  "cls": 0.001,
+  "failed": []
+ },
+ {
+  "name": "plan",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 79,
+  "bp": 100,
+  "lcpMs": 4073,
+  "cls": 0.003,
+  "failed": []
+ },
+ {
+  "name": "accounts",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 57,
+  "cls": 0.001,
+  "failed": []
+ },
+ {
+  "name": "accounts",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3923,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "stages",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 76,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "stages",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3923,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "projects",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 77,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "projects",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 76,
+  "bp": 100,
+  "lcpMs": 3923,
+  "cls": 0.118,
+  "failed": []
+ },
+ {
+  "name": "project",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 59,
+  "cls": 0.001,
+  "failed": []
+ },
+ {
+  "name": "project",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3925,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "new-request",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 66,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "new-request",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3923,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "activity",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 78,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "activity",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3923,
+  "cls": 0.001,
+  "failed": []
+ },
+ {
+  "name": "fix-rounds",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 56,
+  "cls": 0.001,
+  "failed": []
+ },
+ {
+  "name": "fix-rounds",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3923,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "run-failed",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 62,
+  "cls": 0.039,
+  "failed": []
+ },
+ {
+  "name": "run-failed",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3924,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "run-verified",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 63,
+  "cls": 0.002,
+  "failed": []
+ },
+ {
+  "name": "run-verified",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 80,
+  "bp": 100,
+  "lcpMs": 3924,
+  "cls": 0.005,
+  "failed": []
+ },
+ {
+  "name": "costs",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 75,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "costs",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 83,
+  "bp": 100,
+  "lcpMs": 3602,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "soon-system",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 59,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "soon-system",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 83,
+  "bp": 100,
+  "lcpMs": 3602,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "settings",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 58,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "settings",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 83,
+  "bp": 100,
+  "lcpMs": 3602,
+  "cls": 0.001,
+  "failed": []
+ },
+ {
+  "name": "more",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 63,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "more",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 83,
+  "bp": 100,
+  "lcpMs": 3604,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "login",
+  "ff": "desktop",
+  "a11y": 100,
+  "perf": 100,
+  "bp": 100,
+  "lcpMs": 50,
+  "cls": 0,
+  "failed": []
+ },
+ {
+  "name": "login",
+  "ff": "mobile",
+  "a11y": 100,
+  "perf": 86,
+  "bp": 100,
+  "lcpMs": 3301,
+  "cls": 0,
+  "failed": []
+ }
+]

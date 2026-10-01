@@ -507,7 +507,7 @@ REPORT in the Part C format after each milestone, then STOP.
 
 ---
 
-### STEP 4C — Cockpit UI/UX redesign: the control room (P1) — IN PROGRESS (Phase 1 audit and proposal done 2026-10-01, waiting for GO; see `docs/step-4c/PHASE-1-PROPOSAL.md`)
+### STEP 4C — Cockpit UI/UX redesign: the control room (P1) — BUILT 2026-10-01, waiting for Huraira's review and a live signed-in check (Phase 1 approved, D1–D8 accepted; evidence in `docs/step-4c/after/`)
 
 **Depends on**: none hard. Best after Step 4B M2 (so the track choice is designed in). Must land **before** Steps 9, 10, 14 and 17,
 which then build their rooms inside this design system. Can run in parallel with Steps 5-8 (it only touches `apps/cockpit`).
@@ -1420,7 +1420,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove | 2026-09-30 | yes |
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
 | 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done | 2026-10-01 | 2026-10-01 (design) |
-| 4C | Cockpit UI/UX redesign | **IN PROGRESS**: Phase 1 (audit, IA, design system, 5 mockups) done in `docs/step-4c/`; Phase 2 build waits for GO and decisions D1–D8 | 2026-10-01 | |
+| 4C | Cockpit UI/UX redesign | **BUILT, not yet deployed**: new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check and `main` deploy pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
 | 5 | Documentation agent | not started | | |
 | 6 | Enforce agent permissions | not started | | |
 | 7 | Evaluation registry | not started | | |

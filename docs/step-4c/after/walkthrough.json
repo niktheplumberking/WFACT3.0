@@ -1,0 +1,114 @@
+[
+ {
+  "name": "intake",
+  "width": 1440,
+  "clicks": 2,
+  "ms": 197,
+  "ok": true,
+  "note": "intake job requested and dispatched; its run page opened"
+ },
+ {
+  "name": "approve-plan",
+  "width": 1440,
+  "clicks": 2,
+  "ms": 105,
+  "ok": true,
+  "note": "approved as Track A; Start build offered"
+ },
+ {
+  "name": "reject-plan",
+  "width": 1440,
+  "clicks": 2,
+  "ms": 128,
+  "ok": true,
+  "note": "rejected with a note; Re-plan offered"
+ },
+ {
+  "name": "start-build",
+  "width": 1440,
+  "clicks": 3,
+  "ms": 138,
+  "ok": true,
+  "note": "approve + start build from Home; live run page"
+ },
+ {
+  "name": "why-failed",
+  "width": 1440,
+  "clicks": 1,
+  "ms": 83,
+  "ok": true,
+  "note": "reason and what-to-do visible"
+ },
+ {
+  "name": "approve-account",
+  "width": 1440,
+  "clicks": 2,
+  "ms": 88,
+  "ok": true,
+  "note": "approved as PM via decide_account_request"
+ },
+ {
+  "name": "sign-out",
+  "width": 1440,
+  "clicks": 2,
+  "ms": 70,
+  "ok": true,
+  "note": "signOut called"
+ },
+ {
+  "name": "intake",
+  "width": 375,
+  "clicks": 2,
+  "ms": 188,
+  "ok": true,
+  "note": "intake job requested and dispatched; its run page opened"
+ },
+ {
+  "name": "approve-plan",
+  "width": 375,
+  "clicks": 2,
+  "ms": 148,
+  "ok": true,
+  "note": "approved as Track A; Start build offered"
+ },
+ {
+  "name": "reject-plan",
+  "width": 375,
+  "clicks": 2,
+  "ms": 166,
+  "ok": true,
+  "note": "rejected with a note; Re-plan offered"
+ },
+ {
+  "name": "start-build",
+  "width": 375,
+  "clicks": 3,
+  "ms": 221,
+  "ok": true,
+  "note": "approve + start build from Home; live run page"
+ },
+ {
+  "name": "why-failed",
+  "width": 375,
+  "clicks": 1,
+  "ms": 127,
+  "ok": true,
+  "note": "reason and what-to-do visible"
+ },
+ {
+  "name": "approve-account",
+  "width": 375,
+  "clicks": 2,
+  "ms": 162,
+  "ok": true,
+  "note": "approved as PM via decide_account_request"
+ },
+ {
+  "name": "sign-out",
+  "width": 375,
+  "clicks": 2,
+  "ms": 160,
+  "ok": true,
+  "note": "signOut called"
+ }
+]
