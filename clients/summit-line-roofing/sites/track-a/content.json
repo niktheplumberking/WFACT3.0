@@ -1,0 +1,270 @@
+{
+  "schemaVersion": "track-a/1",
+  "business": {
+    "name": "Summit Line Roofing",
+    "tagline": "Roofing and gutter work, explained plainly.",
+    "phone": {
+      "value": "555-0142",
+      "source": "sample"
+    },
+    "email": {
+      "value": "hello@summitlineroofing.example",
+      "source": "sample"
+    }
+  },
+  "brand": {
+    "colors": {
+      "ink": "#1F3D36",
+      "paper": "#F6F1E7",
+      "accent": "#B5642A",
+      "deep": "#1F3D36"
+    },
+    "typePairing": "ledger",
+    "corners": "square"
+  },
+  "primaryAction": {
+    "label": "Request a free roof inspection",
+    "page": "faq-contact"
+  },
+  "pages": [
+    {
+      "slug": "index",
+      "navLabel": "Home",
+      "title": "Summit Line Roofing - Roof and Gutter Work",
+      "description": "Roof repair, roof replacement, gutter work and free inspections, explained plainly, no pressure.",
+      "sections": [
+        {
+          "type": "hero",
+          "id": "hero",
+          "heading": "Roofing and gutter work, explained plainly",
+          "intro": "We look at your roof. We tell you what we see. Then we give you honest options. No pressure, no hard sell.",
+          "showPhone": true,
+          "aside": {
+            "heading": "What we handle",
+            "points": [
+              "Roof repairs and patch work",
+              "Full roof replacement",
+              "Gutter cleaning, repair and replacement",
+              "A free roof inspection, no obligation"
+            ]
+          }
+        },
+        {
+          "type": "services",
+          "id": "services",
+          "heading": "What we do",
+          "intro": "Three things, done well. Roofs. Gutters. And the inspection that tells you which one you need.",
+          "items": [
+            {
+              "name": "Roof Repair",
+              "summary": "Leaks, missing shingles, storm damage and worn flashing. We find the cause, not just the symptom.",
+              "details": [
+                "Leak tracing and patching",
+                "Flashing and valley repair",
+                "Storm damage assessment",
+                "Shingle and tile replacement by the section"
+              ]
+            },
+            {
+              "name": "Roof Replacement",
+              "summary": "When patching no longer makes sense, we tear off the old roof and put on a new one.",
+              "details": [
+                "Full tear-off and disposal",
+                "New underlayment and flashing",
+                "Shingle, metal or tile options",
+                "Ridge vent and ventilation check"
+              ]
+            },
+            {
+              "name": "Gutter Services",
+              "summary": "Clogged gutters, or gutters pulling away from the house, cause more damage than people expect.",
+              "details": [
+                "Gutter cleaning",
+                "Gutter repair and resealing",
+                "Gutter replacement",
+                "Downspout extensions"
+              ]
+            },
+            {
+              "name": "Roof Inspections",
+              "summary": "A plain-language look at your roof's condition, before any work gets scheduled.",
+              "details": [
+                "Visual inspection of shingles and flashing",
+                "Attic check for leaks and ventilation",
+                "Gutter and downspout check",
+                "Written notes on what we found"
+              ],
+              "page": "faq-contact"
+            }
+          ]
+        },
+        {
+          "type": "prose",
+          "id": "approach",
+          "heading": "How we quote a job",
+          "paragraphs": [
+            "We tell you what we see first. Then we explain the options in plain terms.",
+            "If a repair will do the job, that's what we recommend. We don't push a full replacement you don't need."
+          ],
+          "aside": {
+            "heading": "No pressure",
+            "text": "You get honest options. Never a sales pitch."
+          }
+        },
+        {
+          "type": "packages",
+          "id": "packages",
+          "heading": "The three ways we work",
+          "intro": "Most jobs fall into one of three categories. Here is roughly what each one covers.",
+          "tiers": [
+            {
+              "name": "Repair",
+              "goodFor": "A roof that's basically sound but has a problem spot",
+              "scope": "We find the specific issue, like a leak or damaged section, and fix that part of the roof without replacing the whole thing.",
+              "includes": [
+                "Leak and damage diagnosis",
+                "Patch or section repair",
+                "Flashing and seal work",
+                "Follow-up check if needed"
+              ]
+            },
+            {
+              "name": "Replace",
+              "goodFor": "A roof that's worn out, leaking in multiple places, or near the end of its life",
+              "scope": "We remove the old roof down to the deck and install a new roofing system, matched to your home.",
+              "includes": [
+                "Full tear-off",
+                "New underlayment and flashing",
+                "New shingles, metal or tile",
+                "Site cleanup and debris haul-away"
+              ]
+            },
+            {
+              "name": "Care",
+              "goodFor": "A roof and gutters that just need regular upkeep",
+              "scope": "Routine gutter cleaning and a visual roof check, so small problems get caught before they become big ones.",
+              "includes": [
+                "Gutter cleaning",
+                "Visual roof inspection",
+                "Minor repairs as needed",
+                "Notes on anything to watch"
+              ]
+            }
+          ],
+          "note": "We don't list prices here. Ask about cost when you request your inspection."
+        }
+      ]
+    },
+    {
+      "slug": "how-it-works",
+      "navLabel": "How It Works",
+      "title": "How a Roofing Job Runs - Summit Line Roofing",
+      "description": "What happens after you request an inspection, step by step, plus what homeowners say about working with us.",
+      "sections": [
+        {
+          "type": "steps",
+          "id": "process",
+          "heading": "How a job runs",
+          "intro": "From the first call to the cleanup, here's the path.",
+          "steps": [
+            {
+              "title": "You request an inspection",
+              "text": "Fill out the form with your address or suburb and a time of day that works for you."
+            },
+            {
+              "title": "We take a look",
+              "text": "We walk the roof and gutters, take photos, and check the attic if needed."
+            },
+            {
+              "title": "You get a plan",
+              "text": "We explain what we found and what your options are, in plain language."
+            },
+            {
+              "title": "We do the work",
+              "text": "If you want to go ahead, we schedule the job and do the work."
+            },
+            {
+              "title": "We clean up",
+              "text": "We haul away debris and walk you through what was done."
+            }
+          ]
+        },
+        {
+          "type": "testimonials",
+          "id": "proof",
+          "heading": "What homeowners say (SAMPLE - replace with real customer feedback)",
+          "quotes": [
+            {
+              "text": "They explained what was wrong with our roof in plain English. No pressure to replace the whole thing.",
+              "attribution": "Dana, homeowner (SAMPLE)",
+              "source": "sample"
+            },
+            {
+              "text": "The gutters had been pulling away for a year. Fixed in an afternoon.",
+              "attribution": "Marcus, homeowner (SAMPLE)",
+              "source": "sample"
+            },
+            {
+              "text": "Straightforward and easy to talk to. They answered every question we had.",
+              "attribution": "Priya, homeowner (SAMPLE)",
+              "source": "sample"
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "id": "cta-inspection",
+          "heading": "Ready to get your roof looked at?",
+          "text": "Request a free inspection and we'll get back to you."
+        }
+      ]
+    },
+    {
+      "slug": "faq-contact",
+      "navLabel": "FAQ & Contact",
+      "title": "Questions and Contact - Summit Line Roofing",
+      "description": "Common questions about roof repair, replacement and gutter work, plus the form to request your free inspection.",
+      "sections": [
+        {
+          "type": "faq",
+          "id": "faq",
+          "heading": "Common questions",
+          "items": [
+            {
+              "q": "Do you offer free inspections?",
+              "a": "Yes. Request one through the form and we'll get back to you to arrange a time."
+            },
+            {
+              "q": "Do I need a full replacement or just a repair?",
+              "a": "That depends on the roof. We'll tell you honestly after we take a look, not before."
+            },
+            {
+              "q": "Do you work on gutters without a roof job?",
+              "a": "Yes. Gutter cleaning, repair and replacement are their own service, separate from roof work."
+            },
+            {
+              "q": "How do I book an inspection?",
+              "a": "Fill out the request form with your address or suburb, what you need, and a time of day that works for you. We'll follow up from there."
+            },
+            {
+              "q": "What if it's an emergency, like an active leak?",
+              "a": "Call the number listed on this site. If no one picks up, leave a message with your address and we'll call back."
+            }
+          ]
+        },
+        {
+          "type": "contact",
+          "id": "contact",
+          "heading": "Request a free roof inspection",
+          "intro": "Tell us about your roof and a time of day that works for you. We'll follow up to arrange an inspection.",
+          "formNote": "We'll call or text you back using the number you provide.",
+          "showDetails": true
+        }
+      ]
+    }
+  ],
+  "openQuestions": [
+    "Should package prices be shown as exact amounts, as ranges, or not at all? The client's messages disagree on this.",
+    "Which booking method is real: online time-slot booking, a form the office calls back on, or phone only? There is no booking tool yet and the phone is only answered in the mornings."
+  ]
+}

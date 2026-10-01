@@ -45,7 +45,7 @@ rows, mark them done so there's a record of when they closed.
 | 2-3 reference sites per track (A local business, B motion-rich) | Before M1 | **PROPOSED 2026-10-01** by the coding agent at Huraira's request (A: guttergalaxy.com, wavehousecleaning.com, seattledentalco.com; B: houseofhoney.com, racing.porsche.com, linear.app), see `docs/FRONTEND-UPGRADE-DESIGN.md` §10. Huraira/Nick to confirm or swap. |
 | Niche taxonomy for the direction step (keep / add / remove categories) | Before M2 | **CLOSED 2026-10-01** - Huraira: keep the proposed list |
 | Image policy (AI-generated allowed if labelled?) and Higgsfield access and budget | Before M3 | **Policy CLOSED 2026-10-01** - Huraira: AI images OK if clearly labelled. **Image tool still OPEN** (Higgsfield access and budget unconfirmed). |
-| Builder model: stay on Agent 37 or approve a second provider | Before M3 (M1 ran on today's builder, per the Step 4B prompt) | **OPEN** |
+| Builder model: stay on Agent 37 or approve a second provider | Before M3 (M1 ran on today's builder, per the Step 4B prompt) | **CLOSED 2026-10-01** - Huraira: "builder stays on Agent 37" (M3 started on that). For Track A the builder writes content JSON only; the starter owns the code. The screenshot reviewer is still Agent 37 too (same vendor, recorded in `packages/rendered-qa/config/reviewer.json`), so the different-vendor gap stays open until OpenAI credits or another vendor. |
 | Spend ceiling for builds (proposal: ask before any single build over $5) | Before M1 | **CLOSED 2026-10-01** - Huraira: ask before any single build over $5 |
 
 ## Budget & spend approval

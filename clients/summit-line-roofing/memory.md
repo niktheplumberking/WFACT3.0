@@ -47,6 +47,13 @@ exist for this client. Step 4 showed none are needed: `plan_approvals` has no fo
 | 1 | 4 Homepage build, attempt 2 (job `81c8607b`, workflow run `0cfc6675`) | Near-black hero/process backgrounds contradict the green/cream palette; body copy at weight 300 with 0.6-0.8 opacity lowers contrast; Google Fonts loaded with 8 weights; service rows invisible without JS. | Agent 37 (builder), round 2 | 2026-09-30 |
 | 2 | same | Hero claims "140+ homeowners served" (unverified, banned-claim spirit); oversized Services heading hurts mobile readability; marquee duplicate list not `aria-hidden`. | Agent 37 (builder), round 3 | 2026-09-30 |
 | 3 | same | Approved by the Claude evaluator (no issues); then QA evaluator approved, 0 failed checks. | n/a | 2026-09-30 |
+| 1 | 4_homepage_build | (approved, no issues) | workflow build-and-verify run 470ea1b9 | 2026-10-01 |
+| 1 | 4_homepage_build | index/packages: the note "We haven't settled on how to show pricing online yet" exposes the open pricing question as visitor-facing copy; the brief requires open questions to be flagged for a human reviewer, not stated as content on the live page. | workflow build-and-verify run 470ea1b9 | 2026-10-01 |
+| 2 | 4_homepage_build | (approved, no issues) | workflow build-and-verify run 470ea1b9 | 2026-10-01 |
+| 1 | 4_homepage_build | (approved, no issues) | workflow build-and-verify run 470ea1b9 | 2026-10-01 |
+| 1 | 4_homepage_build | (approved, no issues) | workflow build-and-verify run 2bfca49e | 2026-10-01 |
+| 1 | 4_homepage_build | (approved, no issues) | workflow build-and-verify run 2bfca49e | 2026-10-01 |
+| 1 | 4_homepage_build | (approved, no issues) | workflow build-and-verify run 2bfca49e | 2026-10-01 |
 
 ## Notes
 

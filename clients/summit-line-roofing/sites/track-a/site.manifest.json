@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "starterVersion": "track-a-starter/1.0.0",
+  "pages": [
+    "index.html",
+    "how-it-works.html",
+    "faq-contact.html"
+  ],
+  "files": [
+    {
+      "name": "content.json",
+      "sha256": "1b69f0f8364dd70140e28025ce89d748bf40b888182eef9577383df55c324a31",
+      "bytes": 10513
+    },
+    {
+      "name": "faq-contact.html",
+      "sha256": "1ac0689eb37605321f1c4cd2e414704ae664c3c06a93805004666b2f7b61cbf5",
+      "bytes": 26592
+    },
+    {
+      "name": "how-it-works.html",
+      "sha256": "b08e5631186cad063c5a6874f3cd43dbacd5709808ecbb8aced08a59463d2ee7",
+      "bytes": 24871
+    },
+    {
+      "name": "index.html",
+      "sha256": "e156fa537ca444b56de910558e81df23771ba5fbe9c6b3f987abfab92a0f29b9",
+      "bytes": 28781
+    }
+  ],
+  "source": "content.json"
+}

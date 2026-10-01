@@ -78,3 +78,11 @@ Format per entry: date, what happened, what it cost, the rule going forward.
    every new verification gate ships with (a) the real artifact that escaped, hash-pinned, as a failing test, and (b) one fixture per defect
    class that differs from a clean fixture by exactly that defect; any "this is allowed because…" exemption must be tested with the
    exempting marker placed next to, not on, the violating content.
+
+4. **[PROPOSED, unapproved] A safety fallback that silently changes the output must fail loudly, or be tested as its own outcome.**
+   Step 4B M3, 2026-10-01: the Track A palette fell back to "tint = paper" whenever the tint missed WCAG AA, which was right for
+   accessibility, but the accent was tuned only on the paper, so the fallback fired on every brand and every page lost its section
+   rhythm. Nothing failed: contrast, axe and the DOM detectors all passed; only the screenshot reviewer and a human look showed one flat
+   colour. In the same milestone, `max_tokens: 4096` on claude-sonnet-5 (adaptive thinking on by default, thinking counts against the
+   cap) returned no text and was reported as "no text block", which hid the cause. → Proposed rule: every fallback branch gets a test that
+   asserts the normal path does NOT take it, and a model call that hits `stop_reason: max_tokens` reports that reason by name.

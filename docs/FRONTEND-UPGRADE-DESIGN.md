@@ -149,5 +149,6 @@ roundups; dental website roundups (Colorlib, Delmain, Azuro); the Awwwards Motio
 
 ### Still open before M1
 
-- **Builder model**: stay on Agent 37 or add a second provider (builder and evaluator must stay on different vendors).
+- **Builder model**: ~~stay on Agent 37 or add a second provider~~ **Decided 2026-10-01 (Huraira): the builder stays on Agent 37.**
+  M3 makes this workable for multi-page output by having the builder write content JSON for a committed starter instead of HTML.
 - **Image source**: which tool generates the images (Higgsfield access and budget are unconfirmed); needed by M5, not M1.

@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-01 (19:20 +05), via `/progress-sync` — re-sync after Step 4B M2: no new commits since `c0f3d29`; folds in `main` CI
+Last updated: 2026-10-01 (21:15 +05), Step 4B M3 done (see the Step 4B section; commits `d190e4d`…`74b59a0` plus the docs commit).
+Previous sync: 2026-10-01 (19:20 +05), via `/progress-sync` — re-sync after Step 4B M2: no new commits since `c0f3d29`; folds in `main` CI
 run `36871379578` (green, Cockpit deployed, HTTP 200), live `plan_approvals` (plan `b5a45a8e` still pending, no track) and `jobs` (9 rows,
 none since 2026-09-30, `a2a41d2d`/`cbf8bf7b` still queued). Earlier syncs: `289ec00`…`c0f3d29`.
 
@@ -17,15 +18,18 @@ steps; this file tracks the Continuation Stages.
 **Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
 Step 4 is **partial** (its preview is superseded by Step 4B M6), and **Step 4B is in progress**: M0 has 5 of 7 inputs decided, **M1 is
 done** (reviewer on the builder's vendor by Huraira's recorded decision) and **M2 is done** (2026-10-01): a direction step recommends a
-track, the owner chooses it in the Cockpit, and no build starts without one. See the Step 4B section at the end; roughly a third of Step 4B is done (M0 mostly, M1, M2 of M0–M6). `main` and `huraira-work` are both at
-`c0f3d29` (CI `36871379578` green, Cockpit deployed). **Biggest open items**: the builder model (before M3; also decides whether the
-reviewer can return to a different vendor), image tool (before M5), Nick's real brief, a real Step 3A sign-up.
+track, the owner chooses it in the Cockpit, and no build starts without one. **M3 is done** (2026-10-01): Track A builds a multi-page
+site from a committed starter (Agent 37 writes content only) and a live Summit Line build passed the whole gate (run `2bfca49e`).
+See the Step 4B section at the end; about half of Step 4B is done (M0 6 of 7 inputs, M1, M2, M3 of M0–M6). `huraira-work` is ahead of
+`main` with the M3 commits (not pushed). **Biggest open items**: image tool (before M5), a different-vendor screenshot reviewer (the
+Agent 37 reviewer produced false positives in M3), Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
-1. **Huraira: approve plan `b5a45a8e` in the Cockpit** (Summit Line, recommended Track A) to prove the track choice live, then GO for
-   **Step 4B M3** (Track A starter + multi-page build).
-2. **Huraira**: builder model before M3. If the builder stays on Agent 37, decide whether the reviewer stays same-vendor
-   (`packages/rendered-qa/config/reviewer.json`) or moves to OpenAI once it has credits.
+1. **Huraira**: review the Track A starter (it is "human-reviewed" only once you have looked: screenshots of the verified build are
+   the M3 evidence) and the M3 report; then GO for **Step 4B M4** (Track B, Next.js static export). Approving plan `b5a45a8e` in the
+   Cockpit would also prove the track choice and a Track A Cockpit job live (pushing to `main` deploys; only on your word).
+2. **Huraira**: the screenshot reviewer. It stays Agent 37 (same vendor as the builder) unless OpenAI gets credits; in M3 it failed
+   DR-SINGLE-DEFAULT-FONT on pages whose fonts were proven loaded, costing a revision round.
 3. **Huraira**: image tool (before M5); Supabase Auth settings and one real sign-up for Step 3A; the old
    Doppler CLI token check; OK to close the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b` (still 2 queued, checked this sync).
 
@@ -630,11 +634,11 @@ demonstrates the factory but does not count against DreamSign's 40+.
 
 Steps 1–4 and 3A are summarised at the top and in the plan's Part E; from Step 4B on, each milestone gets its checklist here.
 
-## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 5 of 7 inputs, M1 DONE with a recorded deviation, M2 DONE 2026-10-01)
+## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 6 of 7 inputs, M1 DONE with a recorded deviation, M2 DONE, M3 DONE 2026-10-01)
 
 **M0 — inputs** (`docs/FRONTEND-UPGRADE-DESIGN.md` §10)
 - [x] Reference sites per track, niche taxonomy, labelled-AI-images policy, $5 per-build ceiling — `0fbdfce`, `0bfb19c`
-- [ ] Builder model: **Huraira**, needed before M3 (`BLOCKED-ON-NICK.md`)
+- [x] Builder model: **Huraira 2026-10-01, "builder stays on Agent 37"** (`BLOCKED-ON-NICK.md` closed)
 - [ ] Image tool and budget: **Huraira**, needed before M5
 
 **M1 — rendered QA + claims gate on today's builder**
@@ -700,4 +704,50 @@ works, but on the builder's own vendor by Huraira's recorded decision, so this p
 track"* — **MET** for the fixture run, storage, audit and the build gate (attack test + jobs tests); the owner's choice is proven in the
 browser against stubbed data and in the database by the attack test; a live click in the deployed Cockpit is still owed (Huraira).
 
-**M3–M6**: not started. M3 needs the builder-model decision first (`BLOCKED-ON-NICK.md`).
+**M3 — Track A starter + multi-page build** (DONE 2026-10-01)
+- [x] Committed Track A starter `packages/frontend-loop/starters/track-a/` (CSS design system + 1.7 KB of JS, no framework, no web fonts,
+      no third-party requests) and a deterministic renderer `src/trackA/render.ts` (same content → same bytes). Design skills loaded first
+      (impeccable, design-taste-frontend, high-end-visual-design, ecc:frontend-design-direction, ecc:frontend-a11y, ecc:motion-foundations);
+      art direction from the brand: pitched-roofline edge with a drawn copper ridge, system type pairings (serif + humanist sans), computed
+      AA palette. `d190e4d`, `10ef870`
+- [x] Content as data `src/trackA/content.ts` (schema `track-a/1`): every business fact is `source: brief` (checked against the brief) or
+      `sample` (rendered with a visible SAMPLE label, never in JSON-LD); required section ids, reserved ids, page structure (home ≤ 6
+      sections, others ≥ 2, one cta, no three list-like sections in a row) and WCAG contrast are validated before rendering
+- [x] Builder loop `src/trackA/loop.ts` + agent: Agent 37 writes content JSON only; exact validation errors go back (bounded); Claude
+      reviews the content against the brief (bounded rounds); QA failures come back as page + check id and the builder edits the content
+- [x] Multi-page through the pipeline: text gate on every page, required sections site-wide, JSON-LD parsed as JSON; rendered QA serves the
+      whole site; workflow checkpoints a manifest pinning every file's sha256 and re-hashes all files before QA; revisions edit
+      `content.json`; resume refuses a different builder; jobs build Track A plans with the Track A builder; CLI `--track A`. `6234f87`
+- [x] Migration `0012_artifacts_site_json.sql` (applied): the private `artifacts` bucket also accepts `application/json`; still private,
+      2 MB, owner/admin read only. No table or RLS change. `get_advisors`: nothing new (the 3 known items)
+- [x] **Acceptance fixtures** (real Chromium, `packages/rendered-qa/test/trackA.test.ts`, 5/5): the SYNTHETIC 4-page Summit Line site passes
+      the text gate on every page, every rendered check and the Track A budget on every page (LCP 0.90 s vs 2.0 s, CLS 0, 1.7 KB JS);
+      **broken-link fixture** (a page removed) fails only `render.links` (HTTP 404 on 3 pages); **over-budget fixture** (60 KB script + a
+      hero image over 2 MB) fails only `render.js-budget` and `render.perf` (LCP over 2.0 s)
+- [x] **Live build through the pipeline** (workflow CLI, same library code as the Cockpit job; Agent 37 builder, Claude content reviewer,
+      text gate + rendered QA + Agent 37 screenshot review + Claude evaluator): run `2bfca49e` → `awaiting_launch_approval` after 3 build→QA
+      cycles, 16 min; verified checkpoint `clients/summit-line-roofing/sites/track-a/site.manifest.json` sha256 `12a6cd7a…`, 3 pages.
+      **Independent re-check** (separate process): every file re-hashes to the manifest; text gate 10/10 and rendered 9/9 pass on all 3
+      pages; LCP 0.90 s, CLS 0, perf score 1.0. Not deployed (launch gate)
+- [x] Cost: Claude $0.36 across all three live runs ($0.11 + $0.09 + $0.17); 12 Agent 37 builder calls (~474k input tokens) UNPRICED;
+      Agent 37 screenshot-review calls still not in `model_traces` (M1 gap)
+- Live runs, honestly: `470ea1b9` failed_verification (claims gate caught "licensed and insured?"/"warranty" FAQ copy; then the reviewer
+  failed rhythm and contrast → found a real starter bug: the tinted section background silently fell back to the paper); `b2cd975e`
+  build_failed (claude-sonnet-5 spent all 4096 output tokens thinking: `max_tokens` raised to 16000 in both Claude clients, `74b59a0`);
+  `2bfca49e` passed
+- [x] Fixed on the way: rendered-qa design detectors crashed on any inline SVG (`innerText` undefined), so no Track A page could be checked
+- **Defects the checks missed** (human look at the verified build): invented service scope not in the brief ("Shingle, metal or tile
+  options", "Attic check for leaks and ventilation"; the claims gate only covers factual patterns); the packages table's "Includes"
+  column wraps heavily; the home page ends without a closing call to action; one generic line ("Three things, done well.")
+- **Reviewer noise** (Agent 37, same vendor): DR-SINGLE-DEFAULT-FONT failed twice on pages whose fonts (Iowan Old Style + Avenir Next)
+  were proven loaded in the QA browser; DR-THIN-LOW-CONTRAST once although axe colour-contrast passed. Claims-gate false positive:
+  BC-SUPERLATIVE matches "the best time to reach you"
+- [ ] Track A built by a real Cockpit job (GitHub Actions): not run (needs a push to `main` and plan `b5a45a8e` approved; Huraira's call).
+      On the Linux runner the starter's system fonts are not installed, so screenshots there show fallback faces
+- [ ] "Human-reviewed starter": waiting on Huraira's look
+
+**Exit check**: *"a 3+ page local-business site builds, passes rendered QA, the rulebook and its budgets; a broken-link fixture and an
+over-budget fixture fail."* — **MET**: live run `2bfca49e` (3 pages) passed the text gate, rendered QA, the rulebook (DOM detectors and the
+screenshot review) and the Track A budgets, re-verified independently; both fixtures fail on the named checks only.
+
+**M4–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
