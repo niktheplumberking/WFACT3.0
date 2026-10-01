@@ -4,7 +4,7 @@
 **Supersedes**: the 100-hour Operator's Manual sprint as the thing you're optimizing for. That sprint
 proved a real vertical slice (verify-loop, RLS isolation, a live Cockpit) but its own exit checks were
 never the actual finish line — the [Ecosystem Blueprint](WFACT-3.0-Ecosystem-Blueprint.md) and the
-[Execution Roadmap](WFACT-3.0-Execution-Roadmap.md) are. This document sequences what's left of those
+[Execution Roadmap](archive/sprint-100-hour/WFACT-3.0-Execution-Roadmap.md) are. This document sequences what's left of those
 two, in dependency order, against what's *actually* in this repo today, not against calendar days.
 
 **Why this document exists**: the sprint was time-boxed by days-per-phase. That produced real, verified
@@ -68,7 +68,7 @@ pick a starting point.
 - `memory/context.md` is still placeholder content — Nick's real business-rules session hasn't happened.
 - The one pilot ran on a placeholder brief, not a real client.
 
-This is roughly Phase 0–1 of the [Execution Roadmap](WFACT-3.0-Execution-Roadmap.md)'s 5-phase plan,
+This is roughly Phase 0–1 of the [Execution Roadmap](archive/sprint-100-hour/WFACT-3.0-Execution-Roadmap.md)'s 5-phase plan,
 and Phase 0–4 (of 13) of the Blueprint's build order (§4), with Phases 2, 3, 4, 5, 8, 9 each partially
 started, not sequentially completed. **The stages below finish those partials in dependency order
 before opening any new phase**, rather than spreading thinner across more phases.

@@ -43,7 +43,7 @@ docs/                     source planning documents (do not treat this repo's ot
 ## What this is, right now
 
 Not the full multi-month build. This repo currently executes the **100-hour, 7-phase proof sprint**
-described in `docs/wfact-3.0-nick-plan.html` and `docs/wfact-3.0-operator-manual.html`: prove one real
+described in `docs/archive/sprint-100-hour/wfact-3.0-nick-plan.html` and `docs/archive/sprint-100-hour/wfact-3.0-operator-manual.html`: prove one real
 loop (controller → memory → front-end build → verification → cockpit visibility) end to end, on one
 real or pilot client, with honest measured numbers — not a finished product. See `PROGRESS.md` for
 where things stand today.

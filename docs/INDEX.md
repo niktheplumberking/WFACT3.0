@@ -1,18 +1,39 @@
 # Documentation Index
 
----
+**Last updated**: 2026-10-01
 
-## Session Start (Essential - ~800 tokens)
+## Session start (essential, ~800 tokens)
 
-- `CLAUDE.md` (~450 tokens)
-- `.claude/COMMON_MISTAKES.md` (~350 tokens)
-- `.claude/QUICK_START.md` (~100 tokens)
-- `.claude/ARCHITECTURE_MAP.md` (~150 tokens)
+- `CLAUDE.md` (law file)
+- `.claude/COMMON_MISTAKES.md`
+- `.claude/QUICK_START.md`
+- `.claude/ARCHITECTURE_MAP.md`
 
-## Task-Specific Topics (Load As Needed)
+## The plan in force (read in this order)
 
-Add topic files in `docs/learnings/` and list them here.
+| Doc | What it is |
+|---|---|
+| `wfact-3.0-blueprint.html` | Scope source of truth: 13 phases, Cockpit map (§9), Definition of Done (§16K) |
+| `WFACT-3.0-Continuation-Build-Plan.md` | Stages 1–7 |
+| `WFACT-3.0-Factory-Completion-Plan.md` | Steps 1–24, one agent prompt per step, Standard Operating Rules |
+| `FRONTEND-UPGRADE-DESIGN.md` | Step 4B: the two front-end build tracks |
 
----
+Live status: `../PROGRESS.md`. Waiting on Nick: `../BLOCKED-ON-NICK.md`.
 
-**Last Updated**: 2026-09-10
+## Reference (current, still cited by the law file and memory)
+
+| Doc | Use |
+|---|---|
+| `WFACT-3.0-Playbook.md` | Five pillars, 11-stage pipeline (§7), carried-over laws |
+| `WFACT-3.0-Ecosystem-Blueprint.md` | Markdown version of the Blueprint (text-friendly) |
+| `COCKPIT-JOBS.md` | Cockpit job queue design and runbook |
+| `SECRETS.md` | Doppler secrets runbook |
+| `WFACT SOPS/` | The 3 SOPs, Factory Book and Factory Audit (PDFs, with markdown copies) |
+
+## Planned outputs (created by later steps, not yet present)
+
+`DISASTER-RECOVERY.md`, `nick-briefing-<date>.md`, and dated results under `learnings/`.
+
+## Archive (history only, zero token cost, do not work from it)
+
+`archive/` is listed in `.claudeignore`. See `archive/README.md` for what is in it.

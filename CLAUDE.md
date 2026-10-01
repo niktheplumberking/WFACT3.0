@@ -1,7 +1,7 @@
 # WFACT 3.0 — Law File
 
 Every agent (human or AI) reads this file first, before touching anything else in this repo.
-This file is the executable summary of `docs/WFACT-3.0-Playbook.md`, `docs/WFACT-3.0-Execution-Roadmap.md`,
+This file is the executable summary of `docs/WFACT-3.0-Playbook.md`, `docs/archive/sprint-100-hour/WFACT-3.0-Execution-Roadmap.md`,
 and `docs/WFACT-3.0-Ecosystem-Blueprint.md`. Where this file and those docs disagree, the docs are the
 source of truth and this file is stale — fix this file, don't trust it blindly.
 
@@ -10,15 +10,18 @@ time-sensitive (model IDs, pricing, credentials) before relying on it.
 
 ## 0. What WFACT 3.0 is, right now
 
-We are 20 days into a **100-hour, 7-phase proof sprint** (see `docs/wfact-3.0-nick-plan.html` and
-`docs/wfact-3.0-operator-manual.html`), not the full multi-month build (that's the Execution Roadmap's
-Phase 0–4 / Blueprint's 13-phase plan, which this sprint feeds into). The sprint's job is to prove one
-real loop end to end — controller, memory, front-end build, verification, cockpit visibility — on one
-real (or pilot) client, with real measured numbers. It is explicitly not trying to build the full
-11-stage pipeline, the full cockpit, or the full 78-check registry in these 100 hours.
+**Plan in force** (updated 2026-10-01): the 100-hour sprint is finished and archived
+(`docs/archive/sprint-100-hour/`, historical only, do not work from it). Work now follows, in order:
 
-Current phase: **Phase 1 — Foundation & Access** (Days 1–2). See `PROGRESS.md` for live status and
-`BLOCKED-ON-NICK.md` for everything waiting on access, decisions, or budget that isn't ours to resolve.
+1. `docs/wfact-3.0-blueprint.html`: scope source of truth (13 build phases, Cockpit §9, Definition of Done §16K).
+2. `docs/WFACT-3.0-Continuation-Build-Plan.md`: Stages 1–7.
+3. `docs/WFACT-3.0-Factory-Completion-Plan.md`: Steps 1–24 with one agent prompt per step and the Standard
+   Operating Rules (Part C). One step at a time, report back, wait for Huraira's GO. Step 4B is described in
+   `docs/FRONTEND-UPGRADE-DESIGN.md`.
+
+Live status is in `PROGRESS.md`; everything waiting on Nick is in `BLOCKED-ON-NICK.md`. The document index is
+`docs/INDEX.md`. The sprint-era phrasing elsewhere in this file ("proof sprint", "Phase 1") is history; the
+law sections below still apply unchanged.
 
 ## 1. The one law above all others
 
