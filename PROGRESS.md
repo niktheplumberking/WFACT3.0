@@ -1,8 +1,9 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-01, via `/progress-sync` — re-synced to fold in `79a0c67`…`1ccae2b` (Factory Completion Plan committed and
-revised with Steps 3A, 4B, 4C; Step 4B design approved, M0 decisions) against git, GitHub Actions (`main` run `36750897743`), live Supabase
-(`jobs`, row counts) and the working tree (uncommitted archive-path fixes by another editor, kept as found).
+Last synced: 2026-10-01 (17:20 +05), via `/progress-sync` — re-synced to fold in `289ec00`…`6a296f8` (archive-path fixes; Step 4B M1
+claims gate, rulebook, rendered QA; the unplanned push of M1 to `main`) against git and reflog, GitHub Actions (`main` run `36859122425`),
+the live Cockpit (HTTP 200) and live Supabase (`jobs` by status). Test counts are from this session's runs (fresh clone of `47cef2c`;
+rendered-qa re-run at `5641f45`).
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -14,60 +15,32 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**
-(3A = password sign-in with approval-gated accounts, added to the plan), Step 4 is **partial** (full synthetic run built and
-QA-approved, but a human review found defects the checks missed; its preview is superseded by Step 4B M6), and **Step 4B is in progress**:
-design approved 2026-10-01 (two build tracks chosen per client, Track B on Next.js, anti-slop design rulebook, rendered QA), M0 has 5 of 7
-inputs decided, **M1 is PARTIAL** (2026-10-01, `c1345de`, `47cef2c`; see the Step 4B M1 entry below). `main` is at `eaea97b` (CI
-`36859122425` green, Cockpit redeployed); `huraira-work` is 1 commit ahead (`5641f45`, unpushed). **Biggest blockers**: OpenAI credits for the screenshot reviewer (now),
-builder model (before 4B M3) and image tool (before M5), Nick's real brief and business rules, and a real sign-up to prove Step 3A live.
-
-**Step 4B M1 — rendered QA + claims gate (2026-10-01, PARTIAL).** Built: a claims gate in `packages/verification` (`claims.after-html`,
-`claims.sample-label`, `claims.banned` from R-10, `claims.unsourced-fact` with the approved brief as the only fact source; rules in
-`config/claims-rules.json` v1.0.0); the design rulebook `packages/frontend-loop/design/rulebook.json` v1.0.0 (12 banned patterns, 4 required
-qualities, one failing fixture each), now in the builder's system prompt; a new `packages/rendered-qa` (Chromium at 1440/768/375, axe,
-Lighthouse, links, console, layout, JS budget, reduced motion, rulebook DOM detectors, and an OpenAI gpt-5.4 screenshot reviewer). Wired into
-Cockpit jobs and the workflow CLI with no off switch. Evidence:
-- Step 4 artifact, re-downloaded from the private bucket, sha256 `960b61ba…` matches the checkpoint; it still passes the original six, and
-  now FAILS `claims.after-html` (leaked "File-mutation verifier" text), `claims.sample-label` (3 unlabelled testimonials), `claims.unsourced-fact`
-  ((555) 014-7732, Mon-Sat 7:00am-6:00pm, "within one business day", the six invented areas), `claims.banned` (★★★★★, "no automatic charges,
-  ever"), `render.design-rules` (initials avatars, ★ glyphs, eyebrow labels above 6 of 7 headings), `render.layout` (11.2px text, five
-  19px-tall nav links at 375) and `render.perf` (mobile LCP 2.87 s vs 2.0 s). Independent CLI run (`npm run qa`, separate process).
-- Clean fixture passes all 10 text checks and all 9 rendered checks (LCP 0.75 s, Lighthouse perf 1.0). Each planted fixture fails only its own
-  check: leaked text, missing SAMPLE, invented fact, banned claim, broken link, console error, over-budget JS, reduced motion ignored, and
-  each of the 11 DOM-detectable rules.
-- Tests: verification 35, frontend-loop 29, rendered-qa 18 (real Chromium), workflow 8, jobs 8, hermes 40, planning 12, agent-runtime 12,
-  audit 14, all passing, from a fresh clone of `47cef2c` with `npm ci`; fixtures regenerate with no drift; gitleaks clean on both commits.
-- **Not done**: the live screenshot review returned OpenAI **HTTP 429 "You have no credits remaining"**, so it reported NOT RUN (correctly,
-  never a pass). Until credits are added, every Cockpit build ends "not verified". The new CI job and the Chromium step in `cockpit-job.yml`
-  ran on GitHub in `main` CI run `36859122425` (12:02 UTC): `rendered-qa` passed (Chromium install 21 s, browser tests 2m03s), every other
-  job passed and `deploy-cockpit` redeployed the Cockpit (no `apps/cockpit` change in M1). The Chromium step in `cockpit-job.yml` has not run
-  yet (no Cockpit job since). Reviewer calls are cost-logged in the CLI and `report.json`, not yet in `model_traces`.
-- **How M1 reached `main`**: not by the coding agent. This checkout pushed `huraira-work` (17:02:01 +05) and `main` (17:02:03 +05) right
-  after another session's commit `03138d9` (which also folded in the agent's then-uncommitted M1 entry in this file); the agent's docs commit
-  `eaea97b` landed in that two-second gap and went to `main` with it. Evidence: `git reflog show origin/main` ("update by push"). No hook or
-  push config exists in the checkout. Same pattern as `289ec00` at 16:10. Prevention: one session at a time per checkout, or push named
-  commits only (`git push origin <sha>:main`).
-- **Correction**: commit `5641f45`'s message says the first `rendered-qa` run "sat 20+ minutes"; that is false (the agent misread a watch
-  command that returned early). The job passed in 2m03s. The commit's timeouts are kept as a safeguard only.
+**Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
+Step 4 is **partial** (its preview is superseded by Step 4B M6), and **Step 4B is in progress**: M0 has 5 of 7 inputs decided and **M1 is
+partial**, roughly 85% of M1 done (built, tested, on `main`, CI green; only the live cross-vendor screenshot review is missing). See the
+Step 4B section at the end. `main` is at `eaea97b` (CI `36859122425` green, Cockpit redeployed); `huraira-work` is 2 commits ahead
+(`5641f45`, `6a296f8`) plus this sync. **Biggest blocker now**: OpenAI credits for the screenshot reviewer (HTTP 429); until then every
+Cockpit build ends "not verified". Later: builder model (before M3), image tool (before M5), Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
-1. **Huraira: OpenAI credits** for the screenshot reviewer (money, human only), or choose another reviewer vendor. Then re-run
-   `doppler run -- npm run qa -- … --review-always` on the Step 4 artifact and the review-only fixtures to finish M1.
-2. **Step 4B M2** (direction step + track choice) after Huraira's GO on the M1 report.
-3. **Huraira decisions**: builder model (before M3) and image tool / Higgsfield access (before M5); how to tidy commit `0fbdfce` (see
-   Incidents). The archive-path fixes were committed in `289ec00`.
-4. **Huraira actions**: push `5641f45` (hang safeguard) when ready; Supabase Auth settings and one real sign-up to
-   prove Step 3A live; the old Doppler CLI token check; OK to close the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b`.
+1. **Huraira: OpenAI credits** (money, human only) or another reviewer vendor that is not the builder's. Then re-run
+   `doppler run -- npm run qa -- … --review-always` on the Step 4 artifact and the review-only fixtures to close M1.
+2. **Step 4B M2** (direction step + track choice) on Huraira's GO after M1.
+3. **Huraira**: builder model (before M3) and image tool (before M5); Supabase Auth settings and one real sign-up for Step 3A; the old
+   Doppler CLI token check; OK to close the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b` (still 2 queued, checked this sync).
 
 **Gaps noticed**:
+- **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`
+  (the only dead path found in a link check of the 7 main docs this sync).
+- **Two ways in to QA still differ**: `packages/verification`'s old `npm run verify` CLI runs only the original six checks; the M1 gate is
+  in `npm run qa` (rendered-qa), the jobs runner and the workflow CLI.
 - **The Factory Completion Plan has no step for richer or multi-page output.** The builder is limited by design to one text-only HTML
   file (`frontend-loop/src/loop.ts:140`, `planner.ts:93`) and every check reads text only. Added as Step 4B (Option B), design in
-  `docs/FRONTEND-UPGRADE-DESIGN.md`; the plan file itself is untracked and not edited.
+  `docs/FRONTEND-UPGRADE-DESIGN.md`, now in the committed plan. M1 adds rendered checks; multi-page output is M3/M4.
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
   moment Stage 6 finishes". The rows exist ("One real pilot project brief", "business rules session")
   but are still framed as sprint Day 3–9 items.
-- **Linked `file:` packages need a decision.** There are 9 packages under `packages/`, linked with a
+- **Linked `file:` packages need a decision.** There are 10 packages under `packages/` (`rendered-qa` added in M1), linked with a
   hand-ordered install per CI job. It's worth deciding on npm workspaces now. Check first: the repo
   root has no `package.json` on purpose, because of the Phase 6 Vercel Root Directory incident. (Three
   near-identical copies of this gap were in the file; merged here.)
@@ -126,19 +99,27 @@ Cockpit jobs and the workflow CLI with no off switch. Evidence:
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
-- **Unrelated staged changes swept into an agent commit (2026-10-01, open).** Commit `0fbdfce` ("Step 4B M0: researched reference
-  sites…") also contains 12 pure renames into `docs/archive/` (graphify snapshot, old reports, the 100-hour sprint docs) that another
-  editor had staged; the agent committed with a plain `git commit` without checking the index. Contents are unchanged (0 lines), the
-  commit is unpushed, and `main` is unaffected, but the renames are mis-attributed and the matching link fixes are still uncommitted, so
-  the committed tree has stale paths until they land. Found by this sync (`git show --stat 0fbdfce`). Fix owed: Huraira decides whether
-  to keep it and commit the path fixes on top, or split it. Prevention: commit only named paths (`git commit -- <paths>`) and check
-  `git diff --cached` first.
+- **Step 4B M1 reached `main` and redeployed the Cockpit without a planned push (2026-10-01).** This checkout pushed `huraira-work`
+  (17:02:01 +05) and `main` (17:02:03 +05) right after another session's commit `03138d9`; the coding agent's docs commit `eaea97b` landed in
+  the gap and went to `main` with it, so `c1345de`, `47cef2c`, `eaea97b` deployed through CI run `36859122425` (all jobs green,
+  `deploy-cockpit` success, live HTTP 200). Found by the agent (`git reflog show origin/main`: "update by push"; no hook or push config).
+  Impact: none observed; M1 does not touch `apps/cockpit` and deploys no client site. `03138d9` also committed the agent's uncommitted M1
+  entry in this file, and its message ("mark the 0fbdfce rename incident resolved") does not match its diff. Huraira has since authorised
+  pushing and merging to `main` (2026-10-01). Prevention: one session per checkout, or push named commits (`git push origin <sha>:main`).
+- **False CI-hang claim in a commit message (2026-10-01, corrected).** `5641f45` says the first `rendered-qa` run "sat 20+ minutes"; it
+  passed in 2m03s (run `36859122425`, tests 12:02:50 to 12:04:53 UTC). The agent misread a watch command that returned early. Amending was
+  blocked by the GateGuard hook, so the correction lives here. The commit's timeouts stay as a safeguard.
+- **Unrelated staged changes swept into an agent commit (2026-10-01, resolved).** `0fbdfce` contained 12 renames into `docs/archive/`
+  staged by another editor. Resolved by `289ec00` (link fixes), now on `main`; a link check of the 7 main docs this sync found no stale
+  archive paths. Prevention: commit only named paths and check `git diff --cached` first.
 - **Verification approved a defective page (2026-09-30, open; input to Step 7).** The Step 4 artifact passed all 6 deterministic checks, the
   in-loop evaluator (round 3) and the QA evaluator, and re-verified clean in a separate CLI run (`4a73fa57`). A human read of the file and
   the rendered page then found: agent-tool text after `</html>` ("File-mutation verifier: 2 file edit(s) FAILED…") shown under the footer;
   testimonials with 5-star ratings and no SAMPLE label although the approved plan required it; an invented phone number, opening hours,
   six neighbourhoods and response-time promises. Found by the Step 4 human review, not by any check. Nothing shipped (the workflow stops at the
-  launch hard-gate). Fix is Step 7 (checks for content after the closing tag, required SAMPLE labels, and unsupported factual claims).
+  launch hard-gate). **Fix landed 2026-10-01 in Step 4B M1** (`c1345de`): the same file now fails `claims.after-html`, `claims.sample-label`,
+  `claims.unsourced-fact` and `claims.banned` (test `packages/verification/test/claims.test.ts`, sha256-pinned). Still open: the live
+  screenshot review, which would also judge the visual defects.
 - **Builder provider out of credits (2026-09-30, resolved: credits restored, build re-run succeeded).** The Step 4 build (job `31c965ff`) failed when Agent 37
   returned HTTP 402 "AI credits exhausted" after the first draft was produced and the Claude evaluator had
   requested changes. The workflow escalated to a human and stopped after 1 attempt, as designed (`agent.escalate`
@@ -642,3 +623,45 @@ plus the Cognee write-up exists.
 **Acceptance** (not met): Blueprint §16K item 1: one real client, the full pipeline, a measured
 correction count below 40+, independently verified against the deployed output. A synthetic run (Step 4)
 demonstrates the factory but does not count against DreamSign's 40+.
+
+---
+
+# Factory Completion Plan (`docs/WFACT-3.0-Factory-Completion-Plan.md`) — steps tracked here from Step 4B on
+
+Steps 1–4 and 3A are summarised at the top and in the plan's Part E; from Step 4B on, each milestone gets its checklist here.
+
+## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 5 of 7 inputs, M1 PARTIAL 2026-10-01)
+
+**M0 — inputs** (`docs/FRONTEND-UPGRADE-DESIGN.md` §10)
+- [x] Reference sites per track, niche taxonomy, labelled-AI-images policy, $5 per-build ceiling — `0fbdfce`, `0bfb19c`
+- [ ] Builder model: **Huraira**, needed before M3 (`BLOCKED-ON-NICK.md`)
+- [ ] Image tool and budget: **Huraira**, needed before M5
+
+**M1 — rendered QA + claims gate on today's builder**
+- [x] Claims gate: `claims.after-html`, `claims.sample-label`, `claims.banned` (R-10), `claims.unsourced-fact` (approved brief = only fact
+      source), rules `packages/verification/config/claims-rules.json` v1.0.0 — `c1345de`; verification tests 35/35
+- [x] Design rulebook `packages/frontend-loop/design/rulebook.json` v1.0.0 (12 banned, 4 required, one failing fixture each) in the
+      builder's system prompt — `c1345de`, `47cef2c`; frontend-loop tests 29/29 (incl. "every rule id in the builder prompt")
+- [x] Headless Chromium screenshots at 1440/768/375, axe, Lighthouse, link/asset crawl, console errors, layout, JS budget, reduced motion,
+      rulebook DOM detectors (`packages/rendered-qa`) — `47cef2c`; rendered-qa tests 18/18 real Chromium, locally and on GitHub
+      (run `36859122425`, tests 2m03s)
+- [x] Step 4 artifact (sha256 `960b61ba…`, re-downloaded from the private bucket) FAILS on the leaked tool text, the unlabelled
+      testimonials and the invented phone/hours — `claims.test.ts` (hash-pinned) and an independent `npm run qa` run: also fails
+      `render.design-rules`, `render.layout`, `render.perf` (LCP 2.87 s vs 2.0 s)
+- [x] Clean fixtures pass; each planted defect (leaked text, missing SAMPLE, invented fact, banned claim, broken link, console error,
+      over-budget JS, reduced motion, 11 DOM-detectable rules) fails only its own check — `claims.test.ts`, `rendered.test.ts`
+- [x] Results are exact check ids `FrontendLoop.revise()` acts on — `packages/workflow/test/claimsGate.test.ts` (revision prompt carries
+      `[claims.*]` lines; clean revision reaches the launch gate); workflow 8/8, jobs 8/8
+- [x] Wired into production QA (Cockpit jobs runner, workflow CLI), no off switch; CI `rendered-qa` job gates the Cockpit deploy —
+      `47cef2c`, run `36859122425` green
+- [ ] **Live screenshot review by a different-vendor model**: built and contract-tested (10 mocked tests), but the live call returned OpenAI
+      HTTP 429 "You have no credits remaining" and reported NOT RUN. Waiting on **Huraira** (credits or another vendor).
+- [ ] Chromium step in `.github/workflows/cockpit-job.yml` exercised by a real Cockpit job: none run since 2026-09-30 (`jobs` table checked)
+- [ ] Reviewer cost written to `model_traces` (today only in CLI output and `report.json`)
+
+**Exit check**: *"re-checking the Step 4 artifact (sha256 960b61ba...) FAILS on the leaked tool text, the unlabelled testimonials and the
+invented phone/hours; clean fixtures pass. Results are exact check IDs that FrontendLoop.revise() can act on."* — **MET** (evidence above).
+The milestone also asks for *"a screenshot review by a model from a different vendor than the builder"* — **NOT MET live** (OpenAI credits),
+so M1 as a whole is **PARTIALLY MET**.
+
+**M2–M6**: not started. M2 waits on Huraira's GO after M1.
