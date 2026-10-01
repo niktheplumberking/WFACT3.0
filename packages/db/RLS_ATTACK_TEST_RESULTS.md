@@ -130,3 +130,38 @@ old policy, so the exploit itself was reasoned from the policy text, not demonst
 executable by `authenticated` (intentional: it is the approval endpoint and checks the caller's role
 itself, attack-tested above), the pre-existing platform function `rls_auto_enable`, and Auth's
 leaked-password protection being off (a dashboard setting; now relevant because passwords exist).
+
+## Run 4: 2026-10-01, migration 0011 (plan_approvals.build_track / track_overridden, jobs build gate)
+
+Script: `scripts/rls_attack_test_tracks.sql`, run with `execute_sql` against `mcaxxhgjptwowwrluhra` after `apply_migration
+0011_plan_build_track`. Everything ran in a sub-transaction that is always rolled back; afterwards 0 synthetic plans and 0 synthetic
+users were left. **Result: 19/19 rows matched.**
+
+| Attack | Expect | Got |
+|---|---|---|
+| pipeline (no session) approves a plan with a track | 42501 | 42501 |
+| insert a pending plan that already carries a track | 23514 | 23514 |
+| PM approves a plan (RLS) | 0 rows | 0 rows |
+| PM reads plan_approvals | 0 | 0 |
+| owner approves WITHOUT a track | 23514 | 23514 |
+| owner approves with track C | 23514 | 23514 |
+| owner overrides recommended A with B: stored track / override | B / true | B / true |
+| owner changes the track after approving: rows changed / track | 0 / B | 0 / B |
+| browser forges track_overridden=true while choosing the recommended A | false | false |
+| no recommendation: overridden | null | null |
+| owner rejects WITH a track | 23514 | 23514 |
+| owner rejects without a track: track | null | null |
+| build_plan job on a pre-0011 approved plan with no track (real row, rolled back) | 23514 | 23514 |
+| build_plan job on a rejected plan | 23514 | 23514 |
+| build_plan job on an approved plan WITH a track | allowed | allowed |
+| pipeline changes the track of an approved plan (bypasses RLS; trigger) | 42501 | 42501 |
+| admin approves WITHOUT a track | 23514 | 23514 |
+| anon reads plan_approvals | 0 | 0 |
+| audit row for the override: buildTrack / recommendedTrack / trackOverridden | B / A / true | B / A / true |
+
+Two test-design bugs were found and fixed on the first run, neither a security gap: "owner changes the track after approving" was
+recorded as ALLOWED because RLS makes that UPDATE touch 0 rows without an error (now asserted as 0 rows and the track unchanged, plus the
+same change as the pipeline, which the trigger refuses); and the audit query used `created_at` (the column is `occurred_at`).
+`get_advisors` (security) after the migration: only the three pre-existing items (`public.rls_auto_enable`, `public.decide_account_request`
+by design, leaked-password protection off); nothing new from 0011 (its functions are in the `private` schema).
+Known consequence: the 2 plans approved before 0011 have no track and cannot be built; a fresh plan (or re-plan) is needed.

@@ -19,6 +19,8 @@ interface PlanLite {
   status: string;
   revision: number;
   decision_note: string | null;
+  /** Step 4B M2: the owner's track; null for plans approved before migration 0011. */
+  build_track: "A" | "B" | null;
   plan: { plan: { brief: { projectName: string; goal: string; requiredSections: string[] }; templateId: string } };
 }
 
@@ -154,7 +156,7 @@ export function Actions() {
   const loadPlans = useCallback(async () => {
     const { data } = await supabase
       .from("plan_approvals")
-      .select("id,client_slug,status,revision,decision_note,plan")
+      .select("id,client_slug,status,revision,decision_note,build_track,plan")
       .in("status", ["approved", "rejected"])
       .order("created_at", { ascending: false })
       .limit(10);
@@ -220,12 +222,19 @@ export function Actions() {
           <div key={p.id} className="plan-actions action-row">
             <span className="action-label">
               <strong>{p.plan.plan.brief.projectName}</strong> · <code>{p.plan.plan.templateId}</code> · {p.status}
+              {p.build_track && ` · Track ${p.build_track}`}
               {p.status === "rejected" && p.decision_note ? ` — “${p.decision_note}”` : ""}
             </span>
-            {p.status === "approved" && (
+            {p.status === "approved" && p.build_track === "A" && (
               <button className="btn primary" disabled={busy} onClick={() => go("build_plan", { planId: p.id })}>
                 Build + verify
               </button>
+            )}
+            {p.status === "approved" && p.build_track === "B" && (
+              <span className="pill status-default">Track B builder arrives in Step 4B M4</span>
+            )}
+            {p.status === "approved" && !p.build_track && (
+              <span className="pill status-default">approved before track choice existed: needs a new plan</span>
             )}
             {p.status === "rejected" && p.revision < 2 && (
               <button className="btn" disabled={busy} onClick={() => go("replan", { planId: p.id }, loadPlans)}>
