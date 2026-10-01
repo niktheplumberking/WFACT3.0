@@ -56,7 +56,7 @@ rows, mark them done so there's a record of when they closed.
 | Vercel plan upgrade (fixes the 12-function serverless ceiling) | Day 16 | **OPEN** |
 | Agent 37 credits (the front-end builder's provider returned HTTP 402 "AI credits exhausted" on 2026-09-30) | **Now**, blocks Factory Completion Plan Step 4 | **CLOSED 2026-09-30** - credits restored (1-token call returned HTTP 200 and the re-run build completed, job `81c8607b`). Consider enabling auto top-up. |
 | Where the self-hosted second brain + Hermes run (infra, budget) | Day 3 | **OPEN** |
-| OpenAI API credits for the Step 4B screenshot reviewer (gpt-5.4, about $0.05-0.15 per review at list price, estimate). Found 2026-10-01: the live review returned HTTP 429 "You have no credits remaining". Alternative is a different reviewer vendor (Huraira's call; it must not be the builder's vendor). | **Now**: blocks Step 4B M1's live review; until then every Cockpit build ends "not verified" | **OPEN** (Huraira) |
+| OpenAI API credits for the Step 4B screenshot reviewer (gpt-5.4, about $0.05-0.15 per review at list price, estimate). Found 2026-10-01: the live review returned HTTP 429 "You have no credits remaining". Alternative is a different reviewer vendor (Huraira's call; it must not be the builder's vendor). | Not blocking since 2026-10-01 | **WORKED AROUND 2026-10-01** - Huraira chose Agent 37 as the reviewer (same vendor as the builder, recorded in `packages/rendered-qa/config/reviewer.json`). Credits still needed to return to a different-vendor reviewer. |
 
 ## Nick's time
 

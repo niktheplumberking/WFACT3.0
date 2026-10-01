@@ -1,9 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-01 (17:20 +05), via `/progress-sync` — re-synced to fold in `289ec00`…`6a296f8` (archive-path fixes; Step 4B M1
-claims gate, rulebook, rendered QA; the unplanned push of M1 to `main`) against git and reflog, GitHub Actions (`main` run `36859122425`),
-the live Cockpit (HTTP 200) and live Supabase (`jobs` by status). Test counts are from this session's runs (fresh clone of `47cef2c`;
-rendered-qa re-run at `5641f45`).
+Last synced: 2026-10-01 (17:55 +05), via `/progress-sync` — re-synced to fold in `289ec00`…`899e425` plus the M1 close-out (Agent 37
+reviewer, redesigned clean fixture, live reviews) against git and reflog, GitHub Actions (`main` runs `36859122425`, `36860220959`), the live
+Cockpit (HTTP 200), live Supabase (`jobs` by status) and live Agent 37 reviews. Test counts are from this session's runs.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -17,16 +16,16 @@ steps; this file tracks the Continuation Stages.
 
 **Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
 Step 4 is **partial** (its preview is superseded by Step 4B M6), and **Step 4B is in progress**: M0 has 5 of 7 inputs decided and **M1 is
-partial**, roughly 85% of M1 done (built, tested, on `main`, CI green; only the live cross-vendor screenshot review is missing). See the
-Step 4B section at the end. `main` is at `eaea97b` (CI `36859122425` green, Cockpit redeployed); `huraira-work` is 2 commits ahead
-(`5641f45`, `6a296f8`) plus this sync. **Biggest blocker now**: OpenAI credits for the screenshot reviewer (HTTP 429); until then every
-Cockpit build ends "not verified". Later: builder model (before M3), image tool (before M5), Nick's real brief, a real Step 3A sign-up.
+done** (2026-10-01), with one recorded deviation: the screenshot reviewer is Agent 37, the builder's own vendor, by Huraira's decision,
+because OpenAI has no credits. See the Step 4B section at the end. `main` is at `eaea97b` (CI `36859122425` green, Cockpit redeployed); `huraira-work` is 2 commits ahead
+(`5641f45`, `6a296f8`) plus this sync. **Biggest open items**: the builder model (before M3; also decides whether the
+reviewer can return to a different vendor), image tool (before M5), Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
-1. **Huraira: OpenAI credits** (money, human only) or another reviewer vendor that is not the builder's. Then re-run
-   `doppler run -- npm run qa -- … --review-always` on the Step 4 artifact and the review-only fixtures to close M1.
-2. **Step 4B M2** (direction step + track choice) on Huraira's GO after M1.
-3. **Huraira**: builder model (before M3) and image tool (before M5); Supabase Auth settings and one real sign-up for Step 3A; the old
+1. **Step 4B M2** (direction step + track choice) on Huraira's GO after the M1 report.
+2. **Huraira**: builder model before M3. If the builder stays on Agent 37, decide whether the reviewer stays same-vendor
+   (`packages/rendered-qa/config/reviewer.json`) or moves to OpenAI once it has credits.
+3. **Huraira**: image tool (before M5); Supabase Auth settings and one real sign-up for Step 3A; the old
    Doppler CLI token check; OK to close the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b` (still 2 queued, checked this sync).
 
 **Gaps noticed**:
@@ -630,7 +629,7 @@ demonstrates the factory but does not count against DreamSign's 40+.
 
 Steps 1–4 and 3A are summarised at the top and in the plan's Part E; from Step 4B on, each milestone gets its checklist here.
 
-## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 5 of 7 inputs, M1 PARTIAL 2026-10-01)
+## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 5 of 7 inputs, M1 DONE 2026-10-01 with a recorded deviation)
 
 **M0 — inputs** (`docs/FRONTEND-UPGRADE-DESIGN.md` §10)
 - [x] Reference sites per track, niche taxonomy, labelled-AI-images policy, $5 per-build ceiling — `0fbdfce`, `0bfb19c`
@@ -654,14 +653,23 @@ Steps 1–4 and 3A are summarised at the top and in the plan's Part E; from Step
       `[claims.*]` lines; clean revision reaches the launch gate); workflow 8/8, jobs 8/8
 - [x] Wired into production QA (Cockpit jobs runner, workflow CLI), no off switch; CI `rendered-qa` job gates the Cockpit deploy —
       `47cef2c`, run `36859122425` green
-- [ ] **Live screenshot review by a different-vendor model**: built and contract-tested (10 mocked tests), but the live call returned OpenAI
-      HTTP 429 "You have no credits remaining" and reported NOT RUN. Waiting on **Huraira** (credits or another vendor).
+- [x] **Live screenshot review** — Agent 37 `hermes-agent`, per Huraira 2026-10-01 ("Use Agent37 Models, and finish M1") after OpenAI
+      returned HTTP 429 (no credits). **Deviation**: same vendor and model as the builder, not "a different vendor"; recorded in
+      `packages/rendered-qa/config/reviewer.json` (the guard refuses a same-vendor review without it; every report flags
+      `sameVendorAsBuilder`). Vision checked first (it read a random number and colour from an image). Live results: clean fixture PASS
+      (whole gate, 134 s); Step 4 artifact FAIL on 6 rules (avatars, eyebrows, repeated rhythm, three-card row, thin text, centring);
+      DR-REPEATED-RHYTHM, DQ-ART-DIRECTION, DQ-TYPE-HIERARCHY, DQ-CONTENT-HIERARCHY fixtures each FAIL their rule. **Missed**
+      DQ-MOBILE-READABLE (also at full image detail); that fixture is caught by `render.layout` (42 texts under 12px, 4 tap targets 16px
+      tall). About 34k input tokens and 127-157 s per review, UNPRICED. Reviewer tests 16/16 (10 original + 6 Agent 37).
+- [x] Clean fixture is clean by the rulebook, not only by the detectors: the first live review failed it on DR-THREE-CARD-ROW and
+      DR-REPEATED-RHYTHM (fair: three white cards; three list sections in a row); the generator's base was redesigned (featured pull-quote,
+      split services, numbered timeline) and all fixtures regenerated; it then passed. rendered-qa 24/24, verification 35/35.
 - [ ] Chromium step in `.github/workflows/cockpit-job.yml` exercised by a real Cockpit job: none run since 2026-09-30 (`jobs` table checked)
 - [ ] Reviewer cost written to `model_traces` (today only in CLI output and `report.json`)
 
 **Exit check**: *"re-checking the Step 4 artifact (sha256 960b61ba...) FAILS on the leaked tool text, the unlabelled testimonials and the
 invented phone/hours; clean fixtures pass. Results are exact check IDs that FrontendLoop.revise() can act on."* — **MET** (evidence above).
-The milestone also asks for *"a screenshot review by a model from a different vendor than the builder"* — **NOT MET live** (OpenAI credits),
-so M1 as a whole is **PARTIALLY MET**.
+The milestone also asks for *"a screenshot review by a model from a different vendor than the builder"*: a live screenshot review runs and
+works, but on the builder's own vendor by Huraira's recorded decision, so this part is **MET WITH A DEVIATION**, not met as written.
 
 **M2–M6**: not started. M2 waits on Huraira's GO after M1.
