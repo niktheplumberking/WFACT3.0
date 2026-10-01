@@ -133,11 +133,22 @@ async function checkLink(link: { href: string; abs: string; text: string; anchor
   }
 }
 
+const LIGHTHOUSE_TIMEOUT_MS = 120_000;
+
 async function lighthouseRun(url: string): Promise<{ lcpMs: number; cls: number; score: number | null }> {
   const [{ default: lighthouse }, chromeLauncher] = await Promise.all([import("lighthouse"), import("chrome-launcher")]);
-  const chrome = await chromeLauncher.launch({ chromePath: chromium.executablePath(), chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu"] });
+  const chrome = await chromeLauncher.launch({
+    chromePath: chromium.executablePath(),
+    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
+    maxConnectionRetries: 100,
+  });
+  let timer: NodeJS.Timeout | undefined;
   try {
-    const run = await lighthouse(url, { port: chrome.port, output: "json", logLevel: "error", onlyCategories: ["performance"] });
+    // A hung Lighthouse run must fail the check by name, not hang the job (first CI run, 2026-10-01).
+    const timeout = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => reject(new Error(`Lighthouse did not finish within ${LIGHTHOUSE_TIMEOUT_MS / 1000} s`)), LIGHTHOUSE_TIMEOUT_MS);
+    });
+    const run = await Promise.race([lighthouse(url, { port: chrome.port, output: "json", logLevel: "error", onlyCategories: ["performance"] }), timeout]);
     if (!run) throw new Error("Lighthouse returned no result");
     const audits = run.lhr.audits;
     return {
@@ -146,6 +157,7 @@ async function lighthouseRun(url: string): Promise<{ lcpMs: number; cls: number;
       score: run.lhr.categories.performance?.score ?? null,
     };
   } finally {
+    clearTimeout(timer);
     chrome.kill();
   }
 }

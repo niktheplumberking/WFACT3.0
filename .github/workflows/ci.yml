@@ -176,6 +176,8 @@ jobs:
     name: Rendered QA — typecheck + browser tests
     runs-on: ubuntu-latest
     needs: guardrails
+    # A hung browser must fail in minutes, not hold the job for GitHub's 6-hour default (first run, 2026-10-01).
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: packages/rendered-qa

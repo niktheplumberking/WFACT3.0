@@ -10,7 +10,7 @@
   "scripts": {
     "qa": "tsx src/cli.ts",
     "fixtures": "tsx scripts/make-fixtures.ts",
-    "test": "tsx --test --test-concurrency=1 test/*.test.ts",
+    "test": "tsx --test --test-concurrency=1 --test-timeout=300000 test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
