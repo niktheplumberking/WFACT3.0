@@ -1,6 +1,6 @@
 # Progress — WFACT 3.0
 
-Last updated: 2026-10-01 (21:15 +05), Step 4B M3 done (see the Step 4B section; commits `d190e4d`…`74b59a0` plus the docs commit).
+Last updated: 2026-10-01, Step 4C Phase 1 done (audit, IA, design system and 5 mockups in `docs/step-4c/PHASE-1-PROPOSAL.md`, product record in `PRODUCT.md`; no Cockpit code changed; waiting for GO). Before that: 2026-10-01 (21:15 +05), Step 4B M3 done (see the Step 4B section; commits `d190e4d`…`74b59a0` plus the docs commit).
 Previous sync: 2026-10-01 (19:20 +05), via `/progress-sync` — re-sync after Step 4B M2: no new commits since `c0f3d29`; folds in `main` CI
 run `36871379578` (green, Cockpit deployed, HTTP 200), live `plan_approvals` (plan `b5a45a8e` still pending, no track) and `jobs` (9 rows,
 none since 2026-09-30, `a2a41d2d`/`cbf8bf7b` still queued). Earlier syncs: `289ec00`…`c0f3d29`.
@@ -25,6 +25,9 @@ See the Step 4B section at the end; about half of Step 4B is done (M0 6 of 7 inp
 Agent 37 reviewer produced false positives in M3), Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
+0. **Huraira**: read `docs/step-4c/PHASE-1-PROPOSAL.md` and the mockups in `docs/step-4c/mockups/` (open the `.html` files or
+   `shots/*.png`); answer decisions D1–D8 and GO for Step 4C Phase 2 (build). Evidence: current Cockpit has axe colour-contrast
+   failures on every room (`docs/step-4c/before/audit.json`); the mockups have 0 axe violations at 1440/375 in dark and light.
 1. **Huraira**: review the Track A starter (it is "human-reviewed" only once you have looked: screenshots of the verified build are
    the M3 evidence) and the M3 report; then GO for **Step 4B M4** (Track B, Next.js static export). Approving plan `b5a45a8e` in the
    Cockpit would also prove the track choice and a Track A Cockpit job live (pushing to `main` deploys; only on your word).
