@@ -7,13 +7,15 @@
 import { supabase } from "./supabaseClient";
 
 export type JobKind = "intake" | "replan" | "build_plan" | "resume" | "verify" | "ask";
+/** `cancelled` arrived with migration 0013 (a queued job that never started, closed by an owner/admin). */
+export type JobStatus = "queued" | "dispatched" | "running" | "succeeded" | "failed" | "cancelled";
 
 export interface JobRow {
   id: string;
   created_at: string;
   kind: JobKind;
   params: Record<string, unknown>;
-  status: "queued" | "dispatched" | "running" | "succeeded" | "failed";
+  status: JobStatus;
   started_at: string | null;
   finished_at: string | null;
   result: Record<string, unknown> | null;
@@ -21,16 +23,34 @@ export interface JobRow {
   gh_run_url: string | null;
 }
 
+export const JOB_COLUMNS = "id,created_at,kind,params,status,started_at,finished_at,result,error,gh_run_url";
+
+// A job still `queued` after this long was never dispatched (the function flips it to `dispatched` or
+// `failed` within seconds) — stop polling for it and offer Start or Cancel instead. Same 2 minutes as
+// cancel_job's guard in migration 0013.
+export const STALE_QUEUED_MS = 2 * 60 * 1000;
+
+export function isStaleQueued(j: Pick<JobRow, "status" | "created_at">, now = Date.now()): boolean {
+  return j.status === "queued" && now - new Date(j.created_at).getTime() > STALE_QUEUED_MS;
+}
+
+export function isActive(j: Pick<JobRow, "status" | "created_at">, now = Date.now()): boolean {
+  return (j.status === "queued" && !isStaleQueued(j, now)) || j.status === "dispatched" || j.status === "running";
+}
+
 export async function requestJob(kind: JobKind, params: Record<string, unknown>): Promise<{ jobId: string | null; error: string | null }> {
   const { data: userData } = await supabase.auth.getUser();
   const userId = userData.user?.id;
-  if (!userId) return { jobId: null, error: "Not signed in." };
+  if (!userId) return { jobId: null, error: "You're signed out. Sign in again, then retry." };
 
   const { data, error } = await supabase.from("jobs").insert({ created_by: userId, kind, params }).select("id").single();
   if (error || !data) return { jobId: null, error: error?.message ?? "Could not create the job." };
 
   const dispatchError = await dispatchJob(data.id);
-  return { jobId: data.id, error: dispatchError ? `Job created but not started: ${dispatchError} — use Start on the job below to retry.` : null };
+  return {
+    jobId: data.id,
+    error: dispatchError ? `The request was saved but didn't start: ${dispatchError}. Open it and press Start again.` : null,
+  };
 }
 
 /**
@@ -58,11 +78,17 @@ export async function dispatchJob(jobId: string): Promise<string | null> {
   return null;
 }
 
+/** Close a job that never started (migration 0013). The database checks role, status, age and reason. */
+export async function cancelJob(jobId: string, reason: string): Promise<string | null> {
+  const { error } = await supabase.rpc("cancel_job", { p_job_id: jobId, p_reason: reason });
+  return error ? error.message : null;
+}
+
 /**
  * Fetch a built page's HTML for an in-Cockpit preview. Supabase Storage deliberately serves every
  * .html object as `text/plain` with `Content-Security-Policy: sandbox` (so its shared domain can't host
  * live pages), so opening the signed URL shows source, not a page. The caller renders this text in a
- * sandboxed iframe instead (Actions.tsx).
+ * sandboxed iframe instead (components/PagePreview.tsx).
  */
 export async function previewHtml(path: string): Promise<{ html: string | null; error: string | null }> {
   const { data, error } = await supabase.storage.from("artifacts").download(path);

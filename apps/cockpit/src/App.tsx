@@ -1,95 +1,118 @@
-import { useEffect, useState } from "react";
+/**
+ * The Cockpit: sign-in gating, then the navigation shell with one URL per screen (Step 4C IA,
+ * docs/step-4c/PHASE-1-PROPOSAL.md §3). Rooms load lazily. Access control is RLS only; the role read
+ * from profiles here just hides controls the database would refuse anyway.
+ */
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabaseClient";
-import { Login } from "./Login";
-import { AccessPending } from "./AccessPending";
-import { SetPassword } from "./SetPassword";
-import { Pipeline } from "./Pipeline";
-import { Approvals } from "./Approvals";
-import { Runs } from "./Runs";
-import { Models } from "./Models";
-import { Actions } from "./Actions";
+import { AccessPending, Login, SetPassword } from "./auth/Auth";
+import { FactoryProvider, MeProvider, ToastProvider, type Me } from "./lib/state";
+import type { Role } from "./lib/model";
+import { Shell } from "./shell/Shell";
+import { Loading } from "./components/ui";
 
-type Room = "pipeline" | "approvals" | "actions" | "runs" | "models";
+const Home = lazy(() => import("./pages/Home"));
+const PlansTab = lazy(() => import("./pages/Decisions"));
+const PlanPage = lazy(() => import("./pages/Decisions").then((m) => ({ default: m.PlanPage })));
+const AccountsTab = lazy(() => import("./pages/Decisions").then((m) => ({ default: m.AccountsTab })));
+const StagesTab = lazy(() => import("./pages/Decisions").then((m) => ({ default: m.StagesTab })));
+const Projects = lazy(() => import("./pages/Work"));
+const ProjectPage = lazy(() => import("./pages/Work").then((m) => ({ default: m.ProjectPage })));
+const NewRequest = lazy(() => import("./pages/Work").then((m) => ({ default: m.NewRequest })));
+const Activity = lazy(() => import("./pages/Activity"));
+const FixRounds = lazy(() => import("./pages/Activity").then((m) => ({ default: m.FixRounds })));
+const RunPage = lazy(() => import("./pages/Activity").then((m) => ({ default: m.RunPage })));
+const Costs = lazy(() => import("./pages/Misc").then((m) => ({ default: m.Costs })));
+const ComingSoon = lazy(() => import("./pages/Misc").then((m) => ({ default: m.ComingSoon })));
+const More = lazy(() => import("./pages/Misc").then((m) => ({ default: m.More })));
+const Settings = lazy(() => import("./pages/Misc").then((m) => ({ default: m.Settings })));
+const NotFound = lazy(() => import("./pages/Misc").then((m) => ({ default: m.NotFound })));
 
-const ROOMS: { id: Room; label: string; hint: string }[] = [
-  { id: "pipeline", label: "Pipeline", hint: "Every project, by stage" },
-  { id: "approvals", label: "Approvals", hint: "Gates waiting on a decision" },
-  { id: "actions", label: "Actions", hint: "Run intake, builds, checks, questions" },
-  { id: "runs", label: "Runs", hint: "Correction rounds, logged" },
-  { id: "models", label: "Models", hint: "Usage, real cost, latency — owner only" },
-];
-
-interface Stats {
-  projects: number | null;
-  active: number | null;
-  corrections: number | null;
-}
-
-function useStats(): Stats {
-  const [stats, setStats] = useState<Stats>({ projects: null, active: null, corrections: null });
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      const [projectsRes, activeRes, correctionsRes] = await Promise.all([
-        supabase.from("projects").select("id", { count: "exact", head: true }),
-        supabase.from("projects").select("id", { count: "exact", head: true }).eq("status", "active"),
-        supabase.from("correction_rounds").select("id", { count: "exact", head: true }),
-      ]);
-      if (cancelled) return;
-      setStats({
-        projects: projectsRes.count ?? null,
-        active: activeRes.count ?? null,
-        corrections: correctionsRes.count ?? null,
-      });
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return stats;
+interface Profile {
+  role: Role | null;
+  fullName: string | null;
 }
 
 /**
- * Does the signed-in account have a profile (i.e. has an owner/admin approved it — migration 0010)?
- * null = not known yet. Only a clean "no row" answer shows the pending screen; a failed lookup falls
- * through to the normal shell, which is safe because RLS, not this hook, is what withholds data.
+ * Has an owner/admin approved this account (migration 0010), and with which role? undefined = not known
+ * yet; null = a clean "no row" answer, which shows the pending screen. A failed lookup falls through to the
+ * shell with no role, which is safe because RLS, not this hook, is what withholds data.
  */
-function useHasProfile(session: Session | null | undefined): boolean | null {
-  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+function useProfile(session: Session | null | undefined): Profile | null | undefined {
+  const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const userId = session?.user.id ?? null;
-
   useEffect(() => {
-    setHasProfile(null);
+    setProfile(undefined);
     if (!userId) return;
     let cancelled = false;
     supabase
       .from("profiles")
-      .select("id")
+      .select("id,role,full_name")
       .eq("id", userId)
       .maybeSingle()
       .then(({ data, error }) => {
-        if (!cancelled) setHasProfile(error ? true : data !== null);
+        if (cancelled) return;
+        if (error) setProfile({ role: null, fullName: null });
+        else setProfile(data ? { role: (data.role as Role) ?? null, fullName: (data.full_name as string | null) ?? null } : null);
       });
     return () => {
       cancelled = true;
     };
   }, [userId]);
+  return profile;
+}
 
-  return hasProfile;
+export function CockpitRoutes() {
+  return (
+    <Suspense fallback={<Loading rows={4} label="Loading the page" />}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/decisions" element={<PlansTab />} />
+        <Route path="/decisions/plans/:id" element={<PlanPage />} />
+        <Route path="/decisions/accounts" element={<AccountsTab />} />
+        <Route path="/decisions/stages" element={<StagesTab />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/projects/new" element={<NewRequest />} />
+        <Route path="/projects/:id" element={<ProjectPage />} />
+        <Route path="/activity" element={<Activity />} />
+        <Route path="/activity/fixes" element={<FixRounds />} />
+        <Route path="/activity/:jobId" element={<RunPage />} />
+        <Route path="/costs" element={<Costs />} />
+        <Route path="/soon/:slug" element={<ComingSoon />} />
+        <Route path="/more" element={<More />} />
+        <Route path="/settings" element={<Settings />} />
+        {/* Old room names (before Step 4C) still land somewhere sensible. */}
+        <Route path="/pipeline" element={<Navigate to="/projects" replace />} />
+        <Route path="/approvals" element={<Navigate to="/decisions" replace />} />
+        <Route path="/actions" element={<Navigate to="/projects/new" replace />} />
+        <Route path="/runs" element={<Navigate to="/activity/fixes" replace />} />
+        <Route path="/models" element={<Navigate to="/costs" replace />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+  );
+}
+
+export function SignedIn({ me }: { me: Me }) {
+  return (
+    <MeProvider value={me}>
+      <ToastProvider>
+        <FactoryProvider>
+          <Shell>
+            <CockpitRoutes />
+          </Shell>
+        </FactoryProvider>
+      </ToastProvider>
+    </MeProvider>
+  );
 }
 
 export default function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
-  const [room, setRoom] = useState<Room>("pipeline");
   const [recovering, setRecovering] = useState(false);
-  const stats = useStats();
-  const hasProfile = useHasProfile(session);
+  const profile = useProfile(session);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -105,69 +128,8 @@ export default function App() {
   if (session === undefined) return null;
   if (session === null) return <Login />;
   if (recovering) return <SetPassword onDone={() => setRecovering(false)} />;
-  if (hasProfile === null) return null;
-  if (hasProfile === false) return <AccessPending email={session.user.email ?? ""} />;
+  if (profile === undefined) return null;
+  if (profile === null) return <AccessPending email={session.user.email ?? ""} />;
 
-  const activeRoom = ROOMS.find((r) => r.id === room)!;
-
-  return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <div className="sidebar-mark">
-          <span className="sidebar-mark-dot" />
-          <span className="sidebar-mark-text">WFACT</span>
-        </div>
-
-        <nav className="sidebar-nav">
-          {ROOMS.map((r) => (
-            <button
-              key={r.id}
-              className={`nav-item${room === r.id ? " active" : ""}`}
-              onClick={() => setRoom(r.id)}
-            >
-              <span className="nav-item-label">{r.label}</span>
-              <span className="nav-item-hint">{r.hint}</span>
-            </button>
-          ))}
-        </nav>
-
-        <div className="sidebar-foot">Cockpit v3</div>
-      </aside>
-
-      <main className="main">
-        <header className="topbar">
-          <div>
-            <h1 className="topbar-title">{activeRoom.label}</h1>
-            <p className="topbar-hint">{activeRoom.hint}</p>
-          </div>
-          <button className="btn" onClick={() => supabase.auth.signOut()}>
-            Sign out · {session.user.email}
-          </button>
-        </header>
-
-        <section className="stat-strip">
-          <div className="stat-tile stat-amber">
-            <span className="stat-value">{stats.projects ?? "—"}</span>
-            <span className="stat-label">Projects</span>
-          </div>
-          <div className="stat-tile stat-green">
-            <span className="stat-value">{stats.active ?? "—"}</span>
-            <span className="stat-label">Active</span>
-          </div>
-          <div className="stat-tile stat-cyan">
-            <span className="stat-value">{stats.corrections ?? "—"}</span>
-            <span className="stat-label">Correction rounds logged</span>
-          </div>
-        </section>
-
-        <section className="room-content">
-          {room === "pipeline" && <Pipeline />}
-          {room === "approvals" && <Approvals />}
-          {room === "actions" && <Actions />}
-          {room === "runs" && <Runs />}
-          {room === "models" && <Models />}
-        </section>
-      </main>
-    </div>
-  );
+  return <SignedIn me={{ userId: session.user.id, email: session.user.email ?? "", role: profile.role, fullName: profile.fullName }} />;
 }
