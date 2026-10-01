@@ -121,6 +121,11 @@ Every step prompt below says "Follow the Standard Operating Rules". Those rules 
 - **Git.** Work on branch `huraira-work`. Make small, clear commits. **Do not push to `main`** and do not
   merge to `main`; pushing `main` triggers a production deploy. Push `huraira-work` only if Huraira says so.
 - **Docs.** Update `PROGRESS.md` (status, evidence, date) and `BLOCKED-ON-NICK.md` when the step changes them.
+  **Before sending the Report, run `/step-close <id>`** (`.claude/skills/step-close/SKILL.md`, added 2026-10-01): it updates this
+  file (Part D heading, Part E row, top status line, goal tracker) and `PROGRESS.md` (last synced, status summary, next up, step
+  section) from verified evidence, then requires `node scripts/check-trackers.mjs` to print OK and commits both files by name.
+  A Stop hook (`.claude/hooks/stop-tracker-guard.sh`) blocks the agent from ending its turn once if code was committed after the
+  last tracker update or the trackers disagree. The agent never fills "Approved by Huraira".
 - **Design quality (client sites and the Cockpit), Huraira's rule 2026-10-01.** Nothing we build may look AI-generated
   ("AI slop"), basic, or like an unmodified template. Banned by default: purple/blue gradient heroes, the generic three-card
   feature row, emoji used as icons, centred-everything layouts, one default font with no pairing, fake "trusted by" logos or

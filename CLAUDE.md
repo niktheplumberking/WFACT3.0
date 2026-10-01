@@ -159,4 +159,7 @@ Rules:
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 - At the end of every session, update PROGRESS.md with what changed and what's next.
-- At the end of completing each step, update that step status in WFACT-3.0-Factory-Completion-Plan.md as well
+- At the end of completing each step, update that step status in WFACT-3.0-Factory-Completion-Plan.md as well.
+  Do this with `/step-close <step id>` (`.claude/skills/step-close/SKILL.md`): it updates both trackers from verified evidence,
+  runs `node scripts/check-trackers.mjs` (must print OK) and commits them. The Stop hook `.claude/hooks/stop-tracker-guard.sh`
+  blocks ending a turn while code commits are newer than the trackers; tag a commit `[no-tracker]` only if it truly needs no entry.
