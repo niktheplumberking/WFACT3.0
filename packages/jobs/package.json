@@ -23,6 +23,7 @@
     "@wfact/frontend-loop": "file:../frontend-loop",
     "@wfact/hermes-lite": "file:../hermes",
     "@wfact/planning": "file:../planning",
+    "@wfact/rendered-qa": "file:../rendered-qa",
     "@wfact/verification": "file:../verification",
     "@wfact/workflow": "file:../workflow"
   }

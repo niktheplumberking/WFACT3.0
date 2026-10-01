@@ -15,6 +15,7 @@
 import type { ModelClient } from "./modelClient.js";
 import type { PageTemplate } from "./templates.js";
 import type { PilotBrief } from "./brief.js";
+import { rulebookPromptText } from "./rulebook.js";
 
 export interface CorrectionRound {
   round: number;
@@ -136,11 +137,15 @@ export class FrontendLoop {
 
   private buildSystemPrompt(): string {
     return [
-      "You are the front-end builder in WFACT 3.0's Phase 4 loop.",
-      "Produce a single, complete HTML5 document: semantic markup, inline <style>, no external",
-      "assets, no build step, mobile-first responsive. Output only the HTML, no commentary before",
-      "or after it, no markdown code fences.",
-    ].join(" ");
+      [
+        "You are the front-end builder in WFACT 3.0's Phase 4 loop.",
+        "Produce a single, complete HTML5 document: semantic markup, inline <style>, no external",
+        "assets, no build step, mobile-first responsive. Output only the HTML, no commentary before",
+        "or after it, no markdown code fences.",
+      ].join(" "),
+      // Step 4B M1: the anti-slop design rulebook; rendered QA checks the same rule ids.
+      rulebookPromptText(),
+    ].join("\n\n");
   }
 
   private async generate(brief: PilotBrief, template: PageTemplate): Promise<string> {

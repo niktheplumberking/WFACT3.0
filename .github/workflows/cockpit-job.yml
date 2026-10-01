@@ -55,7 +55,12 @@ jobs:
       - uses: dopplerhq/cli-action@v3
 
       - name: "Install packages (dependency order; file: links don't install linked deps)"
-        run: for p in audit hermes agent-runtime frontend-loop verification planning workflow jobs; do (cd "packages/$p" && npm ci --no-audit --no-fund); done
+        run: for p in audit hermes agent-runtime frontend-loop verification planning rendered-qa workflow jobs; do (cd "packages/$p" && npm ci --no-audit --no-fund); done
+
+      # Step 4B M1: QA renders every built page in headless Chromium (screenshots, axe, Lighthouse).
+      - name: Install Chromium for rendered QA
+        working-directory: packages/rendered-qa
+        run: npx playwright install --with-deps chromium
 
       - name: Run job
         working-directory: packages/jobs

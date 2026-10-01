@@ -131,6 +131,12 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       }
       if (html === null) return { ok: false, reason: `no page at ${relPath} (artifact store or repo)`, result: { path: relPath } };
       const sections = Array.isArray(p.sections) ? (p.sections as unknown[]).filter((s): s is string => typeof s === "string") : [];
+      // Step 4B M1 claims gate: the client's brief on file is the only fact source; without one every
+      // factual claim on the page fails as unsourced (fails closed).
+      const briefOnFile = await readFile(path.join(deps.repoRoot, "clients", clientSlug, "brief.json"), "utf-8")
+        .then((t) => JSON.parse(t) as { goal?: unknown; brandNotes?: unknown })
+        .catch(() => null);
+      const factSources = briefOnFile ? [briefOnFile.goal, briefOnFile.brandNotes].filter((s): s is string => typeof s === "string") : [];
       const run = await runAgent(
         deps.qaAgent,
         {
@@ -142,6 +148,7 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
             requiredSections: sections,
             otherClientSlugs: deps.knownClientSlugs.filter((s) => s !== clientSlug),
             goal: str(p, "goal", 1000),
+            factSources,
           },
         },
         { registry: createSeedRegistry(), audit: deps.audit ? { sink: deps.audit } : null },

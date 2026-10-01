@@ -19,6 +19,7 @@ import { createFrontendBuilderAgent } from "@wfact/frontend-loop/agent";
 import { modelClientFromEnv } from "@wfact/frontend-loop/modelClient";
 import { appendCorrectionLogRows, formatCorrectionSummary } from "@wfact/frontend-loop/correctionLog";
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
+import { productionQaOptions } from "@wfact/rendered-qa/production";
 import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
 import { traceModelClient } from "@wfact/hermes-lite/tracing";
 import { knownClientSlugs } from "@wfact/verification/paths";
@@ -92,7 +93,8 @@ async function main() {
 
   const deps: WorkflowDeps = {
     frontEndAgent: createFrontendBuilderAgent({ builderModel, evaluatorModel: reviewerModel }),
-    qaAgent: createQaEvaluatorAgent({ evaluatorModel: qaModel }),
+    // Step 4B M1: claims gate + rendered QA + cross-vendor screenshot review, then the evaluator.
+    qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name })),
     registry: createSeedRegistry(),
     audit: sink,
     reader,

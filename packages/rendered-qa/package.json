@@ -1,0 +1,29 @@
+{
+  "name": "@wfact/rendered-qa",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Step 4B M1 rendered QA: headless Chromium screenshots at 1440/768/375, axe accessibility, Lighthouse performance against a track budget, link and asset crawl, console errors, reduced motion, the design rulebook's DOM detectors, and a screenshot review by a model from a different vendor than the builder. See README.md.",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "qa": "tsx src/cli.ts",
+    "fixtures": "tsx scripts/make-fixtures.ts",
+    "test": "tsx --test --test-concurrency=1 test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@wfact/hermes-lite": "file:../hermes",
+    "@wfact/verification": "file:../verification",
+    "chrome-launcher": "1.2.2",
+    "lighthouse": "13.5.0",
+    "playwright": "1.63.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

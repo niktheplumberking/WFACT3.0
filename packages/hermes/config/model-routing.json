@@ -1,6 +1,6 @@
 {
   "_doc": "Blueprint §7 routing table, as configuration (Continuation Plan Stage 4). Hermes owns model SELECTION; agents ask for a slot, never a model id. Override any slot per run with WFACT_ROUTE_<SLOT>=anthropic:<model-id> (e.g. WFACT_ROUTE_INTAKE). Only slots actually read through packages/hermes/src/routing.ts are listed — the Phase 4 builder/evaluator split and Hermes-lite's own model are still chosen in their packages' modelClient.ts, a tracked gap (PROGRESS.md), not silently implied here. Prices re-verified 2026-09-28 against the Claude API pricing table; re-verify before relying on them. Stage 5: `models` is the ONE per-model price table every cost figure is computed from (costForModel in src/routing.ts) — replacing the per-CLI PRICING constants.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "slots": {
     "intake": {
       "provider": "anthropic",
@@ -31,6 +31,14 @@
         "output": 10.0
       },
       "note": "Claude API list price, re-verified 2026-09-28"
+    },
+    "gpt-5.4": {
+      "provider": "openai",
+      "usdPerMTok": {
+        "input": 2.5,
+        "output": 15.0
+      },
+      "note": "OpenAI standard-tier list price (short context), read from developers.openai.com/api/docs/pricing 2026-10-01. Used only by the Step 4B screenshot reviewer (packages/rendered-qa), not by a routing slot."
     },
     "hermes-agent": {
       "provider": "agent37",

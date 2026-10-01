@@ -30,6 +30,7 @@ import { knownClientSlugs } from "@wfact/verification/paths";
 import { ClaudeJsonClient } from "@wfact/planning/modelClient";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
 import { SupabaseArtifactStore } from "@wfact/workflow/supabaseArtifacts";
+import { productionQaOptions } from "@wfact/rendered-qa/production";
 import { SupabaseJobStore } from "./jobStore.js";
 import { handleJob, type HandlerDeps } from "./handlers.js";
 
@@ -79,7 +80,8 @@ function buildDeps(): HandlerDeps {
         builderModel: traceModelClient(builder.client, traces, actor),
         evaluatorModel: traceModelClient(reviewer.client, traces, actor),
       }),
-      qaAgent: createQaEvaluatorAgent({ evaluatorModel: qaModel }),
+      // Step 4B M1: claims gate + rendered QA + cross-vendor screenshot review, then the evaluator.
+      qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name })),
       registry: createSeedRegistry(),
       audit,
       reader,
@@ -88,7 +90,7 @@ function buildDeps(): HandlerDeps {
     },
     readArtifact: (p) => artifacts.read(p),
     repoRoot: REPO_ROOT,
-    qaAgent: createQaEvaluatorAgent({ evaluatorModel: qaModel }),
+    qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name })),
     audit,
     knownClientSlugs: slugs,
     ask: async (question) => {
