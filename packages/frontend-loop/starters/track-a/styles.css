@@ -95,7 +95,7 @@ a:hover { text-decoration-thickness: 0.14em; }
 .menu-toggle[aria-expanded="true"] .icon-close { display: block; }
 
 /* Sections */
-.section { padding-block: clamp(64px, 8vw, 112px); }
+.section { padding-block: clamp(56px, 7vw, 96px); }
 .section.tint { background: var(--surface); }
 .section-head { margin-bottom: clamp(32px, 4vw, 48px); max-width: 46rem; }
 .section-head p { margin-top: 16px; color: var(--muted); }
@@ -211,12 +211,21 @@ a:hover { text-decoration-thickness: 0.14em; }
 .area-list li { padding: 8px 14px; border: 1.5px solid var(--line-strong); border-radius: var(--radius-control); font-weight: 600; }
 
 /* Closing call to action: the one centred moment. */
+/* Closing call to action: a deep brand band with the roofline as its top edge (the motif returns once),
+   and the page's one centred moment. */
+.band {
+  position: relative; background: var(--deep); color: var(--on-deep);
+  padding-top: calc(clamp(56px, 7vw, 96px) + var(--pitch));
+  clip-path: polygon(0 var(--pitch), 64% 0, 100% var(--pitch), 100% 100%, 0 100%);
+}
+.band .ridge { top: 0; bottom: auto; clip-path: none; animation: none; }
+.band + .section, .band + .band { margin-top: 0; }
 .cta { text-align: center; }
 .cta h2 { max-width: 22ch; margin-inline: auto; }
-.cta p { margin: 16px auto 32px; color: var(--muted); }
+.cta p { margin: 16px auto 32px; }
 
 /* Footer */
-.site-footer { background: var(--deep); color: var(--on-deep); padding-block: 56px 40px; }
+.site-footer { background: var(--deep); color: var(--on-deep); padding-block: 56px 40px; border-top: 1px solid var(--deep-line); }
 .site-footer a { color: var(--on-deep); }
 .footer-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 3fr) minmax(0, 4fr); gap: 32px 48px; }
 .footer-grid h2 { font-size: 1.1rem; margin-bottom: 12px; }

@@ -55,11 +55,11 @@ export function contrast(a: string, b: string): number {
 
 const AA = 4.5;
 
-/** Moves `color` toward `toward` in small steps until it reaches `min` (plus a margin) on `bg`. */
-function reach(color: string, bg: string, toward: string, min: number): string | null {
+/** Moves `color` toward `toward` in small steps until it reaches `min` (plus a margin) on every background. */
+function reach(color: string, bgs: string[], toward: string, min: number): string | null {
   for (let i = 0; i <= 40; i += 1) {
     const c = mix(color, toward, i * 0.025);
-    if (contrast(c, bg) >= min + 0.1) return c;
+    if (bgs.every((bg) => contrast(c, bg) >= min + 0.1)) return c;
   }
   return null;
 }
@@ -72,7 +72,12 @@ export function buildPalette(colors: BrandColors): { palette: Palette | null; pr
   const away = paperIsLight ? "#000000" : "#FFFFFF";
 
   if (contrast(ink, paper) < AA) problems.push(`brand.colors: ink ${ink} on paper ${paper} is ${contrast(ink, paper).toFixed(2)}:1; body text needs at least 4.5:1.`);
-  const accentInk = reach(accent, paper, away, AA);
+  // The tinted section background: visibly different from the paper, still AA for ink. Links and buttons
+  // sit on both, so the accent is tuned against both (tuning it on the paper alone made the tint fail
+  // AA and silently fall back to the paper, so pages lost their section rhythm; found in the M3 live run).
+  let surface = mix(paper, deep, 0.12);
+  if (contrast(ink, surface) < AA) surface = paper;
+  const accentInk = reach(accent, [paper, surface], away, AA);
   if (!accentInk) problems.push(`brand.colors: accent ${accent} cannot be adjusted to 4.5:1 on paper ${paper}.`);
   const onDeep = contrast(paper, deep) >= contrast(ink, deep) ? paper : ink;
   if (contrast(onDeep, deep) < AA) problems.push(`brand.colors: deep ${deep} has no readable text colour (best is ${contrast(onDeep, deep).toFixed(2)}:1); it needs 4.5:1 with paper or ink.`);
@@ -82,10 +87,8 @@ export function buildPalette(colors: BrandColors): { palette: Palette | null; pr
   if (contrast(onAccent, accentInk!) < AA) {
     return { palette: null, problems: [`brand.colors: no text colour reaches 4.5:1 on the adjusted accent ${accentInk}.`] };
   }
-  let surface = mix(paper, deep, 0.1);
-  if (contrast(ink, surface) < AA || contrast(accentInk!, surface) < AA) surface = paper;
   // Secondary text appears on both the paper and the tinted surface: it must clear AA on each.
-  let muted = mix(ink, paper, 0.28);
+  let muted = mix(ink, paper, 0.2);
   if (Math.min(contrast(muted, paper), contrast(muted, surface)) < AA) muted = ink;
   const deepPanel = mix(deep, onDeep, 0.08);
 

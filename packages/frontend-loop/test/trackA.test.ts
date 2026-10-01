@@ -171,3 +171,23 @@ test("agent: Track A revisions need the content JSON; summary lists the pages", 
   const out = await agent.execute(agent.parseInput({ brief }), {} as never);
   assert.deepEqual(agent.summarize!(out).pages, ["index.html", "services.html", "faq.html", "contact.html"]);
 });
+
+test("validation enforces page structure: home page size, thin pages, one cta, no three list-like sections in a row", () => {
+  const c = fixture();
+  const home = c.pages[0]!;
+  const services = c.pages[1]!;
+  services.sections = [services.sections[0]!, services.sections[1]!, { type: "steps", id: "how", heading: "How", steps: [{ title: "a", text: "a" }, { title: "b", text: "b" }, { title: "c", text: "c" }] }, services.sections[2]!];
+  home.sections = [...home.sections, { type: "cta", id: "again", heading: "Again", text: "Again." }, { type: "prose", id: "more", heading: "More", paragraphs: ["More."] }];
+  c.pages[2]!.sections = [c.pages[2]!.sections[0]!];
+  const all = validateSiteContent(c, brief).errors.join("\n");
+  assert.match(all, /pages\[0\] \(index\) has 7 sections; keep the home page to 6/);
+  assert.match(all, /pages\[0\] \(index\) has more than one "cta"/);
+  assert.match(all, /pages\[1\] \(services\): sections 0-2 \(services, packages, steps\) are three list-like layouts in a row/);
+  assert.match(all, /pages\[2\] \(faq\) has one section/);
+});
+
+test("palette: the tinted section background really differs from the paper (regression: it silently fell back to paper)", () => {
+  const { palette } = buildPalette({ ink: "#1F3D36", paper: "#F6F1E7", accent: "#B5642A", deep: "#1F3D36" });
+  assert.notEqual(palette!.surface, palette!.paper);
+  assert.ok(contrast(palette!.accentInk, palette!.surface) >= 4.5 && contrast(palette!.ink, palette!.surface) >= 4.5);
+});

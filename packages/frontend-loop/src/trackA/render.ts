@@ -230,7 +230,7 @@ function renderSection(s: Section, ctx: Ctx, lvl: Level, tint: boolean): string 
     }
 
     case "cta":
-      return `${open()}<div class="wrap cta">${h(lvl, s.heading, headId)}<p>${esc(s.text)}</p>${primaryButton(ctx)}</div></section>`;
+      return `<section class="section band on-deep" id="${s.id}" aria-labelledby="${headId}"><svg class="ridge" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline points="0,10 64,0 100,10"/></svg><div class="wrap cta">${h(lvl, s.heading, headId)}<p>${esc(s.text)}</p>${primaryButton(ctx)}</div></section>`;
   }
 }
 
@@ -297,14 +297,14 @@ const comment = (s: string) => `<!-- OPEN QUESTION for a human (not shown on the
 
 function renderPage(content: SiteContent, page: Page, palette: Palette): string {
   const ctx: Ctx = { content, page };
-  // One h1 per page: the first section's heading. Plain sections alternate a light tint for rhythm;
-  // the closing call to action is always tinted.
+  // One h1 per page: the first section's heading. Plain sections alternate a tint for rhythm; the hero
+  // and the call-to-action band are deep brand fields and reset the alternation.
   let tinted = true;
   const sections = page.sections
     .map((s, i) => {
       let tint = false;
-      if (s.type === "cta") tint = true;
-      else if (s.type !== "hero") {
+      if (s.type === "hero" || s.type === "cta") tinted = true;
+      else {
         tinted = !tinted;
         tint = tinted;
       }

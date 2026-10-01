@@ -226,6 +226,23 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
       }
     });
   });
+  // Information architecture and rhythm (from the first live run, 2026-10-01: eight sections piled on the
+  // home page beside two one-section pages read as one repeated heading-then-list rhythm).
+  const LISTLIKE = new Set(["services", "packages", "steps", "faq"]);
+  c.pages.forEach((page, pi) => {
+    const types = page.sections.map((s) => s.type);
+    if (pi === 0 && types.length > MAX_HOME_SECTIONS) {
+      errors.push(`pages[0] (index) has ${types.length} sections; keep the home page to ${MAX_HOME_SECTIONS} and move the rest to their own pages.`);
+    }
+    if (pi > 0 && types.length < 2) errors.push(`pages[${pi}] (${page.slug}) has one section; give every page at least two, or fold it into another page.`);
+    if (types.filter((t) => t === "cta").length > 1) errors.push(`pages[${pi}] (${page.slug}) has more than one "cta" section; one per page.`);
+    for (let i = 2; i < types.length; i += 1) {
+      if (LISTLIKE.has(types[i]!) && LISTLIKE.has(types[i - 1]!) && LISTLIKE.has(types[i - 2]!)) {
+        errors.push(`pages[${pi}] (${page.slug}): sections ${i - 2}-${i} (${types.slice(i - 2, i + 1).join(", ")}) are three list-like layouts in a row (DR-REPEATED-RHYTHM); put testimonials, prose or a cta between them.`);
+      }
+    }
+  });
+
   const allIds = new Set(c.pages.flatMap((p) => p.sections.map((s) => s.id)));
   for (const required of brief.requiredSections) {
     if (!allIds.has(required)) errors.push(`The brief requires a section with id "${required}" on some page; none has it.`);
@@ -237,6 +254,9 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
   }
   return { content: errors.length ? null : c, errors };
 }
+
+/** The home page leads; detail lives on the other pages. */
+export const MAX_HOME_SECTIONS = 6;
 
 /** Element ids the starter itself uses (skip link target, menu, request form). */
 const RESERVED_IDS = new Set(["main", "site-nav", "request"]);
