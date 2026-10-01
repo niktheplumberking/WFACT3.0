@@ -8,10 +8,11 @@
  * Service-role only (writes and reads). The Cockpit reads via RLS (owner/admin) for previews.
  */
 import { createHash } from "node:crypto";
-import { CheckpointIntegrityError, type ArtifactStore, type StoredArtifact } from "./buildAndVerify.js";
+import { ARTIFACT_PATH_RE, CheckpointIntegrityError, type ArtifactStore, type StoredArtifact } from "./buildAndVerify.js";
 
 const BUCKET = "artifacts";
-const PATH_RE = /^clients\/[a-z][a-z0-9-]*\/pages\/[a-z0-9-]+\.html$/;
+// Same allow-list as the file store: one page under pages/, or a site's files under sites/<site>/ (Step 4B M3).
+const PATH_RE = ARTIFACT_PATH_RE;
 const sha256 = (s: string) => createHash("sha256").update(s, "utf8").digest("hex");
 
 export class SupabaseArtifactStore implements ArtifactStore {
@@ -26,10 +27,10 @@ export class SupabaseArtifactStore implements ArtifactStore {
   }
 
   async write(relPath: string, content: string): Promise<StoredArtifact> {
-    if (!PATH_RE.test(relPath)) throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(relPath)} is outside clients/<slug>/pages/`);
+    if (!PATH_RE.test(relPath)) throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(relPath)} is outside clients/<slug>/pages/ and clients/<slug>/sites/`);
     const res = await this.fetchImpl(`${this.base}/${relPath}`, {
       method: "POST",
-      headers: this.headers({ "Content-Type": "text/html", "x-upsert": "true" }),
+      headers: this.headers({ "Content-Type": relPath.endsWith(".json") ? "application/json" : "text/html", "x-upsert": "true" }),
       body: content,
     });
     if (!res.ok) throw new Error(`artifact upload failed (HTTP ${res.status}): ${(await res.text()).slice(0, 300)}`);
@@ -38,7 +39,7 @@ export class SupabaseArtifactStore implements ArtifactStore {
 
   /** Raw read for callers that don't hold a checkpoint (e.g. a Cockpit "verify this page" job). */
   async read(relPath: string): Promise<string | null> {
-    if (!PATH_RE.test(relPath)) throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(relPath)} is outside clients/<slug>/pages/`);
+    if (!PATH_RE.test(relPath)) throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(relPath)} is outside clients/<slug>/pages/ and clients/<slug>/sites/`);
     const res = await this.fetchImpl(`${this.base}/${relPath}`, { headers: this.headers() });
     if (res.status === 400 || res.status === 404) return null;
     if (!res.ok) throw new Error(`artifact download failed (HTTP ${res.status})`);

@@ -16,6 +16,8 @@ const HELPERS = String.raw`
     return s.display !== "none" && s.visibility !== "hidden" && r.width > 0 && r.height > 0 && r.right > 0 && r.left < innerWidth;
   };
   const short = (s, n = 70) => { s = (s || "").replace(/\s+/g, " ").trim(); return s.length > n ? s.slice(0, n) + "…" : s; };
+  // SVG and MathML elements have no innerText; read their textContent instead of crashing the detector.
+  const txt = (el) => (el && (el.innerText ?? el.textContent)) || "";
   const where = (el) => el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") + (el.classList.length ? "." + [...el.classList].slice(0, 2).join(".") : "");
 `;
 
@@ -31,7 +33,7 @@ export const DESIGN_DETECTORS = String.raw`(names) => {
     return { h, s, l };
   };
   const textBlocks = [...document.querySelectorAll("main p, main li, main dd, main dt, main h1, main h2, main h3, main blockquote")]
-    .filter(vis).filter((e) => e.innerText.trim().length > 20);
+    .filter(vis).filter((e) => txt(e).trim().length > 20);
   const D = {
     gradientHero() {
       const hero = document.querySelector("#hero") || document.querySelector("main > section, main > *");
@@ -56,7 +58,7 @@ export const DESIGN_DETECTORS = String.raw`(names) => {
         const rs = kids.map((k) => k.getBoundingClientRect());
         if (rs[0].width < 180) continue;
         if (!rs.every((r) => Math.abs(r.top - rs[0].top) < 4 && Math.abs(r.width - rs[0].width) < 8)) continue;
-        if (!kids.every((k) => k.querySelector("h2, h3, h4, h5") && k.querySelector("p") && k.innerText.length < 260)) continue;
+        if (!kids.every((k) => k.querySelector("h2, h3, h4, h5") && k.querySelector("p") && txt(k).length < 260)) continue;
         out.push("three equal cards with heading + blurb in one row at " + where(p));
       }
       return out;
@@ -95,9 +97,9 @@ export const DESIGN_DETECTORS = String.raw`(names) => {
         if (!vis(e) || e.children.length) return false;
         const r = e.getBoundingClientRect(), s = getComputedStyle(e);
         const radius = parseFloat(s.borderTopLeftRadius) || 0;
-        return /^[A-Z]{1,3}$/.test(e.innerText.trim()) && r.width <= 72 && r.height <= 72 && Math.abs(r.width - r.height) < 6 && (radius >= r.width * 0.3 || s.borderTopLeftRadius.endsWith("%"));
+        return /^[A-Z]{1,3}$/.test(txt(e).trim()) && r.width <= 72 && r.height <= 72 && Math.abs(r.width - r.height) < 6 && (radius >= r.width * 0.3 || s.borderTopLeftRadius.endsWith("%"));
       });
-      if (avatars.length >= 2) out.push(avatars.length + " initials avatars (" + avatars.slice(0, 4).map((a) => a.innerText.trim()).join(", ") + ")");
+      if (avatars.length >= 2) out.push(avatars.length + " initials avatars (" + avatars.slice(0, 4).map((a) => txt(a).trim()).join(", ") + ")");
       return out;
     },
     fillerCopy() {
@@ -120,7 +122,7 @@ export const DESIGN_DETECTORS = String.raw`(names) => {
       const opacityOf = (e) => { let o = 1; for (let x = e; x; x = x.parentElement) o *= parseFloat(getComputedStyle(x).opacity); return o; };
       const thin = [...document.querySelectorAll("main p, main li, main dd")].filter(vis).filter((e) => {
         const s = getComputedStyle(e);
-        return parseFloat(s.fontSize) < 18 && (parseInt(s.fontWeight, 10) <= 300 || opacityOf(e) < 0.75) && e.innerText.trim().length > 20;
+        return parseFloat(s.fontSize) < 18 && (parseInt(s.fontWeight, 10) <= 300 || opacityOf(e) < 0.75) && txt(e).trim().length > 20;
       });
       return thin.length >= 3 ? [thin.length + " body text blocks are thin (weight 300 or less) or faded below 0.75 opacity, e.g. " + where(thin[0])] : [];
     },
@@ -128,9 +130,9 @@ export const DESIGN_DETECTORS = String.raw`(names) => {
       const sections = document.querySelectorAll("main > section").length || document.querySelectorAll("section").length;
       const eyebrows = [...document.querySelectorAll("main h2")].filter((h) => {
         const p = h.previousElementSibling;
-        if (!p || !vis(p) || p.innerText.trim().length >= 40) return false;
+        if (!p || !vis(p) || txt(p).trim().length >= 40) return false;
         const s = getComputedStyle(p);
-        return parseFloat(s.fontSize) <= 14 && (s.textTransform === "uppercase" || parseFloat(s.letterSpacing) >= 1 || p.innerText === p.innerText.toUpperCase());
+        return parseFloat(s.fontSize) <= 14 && (s.textTransform === "uppercase" || parseFloat(s.letterSpacing) >= 1 || txt(p) === txt(p).toUpperCase());
       });
       return eyebrows.length > Math.ceil(sections / 3) ? [eyebrows.length + " small uppercase labels above section headings across " + sections + " sections (limit " + Math.ceil(sections / 3) + ")"] : [];
     },

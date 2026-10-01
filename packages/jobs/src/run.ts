@@ -23,6 +23,7 @@ import { buildToolRegistry } from "@wfact/hermes-lite/tools/registry";
 import { stateReaderFromEnv } from "@wfact/hermes-lite/state";
 import { modelClientFromEnv as hermesModelFromEnv } from "@wfact/hermes-lite/modelClient";
 import { createFrontendBuilderAgent } from "@wfact/frontend-loop/agent";
+import { createTrackABuilderAgent } from "@wfact/frontend-loop/trackA/agent";
 import { modelClientFromEnv } from "@wfact/frontend-loop/modelClient";
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
 import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
@@ -74,25 +75,36 @@ function buildDeps(): HandlerDeps {
   const artifacts = new SupabaseArtifactStore(url, serviceKey);
   const slugs = knownClientSlugs();
 
+  const qaAgent = createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name }));
+  const workflow: HandlerDeps["workflow"] = {
+    frontEndAgent: createFrontendBuilderAgent({
+      builderModel: traceModelClient(builder.client, traces, actor),
+      evaluatorModel: traceModelClient(reviewer.client, traces, actor),
+    }),
+    // Step 4B M1: claims gate + rendered QA + screenshot review, then the evaluator.
+    qaAgent,
+    registry: createSeedRegistry(),
+    audit,
+    reader,
+    artifacts,
+    knownClientSlugs: slugs,
+  };
+
   return {
     planning: { intakeModel, plannerModel, directionModel, store: planStore, audit },
     planStore,
-    workflow: {
-      frontEndAgent: createFrontendBuilderAgent({
+    // Step 4B M3: Track A plans are built by the Track A builder (Agent 37 fills the starter's content).
+    trackAWorkflow: {
+      ...workflow,
+      frontEndAgent: createTrackABuilderAgent({
         builderModel: traceModelClient(builder.client, traces, actor),
         evaluatorModel: traceModelClient(reviewer.client, traces, actor),
       }),
-      // Step 4B M1: claims gate + rendered QA + cross-vendor screenshot review, then the evaluator.
-      qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name })),
-      registry: createSeedRegistry(),
-      audit,
-      reader,
-      artifacts,
-      knownClientSlugs: slugs,
     },
+    workflow,
     readArtifact: (p) => artifacts.read(p),
     repoRoot: REPO_ROOT,
-    qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name })),
+    qaAgent,
     audit,
     knownClientSlugs: slugs,
     ask: async (question) => {

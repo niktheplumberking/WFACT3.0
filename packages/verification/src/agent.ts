@@ -36,6 +36,21 @@ function stringArray(value: unknown, field: string): string[] {
   return value;
 }
 
+/** Step 4B M3: a multi-page site. Page files are plain names (no folders, no "..") and each must exist. */
+function parseSite(value: unknown): NonNullable<VerificationContext["site"]> {
+  const s = (value ?? {}) as { files?: unknown; pages?: unknown };
+  if (typeof s.files !== "object" || s.files === null) throw new AgentInputError("site.files must be an object of file name → content");
+  const files = s.files as Record<string, unknown>;
+  const pages = stringArray(s.pages, "site.pages");
+  if (pages.length === 0) throw new AgentInputError("site.pages must list at least one page");
+  for (const [name, content] of Object.entries(files)) {
+    if (!/^[a-z0-9][a-z0-9-]*\.(html|json|txt|xml)$/.test(name)) throw new AgentInputError(`site file name ${JSON.stringify(name)} is not allowed`);
+    if (typeof content !== "string") throw new AgentInputError(`site file ${name} must be text`);
+  }
+  for (const p of pages) if (typeof files[p] !== "string") throw new AgentInputError(`site page ${p} has no file`);
+  return { files: files as Record<string, string>, pages };
+}
+
 export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaInput, VerificationResult> {
   return {
     role: QA_EVALUATOR_ROLE,
@@ -54,6 +69,7 @@ export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaI
           requiredSections: stringArray(r.requiredSections ?? [], "requiredSections"),
           otherClientSlugs: stringArray(r.otherClientSlugs ?? [], "otherClientSlugs"),
           ...(r.factSources !== undefined ? { factSources: stringArray(r.factSources, "factSources") } : {}),
+          ...(r.site !== undefined ? { site: parseSite(r.site) } : {}),
         },
         goal: r.goal,
       };

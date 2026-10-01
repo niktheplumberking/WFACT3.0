@@ -15,13 +15,19 @@ import { QA_EVALUATOR_ROLE } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
 import { intakeAndPlan, replan, type PlanningDeps, type PlanningResult } from "@wfact/planning/pipeline";
 import type { PlanStore } from "@wfact/planning/planStore";
-import { buildAndVerify, resumeBuildAndVerify, qaFailureToIssues, type WorkflowDeps, type WorkflowResult } from "@wfact/workflow";
+import { buildAndVerify, recordedBuilderTemplate, resumeBuildAndVerify, qaFailureToIssues, type WorkflowDeps, type WorkflowResult } from "@wfact/workflow";
 import type { Job } from "./jobStore.js";
 
 export interface HandlerDeps {
   planning: PlanningDeps;
   planStore: PlanStore;
   workflow: WorkflowDeps;
+  /**
+   * Step 4B M3: the same workflow with the Track A (multi-page, content-as-data) builder. Production
+   * (run.ts) always sets it; when absent, Track A falls back to `workflow` (the single-page builder that
+   * M2 used), which only older tests rely on.
+   */
+  trackAWorkflow?: WorkflowDeps;
   /** Reads a page by repo-relative path from the artifact store (null if absent). */
   readArtifact: (relPath: string) => Promise<string | null>;
   repoRoot: string;
@@ -125,17 +131,22 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       if (!stored.buildTrack) {
         return { ok: false, reason: `plan ${planId} has no build track — the owner chooses Track A or B when approving`, result: { planId } };
       }
-      // Today's builder is the single-page Track A builder (multi-page in M3). Track B (Next.js) arrives
-      // in M4; building a Track B plan with the Track A builder would silently ignore the owner's choice.
+      // Track A builds the multi-page site from the Track A starter (M3). Track B (Next.js) arrives in M4;
+      // building a Track B plan with the Track A builder would silently ignore the owner's choice.
       if (stored.buildTrack === "B") {
         return { ok: false, reason: `plan ${planId} is Track B; the Track B builder is not built yet (Step 4B M4)`, result: { planId, buildTrack: "B" } };
       }
-      const outcome = workflowOutcome(await buildAndVerify(stored.plan.brief, deps.workflow));
+      const outcome = workflowOutcome(await buildAndVerify(stored.plan.brief, deps.trackAWorkflow ?? deps.workflow));
       return { ...outcome, result: { planId, buildTrack: stored.buildTrack, ...outcome.result } };
     }
 
-    case "resume":
-      return workflowOutcome(await resumeBuildAndVerify(uuid(p, "workflowRunId"), deps.workflow));
+    case "resume": {
+      const runId = uuid(p, "workflowRunId");
+      // Resume with the builder that started the run (a Track A site is revised as content, not HTML).
+      const template = await recordedBuilderTemplate(runId, deps.workflow.reader);
+      const wf = template === "track-a" && deps.trackAWorkflow ? deps.trackAWorkflow : deps.workflow;
+      return workflowOutcome(await resumeBuildAndVerify(runId, wf));
+    }
 
     case "verify": {
       const relPath = str(p, "path", 200);

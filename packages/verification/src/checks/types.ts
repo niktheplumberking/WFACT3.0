@@ -26,6 +26,11 @@ export interface VerificationContext {
    * hours, price or service area not found here is unsourced. Absent = no sources: every fact fails.
    */
   factSources?: string[];
+  /**
+   * Step 4B M3: a multi-page site. Every text check runs on every page (details prefixed with the page
+   * file); required sections are checked across the whole site. `html` is then the home page.
+   */
+  site?: { files: Record<string, string>; pages: string[] };
 }
 
 export interface CheckResult {

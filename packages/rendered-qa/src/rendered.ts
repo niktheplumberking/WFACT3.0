@@ -85,6 +85,9 @@ export interface RenderedQaOptions {
   rulebook?: Rulebook;
 }
 
+/** Screenshot slices per viewport the reviewer gets for each page after the first. */
+export const EXTRA_PAGE_SLICES = 2;
+
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 const result = (checkId: string, details: string[]): CheckResult => ({ checkId, passed: details.length === 0, details: [...new Set(details)] });
@@ -211,7 +214,10 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
         await page.screenshot({ path: file, fullPage: true });
         const height = await evaluate<number>(page, "() => document.documentElement.scrollHeight");
         const slices: Buffer[] = [];
-        for (let i = 0; i < vp.slices && i * vp.height < height; i += 1) {
+        // The reviewer sees the first page in full and the top of every other page (Step 4B M3: keeps a
+        // multi-page review inside one model call). Full-page PNGs of every page are still written.
+        const maxSlices = pageName === pages[0] ? vp.slices : Math.min(vp.slices, EXTRA_PAGE_SLICES);
+        for (let i = 0; i < maxSlices && i * vp.height < height; i += 1) {
           const y = i * vp.height;
           slices.push(await page.screenshot({ type: "jpeg", quality: 60, fullPage: true, clip: { x: 0, y, width: vp.width, height: Math.min(vp.height, height - y) } }));
         }
@@ -274,9 +280,8 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
 }
 
 /**
- * The rendered checks as a VerificationLoop async suite. The page under test is ctx.html (today's
- * builder emits one file); it is written to a private temp directory as index.html and served from
- * there. The last run is kept so the screenshot reviewer can use its screenshots.
+ * The rendered checks as a VerificationLoop async suite. The page under test is ctx.html, written to a
+ * private temp directory as index.html, or (Step 4B M3) every file of ctx.site, served together. The last run is kept so the screenshot reviewer can use its screenshots.
  */
 export interface RenderedSuite extends AsyncCheckSuite {
   lastRun: RenderedRun | null;
@@ -290,8 +295,17 @@ export function createRenderedSuite(opts: RenderedQaOptions): RenderedSuite {
     async run(ctx: VerificationContext): Promise<CheckResult[]> {
       const dir = mkdtempSync(path.join(tmpdir(), "wfact-rqa-"));
       try {
-        writeFileSync(path.join(dir, "index.html"), ctx.html, "utf-8");
-        suite.lastRun = await runRenderedQa(dir, opts);
+        if (ctx.site) {
+          // Step 4B M3: the whole site is served, so cross-page links and every page are checked.
+          for (const [name, content] of Object.entries(ctx.site.files)) {
+            if (!/^[a-z0-9][a-z0-9-]*\.(html|json|txt|xml)$/.test(name)) throw new Error(`refusing site file name ${JSON.stringify(name)}`);
+            writeFileSync(path.join(dir, name), content, "utf-8");
+          }
+          suite.lastRun = await runRenderedQa(dir, { ...opts, pages: ctx.site.pages });
+        } else {
+          writeFileSync(path.join(dir, "index.html"), ctx.html, "utf-8");
+          suite.lastRun = await runRenderedQa(dir, opts);
+        }
         return suite.lastRun.results;
       } finally {
         rmSync(dir, { recursive: true, force: true });

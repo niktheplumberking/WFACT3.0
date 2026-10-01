@@ -5,6 +5,8 @@
  *
  *   npm run build-and-verify -- ../../clients/<slug>/brief.json
  *   npm run build-and-verify -- --resume <workflow-run-id>
+ *   add --track A to build with the Track A builder (multi-page site from the Track A starter, Step 4B M3);
+ *   with --plan the owner's chosen track is used.
  *
  * Secrets come from the environment (Doppler: `doppler run -- npm run build-and-verify -- …`, see
  * docs/SECRETS.md). Refuses to run without the audit sink: checkpoints are audit_log rows, so a
@@ -16,6 +18,7 @@ import path from "node:path";
 import { auditReaderFromEnv, auditSinkFromEnv, traceSinkFromEnv } from "@wfact/audit";
 import { createSeedRegistry } from "@wfact/agent-runtime";
 import { createFrontendBuilderAgent } from "@wfact/frontend-loop/agent";
+import { createTrackABuilderAgent } from "@wfact/frontend-loop/trackA/agent";
 import { modelClientFromEnv } from "@wfact/frontend-loop/modelClient";
 import { appendCorrectionLogRows, formatCorrectionSummary } from "@wfact/frontend-loop/correctionLog";
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
@@ -27,6 +30,7 @@ import { planStoreFromEnv } from "@wfact/planning/planStore";
 import {
   buildAndVerify,
   resumeBuildAndVerify,
+  recordedBuilderTemplate,
   qaFailureToIssues,
   FileArtifactStore,
   WORKFLOW_ID,
@@ -47,7 +51,14 @@ async function main() {
   const resumeRunId = resumeIdx >= 0 ? args[resumeIdx + 1] : undefined;
   const planIdx = args.indexOf("--plan");
   const planId = planIdx >= 0 ? args[planIdx + 1] : undefined;
-  const briefPath = resumeIdx >= 0 || planIdx >= 0 ? undefined : args[0];
+  const trackIdx = args.indexOf("--track");
+  let track = trackIdx >= 0 ? args[trackIdx + 1] : undefined;
+  if (track !== undefined && track !== "A") {
+    console.error(`--track must be A (Track B arrives in Step 4B M4); got ${JSON.stringify(track)}`);
+    process.exitCode = 1;
+    return;
+  }
+  const briefPath = resumeIdx >= 0 || planIdx >= 0 ? undefined : args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--track");
   if (!briefPath && !resumeRunId && !planId) {
     console.error(
       "Usage: npm run build-and-verify -- <path/to/brief.json>  |  -- --plan <approved-plan-id>  |  -- --resume <run-id>",
@@ -67,6 +78,10 @@ async function main() {
     if (stored.status !== "approved") blocked(`plan ${planId} is "${stored.status}" — only an owner-approved plan is built`);
     console.error(`(building from approved plan ${planId}, decided ${stored.decidedAt}; brief source "${stored.plan.brief.source}")`);
     planBrief = stored.plan.brief;
+    // Step 4B M2/M3: the owner's track choice decides the builder.
+    if (!stored.buildTrack) blocked(`plan ${planId} has no build track; the owner chooses one when approving`);
+    if (stored.buildTrack === "B") blocked(`plan ${planId} is Track B; the Track B builder arrives in Step 4B M4`);
+    track = stored.buildTrack;
   }
 
   const { sink, reason: sinkReason } = auditSinkFromEnv();
@@ -91,8 +106,13 @@ async function main() {
   const reviewerModel = traceModelClient(builderReviewer.client, traceSink, "cli:build-and-verify");
   const qaModel = qa.client ? traceModelClient(qa.client, traceSink, "cli:build-and-verify") : null;
 
+  if (resumeRunId && (await recordedBuilderTemplate(resumeRunId, reader)) === "track-a") track = "A";
+  if (track === "A") console.error("(builder: Track A starter, multi-page; the builder model writes the content only)");
   const deps: WorkflowDeps = {
-    frontEndAgent: createFrontendBuilderAgent({ builderModel, evaluatorModel: reviewerModel }),
+    frontEndAgent:
+      track === "A"
+        ? createTrackABuilderAgent({ builderModel, evaluatorModel: reviewerModel })
+        : createFrontendBuilderAgent({ builderModel, evaluatorModel: reviewerModel }),
     // Step 4B M1: claims gate + rendered QA + cross-vendor screenshot review, then the evaluator.
     qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name })),
     registry: createSeedRegistry(),

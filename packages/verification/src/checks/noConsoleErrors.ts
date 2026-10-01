@@ -33,6 +33,19 @@ export const noConsoleErrorsCheck: Check = {
       }
       const code = (body ?? "").trim();
       if (code.length === 0) continue;
+      // Step 4B M3: structured data (<script type="application/ld+json">) is JSON, not script; the
+      // browser never executes it, but invalid JSON-LD is still a defect.
+      const type = (attrs ?? "").match(/\btype\s*=\s*["']?([^"'\s>]+)/i)?.[1]?.toLowerCase();
+      if (type && !/^(text|application)\/(javascript|ecmascript)$|^module$/.test(type)) {
+        if (/json/.test(type)) {
+          try {
+            JSON.parse(code);
+          } catch (err) {
+            details.push(`<script type="${type}"> #${scriptIndex} is not valid JSON: ${err instanceof Error ? err.message : String(err)}`);
+          }
+        }
+        continue;
+      }
       try {
         // Parse only — never execute untrusted generated JS. A SyntaxError here is exactly the
         // class of bug that throws immediately in a real browser console.

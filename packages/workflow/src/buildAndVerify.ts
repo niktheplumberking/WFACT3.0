@@ -65,11 +65,67 @@ export class CheckpointIntegrityError extends Error {
 
 const sha256 = (s: string) => createHash("sha256").update(s, "utf8").digest("hex");
 
+/**
+ * Where artifacts may live: a single page under clients/<slug>/pages/, or (Step 4B M3) the files of a
+ * multi-page site under clients/<slug>/sites/<site>/ (pages, content.json, site.manifest.json).
+ */
+export const ARTIFACT_PATH_RE = /^clients\/[a-z][a-z0-9-]*\/(pages\/[a-z0-9-]+\.html|sites\/[a-z0-9-]+\/[a-z0-9][a-z0-9-.]*\.(html|json))$/;
+
 function assertSafeRelPath(relPath: string): void {
   const normalized = path.posix.normalize(relPath);
-  if (path.posix.isAbsolute(normalized) || normalized.startsWith("..") || !/^clients\/[a-z][a-z0-9-]*\/pages\/[a-z0-9-]+\.html$/.test(normalized)) {
-    throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(relPath)} is outside clients/<slug>/pages/`);
+  if (path.posix.isAbsolute(normalized) || normalized.startsWith("..") || normalized !== relPath || !ARTIFACT_PATH_RE.test(normalized)) {
+    throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(relPath)} is outside clients/<slug>/pages/ and clients/<slug>/sites/`);
   }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Multi-page sites (Step 4B M3): one manifest checkpoints every file
+// ---------------------------------------------------------------------------------------------
+
+export const SITE_MANIFEST = "site.manifest.json";
+const SITE_SOURCE = "content.json";
+
+export interface SiteManifest {
+  version: 1;
+  starterVersion: string;
+  pages: string[];
+  /** Every file of the site, including the content source; each re-hashed before QA. */
+  files: { name: string; sha256: string; bytes: number }[];
+  source: string;
+}
+
+const isSiteManifest = (artifact: StoredArtifact) => artifact.path.endsWith(`/${SITE_MANIFEST}`);
+
+/** Writes every site file, then the manifest that pins their hashes. The manifest is the checkpoint. */
+async function writeSite(store: ArtifactStore, dir: string, site: NonNullable<FrontendLoopResult["site"]>): Promise<StoredArtifact> {
+  const entries = Object.entries({ ...site.files, [SITE_SOURCE]: site.contentJson }).sort(([a], [b]) => a.localeCompare(b));
+  const files: SiteManifest["files"] = [];
+  for (const [name, content] of entries) {
+    const stored = await store.write(`${dir}/${name}`, content);
+    files.push({ name, sha256: stored.sha256, bytes: stored.bytes });
+  }
+  const manifest: SiteManifest = { version: 1, starterVersion: site.starterVersion, pages: site.pages, files, source: SITE_SOURCE };
+  return store.write(`${dir}/${SITE_MANIFEST}`, `${JSON.stringify(manifest, null, 2)}\n`);
+}
+
+/** Reads a checkpointed site back, refusing it if the manifest or any file changed since the checkpoint. */
+export async function readSiteVerified(
+  store: ArtifactStore,
+  manifestArtifact: StoredArtifact,
+): Promise<{ files: Record<string, string>; pages: string[]; contentJson: string }> {
+  const manifest = JSON.parse(await store.readVerified(manifestArtifact)) as SiteManifest;
+  const dir = manifestArtifact.path.slice(0, -SITE_MANIFEST.length - 1);
+  const files: Record<string, string> = {};
+  let contentJson = "";
+  for (const f of manifest.files) {
+    const content = await store.readVerified({ path: `${dir}/${f.name}`, sha256: f.sha256, bytes: f.bytes });
+    if (f.name === manifest.source) contentJson = content;
+    else files[f.name] = content;
+  }
+  for (const p of manifest.pages) {
+    if (files[p] === undefined) throw new CheckpointIntegrityError(`site manifest lists page ${p} but has no file for it`);
+  }
+  return { files, pages: manifest.pages, contentJson };
 }
 
 /** Files under the repo root — the same location the front-end CLI has always written pages to. */
@@ -256,7 +312,14 @@ class Workflow {
       outcome: "info",
       // The brief is stored so a resume can continue without the original file. Briefs carry no
       // secrets (see clients/<slug>/brief.json).
-      payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, brief: this.brief, maxQaRevisions: this.maxRevisions },
+      payload: {
+        workflow: WORKFLOW_ID,
+        version: WORKFLOW_VERSION,
+        brief: this.brief,
+        maxQaRevisions: this.maxRevisions,
+        // Which builder ran (e.g. "track-a"); a resume must use the same one.
+        template: this.deps.frontEndAgent.parseInput({ brief: this.brief }).template.id,
+      },
     });
     const built = await this.build(0, undefined);
     if ("halted" in built) return built.halted;
@@ -266,7 +329,7 @@ class Workflow {
   /** Stage 1: run the builder (fresh or revision), write the artifact, checkpoint it. */
   private async build(
     cycle: number,
-    revision: { html: string; issues: string[] } | undefined,
+    revision: { html: string; issues: string[]; contentJson?: string } | undefined,
   ): Promise<{ cp: CheckpointState } | { halted: WorkflowResult }> {
     const buildTaskId = randomUUID();
     const run: AgentRun<FrontendLoopResult> = await runAgent(
@@ -278,8 +341,9 @@ class Workflow {
     if (run.status !== "completed" || !run.output?.finalHtml) {
       return { halted: await this.halt("build_failed", "build", cycle, null, `builder ${run.status}: ${run.reason ?? "no page produced"}`) };
     }
-    const relPath = `clients/${run.output.brief.clientSlug}/pages/${run.output.template.id}.html`;
-    const artifact = await this.deps.artifacts.write(relPath, run.output.finalHtml);
+    const artifact = run.output.site
+      ? await writeSite(this.deps.artifacts, `clients/${run.output.brief.clientSlug}/sites/${run.output.template.id}`, run.output.site)
+      : await this.deps.artifacts.write(`clients/${run.output.brief.clientSlug}/pages/${run.output.template.id}.html`, run.output.finalHtml);
     const cp: CheckpointState = { stage: "build", cycle, buildTaskId, artifact };
     await this.checkpoint(cp);
     this.templateSections = run.output.template.requiredSections;
@@ -291,8 +355,14 @@ class Workflow {
     let cp = initial;
     for (;;) {
       let html: string;
+      let site: { files: Record<string, string>; pages: string[]; contentJson: string } | null = null;
       try {
-        html = await this.deps.artifacts.readVerified(cp.artifact);
+        if (isSiteManifest(cp.artifact)) {
+          site = await readSiteVerified(this.deps.artifacts, cp.artifact);
+          html = site.files[site.pages[0]!]!;
+        } else {
+          html = await this.deps.artifacts.readVerified(cp.artifact);
+        }
       } catch (err) {
         return this.halt("checkpoint_corrupt", "qa", cp.cycle + 1, cp, err instanceof Error ? err.message : String(err));
       }
@@ -311,6 +381,7 @@ class Workflow {
             goal: this.brief.goal,
             // Step 4B M1 claims gate: the approved brief is the only place a page fact may come from.
             factSources: [this.brief.goal, this.brief.brandNotes],
+            ...(site ? { site: { files: site.files, pages: site.pages } } : {}),
           },
         },
         { registry: this.deps.registry, audit: { sink: this.deps.audit }, runId: this.runId },
@@ -369,7 +440,7 @@ class Workflow {
         outcome: "info",
         payload: { workflow: WORKFLOW_ID, cycle: cp.cycle, issues, qaStatus: verdict.status },
       });
-      const rebuilt = await this.build(cp.cycle + 1, { html, issues });
+      const rebuilt = await this.build(cp.cycle + 1, site ? { html, issues, contentJson: site.contentJson } : { html, issues });
       if ("halted" in rebuilt) return rebuilt.halted;
       cp = rebuilt.cp;
     }
@@ -387,6 +458,14 @@ export async function buildAndVerify(rawBrief: unknown, deps: WorkflowDeps): Pro
   return wf.start();
 }
 
+/** The builder template a run recorded at start ("track-a", "clean-agency", ...), or null for older runs. */
+export async function recordedBuilderTemplate(runId: string, reader: AuditReader): Promise<string | null> {
+  const rows = await reader.listByRun(runId);
+  const start = rows.find((r) => r.actor === `workflow:${WORKFLOW_ID}` && r.action === "workflow.start");
+  const t = start?.payload?.template;
+  return typeof t === "string" ? t : null;
+}
+
 /**
  * Crash recovery: continue a run from its last durable checkpoint. Never re-runs a build that has a
  * checkpoint; never trusts an artifact whose hash changed; never re-opens a run that already ended.
@@ -398,7 +477,12 @@ export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps): P
   if (!start || !start.taskId) {
     throw new Error(`no ${WORKFLOW_ID} run found for run_id ${runId}`);
   }
-  const brief = deps.frontEndAgent.parseInput({ brief: start.payload?.brief }).brief;
+  const parsed = deps.frontEndAgent.parseInput({ brief: start.payload?.brief });
+  const brief = parsed.brief;
+  const recordedTemplate = start.payload?.template;
+  if (typeof recordedTemplate === "string" && recordedTemplate !== parsed.template.id) {
+    throw new Error(`run ${runId} was built by the "${recordedTemplate}" builder; resume it with that builder, not "${parsed.template.id}"`);
+  }
   const wf = new Workflow(deps, runId, start.taskId, brief);
 
   const terminal = workflowRows.find((r) => r.action === "workflow.halt" || r.action === "workflow.gate");

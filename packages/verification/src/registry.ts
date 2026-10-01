@@ -31,9 +31,31 @@ export const CHECK_REGISTRY: Check[] = [
 export const CLAIMS_CHECKS: Check[] = CLAIMS;
 export const QA_GATE_CHECKS: Check[] = [...CHECK_REGISTRY, ...CLAIMS];
 
-/** Runs every check in the registry (or a caller-supplied subset) against one context. */
+/**
+ * Runs every check in the registry (or a caller-supplied subset) against one context. For a multi-page
+ * site (Step 4B M3) each check runs on every page and its details name the page; required sections are
+ * the one site-wide property (a section may live on any page), so that check sees all pages at once.
+ */
 export function runChecks(ctx: VerificationContext, checks: Check[] = CHECK_REGISTRY): CheckResult[] {
-  return checks.map((check) => check.run(ctx));
+  const site = ctx.site;
+  if (!site) return checks.map((check) => check.run(ctx));
+  const pageCtx = (html: string): VerificationContext => ({ ...ctx, html, site: undefined });
+  return checks.map((check) => {
+    if (check.id === requiredSectionsCheck.id) {
+      const r = check.run(pageCtx(site.pages.map((p) => site.files[p] ?? "").join("\n")));
+      return { ...r, details: r.details.map((d) => `site: ${d}`) };
+    }
+    const details: string[] = [];
+    for (const page of site.pages) {
+      const html = site.files[page];
+      if (html === undefined) {
+        details.push(`${page}: the page is missing from the site files`);
+        continue;
+      }
+      details.push(...check.run(pageCtx(html)).details.map((d) => `${page}: ${d}`));
+    }
+    return { checkId: check.id, passed: details.length === 0, details };
+  });
 }
 
 export type { Check, CheckResult, VerificationContext };

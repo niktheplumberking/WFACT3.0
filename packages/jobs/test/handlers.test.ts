@@ -162,3 +162,23 @@ test("malformed params are rejected by the runner too (defence in depth behind t
   await assert.rejects(() => handleJob(job("build_plan", { planId: "$(whoami)" }), d), /must be a UUID/);
   await assert.rejects(() => handleJob(job("verify", { path: "../../etc/passwd", goal: "g" }), d), /clients\/<slug>\/pages/);
 });
+
+test("Step 4B M3: a Track A plan is built by the Track A builder into a multi-page site", async () => {
+  const { createTrackABuilderAgent } = await import("@wfact/frontend-loop/trackA/agent");
+  const content = readFileSync(path.join(import.meta.dirname, "..", "..", "frontend-loop", "test", "fixtures", "track-a", "summit-line.content.json"), "utf-8");
+  const { d, planStore, artifacts } = deps(CLEAN);
+  d.trackAWorkflow = {
+    ...d.workflow,
+    frontEndAgent: createTrackABuilderAgent({ builderModel: new BuilderMock(() => content), evaluatorModel: new BuilderMock(() => "VERDICT: APPROVED") }),
+  };
+  const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
+  planStore.decide(intake.result.planId as string, "approved", null, "A");
+  const out = await handleJob(job("build_plan", { planId: intake.result.planId }), d);
+  assert.equal(out.ok, true, out.reason ?? JSON.stringify(out.result.qaIssues));
+  const cp = out.result.lastCheckpoint as { path: string };
+  assert.match(cp.path, /^clients\/northlight-signs\/sites\/track-a\/site\.manifest\.json$/);
+  for (const f of ["index.html", "services.html", "faq.html", "contact.html", "content.json"]) {
+    assert.ok(artifacts.files.has(`clients/northlight-signs/sites/track-a/${f}`), f);
+  }
+  assert.ok(![...artifacts.files.keys()].some((k) => k.includes("/pages/")), "the single-page builder was not used");
+});

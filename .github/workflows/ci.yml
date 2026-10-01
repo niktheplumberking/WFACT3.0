@@ -186,8 +186,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Install linked packages (audit, hermes, agent-runtime, verification)
-        run: for p in audit hermes agent-runtime verification; do (cd ../$p && npm ci); done
+      - name: Install linked packages (audit, hermes, agent-runtime, frontend-loop, verification)
+        # frontend-loop: the Step 4B M3 Track A test renders its fixture site with the committed starter.
+        run: for p in audit hermes agent-runtime frontend-loop verification; do (cd ../$p && npm ci); done
       - name: Install
         run: npm ci
       - name: Install Chromium

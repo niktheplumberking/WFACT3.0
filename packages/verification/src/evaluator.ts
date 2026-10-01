@@ -42,11 +42,32 @@ export async function runEvaluator(
     `Page goal: ${goal}`,
     `Required sections (already verified present): ${ctx.requiredSections.join(", ")}`,
     "",
-    "--- HTML to review ---",
-    ctx.html,
+    ctx.site ? `--- HTML of a ${ctx.site.pages.length}-page site to review, page by page ---` : "--- HTML to review ---",
+    ctx.site ? siteForReview(ctx.site) : ctx.html,
   ].join("\n");
   const raw = await model.complete({ system: RUBRIC, user });
   return parseEvaluatorResponse(raw);
+}
+
+/**
+ * Step 4B M3: every page of a site, in nav order. The stylesheet repeated on each page is sent once
+ * (on the first page) so the reviewer reads the content, not the same CSS four times.
+ */
+export function siteForReview(site: NonNullable<VerificationContext["site"]>): string {
+  let firstStyle: string | null = null;
+  return site.pages
+    .map((page) => {
+      const html = (site.files[page] ?? "").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, (style) => {
+        if (firstStyle === null || firstStyle === style) {
+          const repeat = firstStyle === style;
+          firstStyle = style;
+          return repeat ? "<style>/* same stylesheet as the first page */</style>" : style;
+        }
+        return style;
+      });
+      return `\n===== PAGE: ${page} =====\n${html}`;
+    })
+    .join("\n");
 }
 
 /** Same strict-protocol parsing as frontend-loop's `parseReviewResponse` — never silently approve. */
