@@ -165,3 +165,33 @@ same change as the pipeline, which the trigger refuses); and the audit query use
 `get_advisors` (security) after the migration: only the three pre-existing items (`public.rls_auto_enable`, `public.decide_account_request`
 by design, leaked-password protection off); nothing new from 0011 (its functions are in the `private` schema).
 Known consequence: the 2 plans approved before 0011 have no track and cannot be built; a fresh plan (or re-plan) is needed.
+
+## Run 5: 2026-10-01, migration 0013 (jobs `cancelled` status, `public.cancel_job`, Step 4C decision D7)
+
+Script: `scripts/rls_attack_test_jobs_cancel.sql`, run with `execute_sql` against the live project. Everything runs inside a
+sub-transaction that is always rolled back; checked afterwards: 0 `@attack.test` users, 9 jobs (unchanged), 0 cancelled jobs,
+0 `job.cancelled` audit rows. **Result: 17/17 PASS.**
+
+| Attack | Expect | Got |
+|---|---|---|
+| anon calls cancel_job | 42501 | 42501 |
+| signed-in account without a profile cancels | 42501 | 42501 |
+| PM cancels | 42501 | 42501 |
+| PM reads jobs | 0 | 0 |
+| owner cancels with a blank reason | 22023 | 22023 |
+| owner cancels a RUNNING job | 23514 | 23514 |
+| owner cancels a finished job | 23514 | 23514 |
+| owner cancels a job queued under 2 minutes ago (could race a dispatch) | 23514 | 23514 |
+| owner cancels a job that does not exist | P0002 | P0002 |
+| owner UPDATEs jobs directly (no update policy) | 0 rows | 0 rows |
+| owner cancels an old queued job: status / finished / error | cancelled / true / "Cancelled by owner: …" | same |
+| owner cancels the same job twice | 23514 | 23514 |
+| admin cancels an old queued job | cancelled | cancelled |
+| worker (service role) revives a cancelled job | 42501 | 42501 |
+| worker cancels a running job directly | 23514 | 23514 |
+| audit rows for the two cancellations | 2 | 2 |
+| audit row records the admin role | admin | admin |
+
+`get_advisors` (security) after the migration: `public.cancel_job` is flagged as a SECURITY DEFINER function signed-in users can call;
+that is by design (same pattern as `decide_account_request`: the function checks the caller's role itself and is the only path to
+the `cancelled` status). The other items are the pre-existing ones (`public.rls_auto_enable`, leaked-password protection off).
