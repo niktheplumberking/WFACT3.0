@@ -12,6 +12,7 @@ import { noConsoleErrorsCheck } from "./checks/noConsoleErrors.js";
 import { imageOptimizationCheck } from "./checks/imageOptimization.js";
 import { isolationCheck } from "./checks/isolation.js";
 import { requiredSectionsCheck } from "./checks/requiredSections.js";
+import { CLAIMS_CHECKS as CLAIMS } from "./checks/claims.js";
 
 export const CHECK_REGISTRY: Check[] = [
   secretsScanCheck,
@@ -21,6 +22,14 @@ export const CHECK_REGISTRY: Check[] = [
   isolationCheck,
   requiredSectionsCheck,
 ];
+
+/**
+ * Step 4B M1: the claims gate (content after </html>, SAMPLE labels, banned claims, unsourced
+ * facts). Kept as its own list so `CHECK_REGISTRY` stays exactly the Phase 5 six; production QA
+ * (the jobs runner, the workflow and verify CLIs) uses `QA_GATE_CHECKS`, which is both.
+ */
+export const CLAIMS_CHECKS: Check[] = CLAIMS;
+export const QA_GATE_CHECKS: Check[] = [...CHECK_REGISTRY, ...CLAIMS];
 
 /** Runs every check in the registry (or a caller-supplied subset) against one context. */
 export function runChecks(ctx: VerificationContext, checks: Check[] = CHECK_REGISTRY): CheckResult[] {

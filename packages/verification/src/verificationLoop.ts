@@ -7,7 +7,7 @@
  * distinct and named, same honesty pattern as `packages/frontend-loop/src/modelClient.ts`'s
  * `modelClientFromEnv` refusing to fabricate a result.
  */
-import type { Check, CheckResult, VerificationContext } from "./checks/types.js";
+import type { AsyncCheckSuite, Check, CheckResult, VerificationContext } from "./checks/types.js";
 import { CHECK_REGISTRY, runChecks } from "./registry.js";
 import type { ModelClient } from "./modelClient.js";
 import { runEvaluator, type EvaluatorVerdict } from "./evaluator.js";
@@ -27,6 +27,17 @@ export interface VerificationResult {
 
 export interface VerificationLoopOptions {
   checks?: Check[];
+  /**
+   * Step 4B M1: deterministic checks that need I/O (the rendered-QA browser pass). Run with
+   * `checks`; any failure is `failed_checks` and no model is called.
+   */
+  asyncChecks?: AsyncCheckSuite[];
+  /**
+   * Step 4B M1: model-based review suites (the cross-vendor screenshot reviewer). Run only after
+   * every deterministic check passed, before the evaluator. A failed result is
+   * `changes_requested`; a `notRun` result is `blocked_no_evaluator` (never a pass).
+   */
+  reviewSuites?: AsyncCheckSuite[];
   evaluatorModel?: ModelClient | null;
   /**
    * When set, every pass/fail decision writes one `verification.decision` row to `audit_log`
@@ -38,11 +49,15 @@ export interface VerificationLoopOptions {
 
 export class VerificationLoop {
   private readonly checks: Check[];
+  private readonly asyncChecks: AsyncCheckSuite[];
+  private readonly reviewSuites: AsyncCheckSuite[];
   private readonly evaluatorModel: ModelClient | null;
   private readonly audit: AuditContext | null;
 
   constructor(opts: VerificationLoopOptions = {}) {
     this.checks = opts.checks ?? CHECK_REGISTRY;
+    this.asyncChecks = opts.asyncChecks ?? [];
+    this.reviewSuites = opts.reviewSuites ?? [];
     this.evaluatorModel = opts.evaluatorModel ?? null;
     this.audit = opts.audit ?? null;
   }
@@ -69,6 +84,7 @@ export class VerificationLoop {
 
   private async decide(ctx: VerificationContext, goal: string): Promise<VerificationResult> {
     const checkResults = runChecks(ctx, this.checks);
+    for (const suite of this.asyncChecks) checkResults.push(...(await suite.run(ctx)));
     const checksPassed = checkResults.every((r) => r.passed);
 
     if (!checksPassed) {
@@ -76,6 +92,19 @@ export class VerificationLoop {
       // this IS the Manual's Phase 5 exit check: "a deliberately broken test build gets caught
       // and returned before being marked done."
       return { status: "failed_checks", checkResults, evaluator: null };
+    }
+
+    if (this.reviewSuites.length > 0) {
+      const reviewResults: CheckResult[] = [];
+      for (const suite of this.reviewSuites) reviewResults.push(...(await suite.run(ctx)));
+      checkResults.push(...reviewResults);
+      if (reviewResults.some((r) => r.notRun)) {
+        return { status: "blocked_no_evaluator", checkResults, evaluator: null };
+      }
+      if (reviewResults.some((r) => !r.passed)) {
+        // The reviewer's rule ids go back to the builder like any failed check; no evaluator call.
+        return { status: "changes_requested", checkResults, evaluator: null };
+      }
     }
 
     if (!this.evaluatorModel) {
@@ -95,7 +124,7 @@ export class VerificationLoop {
 export function formatVerificationSummary(result: VerificationResult): string {
   const lines: string[] = [];
   for (const check of result.checkResults) {
-    lines.push(`[${check.passed ? "PASS" : "FAIL"}] ${check.checkId}`);
+    lines.push(`[${check.notRun ? "NOT RUN" : check.passed ? "PASS" : "FAIL"}] ${check.checkId}`);
     for (const detail of check.details) {
       lines.push(`    - ${detail}`);
     }
@@ -112,6 +141,10 @@ export function formatVerificationSummary(result: VerificationResult): string {
       );
       break;
     case "changes_requested":
+      if (!result.evaluator) {
+        lines.push("VERIFICATION: CHANGES REQUESTED by the screenshot review (failed rules above); evaluator not run.");
+        break;
+      }
       lines.push("VERIFICATION: CHANGES REQUESTED by evaluator:");
       for (const issue of result.evaluator?.issues ?? []) {
         lines.push(`    - ${issue}`);

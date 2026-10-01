@@ -9,7 +9,7 @@
  * agent did its job. The workflow (Stage 3) routes on `output.status`.
  */
 import { AgentInputError, type Agent } from "@wfact/agent-runtime";
-import type { Check, VerificationContext } from "./checks/types.js";
+import type { AsyncCheckSuite, Check, VerificationContext } from "./checks/types.js";
 import type { ModelClient } from "./modelClient.js";
 import { VerificationLoop, type VerificationResult } from "./verificationLoop.js";
 
@@ -23,6 +23,10 @@ export interface QaInput {
 export interface QaEvaluatorAgentOptions {
   evaluatorModel: ModelClient | null;
   checks?: Check[];
+  /** Step 4B M1: rendered-QA browser suites (deterministic). */
+  asyncChecks?: AsyncCheckSuite[];
+  /** Step 4B M1: cross-vendor screenshot review suites (model). */
+  reviewSuites?: AsyncCheckSuite[];
 }
 
 function stringArray(value: unknown, field: string): string[] {
@@ -49,6 +53,7 @@ export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaI
           clientSlug: r.clientSlug,
           requiredSections: stringArray(r.requiredSections ?? [], "requiredSections"),
           otherClientSlugs: stringArray(r.otherClientSlugs ?? [], "otherClientSlugs"),
+          ...(r.factSources !== undefined ? { factSources: stringArray(r.factSources, "factSources") } : {}),
         },
         goal: r.goal,
       };
@@ -56,6 +61,8 @@ export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaI
     execute: ({ ctx, goal }, runCtx) =>
       new VerificationLoop({
         checks: opts.checks,
+        asyncChecks: opts.asyncChecks,
+        reviewSuites: opts.reviewSuites,
         evaluatorModel: opts.evaluatorModel,
         audit: runCtx.audit ?? undefined,
       }).run(ctx, goal),

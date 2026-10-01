@@ -1,0 +1,150 @@
+{
+  "_doc": "WFACT design rulebook (anti AI-slop), Step 4B. Versioned data. Distilled in our own words from Huraira's design-quality rule (Factory Completion Plan Part C, 2026-10-01) and the installed design skills (impeccable, design-taste-frontend, high-end-visual-design, ecc:frontend-design-direction, ecc:frontend-a11y); no third-party prompt text is copied. Given to the builder in its system prompt (packages/frontend-loop/src/rulebook.ts) and checked on the rendered page: `dom` names a deterministic detector in packages/rendered-qa/src/design.ts, `review` is the question the cross-vendor screenshot reviewer answers. Every rule has a failing fixture under design/fixtures/. A brief may explicitly ask for a pattern (e.g. a brand that is purple); `briefCanAllow` says whether that override exists. Change a rule = bump version.",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "DR-GRADIENT-HERO",
+      "kind": "banned",
+      "title": "Purple/blue gradient hero",
+      "rule": "The hero background is not a purple, violet or blue gradient (the default AI look). Use the brand palette, a real image, or a flat field.",
+      "detect": { "dom": "gradientHero", "review": "Is the hero background a purple, violet or blue gradient or glow?" },
+      "briefCanAllow": true,
+      "fixture": "fixtures/DR-GRADIENT-HERO.html"
+    },
+    {
+      "id": "DR-THREE-CARD-ROW",
+      "kind": "banned",
+      "title": "Generic three-card feature row",
+      "rule": "No row of three identical cards each holding an icon, a heading and a short blurb. Vary the composition: a list with real detail, an asymmetric grid, a split with an image.",
+      "detect": { "dom": "threeCardRow", "review": "Is there a row of three same-size cards each with an icon, heading and short blurb?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DR-THREE-CARD-ROW.html"
+    },
+    {
+      "id": "DR-EMOJI-ICONS",
+      "kind": "banned",
+      "title": "Emoji or text glyphs used as icons",
+      "rule": "No emoji or Unicode pictographs standing in for icons (in headings, buttons, list markers, cards). Icons come from one drawn icon set with a consistent stroke.",
+      "detect": { "dom": "emojiIcons", "review": "Are emoji or Unicode symbols used where icons should be?" },
+      "briefCanAllow": true,
+      "fixture": "fixtures/DR-EMOJI-ICONS.html"
+    },
+    {
+      "id": "DR-CENTRED-EVERYTHING",
+      "kind": "banned",
+      "title": "Centred-everything layout",
+      "rule": "Most text is not centre-aligned. Body copy is left-aligned; centring is reserved for a deliberate moment (one hero or one closing call to action).",
+      "detect": { "dom": "centredEverything", "review": "Is nearly every heading and paragraph centred on the page?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DR-CENTRED-EVERYTHING.html"
+    },
+    {
+      "id": "DR-SINGLE-DEFAULT-FONT",
+      "kind": "banned",
+      "title": "One default font with no pairing",
+      "rule": "Headings and body are not both set in one default face (Inter, Roboto, Arial, Helvetica, Open Sans, system-ui or a bare generic family). Choose a deliberate pairing, or one characterful family with clear weight and size contrast.",
+      "detect": { "dom": "singleDefaultFont", "review": "Does the whole page use one generic default font with no typographic pairing or contrast?" },
+      "briefCanAllow": true,
+      "fixture": "fixtures/DR-SINGLE-DEFAULT-FONT.html"
+    },
+    {
+      "id": "DR-FAKE-SOCIAL-PROOF",
+      "kind": "banned",
+      "title": "Fake 'trusted by' logos or initials avatars",
+      "rule": "No 'trusted by / as seen in / featured in' strips without supplied, real logos, and no circles of initials posing as customers.",
+      "detect": { "dom": "fakeSocialProof", "review": "Is there a logo wall, 'trusted by' strip or row of initials avatars that looks invented?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DR-FAKE-SOCIAL-PROOF.html"
+    },
+    {
+      "id": "DR-FILLER-COPY",
+      "kind": "banned",
+      "title": "Filler marketing copy",
+      "rule": "No stock phrases: 'unlock your potential', 'seamless', 'cutting-edge', 'elevate', 'revolutionize', 'game-changer', 'next-level', 'empower', 'supercharge', 'unleash', 'in today's fast-paced world'. Say the specific thing in the client's own words.",
+      "detect": { "dom": "fillerCopy", "review": "Does the copy lean on generic marketing filler instead of specific statements about this business?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DR-FILLER-COPY.html"
+    },
+    {
+      "id": "DR-GLASS-EVERYWHERE",
+      "kind": "banned",
+      "title": "Glassmorphism everywhere",
+      "rule": "Frosted-glass blur is not a default surface. At most one or two fixed or overlay elements (a sticky header, a modal) may use backdrop blur.",
+      "detect": { "dom": "glassEverywhere", "review": "Are many cards or sections styled as frosted glass?" },
+      "briefCanAllow": true,
+      "fixture": "fixtures/DR-GLASS-EVERYWHERE.html"
+    },
+    {
+      "id": "DR-REPEATED-RHYTHM",
+      "kind": "banned",
+      "title": "Same section rhythm repeated",
+      "rule": "Sections do not all share one layout (heading, short paragraph, grid of cards, repeat). Use at least three different layout families on a page of five or more sections, and never the same family three times in a row.",
+      "detect": { "review": "Do three or more consecutive sections share the same layout (same heading treatment, same grid, same spacing)?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DR-REPEATED-RHYTHM.html"
+    },
+    {
+      "id": "DR-GRATUITOUS-MOTION",
+      "kind": "banned",
+      "title": "Gratuitous animation",
+      "rule": "Motion is motivated (hierarchy, feedback, a state change, one authored moment). No more than one infinite loop on a page, and every animation stops under prefers-reduced-motion.",
+      "detect": { "dom": "gratuitousMotion", "review": "Does the page appear to rely on decorative, looping or attention-seeking animation?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DR-GRATUITOUS-MOTION.html"
+    },
+    {
+      "id": "DR-THIN-LOW-CONTRAST",
+      "kind": "banned",
+      "title": "Thin, low-contrast grey text",
+      "rule": "Body text is not set in a light weight (300 or less) at small sizes, nor faded with opacity. Body text keeps at least 4.5:1 contrast.",
+      "detect": { "dom": "thinLowContrast", "review": "Is body text thin, pale grey or faded so it is hard to read?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DR-THIN-LOW-CONTRAST.html"
+    },
+    {
+      "id": "DR-EYEBROW-OVERUSE",
+      "kind": "banned",
+      "title": "A small uppercase label above every heading",
+      "rule": "No tiny uppercase letter-spaced 'eyebrow' label above most section headings; the heading carries its own weight. At most one per three sections.",
+      "detect": { "dom": "eyebrowOveruse", "review": "Does nearly every section heading have a small uppercase label above it?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DR-EYEBROW-OVERUSE.html"
+    },
+    {
+      "id": "DQ-ART-DIRECTION",
+      "kind": "required",
+      "title": "Explicit art direction from the brand direction",
+      "rule": "The page visibly follows the brief's brand direction (palette, tone, type feel, imagery style) and has one memorable, specific idea, not a neutral template look.",
+      "detect": { "review": "Does the page follow the stated brand direction (palette, tone, type feel) and have a distinct look of its own rather than a generic template?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DQ-ART-DIRECTION.html"
+    },
+    {
+      "id": "DQ-TYPE-HIERARCHY",
+      "kind": "required",
+      "title": "Deliberate type pairing and hierarchy",
+      "rule": "Display and body type are chosen deliberately and the scale has obvious steps: one dominant headline, clear section headings, readable body (65-75 characters per line).",
+      "detect": { "review": "Is there a clear, deliberate typographic hierarchy (one dominant headline, distinct section headings, comfortable body text)?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DQ-TYPE-HIERARCHY.html"
+    },
+    {
+      "id": "DQ-CONTENT-HIERARCHY",
+      "kind": "required",
+      "title": "Real content hierarchy and one clear action",
+      "rule": "Each screen leads with what matters to the visitor and has one primary action, labelled the same way everywhere. The first screen says what the business does and what to do next.",
+      "detect": { "review": "Does the first screen make clear what the business does and what single action to take, with the primary action consistent across the page?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DQ-CONTENT-HIERARCHY.html"
+    },
+    {
+      "id": "DQ-MOBILE-READABLE",
+      "kind": "required",
+      "title": "Comfortable on a phone",
+      "rule": "At 375px wide: no horizontal scroll, body text at least 16px, nothing below 12px, tap targets at least 24px (44px for primary actions).",
+      "detect": { "review": "At phone width, is everything readable and easy to tap without zooming?" },
+      "briefCanAllow": false,
+      "fixture": "fixtures/DQ-MOBILE-READABLE.html"
+    }
+  ]
+}

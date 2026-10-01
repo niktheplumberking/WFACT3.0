@@ -309,6 +309,8 @@ class Workflow {
             requiredSections: requiredSectionsFor(this.brief, this.templateSections),
             otherClientSlugs: this.deps.knownClientSlugs.filter((s) => s !== this.brief.clientSlug),
             goal: this.brief.goal,
+            // Step 4B M1 claims gate: the approved brief is the only place a page fact may come from.
+            factSources: [this.brief.goal, this.brief.brandNotes],
           },
         },
         { registry: this.deps.registry, audit: { sink: this.deps.audit }, runId: this.runId },

@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Summit Line Roofing — Roofing Done Right</title>
+<meta name="description" content="Summit Line Roofing: clear service packages, straightforward process, and honest communication for homeowners.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+  :root{
+    --green-900:#12321f;
+    --green-800:#173f27;
+    --green-700:#1f4f31;
+    --green-600:#2c6b41;
+    --cream-100:#fbf6ec;
+    --cream-200:#f4ecd8;
+    --cream-300:#e9dcc0;
+    --cream-400:#d8cba9;
+    --near-black:#0c0c0c;
+    --ink:#161611;
+    --ink-soft:#4a4938;
+    --accent:#c98a3f;
+    --divider: rgba(22,22,17,0.12);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    font-family:'Kanit', sans-serif;
+    background:var(--cream-100);
+    color:var(--ink);
+    scroll-behavior:smooth;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+  section{scroll-margin-top:84px;}
+
+  /* ---------- Skip link ---------- */
+  .skip-link{
+    position:absolute;
+    left:-999px;
+    top:0;
+    background:var(--accent);
+    color:#111;
+    padding:0.6rem 1rem;
+    z-index:1000;
+    font-weight:600;
+  }
+  .skip-link:focus{left:1rem;top:1rem;}
+
+  /* ---------- Nav ---------- */
+  header.site-nav{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:500;
+    background:rgba(18,50,31,0.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+  }
+  .nav-inner{
+    max-width:1200px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0.9rem 1.25rem;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    font-weight:800;
+    letter-spacing:0.02em;
+    color:var(--cream-100);
+    font-size:1.05rem;
+    text-transform:uppercase;
+  }
+  .brand-mark{
+    width:32px;height:32px;
+    border-radius:8px;
+    background:linear-gradient(145deg, var(--green-600), var(--green-900));
+    display:flex;align-items:center;justify-content:center;
+    color:var(--cream-100);
+    font-weight:900;
+    font-size:0.95rem;
+    flex:none;
+  }
+  nav.primary-links{
+    display:none;
+    gap:1.75rem;
+    font-weight:500;
+    font-size:0.95rem;
+  }
+  nav.primary-links a{
+    color:var(--cream-200);
+    transition:color 0.2s ease;
+  }
+  nav.primary-links a:hover{color:var(--cream-100);}
+  .nav-cta{
+    display:none;
+    background:var(--accent);
+    color:#161611;
+    font-weight:700;
+    padding:0.6rem 1.15rem;
+    border-radius:6px;
+    font-size:0.9rem;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+  }
+  .nav-toggle{
+    background:none;
+    border:1px solid rgba(255,255,255,0.3);
+    color:var(--cream-100);
+    border-radius:6px;
+    padding:0.45rem 0.6rem;
+    font-size:1.1rem;
+    line-height:1;
+  }
+  .mobile-menu{
+    display:none;
+    flex-direction:column;
+    background:var(--green-900);
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .mobile-menu.open{display:flex;}
+  .mobile-menu a{
+    padding:0.9rem 1.25rem;
+    color:var(--cream-200);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    font-weight:500;
+  }
+  .mobile-menu .nav-cta{
+    display:block;
+    margin:1rem 1.25rem;
+    text-align:center;
+  }
+
+  @media(min-width:860px){
+    nav.primary-links{display:flex;}
+    .nav-cta{display:inline-block;}
+    .nav-toggle{display:none;}
+  }
+
+  /* ---------- Hero ---------- */
+  #hero{
+    background:linear-gradient(160deg, var(--green-900) 0%, var(--green-800) 55%, var(--green-700) 100%);
+    color:var(--cream-100);
+    padding:7.5rem 1.25rem 4rem;
+    position:relative;
+    overflow:hidden;
+  }
+  #hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(201,138,63,0.16), transparent 45%),
+      radial-gradient(circle at 85% 0%, rgba(12,12,12,0.25), transparent 40%);
+    pointer-events:none;
+  }
+  .hero-inner{
+    max-width:900px;
+    margin:0 auto;
+    position:relative;
+    z-index:2;
+    text-align:center;
+  }
+  .trust-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:0.9rem;
+    margin-bottom:1.5rem;
+    flex-wrap:wrap;
+  }
+  .avatar-stack{
+    display:flex;
+  }
+  .avatar{
+    width:38px;height:38px;
+    border-radius:50%;
+    border:2px solid var(--green-900);
+    margin-left:-12px;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;
+    font-size:0.75rem;
+    color:#fff;
+  }
+  .avatar:first-child{margin-left:0;}
+  .avatar.a1{background:var(--green-700);}
+  .avatar.a2{background:var(--green-600);}
+  .avatar.a3{background:var(--accent);color:#161611;}
+  .trust-copy{
+    font-size:0.85rem;
+    color:var(--cream-200);
+    font-weight:500;
+    letter-spacing:0.02em;
+  }
+  .trust-copy strong{color:var(--cream-100);font-weight:700;}
+
+  .hero-headline{
+    font-size:clamp(2.1rem, 6vw, 4rem);
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:-0.01em;
+    line-height:1.05;
+    margin:0 0 1.1rem;
+  }
+  .hero-headline .accent-word{color:var(--accent);}
+  .hero-sub{
+    font-size:clamp(1rem, 2vw, 1.2rem);
+    color:var(--cream-200);
+    font-weight:400;
+    max-width:620px;
+    margin:0 auto 2rem;
+    line-height:1.6;
+  }
+  .cta-row{
+    display:flex;
+    flex-direction:column;
+    gap:0.8rem;
+    align-items:center;
+    margin-bottom:3rem;
+  }
+  .btn-primary{
+    display:inline-block;
+    background:var(--accent);
+    color:#161611;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    padding:1rem 2.2rem;
+    border-radius:6px;
+    font-size:1rem;
+    border:none;
+    cursor:pointer;
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow:0 8px 24px rgba(201,138,63,0.25);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(201,138,63,0.35);}
+  .cta-note{
+    font-size:0.82rem;
+    color:var(--cream-300);
+  }
+
+  .marquee-wrap{
+    position:relative;
+    z-index:2;
+    max-width:900px;
+    margin:0 auto;
+    overflow:hidden;
+    border-top:1px solid rgba(255,255,255,0.08);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    padding:1.2rem 0;
+  }
+  .marquee-track{
+    display:flex;
+    gap:3rem;
+    width:max-content;
+    animation:scroll-left 24s linear infinite;
+  }
+  .marquee-track span{
+    font-size:0.78rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--cream-400);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  @keyframes scroll-left{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .marquee-track{animation:none;}
+  }
+
+  /* ---------- Services (rounded white panel on green) ---------- */
+  #services{
+    background:var(--cream-100);
+    border-radius:40px 40px 0 0;
+    margin-top:-2.5rem;
+    position:relative;
+    z-index:5;
+    padding:5rem 1.25rem 6rem;
+  }
+  @media(min-width:700px){
+    #services{border-radius:60px 60px 0 0; padding:6rem 2rem 7rem;}
+  }
+  .section-inner{
+    max-width:1100px;
+    margin:0 auto;
+  }
+  .section-kicker{
+    font-size:0.8rem;
+    font-weight:700;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--green-700);
+    margin-bottom:0.75rem;
+  }
+  .services-heading{
+    font-size:clamp(2rem, 6vw, 3.4rem);
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:-0.01em;
+    line-height:1.1;
+    color:var(--ink);
+    margin:0 0 3rem;
+  }
+  .service-row{
+    display:flex;
+    gap:1.5rem;
+    align-items:flex-start;
+    padding:2.2rem 0;
+    border-top:1px solid var(--divider);
+    opacity:1;
+    transform:none;
+  }
+  html.js .service-row{
+    opacity:0;
+    transform:translateY(30px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .service-row:first-child{border-top:none;}
+  html.js .service-row.in-view{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .service-num{
+    font-size:clamp(2.2rem, 6vw, 4.2rem);
+    font-weight:900;
+    color:var(--green-700);
+    line-height:1;
+    min-width:2.4em;
+    flex:none;
+  }
+  .service-text h3{
+    margin:0 0 0.5rem;
+    font-size:clamp(1.2rem, 2.4vw, 1.7rem);
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.01em;
+  }
+  .service-text p{
+    margin:0;
+    font-size:1rem;
+    line-height:1.65;
+    color:var(--ink-soft);
+    max-width:620px;
+    font-weight:400;
+  }
+
+  /* ---------- Packages ---------- */
+  #packages{
+    background:var(--cream-200);
+    padding:5rem 1.25rem;
+  }
+  @media(min-width:700px){#packages{padding:6rem 2rem;}}
+  .packages-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:1.5rem;
+    margin-top:2.5rem;
+  }
+  @media(min-width:760px){
+    .packages-grid{grid-template-columns:repeat(3,1fr);}
+  }
+  .package-card{
+    background:var(--cream-100);
+    border:1px solid var(--divider);
+    padding:2rem 1.75rem;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+  }
+  .package-card.featured{
+    border:2px solid var(--green-700);
+    background:#fff;
+    position:relative;
+  }
+  .featured-tag{
+    position:absolute;
+    top:-0.85rem;
+    left:1.75rem;
+    background:var(--green-700);
+    color:var(--cream-100);
+    font-size:0.7rem;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:0.35rem 0.8rem;
+  }
+  .package-name{
+    font-size:1.3rem;
+    font-weight:800;
+    text-transform:uppercase;
+    margin:0;
+  }
+  .package-desc{
+    font-size:0.95rem;
+    line-height:1.6;
+    color:var(--ink-soft);
+    margin:0;
+    font-weight:400;
+  }
+  .package-list{
+    list-style:none;
+    padding:0;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:0.6rem;
+    font-size:0.92rem;
+  }
+  .package-list li{
+    display:flex;
+    gap:0.6rem;
+    align-items:flex-start;
+  }
+  .package-list li::before{
+    content:"";
+    width:8px;height:8px;
+    background:var(--accent);
+    margin-top:0.45rem;
+    flex:none;
+  }
+  .package-cta{
+    margin-top:auto;
+    display:inline-block;
+    text-align:center;
+    border:1px solid var(--ink);
+    padding:0.75rem 1rem;
+    font-weight:700;
+    text-transform:uppercase;
+    font-size:0.85rem;
+    letter-spacing:0.03em;
+  }
+  .package-card.featured .package-cta{
+    background:var(--green-700);
+    color:#fff;
+    border-color:var(--green-700);
+  }
+
+  /* ---------- Process ---------- */
+  #process{
+    background:linear-gradient(160deg, var(--green-800) 0%, var(--green-900) 100%);
+    color:var(--cream-100);
+    padding:5rem 1.25rem;
+  }
+  @media(min-width:700px){#process{padding:6rem 2rem;}}
+  #process .section-kicker{color:var(--accent);}
+  #process h2{
+    font-size:clamp(2rem, 6vw, 3.2rem);
+    font-weight:800;
+    text-transform:uppercase;
+    margin:0 0 2.5rem;
+    letter-spacing:-0.01em;
+  }
+  .process-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:2rem;
+  }
+  @media(min-width:760px){
+    .process-grid{grid-template-columns:repeat(4,1fr);}
+  }
+  .process-step{
+    border-top:2px solid var(--green-600);
+    padding-top:1rem;
+  }
+  .process-step .step-num{
+    font-size:0.85rem;
+    color:var(--accent);
+    font-weight:700;
+    letter-spacing:0.1em;
+  }
+  .process-step h3{
+    font-size:1.15rem;
+    font-weight:700;
+    margin:0.5rem 0 0.6rem;
+    text-transform:uppercase;
+  }
+  .process-step p{
+    font-size:0.92rem;
+    line-height:1.6;
+    color:var(--cream-300);
+    font-weight:400;
+    margin:0;
+  }
+
+  /* ---------- Testimonials ---------- */
+  #testimonials{
+    background:var(--cream-100);
+    padding:5rem 1.25rem;
+  }
+  @media(min-width:700px){#testimonials{padding:6rem 2rem;}}
+  .testimonial-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:1.5rem;
+    margin-top:2.5rem;
+  }
+  @media(min-width:760px){
+    .testimonial-grid{grid-template-columns:repeat(3,1fr);}
+  }
+  .testimonial-card{
+    background:#fff;
+    border:1px solid var(--divider);
+    padding:1.75rem;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+  }
+  .stars{
+    color:var(--accent);
+    letter-spacing:0.15em;
+    font-size:0.95rem;
+  }
+  .testimonial-quote{
+    font-size:0.98rem;
+    line-height:1.65;
+    font-weight:400;
+    color:var(--ink);
+    margin:0;
+  }
+  .testimonial-who{
+    display:flex;
+    align-items:center;
+    gap:0.75rem;
+    margin-top:auto;
+  }
+  .who-avatar{
+    width:40px;height:40px;
+    border-radius:50%;
+    background:var(--green-700);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;
+    font-size:0.85rem;
+    flex:none;
+  }
+  .who-name{font-weight:700;font-size:0.9rem;}
+  .who-loc{font-size:0.8rem;color:var(--ink-soft);font-weight:400;}
+
+  /* ---------- FAQ ---------- */
+  #faq{
+    background:var(--cream-200);
+    padding:5rem 1.25rem;
+  }
+  @media(min-width:700px){#faq{padding:6rem 2rem;}}
+  .faq-list{
+    max-width:800px;
+    margin:2.5rem auto 0;
+    display:flex;
+    flex-direction:column;
+  }
+  .faq-item{
+    border-bottom:1px solid var(--divider);
+  }
+  .faq-item summary{
+    cursor:pointer;
+    list-style:none;
+    padding:1.25rem 0;
+    font-weight:600;
+    font-size:1.02rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+  }
+  .faq-item summary::-webkit-details-marker{display:none;}
+  .faq-item summary::after{
+    content:"+";
+    font-size:1.4rem;
+    font-weight:400;
+    color:var(--green-700);
+    flex:none;
+    transition:transform 0.2s ease;
+  }
+  .faq-item[open] summary::after{
+    content:"−";
+  }
+  .faq-item p{
+    margin:0 0 1.5rem;
+    font-size:0.95rem;
+    line-height:1.65;
+    color:var(--ink-soft);
+    font-weight:400;
+    max-width:680px;
+  }
+
+  /* ---------- Contact ---------- */
+  #contact{
+    background:var(--green-900);
+    color:var(--cream-100);
+    padding:5rem 1.25rem;
+  }
+  @media(min-width:700px){#contact{padding:6rem 2rem;}}
+  .contact-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:3rem;
+    max-width:1100px;
+    margin:2.5rem auto 0;
+  }
+  @media(min-width:860px){
+    .contact-grid{grid-template-columns:1fr 1fr;}
+  }
+  #contact h2{
+    font-size:clamp(2rem, 6vw, 3rem);
+    font-weight:800;
+    text-transform:uppercase;
+    margin:0 0 1rem;
+  }
+  #contact .section-kicker{color:var(--accent);}
+  .contact-lead{
+    font-size:1rem;
+    line-height:1.7;
+    color:var(--cream-200);
+    font-weight:400;
+    max-width:460px;
+  }
+  .contact-detail-list{
+    list-style:none;
+    padding:0;
+    margin:2rem 0 0;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    font-size:0.95rem;
+  }
+  .contact-detail-list li strong{
+    display:block;
+    font-size:0.75rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:0.2rem;
+    font-weight:700;
+  }
+  form.contact-form{
+    background:var(--cream-100);
+    color:var(--ink);
+    padding:2rem;
+    display:flex;
+    flex-direction:column;
+    gap:1.1rem;
+  }
+  form.contact-form label{
+    font-size:0.85rem;
+    font-weight:600;
+    display:block;
+    margin-bottom:0.4rem;
+  }
+  form.contact-form input,
+  form.contact-form select,
+  form.contact-form textarea{
+    width:100%;
+    padding:0.75rem 0.85rem;
+    border:1px solid var(--divider);
+    background:#fff;
+    font-family:inherit;
+    font-size:0.95rem;
+    border-radius:4px;
+  }
+  form.contact-form textarea{resize:vertical;min-height:100px;}
+  form.contact-form button{
+    background:var(--green-700);
+    color:#fff;
+    border:none;
+    padding:0.95rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    cursor:pointer;
+    border-radius:4px;
+    font-size:0.95rem;
+    transition:background 0.2s ease;
+  }
+  form.contact-form button:hover{background:var(--green-800);}
+  .form-note{font-size:0.78rem;color:var(--ink-soft);margin-top:-0.3rem;}
+
+  /* ---------- Footer ---------- */
+  footer.site-footer{
+    background:var(--green-900);
+    color:var(--cream-300);
+    padding:2.5rem 1.25rem;
+    text-align:center;
+    font-size:0.82rem;
+  }
+  footer.site-footer a{
+    color:var(--cream-100);
+    font-weight:600;
+  }
+  footer.site-footer .footer-links{
+    margin-top:0.75rem;
+    display:flex;
+    gap:1.25rem;
+    justify-content:center;
+    flex-wrap:wrap;
+    color:var(--cream-300);
+  }
+
+  /* generic small-screen container padding */
+  @media(min-width:700px){
+    .section-inner{padding:0;}
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="site-nav">
+  <div class="nav-inner">
+    <a class="brand" href="#hero" aria-label="Summit Line Roofing home">
+      <span class="brand-mark" aria-hidden="true">SL</span>
+      Summit Line Roofing
+    </a>
+    <nav class="primary-links" aria-label="Primary">
+      <a href="#services">Services</a>
+      <a href="#packages">Packages</a>
+      <a href="#process">Process</a>
+      <a href="#testimonials">Reviews</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="nav-cta" href="#contact">Get a Quote</a>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">☰</button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#services">Services</a>
+    <a href="#packages">Packages</a>
+    <a href="#process">Process</a>
+    <a href="#testimonials">Reviews</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
+    <a class="nav-cta" href="#contact">Get a Quote</a>
+  </div>
+</header>
+
+<main id="main-content">
+
+  <section id="hero" aria-labelledby="hero-heading">
+    <div class="hero-inner">
+      <div class="trust-row">
+        <div class="avatar-stack" aria-hidden="true">
+          <span class="avatar a1">JK</span>
+          <span class="avatar a2">RM</span>
+          <span class="avatar a3">TP</span>
+        </div>
+        <p class="trust-copy">Roofing the neighborhoods you already know and trust</p>
+      </div>
+      <h1 class="hero-headline" id="hero-heading">
+        Roofing Answers <span class="accent-word">Before</span> You Even Call
+      </h1>
+      <p class="hero-sub">
+        Summit Line Roofing lays out our services, packages, and step-by-step process right here — so you know what to expect before you pick up the phone.
+      </p>
+      <div class="cta-row">
+        <a class="btn-primary" href="#contact">Request a Free Inspection</a>
+        <span class="cta-note">No obligation. We'll walk the roof and explain what we find.</span>
+      </div>
+    </div>
+    <div class="marquee-wrap" aria-label="Neighborhoods we serve">
+      <div class="marquee-track">
+        <span>MAPLE RIDGE</span>
+        <span>CEDAR HOLLOW</span>
+        <span>BRIARWOOD</span>
+        <span>OAK STATION</span>
+        <span>PINEHURST</span>
+        <span>SUMMIT HEIGHTS</span>
+        <span aria-hidden="true">MAPLE RIDGE</span>
+        <span aria-hidden="true">CEDAR HOLLOW</span>
+        <span aria-hidden="true">BRIARWOOD</span>
+        <span aria-hidden="true">OAK STATION</span>
+        <span aria-hidden="true">PINEHURST</span>
+        <span aria-hidden="true">SUMMIT HEIGHTS</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="services" aria-labelledby="services-heading">
+    <div class="section-inner">
+      <p class="section-kicker">What We Do</p>
+      <h2 class="services-heading" id="services-heading">Services</h2>
+
+      <div class="service-row">
+        <span class="service-num" aria-hidden="true">01</span>
+        <div class="service-text">
+          <h3>Roof Inspections</h3>
+          <p>A full walk of your roof, attic, and flashing points with photos, so you can see exactly what we see before any work is scheduled.</p>
+        </div>
+      </div>
+      <div class="service-row">
+        <span class="service-num" aria-hidden="true">02</span>
+        <div class="service-text">
+          <h3>Repairs &amp; Leak Fixes</h3>
+          <p>Targeted repair of leaks, damaged shingles, and flashing issues, with a written explanation of the cause and the fix.</p>
+        </div>
+      </div>
+      <div class="service-row">
+        <span class="service-num" aria-hidden="true">03</span>
+        <div class="service-text">
+          <h3>Full Roof Replacement</h3>
+          <p>Tear-off and re-roofing with material options and a clear timeline, reviewed with you at every stage of the job.</p>
+        </div>
+      </div>
+      <div class="service-row">
+        <span class="service-num" aria-hidden="true">04</span>
+        <div class="service-text">
+          <h3>Gutter &amp; Drainage Work</h3>
+          <p>Gutter repair, cleaning, and drainage adjustments that protect your roofline and foundation from water damage.</p>
+        </div>
+      </div>
+      <div class="service-row">
+        <span class="service-num" aria-hidden="true">05</span>
+        <div class="service-text">
+          <h3>Storm Damage Assessment</h3>
+          <p>Post-storm evaluation with documentation you can use for insurance conversations, explained in plain language.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="packages" aria-labelledby="packages-heading">
+    <div class="section-inner">
+      <p class="section-kicker">Pricing Clarity</p>
+      <h2 id="packages-heading" style="font-size:clamp(2rem,5vw,3rem); font-weight:800; text-transform:uppercase; margin:0;">Service Packages</h2>
+      <p style="max-width:560px; color:var(--ink-soft); font-weight:400; margin-top:0.75rem;">Three starting points. Every package includes a written scope of work before any charge — final pricing always follows an in-person inspection.</p>
+
+      <div class="packages-grid">
+        <div class="package-card">
+          <p class="package-name">Inspection Package</p>
+          <p class="package-desc">A clear starting point if you're not sure what your roof needs yet.</p>
+          <ul class="package-list">
+            <li>Full roof &amp; attic walkthrough</li>
+            <li>Photo documentation</li>
+            <li>Written condition report</li>
+            <li>No-pressure recommendation</li>
+          </ul>
+          <a class="package-cta" href="#contact">Ask About This</a>
+        </div>
+        <div class="package-card featured">
+          <span class="featured-tag">Most Requested</span>
+          <p class="package-name">Repair Package</p>
+          <p class="package-desc">For homeowners with a known leak, damaged section, or storm impact.</p>
+          <ul class="package-list">
+            <li>Diagnostic inspection included</li>
+            <li>Itemized repair quote</li>
+            <li>Scheduled repair visit</li>
+            <li>Before/after photo summary</li>
+          </ul>
+          <a class="package-cta" href="#contact">Ask About This</a>
+        </div>
+        <div class="package-card">
+          <p class="package-name">Replacement Package</p>
+          <p class="package-desc">For full tear-off and re-roofing projects, planned start to finish.</p>
+          <ul class="package-list">
+            <li>Material options walkthrough</li>
+            <li>Written project timeline</li>
+            <li>Daily progress updates</li>
+            <li>Final walkthrough sign-off</li>
+          </ul>
+          <a class="package-cta" href="#contact">Ask About This</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="process" aria-labelledby="process-heading">
+    <div class="section-inner">
+      <p class="section-kicker">How It Works</p>
+      <h2 id="process-heading">Our Process</h2>
+      <div class="process-grid">
+        <div class="process-step">
+          <p class="step-num">STEP 01</p>
+          <h3>You Reach Out</h3>
+          <p>Call, submit the form below, or request a callback — we'll confirm a visit time within one business day.</p>
+        </div>
+        <div class="process-step">
+          <p class="step-num">STEP 02</p>
+          <h3>We Inspect</h3>
+          <p>A roofer walks the property, documents findings with photos, and explains anything they find on the spot.</p>
+        </div>
+        <div class="process-step">
+          <p class="step-num">STEP 03</p>
+          <h3>You Get a Written Quote</h3>
+          <p>A itemized scope and price arrives before any work begins — no verbal-only estimates.</p>
+        </div>
+        <div class="process-step">
+          <p class="step-num">STEP 04</p>
+          <h3>We Do the Work</h3>
+          <p>Scheduled work with daily updates, a clean job site each evening, and a final walkthrough together.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="testimonials" aria-labelledby="testimonials-heading">
+    <div class="section-inner">
+      <p class="section-kicker">From Homeowners</p>
+      <h2 id="testimonials-heading" style="font-size:clamp(2rem,5vw,3rem); font-weight:800; text-transform:uppercase; margin:0;">Testimonials</h2>
+
+      <div class="testimonial-grid">
+        <div class="testimonial-card">
+          <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
+          <p class="testimonial-quote">"They showed me photos of the damage before quoting anything. I finally understood what I was paying for."</p>
+          <div class="testimonial-who">
+            <span class="who-avatar" aria-hidden="true">J</span>
+            <div>
+              <p class="who-name">Janet K.</p>
+              <p class="who-loc">Maple Ridge</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
+          <p class="testimonial-quote">"The written quote matched the final bill exactly. No surprises, which is rare these days."</p>
+          <div class="testimonial-who">
+            <span class="who-avatar" aria-hidden="true">R</span>
+            <div>
+              <p class="who-name">Robert M.</p>
+              <p class="who-loc">Cedar Hollow</p>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
+          <p class="testimonial-quote">"They explained every step before doing it. My yard was cleaner at the end of the job than I expected."</p>
+          <div class="testimonial-who">
+            <span class="who-avatar" aria-hidden="true">T</span>
+            <div>
+              <p class="who-name">Teresa P.</p>
+              <p class="who-loc">Briarwood</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" aria-labelledby="faq-heading">
+    <div class="section-inner">
+      <p class="section-kicker">Common Questions</p>
+      <h2 id="faq-heading" style="font-size:clamp(2rem,5vw,3rem); font-weight:800; text-transform:uppercase; margin:0;">Frequently Asked Questions</h2>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>How long does an inspection take?</summary>
+          <p>Most inspections take 30–60 minutes depending on roof size and access. You'll get a written summary the same day.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you provide a written quote before any work starts?</summary>
+          <p>Yes. Every job — repair or replacement — gets an itemized, written scope and price before we schedule anything.</p>
+        </details>
+        <details class="faq-item">
+          <summary>What if a storm has already damaged my roof?</summary>
+          <p>We document the damage with photos and a written assessment you can share with your insurance provider.</p>
+        </details>
+        <details class="faq-item">
+          <summary>How far in advance should I schedule a replacement?</summary>
+          <p>We recommend reaching out as soon as you notice an issue. Timelines depend on season and material availability, which we'll confirm at your inspection.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Do you clean up the site each day?</summary>
+          <p>Yes. Crews clear debris and run a magnetic nail sweep at the end of each work day.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" aria-labelledby="contact-heading">
+    <div class="contact-grid">
+      <div>
+        <p class="section-kicker">Get In Touch</p>
+        <h2 id="contact-heading">Let's Talk About Your Roof</h2>
+        <p class="contact-lead">Tell us a bit about what's going on and we'll confirm an inspection time — most requests get a response within one business day.</p>
+        <ul class="contact-detail-list">
+          <li><strong>Phone</strong>(555) 014-7732</li>
+          <li><strong>Email</strong>hello@summitlineroofing.example</li>
+          <li><strong>Service Hours</strong>Mon–Sat, 7:00am – 6:00pm</li>
+          <li><strong>Service Area</strong>Maple Ridge, Cedar Hollow, Briarwood, Oak Station, Pinehurst, Summit Heights</li>
+        </ul>
+      </div>
+      <form class="contact-form" aria-label="Request an inspection" onsubmit="event.preventDefault(); this.querySelector('.form-confirm').style.display='block';">
+        <div>
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required autocomplete="name">
+        </div>
+        <div>
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone" required autocomplete="tel">
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" autocomplete="email">
+        </div>
+        <div>
+          <label for="topic">What do you need?</label>
+          <select id="topic" name="topic">
+            <option>Inspection</option>
+            <option>Repair</option>
+            <option>Full Replacement</option>
+            <option>Storm Damage</option>
+            <option>Not Sure Yet</option>
+          </select>
+        </div>
+        <div>
+          <label for="message">Anything else we should know?</label>
+          <textarea id="message" name="message" placeholder="e.g. visible leak in the upstairs ceiling, roof age, recent storm..."></textarea>
+        </div>
+        <button type="submit">Request Inspection</button>
+        <p class="form-note">We'll confirm your appointment by phone or email — no automatic charges, ever.</p>
+        <p class="form-confirm" style="display:none; font-weight:600; color:var(--green-700);">Thanks — we'll be in touch shortly to confirm your inspection time.</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>© <span id="year"></span> Summit Line Roofing. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#services">Services</a>
+    <a href="#packages">Packages</a>
+    <a href="#process">Process</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<noscript><style>.service-row{opacity:1 !important;transform:none !important;}</style></noscript>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  var toggle = document.getElementById('navToggle');
+  var menu = document.getElementById('mobileMenu');
+  toggle.addEventListener('click', function(){
+    var open = menu.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  menu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      menu.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  var rows = document.querySelectorAll('.service-row');
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry, i){
+        if (entry.isIntersecting) {
+          var el = entry.target;
+          var idx = Array.prototype.indexOf.call(rows, el);
+          setTimeout(function(){ el.classList.add('in-view'); }, idx * 100);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.2 });
+    rows.forEach(function(row){ observer.observe(row); });
+  } else {
+    rows.forEach(function(row){ row.classList.add('in-view'); });
+  }
+</script>
+
+</body>
+</html>
+
+⚠️ File-mutation verifier: 2 file edit(s) FAILED this turn despite any wording above that may suggest otherwise. Run `git status` or `read_file` to confirm what actually landed.
+  • `/dev/stdout` — [patch] Failed to read file: /proc/214/fd/host:[2]
+  • `/tmp/never.html` — [patch] Failed to read file: `/tmp/never.html`
