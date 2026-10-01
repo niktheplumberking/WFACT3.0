@@ -1,0 +1,100 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New request · WFACT Cockpit (proposal)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Overpass:wght@500;600;700;800&family=Overpass+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="cockpit.css"><style>
+.home-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:var(--s-6);margin-bottom:var(--s-6);align-items:start}
+.stack{display:grid;gap:var(--s-6);align-content:start}.stack-tight{display:grid;gap:var(--s-5)}
+.mini{list-style:none;margin:0;padding:var(--s-2) 0}.mini li{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:var(--s-3);align-items:center;padding:var(--s-3) var(--s-5);font-size:var(--t-sm)}
+.lines{display:grid}.line{display:grid;grid-template-columns:240px minmax(0,1fr);gap:var(--s-6);align-items:center;padding:var(--s-5);border-top:1px solid var(--seam)}.line:first-child{border-top:0}
+.line-name b{display:block;font:700 var(--t-md)/1.3 var(--face-plate)}.line-name span{font-size:var(--t-sm)}
+.plan-grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:var(--s-6);align-items:start}
+.decide{position:sticky;top:88px}
+.lede{font-size:var(--t-lg);line-height:1.5;max-width:60ch;margin-bottom:var(--s-6)}
+.facts{display:grid;gap:var(--s-4);margin:0}.facts div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:var(--s-4)}.facts dt{font:700 var(--t-sm)/1.5 var(--face-plate);color:var(--ink-2)}.facts dd{margin:0}
+.plain{margin:0;padding-left:var(--s-8);display:grid;gap:var(--s-3)}.plain li{padding-left:var(--s-1)}
+.tracks{border:0;margin:0;padding:0;display:grid;gap:var(--s-3)}.tracks legend{font:700 var(--t-sm)/1.2 var(--face-plate);margin-bottom:var(--s-3);padding:0}
+.track{display:grid;grid-template-columns:20px 1fr;gap:var(--s-3);padding:var(--s-4);border:1px solid var(--seam-strong);border-radius:var(--r-plate);cursor:pointer}
+.track input{margin-top:3px;accent-color:var(--clear);width:18px;height:18px}.track b{font-family:var(--face-plate)}.track .muted{display:block;font-size:var(--t-sm);margin-top:4px}
+.track.is-chosen{border-color:var(--clear);background:var(--clear-wash)}.track:focus-within{outline:2px solid var(--caution);outline-offset:2px}
+.reasons{margin:-4px 0 4px;padding-left:44px;font-size:var(--t-sm);color:var(--ink-2);display:grid;gap:4px}
+.decide-actions{display:flex;gap:var(--s-3);flex-wrap:wrap}.fine{font-size:var(--t-xs)}
+.head-actions{display:flex;gap:var(--s-3);flex-wrap:wrap}
+.run-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:var(--s-6);align-items:start}
+.steps{list-style:none;margin:0;display:grid;gap:0}.steps li{display:grid;grid-template-columns:auto 1fr;column-gap:var(--s-4);padding:0 0 var(--s-5) var(--s-6);position:relative;border-left:2px solid var(--seam-strong);margin-left:6px}
+.steps li:last-child{border-left-color:transparent;padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:-8px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--plate);border:2px solid var(--track-idle)}
+.steps li.ok::before{background:var(--clear);border-color:var(--clear)}.steps li.bad::before{background:var(--stop);border-color:var(--stop)}.steps li.notrun::before{border-style:dashed}
+.steps b{font-family:var(--face-plate)}.steps .muted{grid-column:1/-1;font-size:var(--t-sm);margin-top:2px}
+.kv{display:grid;gap:var(--s-3);margin:0}.kv div{display:flex;justify-content:space-between;gap:var(--s-4);font-size:var(--t-sm)}.kv dt{color:var(--ink-3)}.kv dd{margin:0}
+.raw summary{cursor:pointer;font:700 var(--t-sm)/1.4 var(--face-plate);min-height:32px}.raw pre{white-space:pre-wrap;word-break:break-word;font:500 12px/1.5 var(--face-figure);background:var(--plate-sunk);padding:var(--s-3);border-radius:var(--r-control);color:var(--ink-2)}
+.after{display:flex;flex-wrap:wrap;gap:var(--s-2) var(--s-5);margin:0;padding-left:var(--s-5);font-size:var(--t-sm)}
+.sys{display:grid;gap:var(--s-6)}.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s-4)}
+.swatch{display:grid;gap:2px;font-size:var(--t-sm)}.swatch span{height:44px;border-radius:var(--r-control);border:1px solid var(--seam-strong);margin-bottom:6px}.swatch code{font-size:11px;color:var(--ink-3)}
+.type-spec{display:grid;gap:var(--s-4)}.row-wrap{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center}
+.states{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-6);align-items:start}
+.dialog{max-width:440px;padding:var(--s-6);background:var(--plate-2);border-radius:var(--r-plate);box-shadow:var(--float);display:grid;gap:var(--s-4)}
+@media (max-width:900px){.plate-head{flex-wrap:wrap}.plate-head .quiet{margin-left:0;flex-basis:100%}.home-grid,.plan-grid,.run-grid,.states{grid-template-columns:minmax(0,1fr)}.line{grid-template-columns:minmax(0,1fr);gap:var(--s-3);padding:var(--s-4)}.decide{position:static}.facts div{grid-template-columns:minmax(0,1fr);gap:2px}.mini li{grid-template-columns:84px minmax(0,1fr);padding:var(--s-3) var(--s-4)}.mini li .fig{display:none}.plain{padding-left:var(--s-8)}.page-head h1[style]{font-size:var(--t-2xl)!important}}
+</style></head><body><a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+<aside class="rail" aria-label="Main">
+  <div class="mark"><span class="mark-glyph" aria-hidden="true">WF</span><span class="mark-name">WFACT<span>Cockpit</span></span></div>
+  <nav class="nav" aria-label="Main navigation">
+    <a href="home.html"><i class="ph ph-house" aria-hidden="true"></i>Home</a>
+    <a href="plan.html"><i class="ph ph-seal-check" aria-hidden="true"></i>Decisions<span class="count" aria-label="3 waiting">3</span></a>
+    <a href="new-request.html" aria-current="page"><i class="ph ph-path" aria-hidden="true"></i>Projects</a>
+    <a href="run.html"><i class="ph ph-list-checks" aria-hidden="true"></i>Activity</a>
+    <a href="#"><i class="ph ph-receipt" aria-hidden="true"></i>Costs</a>
+    <div class="nav-group" id="soon-label">Coming next</div>
+    <a href="#" class="soon" aria-describedby="soon-label"><i class="ph ph-heartbeat" aria-hidden="true"></i>System<span class="step">Step 9</span></a>
+    <a href="#" class="soon" aria-describedby="soon-label"><i class="ph ph-robot" aria-hidden="true"></i>Agents<span class="step">Step 10</span></a>
+    <a href="#" class="soon" aria-describedby="soon-label"><i class="ph ph-brain" aria-hidden="true"></i>Memory<span class="step">Step 14</span></a>
+    <a href="#" class="soon" aria-describedby="soon-label"><i class="ph ph-briefcase" aria-hidden="true"></i>Business<span class="step">Step 23</span></a>
+  </nav>
+  <div class="rail-foot"><button class="who" type="button" aria-haspopup="menu"><i class="ph ph-user-circle" aria-hidden="true" style="font-size:28px"></i><span><b>Huraira</b><small>Owner. Account, sign out</small></span></button></div>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="new-request.html">Projects</a><span aria-hidden="true">/</span><span>New request</span></nav>
+    <span class="spacer"></span>
+    <div class="ask" role="search"><i class="ph ph-chat-circle-text" aria-hidden="true"></i><span>Ask the factory a question</span><kbd>/</kbd></div>
+    <a class="btn primary" href="new-request.html"><i class="ph ph-plus" aria-hidden="true"></i>New request</a>
+  </header>
+  <main id="main" class="page">
+<div class="page-head"><div><h1>Start work from a client request</h1>
+<p>Paste the client's email or form. The factory reads it, writes a plan and puts it in Decisions for you, usually within a minute.</p></div></div>
+<div class="plan-grid">
+  <section class="plate" aria-labelledby="req-h">
+    <div class="plate-head"><h2 id="req-h">Client request</h2></div>
+    <form class="plate-body stack-tight" onsubmit="return false">
+      <div class="field"><label for="req">Paste it exactly as it came</label><textarea id="req" class="textarea" aria-describedby="req-hint" placeholder="Hi, we're a small roofing and gutter company…"></textarea>
+      <span id="req-hint" class="hint">The request is treated as information, never as instructions. <span class="fig">0 / 20,000</span> characters.</span></div>
+      <div class="decide-actions"><button class="btn primary" type="submit" disabled><i class="ph ph-arrow-right" aria-hidden="true"></i>Read request and plan</button></div>
+      <ol class="after quiet"><li>Read and sorted</li><li>Plan written</li><li>Your decision</li><li>You start the build</li></ol>
+    </form>
+  </section>
+  <div class="stack">
+    <section class="plate" aria-labelledby="ask-h">
+      <div class="plate-head"><h2 id="ask-h">Ask the factory</h2></div>
+      <form class="plate-body stack-tight" onsubmit="return false"><div class="field"><label for="askq">Question</label><input id="askq" class="input" placeholder="What stage is DreamSign in?"></div><div><button class="btn" type="submit">Ask</button></div></form>
+    </section>
+    <section class="plate" aria-labelledby="re-h">
+      <div class="plate-head"><h2 id="re-h">Re-check a built page</h2></div>
+      <form class="plate-body stack-tight" onsubmit="return false">
+        <div class="field"><label for="pg">Page</label><select id="pg" class="select"><option>DreamSign: homepage (clean agency)</option></select></div>
+        <div class="field"><label for="goal">What the page must achieve</label><input id="goal" class="input" aria-describedby="goal-err" aria-invalid="true"><span id="goal-err" class="error"><i class="ph ph-warning-circle" aria-hidden="true"></i>Say what the page is for, so the checks know what to judge.</span></div>
+        <div><button class="btn" type="submit">Run the checks</button></div>
+      </form>
+    </section>
+  </div>
+</div></main>
+</div>
+</div>
+<nav class="tabbar" aria-label="Main navigation">
+  <a href="home.html"><i class="ph ph-house" aria-hidden="true"></i>Home</a>
+  <a href="plan.html"><i class="ph ph-seal-check" aria-hidden="true"></i>Decisions<span class="count" aria-label="3 waiting">3</span></a>
+  <a href="new-request.html" aria-current="page"><i class="ph ph-path" aria-hidden="true"></i>Projects</a>
+  <a href="run.html"><i class="ph ph-dots-three-outline" aria-hidden="true"></i>More</a>
+</nav>
+</body></html>

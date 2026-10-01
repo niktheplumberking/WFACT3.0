@@ -1,0 +1,77 @@
+{
+ "login": [
+  "landmark-one-main(moderate) x1",
+  "region(moderate) x4"
+ ],
+ "pending": [
+  "landmark-one-main(moderate) x1",
+  "region(moderate) x2"
+ ],
+ "Pipeline@1440": {
+  "scrollWidth": 1440,
+  "viewport": 1440,
+  "smallTargets": 0
+ },
+ "Pipeline": [
+  "color-contrast(serious) x10"
+ ],
+ "Approvals@1440": {
+  "scrollWidth": 1440,
+  "viewport": 1440,
+  "smallTargets": 2
+ },
+ "Approvals": [
+  "color-contrast(serious) x11",
+  "empty-table-header(minor) x1"
+ ],
+ "Actions@1440": {
+  "scrollWidth": 1440,
+  "viewport": 1440,
+  "smallTargets": 5
+ },
+ "Actions": [
+  "color-contrast(serious) x5",
+  "heading-order(moderate) x1"
+ ],
+ "Runs@1440": {
+  "scrollWidth": 1440,
+  "viewport": 1440,
+  "smallTargets": 0
+ },
+ "Runs": [
+  "color-contrast(serious) x7"
+ ],
+ "Models@1440": {
+  "scrollWidth": 1440,
+  "viewport": 1440,
+  "smallTargets": 0
+ },
+ "Models": [
+  "color-contrast(serious) x20"
+ ],
+ "Pipeline@375": {
+  "scrollWidth": 375,
+  "viewport": 375,
+  "smallTargets": 0
+ },
+ "Approvals@375": {
+  "scrollWidth": 375,
+  "viewport": 375,
+  "smallTargets": 2
+ },
+ "Actions@375": {
+  "scrollWidth": 375,
+  "viewport": 375,
+  "smallTargets": 5
+ },
+ "Runs@375": {
+  "scrollWidth": 375,
+  "viewport": 375,
+  "smallTargets": 0
+ },
+ "Models@375": {
+  "scrollWidth": 375,
+  "viewport": 375,
+  "smallTargets": 0
+ }
+}

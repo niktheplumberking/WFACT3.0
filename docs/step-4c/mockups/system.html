@@ -1,0 +1,102 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design system · WFACT Cockpit (proposal)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Overpass:wght@500;600;700;800&family=Overpass+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="cockpit.css"><style>
+.home-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:var(--s-6);margin-bottom:var(--s-6);align-items:start}
+.stack{display:grid;gap:var(--s-6);align-content:start}.stack-tight{display:grid;gap:var(--s-5)}
+.mini{list-style:none;margin:0;padding:var(--s-2) 0}.mini li{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:var(--s-3);align-items:center;padding:var(--s-3) var(--s-5);font-size:var(--t-sm)}
+.lines{display:grid}.line{display:grid;grid-template-columns:240px minmax(0,1fr);gap:var(--s-6);align-items:center;padding:var(--s-5);border-top:1px solid var(--seam)}.line:first-child{border-top:0}
+.line-name b{display:block;font:700 var(--t-md)/1.3 var(--face-plate)}.line-name span{font-size:var(--t-sm)}
+.plan-grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:var(--s-6);align-items:start}
+.decide{position:sticky;top:88px}
+.lede{font-size:var(--t-lg);line-height:1.5;max-width:60ch;margin-bottom:var(--s-6)}
+.facts{display:grid;gap:var(--s-4);margin:0}.facts div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:var(--s-4)}.facts dt{font:700 var(--t-sm)/1.5 var(--face-plate);color:var(--ink-2)}.facts dd{margin:0}
+.plain{margin:0;padding-left:var(--s-8);display:grid;gap:var(--s-3)}.plain li{padding-left:var(--s-1)}
+.tracks{border:0;margin:0;padding:0;display:grid;gap:var(--s-3)}.tracks legend{font:700 var(--t-sm)/1.2 var(--face-plate);margin-bottom:var(--s-3);padding:0}
+.track{display:grid;grid-template-columns:20px 1fr;gap:var(--s-3);padding:var(--s-4);border:1px solid var(--seam-strong);border-radius:var(--r-plate);cursor:pointer}
+.track input{margin-top:3px;accent-color:var(--clear);width:18px;height:18px}.track b{font-family:var(--face-plate)}.track .muted{display:block;font-size:var(--t-sm);margin-top:4px}
+.track.is-chosen{border-color:var(--clear);background:var(--clear-wash)}.track:focus-within{outline:2px solid var(--caution);outline-offset:2px}
+.reasons{margin:-4px 0 4px;padding-left:44px;font-size:var(--t-sm);color:var(--ink-2);display:grid;gap:4px}
+.decide-actions{display:flex;gap:var(--s-3);flex-wrap:wrap}.fine{font-size:var(--t-xs)}
+.head-actions{display:flex;gap:var(--s-3);flex-wrap:wrap}
+.run-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:var(--s-6);align-items:start}
+.steps{list-style:none;margin:0;display:grid;gap:0}.steps li{display:grid;grid-template-columns:auto 1fr;column-gap:var(--s-4);padding:0 0 var(--s-5) var(--s-6);position:relative;border-left:2px solid var(--seam-strong);margin-left:6px}
+.steps li:last-child{border-left-color:transparent;padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:-8px;top:3px;width:14px;height:14px;border-radius:50%;background:var(--plate);border:2px solid var(--track-idle)}
+.steps li.ok::before{background:var(--clear);border-color:var(--clear)}.steps li.bad::before{background:var(--stop);border-color:var(--stop)}.steps li.notrun::before{border-style:dashed}
+.steps b{font-family:var(--face-plate)}.steps .muted{grid-column:1/-1;font-size:var(--t-sm);margin-top:2px}
+.kv{display:grid;gap:var(--s-3);margin:0}.kv div{display:flex;justify-content:space-between;gap:var(--s-4);font-size:var(--t-sm)}.kv dt{color:var(--ink-3)}.kv dd{margin:0}
+.raw summary{cursor:pointer;font:700 var(--t-sm)/1.4 var(--face-plate);min-height:32px}.raw pre{white-space:pre-wrap;word-break:break-word;font:500 12px/1.5 var(--face-figure);background:var(--plate-sunk);padding:var(--s-3);border-radius:var(--r-control);color:var(--ink-2)}
+.after{display:flex;flex-wrap:wrap;gap:var(--s-2) var(--s-5);margin:0;padding-left:var(--s-5);font-size:var(--t-sm)}
+.sys{display:grid;gap:var(--s-6)}.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s-4)}
+.swatch{display:grid;gap:2px;font-size:var(--t-sm)}.swatch span{height:44px;border-radius:var(--r-control);border:1px solid var(--seam-strong);margin-bottom:6px}.swatch code{font-size:11px;color:var(--ink-3)}
+.type-spec{display:grid;gap:var(--s-4)}.row-wrap{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center}
+.states{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s-6);align-items:start}
+.dialog{max-width:440px;padding:var(--s-6);background:var(--plate-2);border-radius:var(--r-plate);box-shadow:var(--float);display:grid;gap:var(--s-4)}
+@media (max-width:900px){.plate-head{flex-wrap:wrap}.plate-head .quiet{margin-left:0;flex-basis:100%}.home-grid,.plan-grid,.run-grid,.states{grid-template-columns:minmax(0,1fr)}.line{grid-template-columns:minmax(0,1fr);gap:var(--s-3);padding:var(--s-4)}.decide{position:static}.facts div{grid-template-columns:minmax(0,1fr);gap:2px}.mini li{grid-template-columns:84px minmax(0,1fr);padding:var(--s-3) var(--s-4)}.mini li .fig{display:none}.plain{padding-left:var(--s-8)}.page-head h1[style]{font-size:var(--t-2xl)!important}}
+</style></head><body><a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+<aside class="rail" aria-label="Main">
+  <div class="mark"><span class="mark-glyph" aria-hidden="true">WF</span><span class="mark-name">WFACT<span>Cockpit</span></span></div>
+  <nav class="nav" aria-label="Main navigation">
+    <a href="home.html"><i class="ph ph-house" aria-hidden="true"></i>Home</a>
+    <a href="plan.html"><i class="ph ph-seal-check" aria-hidden="true"></i>Decisions<span class="count" aria-label="3 waiting">3</span></a>
+    <a href="new-request.html"><i class="ph ph-path" aria-hidden="true"></i>Projects</a>
+    <a href="run.html"><i class="ph ph-list-checks" aria-hidden="true"></i>Activity</a>
+    <a href="#"><i class="ph ph-receipt" aria-hidden="true"></i>Costs</a>
+    <div class="nav-group" id="soon-label">Coming next</div>
+    <a href="#" class="soon" aria-describedby="soon-label"><i class="ph ph-heartbeat" aria-hidden="true"></i>System<span class="step">Step 9</span></a>
+    <a href="#" class="soon" aria-describedby="soon-label"><i class="ph ph-robot" aria-hidden="true"></i>Agents<span class="step">Step 10</span></a>
+    <a href="#" class="soon" aria-describedby="soon-label"><i class="ph ph-brain" aria-hidden="true"></i>Memory<span class="step">Step 14</span></a>
+    <a href="#" class="soon" aria-describedby="soon-label"><i class="ph ph-briefcase" aria-hidden="true"></i>Business<span class="step">Step 23</span></a>
+  </nav>
+  <div class="rail-foot"><button class="who" type="button" aria-haspopup="menu"><i class="ph ph-user-circle" aria-hidden="true" style="font-size:28px"></i><span><b>Huraira</b><small>Owner. Account, sign out</small></span></button></div>
+</aside>
+<div class="main">
+  <header class="topbar">
+    <nav class="crumbs" aria-label="Breadcrumb"><span>Design system</span></nav>
+    <span class="spacer"></span>
+    <div class="ask" role="search"><i class="ph ph-chat-circle-text" aria-hidden="true"></i><span>Ask the factory a question</span><kbd>/</kbd></div>
+    <a class="btn primary" href="new-request.html"><i class="ph ph-plus" aria-hidden="true"></i>New request</a>
+  </header>
+  <main id="main" class="page">
+<div class="page-head"><div><h1>Design system: the signal-box panel</h1>
+<p>A route only lights when every signal along it is proven clear. Colour means state and nothing else; the Cockpit's own colour is caution yellow, because yellow means a person is needed.</p></div>
+<div class="head-actions"><button class="btn" type="button" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'light' ? '' : 'light'"><i class="ph ph-sun-dim" aria-hidden="true"></i>Switch light or dark</button></div></div>
+<div class="sys">
+<section class="plate"><div class="plate-head"><h2>Colour</h2><span class="quiet">Restrained: neutrals plus signal aspects</span></div><div class="plate-body swatches">
+<div class="swatch"><span style="background:var(--ground)"></span><b>Ground</b><code class="fig">--ground</code><small class="quiet">page</small></div><div class="swatch"><span style="background:var(--plate)"></span><b>Plate</b><code class="fig">--plate</code><small class="quiet">panels</small></div><div class="swatch"><span style="background:var(--plate-sunk)"></span><b>Sunk</b><code class="fig">--plate-sunk</code><small class="quiet">inputs, rail</small></div><div class="swatch"><span style="background:var(--seam-strong)"></span><b>Seam</b><code class="fig">--seam-strong</code><small class="quiet">1px dividers</small></div><div class="swatch"><span style="background:var(--ink)"></span><b>Ink</b><code class="fig">--ink</code><small class="quiet">text, primary button</small></div><div class="swatch"><span style="background:var(--ink-2)"></span><b>Ink 2</b><code class="fig">--ink-2</code><small class="quiet">secondary text</small></div><div class="swatch"><span style="background:var(--ink-3)"></span><b>Ink 3</b><code class="fig">--ink-3</code><small class="quiet">hints, labels</small></div><div class="swatch"><span style="background:var(--clear)"></span><b>Clear</b><code class="fig">--clear</code><small class="quiet">verified, approved</small></div><div class="swatch"><span style="background:var(--caution)"></span><b>Caution</b><code class="fig">--caution</code><small class="quiet">needs a human</small></div><div class="swatch"><span style="background:var(--stop)"></span><b>Stop</b><code class="fig">--stop</code><small class="quiet">failed, refused</small></div>
+</div></section>
+<section class="plate"><div class="plate-head"><h2>Type</h2><span class="quiet">Overpass for plates, Atkinson Hyperlegible Next for reading, Overpass Mono for figures</span></div><div class="plate-body type-spec">
+<p style="font:700 var(--t-3xl)/1.08 var(--face-plate)">3 decisions are waiting</p>
+<p style="font:700 var(--t-2xl)/1.15 var(--face-plate)">Summit Line Roofing website</p>
+<p style="font:700 var(--t-lg)/1.3 var(--face-plate)">What the client wants</p>
+<p style="max-width:62ch">Body text is Atkinson Hyperlegible Next at 16 px: designed for readers with low vision, it keeps 1, l and I, and 0 and O apart. That matters for job numbers and for Nick reading on a phone.</p>
+<p class="fig">31c965ff  ·  $0.8234  ·  15:13:56</p>
+</div></section>
+<section class="plate"><div class="plate-head"><h2>Buttons and status</h2></div><div class="plate-body row-wrap">
+<button class="btn primary" type="button">Read request and plan</button><button class="btn go" type="button">Approve as Track A</button><button class="btn danger" type="button">Reject with note</button><button class="btn" type="button">Start build</button><button class="btn ghost" type="button">Cancel</button><button class="btn" type="button" disabled>Start build</button>
+<span class="aspect clear">Verified</span><span class="aspect caution">Your decision</span><span class="aspect stop">Failed</span><span class="aspect idle">Waiting to start</span>
+</div></section>
+<section class="plate"><div class="plate-head"><h2>Route line</h2><span class="quiet">The one signature element: where a client is, and which gate holds it</span></div><div class="plate-body"><div class="route-wrap"><div class="route" role="img" aria-label="Example: at Full build (stage 6 of 10)"><span class="proven" style="--p:59.1%"></span><span class="stop-pt done"></span><span class="stop-pt done"></span><span class="stop-pt done"></span><span class="stop-pt done"></span><span class="stop-pt done"></span><span class="signal cleared"></span><span class="stop-pt here"></span><span class="stop-pt "></span><span class="signal locked"></span><span class="stop-pt "></span><span class="stop-pt "></span></div><div class="route-labels" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span class="on">Full build</span><span></span><span>Launch</span><span></span><span></span></div></div></div></section>
+<section class="plate"><div class="plate-head"><h2>States</h2></div><div class="plate-body states">
+<div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:85%;margin-top:10px"></div><div class="skeleton" style="width:40%;margin-top:10px"></div><small class="quiet">Loading: skeleton in the shape of the result</small></div>
+<div class="empty" style="padding:0"><b>No plans are waiting.</b>New plans arrive here after you start a request. <a href="new-request.html">Start one</a></div>
+<div class="notice stop"><i class="ph ph-warning-octagon" aria-hidden="true"></i><div><b>Couldn't load jobs.</b> The database didn't answer. Check your connection and reload; nothing was changed.</div></div>
+<div class="toast" role="status"><i class="ph ph-check-circle" aria-hidden="true"></i>Plan approved as Track A. Start the build when you're ready.</div>
+</div></section>
+<section class="plate"><div class="plate-head"><h2>Dialog</h2><span class="quiet">Only for moves that can't be undone</span></div><div class="plate-body">
+<div class="dialog" role="dialog" aria-modal="false" aria-labelledby="dlg-h"><h3 id="dlg-h">Move DreamSign homepage to QA?</h3><p class="muted">This records that the full build is done. It doesn't build, publish or bill anything, and it can't be moved back here.</p><div class="decide-actions"><button class="btn ghost" type="button">Cancel</button><button class="btn primary" type="button">Move to QA</button></div></div>
+</div></section>
+</div></main>
+</div>
+</div>
+<nav class="tabbar" aria-label="Main navigation">
+  <a href="home.html"><i class="ph ph-house" aria-hidden="true"></i>Home</a>
+  <a href="plan.html"><i class="ph ph-seal-check" aria-hidden="true"></i>Decisions<span class="count" aria-label="3 waiting">3</span></a>
+  <a href="new-request.html"><i class="ph ph-path" aria-hidden="true"></i>Projects</a>
+  <a href="run.html"><i class="ph ph-dots-three-outline" aria-hidden="true"></i>More</a>
+</nav>
+</body></html>
