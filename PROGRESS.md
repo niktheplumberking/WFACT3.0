@@ -19,15 +19,16 @@ Cockpit the synthetic pilot went request → Intake → plan → reject → re-p
 `81c8607b`: 3 rounds, 2 requesting changes, 8m38s, $0.1741 priced plus 3 unpriced Agent 37 calls) and the artifact re-hashes
 identically to its checkpoint. But **the verification stack approved a page that a human review found defective**: agent-tool text
 leaked after `</html>` and renders under the footer, testimonials are not labelled SAMPLE, and phone, hours and neighbourhoods are
-invented. Huraira chose **Option B** (a real built, multi-page site with images, motion and rendered QA) as a new Step 4B before Steps 5-8; its
-design `docs/FRONTEND-UPGRADE-DESIGN.md` awaits GO and inputs. `main` is at `856e483` (CI `36699308136`); `huraira-work` is 6 commits
+invented. Step 4B (before Steps 5-8) now keeps **both build tracks**, A (local business, conversion-first) and B (motion-rich), picked per build
+in the Cockpit with a recommended track from a new direction step (Huraira, 2026-10-01); design v2 `docs/FRONTEND-UPGRADE-DESIGN.md` awaits GO. `main` is at `856e483` (CI `36699308136`); `huraira-work` is 6 commits
 ahead (`ea4b29a` to `a07d902`, docs/logs only), unpushed. Across Stages 1–5 that's roughly 94%. **Biggest blockers**: Step 4B's go-ahead and inputs (reference sites, image policy, builder model, budget), the verification gap, Nick's real brief
 and business rules, and Huraira's own steps on the new login.
 
 **Next up**:
-1. **Step 4B, front-end upgrade (Option B, decided by Huraira 2026-09-30, before Steps 5-8)**: approve the design in
-   `docs/FRONTEND-UPGRADE-DESIGN.md` (built multi-page site, images, motion, rendered screenshot QA; milestones M0-M5), and settle its
-   inputs: reference sites, image policy/Higgsfield, builder model, spend ceiling. Nothing is built yet.
+1. **Step 4B, front-end upgrade (revised 2026-10-01 by Huraira: keep BOTH tracks, A local-business conversion-first and B
+   motion-rich, chosen per build in the Cockpit, with a direction step that detects niche, requirements and brand direction and
+   recommends a track)**: approve design v2 in `docs/FRONTEND-UPGRADE-DESIGN.md` (milestones M0-M6) and settle its inputs:
+   reference sites per track, niche taxonomy, image policy/Higgsfield, builder model, spend ceiling. Nothing is built yet.
 2. Step 4 close-out: the preview deploy of the text-only synthetic page is now moot unless Huraira wants it; Step 4's findings
    (leaked tool text, unlabelled SAMPLE testimonials, invented facts, text-only checks) feed Step 4B's rendered QA and Step 7.
 3. Huraira's own items: Supabase Auth settings and a real sign-up/reset to prove the new login; old Doppler CLI token check; OK to close
