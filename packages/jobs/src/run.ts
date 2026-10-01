@@ -63,6 +63,8 @@ function buildDeps(): HandlerDeps {
 
   const intakeModel = traceModelClient(new ClaudeJsonClient(resolveModelRoute("intake"), apiKey), traces, actor);
   const plannerModel = traceModelClient(new ClaudeJsonClient(resolveModelRoute("planner"), apiKey), traces, actor);
+  // Step 4B M2: the direction step (niche, brand direction, track recommendation) between Intake and Planner.
+  const directionModel = traceModelClient(new ClaudeJsonClient(resolveModelRoute("direction"), apiKey), traces, actor);
 
   const builder = modelClientFromEnv("builder");
   const reviewer = modelClientFromEnv("evaluator");
@@ -73,7 +75,7 @@ function buildDeps(): HandlerDeps {
   const slugs = knownClientSlugs();
 
   return {
-    planning: { intakeModel, plannerModel, store: planStore, audit },
+    planning: { intakeModel, plannerModel, directionModel, store: planStore, audit },
     planStore,
     workflow: {
       frontEndAgent: createFrontendBuilderAgent({

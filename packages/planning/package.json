@@ -10,7 +10,8 @@
   "scripts": {
     "intake": "tsx src/cli.ts",
     "test": "tsx --test test/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "eval-direction": "tsx src/evalDirection.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.2",

@@ -1,0 +1,20 @@
+{
+  "_doc": "Step 4B M2 direction step: the fixed niche taxonomy (kept as proposed by Huraira, 2026-10-01, docs/FRONTEND-UPGRADE-DESIGN.md §10), the two build tracks, and the conversion goals the direction agent may choose from. Versioned data read by packages/planning/src/direction.ts. `leaningTrack` is the usual fit, a hint only: the agent weighs the whole request, and the owner always chooses. Change a list = bump version.",
+  "version": "1.0.0",
+  "niches": [
+    { "id": "local-trade", "label": "Local trade", "description": "Roofers, plumbers, electricians, builders, cleaners, landscapers and other trades serving a local area.", "leaningTrack": "A" },
+    { "id": "local-health", "label": "Local health", "description": "Dentists, physios, clinics, vets and other local health or wellness practices.", "leaningTrack": "A" },
+    { "id": "hospitality", "label": "Hospitality", "description": "Restaurants, cafes, bars, hotels, venues and caterers.", "leaningTrack": "A" },
+    { "id": "professional-services", "label": "Professional services", "description": "Accountants, lawyers, consultants, agencies selling a service to businesses or individuals.", "leaningTrack": "A" },
+    { "id": "brand-product", "label": "Brand or product", "description": "Product launches, consumer brands, software products and premium or lifestyle brands.", "leaningTrack": "B" },
+    { "id": "creative-portfolio", "label": "Creative portfolio", "description": "Studios, designers, photographers, artists and makers showing their work.", "leaningTrack": "B" },
+    { "id": "other", "label": "Other", "description": "Anything that does not fit the categories above.", "leaningTrack": null }
+  ],
+  "tracks": {
+    "A": "Local business, conversion-first: multi-page static site, fast on weak mobile signal, click-to-call, quote/booking forms, local search basics.",
+    "B": "Motion-rich brand site: Next.js static export, scroll-driven motion and rich sections, premium feel."
+  },
+  "conversionGoals": ["call", "booking", "quote_form", "purchase", "enquiry", "portfolio_view", "other"],
+  "brandAspects": ["tone", "palette", "type", "imagery", "motion", "other"],
+  "minConfidence": 0.6
+}

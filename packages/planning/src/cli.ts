@@ -53,7 +53,9 @@ async function main() {
   if (!traceSink) blocked(`trace store unavailable — ${traceReason}`);
   const intakeModel = traceModelClient(new ClaudeJsonClient(intakeRoute, apiKey), traceSink, "cli:intake");
   const plannerModel = traceModelClient(new ClaudeJsonClient(plannerRoute, apiKey), traceSink, "cli:intake");
-  const deps = { intakeModel, plannerModel, store, audit };
+  // Step 4B M2: the direction step between Intake and Planner.
+  const directionModel = traceModelClient(new ClaudeJsonClient(resolveModelRoute("direction"), apiKey), traceSink, "cli:intake");
+  const deps = { intakeModel, plannerModel, directionModel, store, audit };
 
   let result: PlanningResult;
   if (replanId) {
@@ -78,7 +80,7 @@ async function main() {
     if (p.openQuestions.length) console.log(`open questions: ${p.openQuestions.join(" | ")}`);
     console.log("NEXT: owner approves or rejects this plan in the Cockpit → Approvals. Nothing is built until then.");
   }
-  for (const [label, model] of [["intake", intakeModel], ["planner", plannerModel]] as const) {
+  for (const [label, model] of [["intake", intakeModel], ["direction", directionModel], ["planner", plannerModel]] as const) {
     if (model.totalUsage.inputTokens === 0) continue;
     const cost = estimateCostUsd(model.route, model.totalUsage);
     console.error(

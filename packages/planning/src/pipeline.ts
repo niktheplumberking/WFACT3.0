@@ -6,12 +6,18 @@
  *
  * Intake and Planner are registered onto the seed registry HERE, at composition time — Stage 2's
  * claim that a new agent needs no change to packages/agent-runtime, now proven by two real agents.
+ *
+ * Step 4B M2: the Direction agent (direction.ts) runs between Intake and the Planner on the ORIGINAL
+ * request text, and its result is stored with the plan for the owner's track choice. It is advisory:
+ * if it fails, the plan is still written with `direction: null` and the reason, and the owner chooses
+ * the track without a recommendation. A re-plan reuses the stored direction (the request is unchanged).
  */
 import { randomUUID } from "node:crypto";
 import type { AuditSink } from "@wfact/audit";
 import { createSeedRegistry, runAgent, type AgentRegistry, type AgentRun } from "@wfact/agent-runtime";
 import { createIntakeAgent, INTAKE_DEFINITION, INTAKE_ROLE, type IntakeResult } from "./intake.js";
 import { createPlannerAgent, PLANNER_DEFINITION, PLANNER_ROLE, type Plan } from "./planner.js";
+import { createDirectionAgent, DIRECTION_DEFINITION, DIRECTION_ROLE, type DirectionResult } from "./direction.js";
 import type { JsonModelClient } from "./modelClient.js";
 import type { PlanStore } from "./planStore.js";
 
@@ -22,9 +28,18 @@ export function registryWithPlanning(): AgentRegistry {
   return registry;
 }
 
+/** Step 4B M2: Intake + Planner + Direction, composed here; the planning-only registry is unchanged. */
+export function registryWithPlanningAndDirection(): AgentRegistry {
+  const registry = registryWithPlanning();
+  registry.register(DIRECTION_DEFINITION);
+  return registry;
+}
+
 export interface PlanningDeps {
   intakeModel: JsonModelClient;
   plannerModel: JsonModelClient;
+  /** Step 4B M2. Absent = no direction step (the plan records why); production always passes it. */
+  directionModel?: JsonModelClient;
   store: PlanStore;
   audit: AuditSink | null;
   registry?: AgentRegistry;
@@ -43,8 +58,37 @@ export interface PlanningResult {
   planId: string | null;
   plan: Plan | null;
   intake: IntakeResult | null;
+  /** Step 4B M2: the direction summary and track recommendation, or null with `directionNote`. */
+  direction: DirectionResult | null;
+  directionNote: string | null;
   reason: string | null;
-  runs: { intake: AgentRun<IntakeResult> | null; planner: AgentRun<Plan> | null };
+  runs: { intake: AgentRun<IntakeResult> | null; planner: AgentRun<Plan> | null; direction?: AgentRun<DirectionResult> | null };
+}
+
+/** The request text exactly as Intake read it (same flattening as the Intake agent's parseInput). */
+function rawTextOf(raw: unknown): string {
+  if (typeof raw === "string") return raw;
+  const r = (raw ?? {}) as { text?: unknown };
+  return typeof r.text === "string" ? r.text : JSON.stringify(raw, null, 2);
+}
+
+async function directionFor(
+  intake: IntakeResult,
+  rawText: string,
+  deps: PlanningDeps,
+  registry: AgentRegistry,
+  runId: string,
+): Promise<{ direction: DirectionResult | null; note: string | null; run: AgentRun<DirectionResult> | null }> {
+  if (!deps.directionModel) return { direction: null, note: "no direction model configured for this run", run: null };
+  const run = await runAgent(
+    createDirectionAgent({ model: deps.directionModel }),
+    { taskId: randomUUID(), role: DIRECTION_ROLE, input: { intake, rawText }, entitySlug: intake.entitySlug ?? undefined },
+    { registry, audit: deps.audit ? { sink: deps.audit } : null, runId },
+  );
+  if (run.status !== "completed" || !run.output) {
+    return { direction: null, note: `direction step ${run.status}: ${run.reason ?? "no output"}; the owner chooses the track without a recommendation`, run };
+  }
+  return { direction: run.output, note: null, run };
 }
 
 async function planFrom(
@@ -54,6 +98,7 @@ async function planFrom(
   runId: string,
   intakeRun: AgentRun<IntakeResult> | null,
   replanOf: { id: string; note: string } | null,
+  dir: { direction: DirectionResult | null; note: string | null; run: AgentRun<DirectionResult> | null },
 ): Promise<PlanningResult> {
   const plannerRun = await runAgent(
     createPlannerAgent({ model: deps.plannerModel, registry }),
@@ -65,9 +110,10 @@ async function planFrom(
     },
     { registry, audit: deps.audit ? { sink: deps.audit } : null, runId },
   );
-  const runs = { intake: intakeRun, planner: plannerRun };
+  const runs = { intake: intakeRun, planner: plannerRun, direction: dir.run };
+  const d = { direction: dir.direction, directionNote: dir.note };
   if (plannerRun.status !== "completed" || !plannerRun.output) {
-    return { status: "plan_failed", runId, planId: null, plan: null, intake, reason: `planner ${plannerRun.status}: ${plannerRun.reason}`, runs };
+    return { status: "plan_failed", runId, planId: null, plan: null, intake, ...d, reason: `planner ${plannerRun.status}: ${plannerRun.reason}`, runs };
   }
   const planId = await deps.store.insertPending({
     plan: plannerRun.output,
@@ -75,12 +121,14 @@ async function planFrom(
     revision: replanOf ? 2 : 1,
     supersedes: replanOf?.id ?? null,
     intakeRunId: intakeRun?.runId ?? null,
+    direction: dir.direction,
+    directionNote: dir.note,
   });
-  return { status: "awaiting_owner_approval", runId, planId, plan: plannerRun.output, intake, reason: null, runs };
+  return { status: "awaiting_owner_approval", runId, planId, plan: plannerRun.output, intake, ...d, reason: null, runs };
 }
 
 export async function intakeAndPlan(raw: unknown, deps: PlanningDeps): Promise<PlanningResult> {
-  const registry = deps.registry ?? registryWithPlanning();
+  const registry = deps.registry ?? registryWithPlanningAndDirection();
   const runId = randomUUID();
   const intakeRun = await runAgent(
     createIntakeAgent({ model: deps.intakeModel }),
@@ -88,18 +136,20 @@ export async function intakeAndPlan(raw: unknown, deps: PlanningDeps): Promise<P
     { registry, audit: deps.audit ? { sink: deps.audit } : null, runId },
   );
   const none = { intake: intakeRun, planner: null };
+  const noDir = { direction: null, directionNote: null };
   if (intakeRun.status === "rejected") {
-    return { status: "intake_rejected", runId, planId: null, plan: null, intake: null, reason: intakeRun.reason, runs: none };
+    return { status: "intake_rejected", runId, planId: null, plan: null, intake: null, ...noDir, reason: intakeRun.reason, runs: none };
   }
   if (intakeRun.status === "escalated" || !intakeRun.output) {
-    return { status: "intake_escalated", runId, planId: null, plan: null, intake: intakeRun.output, reason: intakeRun.reason, runs: none };
+    return { status: "intake_escalated", runId, planId: null, plan: null, intake: intakeRun.output, ...noDir, reason: intakeRun.reason, runs: none };
   }
-  return planFrom(intakeRun.output, deps, registry, runId, intakeRun, null);
+  const dir = await directionFor(intakeRun.output, rawTextOf(raw), deps, registry, runId);
+  return planFrom(intakeRun.output, deps, registry, runId, intakeRun, null, dir);
 }
 
 /** Blueprint §5: "Re-plan once on rejection, escalate on second rejection." */
 export async function replan(rejectedPlanId: string, deps: PlanningDeps): Promise<PlanningResult> {
-  const registry = deps.registry ?? registryWithPlanning();
+  const registry = deps.registry ?? registryWithPlanningAndDirection();
   const runId = randomUUID();
   const prev = await deps.store.get(rejectedPlanId);
   const empty = { intake: null, planner: null };
@@ -110,8 +160,11 @@ export async function replan(rejectedPlanId: string, deps: PlanningDeps): Promis
   if (prev.revision >= 2) {
     return {
       status: "replan_limit_reached", runId, planId: null, plan: null, intake: prev.intake, runs: empty,
+      direction: prev.direction, directionNote: prev.directionNote,
       reason: `plan was already re-planned once and the owner rejected it again ("${prev.decisionNote}") — escalating to a human`,
     };
   }
-  return planFrom(prev.intake, deps, registry, runId, null, { id: prev.id, note: prev.decisionNote ?? "" });
+  // The request did not change, so its direction does not either: reuse it rather than pay again.
+  const dir = { direction: prev.direction, note: prev.directionNote, run: null };
+  return planFrom(prev.intake, deps, registry, runId, null, { id: prev.id, note: prev.decisionNote ?? "" }, dir);
 }

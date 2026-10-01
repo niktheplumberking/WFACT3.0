@@ -73,6 +73,15 @@ function planningOutcome(r: PlanningResult): JobOutcome {
         tasks: r.plan.tasks,
         openQuestions: r.plan.openQuestions.length,
       },
+      // Step 4B M2: the direction summary the owner sees in Approvals, plus why it is missing if it is.
+      direction: r.direction && {
+        niche: r.direction.niche,
+        primaryGoal: r.direction.primaryGoal,
+        recommendedTrack: r.direction.recommendation.track,
+        confidence: r.direction.recommendation.confidence,
+        withheldReason: r.direction.recommendation.withheldReason,
+      },
+      directionNote: r.directionNote,
     },
   };
 }
@@ -112,8 +121,17 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       if (stored.status !== "approved") {
         return { ok: false, reason: `plan ${planId} is "${stored.status}" — only an owner-approved plan is built`, result: { planId } };
       }
+      // Step 4B M2: no build without the owner's track choice (also enforced by the jobs trigger, 0011).
+      if (!stored.buildTrack) {
+        return { ok: false, reason: `plan ${planId} has no build track — the owner chooses Track A or B when approving`, result: { planId } };
+      }
+      // Today's builder is the single-page Track A builder (multi-page in M3). Track B (Next.js) arrives
+      // in M4; building a Track B plan with the Track A builder would silently ignore the owner's choice.
+      if (stored.buildTrack === "B") {
+        return { ok: false, reason: `plan ${planId} is Track B; the Track B builder is not built yet (Step 4B M4)`, result: { planId, buildTrack: "B" } };
+      }
       const outcome = workflowOutcome(await buildAndVerify(stored.plan.brief, deps.workflow));
-      return { ...outcome, result: { planId, ...outcome.result } };
+      return { ...outcome, result: { planId, buildTrack: stored.buildTrack, ...outcome.result } };
     }
 
     case "resume":

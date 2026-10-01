@@ -1,12 +1,18 @@
 {
   "_doc": "Blueprint §7 routing table, as configuration (Continuation Plan Stage 4). Hermes owns model SELECTION; agents ask for a slot, never a model id. Override any slot per run with WFACT_ROUTE_<SLOT>=anthropic:<model-id> (e.g. WFACT_ROUTE_INTAKE). Only slots actually read through packages/hermes/src/routing.ts are listed — the Phase 4 builder/evaluator split and Hermes-lite's own model are still chosen in their packages' modelClient.ts, a tracked gap (PROGRESS.md), not silently implied here. Prices re-verified 2026-09-28 against the Claude API pricing table; re-verify before relying on them. Stage 5: `models` is the ONE per-model price table every cost figure is computed from (costForModel in src/routing.ts) — replacing the per-CLI PRICING constants.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "slots": {
     "intake": {
       "provider": "anthropic",
       "model": "claude-haiku-4-5",
       "tier": "fast",
       "why": "Blueprint §5 Task intake: fast/cheap tier (Claude Haiku 4.5) — classification + extraction, high volume, low judgment."
+    },
+    "direction": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-5",
+      "tier": "mid",
+      "why": "Step 4B M2 direction step: niche, audience, conversion goal, brand direction and a track recommendation, each quoted from the request. Needs judgment (mid tier), and runs once per request."
     },
     "planner": {
       "provider": "anthropic",

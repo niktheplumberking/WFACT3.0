@@ -88,17 +88,41 @@ test("build_plan job refuses a plan that isn't approved — even if the request 
 test("build_plan job on an approved plan → verified page stored as an artifact, awaiting launch approval", async () => {
   const { d, planStore, artifacts } = deps(CLEAN);
   const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
-  planStore.decide(intake.result.planId as string, "approved");
+  planStore.decide(intake.result.planId as string, "approved", null, "A"); // Step 4B M2: approvals choose a track
   const out = await handleJob(job("build_plan", { planId: intake.result.planId }), d);
   assert.equal(out.ok, true, out.reason ?? "");
   assert.equal(out.result.status, "awaiting_launch_approval");
+  assert.equal(out.result.buildTrack, "A");
   assert.ok(artifacts.files.has("clients/northlight-signs/pages/clean-agency.html"));
+});
+
+test("Step 4B M2: build_plan refuses an approved plan with no track (a pre-M2 approval), and never builds", async () => {
+  const { d, planStore, artifacts } = deps(CLEAN);
+  const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
+  const id = intake.result.planId as string;
+  // Simulates a plan approved before migration 0011 existed: approved, no build_track.
+  const row = planStore.rows.get(id)!;
+  row.status = "approved";
+  const out = await handleJob(job("build_plan", { planId: id }), d);
+  assert.equal(out.ok, false);
+  assert.match(out.reason ?? "", /no build track/);
+  assert.equal(artifacts.files.size, 0);
+});
+
+test("Step 4B M2: a Track B plan is refused until the Track B builder exists (M4), not built as Track A", async () => {
+  const { d, planStore, artifacts } = deps(CLEAN);
+  const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
+  planStore.decide(intake.result.planId as string, "approved", null, "B");
+  const out = await handleJob(job("build_plan", { planId: intake.result.planId }), d);
+  assert.equal(out.ok, false);
+  assert.match(out.reason ?? "", /Track B builder is not built yet/);
+  assert.equal(artifacts.files.size, 0);
 });
 
 test("build_plan job with a page QA keeps failing → ok:false with the specific failed checks", async () => {
   const { d, planStore } = deps(BROKEN);
   const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
-  planStore.decide(intake.result.planId as string, "approved");
+  planStore.decide(intake.result.planId as string, "approved", null, "A"); // Step 4B M2: approvals choose a track
   const out = await handleJob(job("build_plan", { planId: intake.result.planId }), d);
   assert.equal(out.ok, false);
   assert.equal(out.result.status, "failed_verification");
