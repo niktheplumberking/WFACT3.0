@@ -158,8 +158,11 @@ until Nick confirms Hostinger access, "live" for a synthetic run means a Vercel 
 client-facing production site ships from this pipeline.
 
 **Cost ceiling for pilot runs** (R-12): stop and ask Huraira before any single pilot run whose model spend
-is expected to exceed $25, and before any multi-run test above $75 total. No spend ceiling has been set
-by Nick.
+is expected to exceed $25, and before any multi-run test above $75 total. **Website builds (Step 4B onward): stop and ask before any
+single build expected to cost more than $5 (Huraira, 2026-10-01).** No spend ceiling has been set by Nick.
+
+**AI-generated images** (Huraira, 2026-10-01): allowed on client sites only when clearly labelled as illustrative; never presented as
+the client's own work, people, premises or results.
 
 ## 5. Current priorities
 

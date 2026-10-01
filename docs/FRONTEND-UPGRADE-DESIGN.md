@@ -139,9 +139,15 @@ checks, so they could not be verified). Lesson: "best websites" listicles go sta
 **Sources used**: freshysites.com "Best local service company websites for 2026"; WebFX, Hook Agency and others' 2026 roofing
 roundups; dental website roundups (Colorlib, Delmain, Azuro); the Awwwards Motion listing (awwwards.com/websites/motion/).
 
+### Decided by Huraira, 2026-10-01
+
+- **Niche taxonomy**: keep the section 3 list as is (`local-trade`, `local-health`, `hospitality`, `professional-services`,
+  `brand-product`, `creative-portfolio`, `other`).
+- **Images**: AI-generated images are allowed **if clearly labelled** as illustrative, never presented as the client's own work,
+  people or premises.
+- **Spend ceiling**: stop and ask before any single build expected to cost more than **$5**.
+
 ### Still open before M1
 
-- Niche taxonomy (section 3): proposed list stands unless Huraira/Nick change it.
-- Image policy and Higgsfield access/budget.
-- Builder model (stay on Agent 37 or add a provider).
-- Spend ceiling (proposal: ask before any single build above $5).
+- **Builder model**: stay on Agent 37 or add a second provider (builder and evaluator must stay on different vendors).
+- **Image source**: which tool generates the images (Higgsfield access and budget are unconfirmed); needed by M5, not M1.
