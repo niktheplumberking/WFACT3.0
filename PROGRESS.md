@@ -1,9 +1,8 @@
 # Progress — WFACT 3.0
 
-Last updated: 2026-10-01, Step 4C built (Phase 2: new Cockpit IA and signal-box design system in `apps/cockpit`, migration 0013 applied and attack-tested 17/17, 23 Cockpit tests in CI, axe 0 violations and Lighthouse accessibility 100 on every room at 1440/375; evidence `docs/step-4c/after/`; not deployed, `main` untouched). Before that: Step 4C Phase 1 done (audit, IA, design system and 5 mockups in `docs/step-4c/PHASE-1-PROPOSAL.md`, product record in `PRODUCT.md`; no Cockpit code changed; waiting for GO). Before that: 2026-10-01 (21:15 +05), Step 4B M3 done (see the Step 4B section; commits `d190e4d`…`74b59a0` plus the docs commit).
-Previous sync: 2026-10-01 (19:20 +05), via `/progress-sync` — re-sync after Step 4B M2: no new commits since `c0f3d29`; folds in `main` CI
-run `36871379578` (green, Cockpit deployed, HTTP 200), live `plan_approvals` (plan `b5a45a8e` still pending, no track) and `jobs` (9 rows,
-none since 2026-09-30, `a2a41d2d`/`cbf8bf7b` still queued). Earlier syncs: `289ec00`…`c0f3d29`.
+Last synced: 2026-10-01 (23:30 +05), via `/progress-sync` — folds in `70cd7d1`…`e76cff2` (Step 4C Phase 1 + build, migration 0013),
+`main` fast-forwarded to `e76cff2` on Huraira's word, CI run `36905237284` green including the Cockpit deploy, live deployment checked.
+Previous syncs: 2026-10-01 (19:20 +05) after Step 4B M2 (CI `36871379578`); earlier `289ec00`…`c0f3d29`.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -16,23 +15,20 @@ phases to numbered steps 1–24 and is the source for "Next up" below. Its Part 
 steps; this file tracks the Continuation Stages.
 
 **Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
-Step 4 is **partial** (its preview is superseded by Step 4B M6), and **Step 4B is in progress**: M0 has 5 of 7 inputs decided, **M1 is
-done** (reviewer on the builder's vendor by Huraira's recorded decision) and **M2 is done** (2026-10-01): a direction step recommends a
-track, the owner chooses it in the Cockpit, and no build starts without one. **M3 is done** (2026-10-01): Track A builds a multi-page
-site from a committed starter (Agent 37 writes content only) and a live Summit Line build passed the whole gate (run `2bfca49e`).
-See the Step 4B section at the end; about half of Step 4B is done (M0 6 of 7 inputs, M1, M2, M3 of M0–M6). `huraira-work` is ahead of
-`main` with the M3 commits (not pushed). **Biggest open items**: image tool (before M5), a different-vendor screenshot reviewer (the
-Agent 37 reviewer produced false positives in M3), Nick's real brief, a real Step 3A sign-up.
+Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is about half done** (M0 6 of 7 inputs, M1, M2, M3 done; M4–M6
+not started), and **Step 4C is built and deployed** (2026-10-01): the redesigned Cockpit is live from `main` `e76cff2` (CI `36905237284`),
+but it has only been exercised with copied data, not yet with a real signed-in session. `main` and `huraira-work` are both at `e76cff2`.
+**Biggest open items**: a first live signed-in pass of the new Cockpit, image tool (before M5), a different-vendor screenshot reviewer,
+Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
-0. **Huraira**: review the new Cockpit (Step 4C) and sign in once on a preview so the rooms are checked live with a real session (the agent can't type a password); merging to `main` deploys it, only on your word. Open: Projects on phone has CLS 0.118 (target < 0.1); launch decisions stay on Home until a Launch record exists (Step 14).
-1. **Huraira**: review the Track A starter (it is "human-reviewed" only once you have looked: screenshots of the verified build are
-   the M3 evidence) and the M3 report; then GO for **Step 4B M4** (Track B, Next.js static export). Approving plan `b5a45a8e` in the
-   Cockpit would also prove the track choice and a Track A Cockpit job live (pushing to `main` deploys; only on your word).
-2. **Huraira**: the screenshot reviewer. It stays Agent 37 (same vendor as the builder) unless OpenAI gets credits; in M3 it failed
-   DR-SINGLE-DEFAULT-FONT on pages whose fonts were proven loaded, costing a revision round.
-3. **Huraira**: image tool (before M5); Supabase Auth settings and one real sign-up for Step 3A; the old
-   Doppler CLI token check; OK to close the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b` (still 2 queued, checked this sync).
+1. **Huraira**: sign in to the live Cockpit once and click through Home, a plan, a run and Settings: the first check with a real session
+   (the agent can't type a password). While there, close the two stuck jobs `a2a41d2d`, `cbf8bf7b` with "Close it" on their run pages
+   (Activity, filter "Never started"); both are still `queued` today. Approving plan `b5a45a8e` as Track A and pressing Start build would
+   also prove a Track A build through the real Cockpit job path.
+2. **Huraira**: review the Track A starter and the Step 4B M3 report, then GO for **Step 4B M4** (Track B, Next.js static export).
+3. **Huraira**: the screenshot reviewer (still Agent 37, same vendor as the builder; false positives in M3); image tool before M5;
+   Supabase Auth settings and one real sign-up for Step 3A; the old Doppler CLI token check.
 
 **Gaps noticed**:
 - **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`
@@ -68,8 +64,12 @@ Agent 37 reviewer produced false positives in M3), Nick's real brief, a real Ste
 - **Two Nick disclosures are still owed in person**: Hermes-lite as a stand-in and Vercel substituting
   for Hostinger. Both are logged in `BLOCKED-ON-NICK.md` as "TELL NICK, DON'T JUST LOG IT", and
   neither conversation has happened.
-- **`CLAUDE.md` §0 is stale.** It still says "Current phase: Phase 1 — Foundation & Access" and
-  describes the 100-hour sprint. It predates the Continuation plan.
+- **Step 4C leftovers** (from its own evidence, `docs/step-4c/after/`): Projects on a phone shifts slightly while it loads (Lighthouse CLS
+  0.118, target < 0.1); "Decide on launching …" items stay on Home and in Decisions until a Launch record exists (Human Control, Step 14),
+  so today Northlight Signs and Summit Line show permanently; the `verify` job can only re-check single pages, not Track A sites (D4: Step 7);
+  phone performance is 76–86 under Lighthouse's simulated slow 4G (desktop 100), mostly the Supabase + React bundle.
+- **Security advisor, pre-existing**: `public.rls_auto_enable()` is callable by `anon` as SECURITY DEFINER; leaked-password protection is
+  off in Supabase Auth. Both predate Step 4C and are not fixed by it.
 
 **Unplanned work done**:
 - **Cockpit-driven actions** (`4653c67`): a `jobs` queue (migration `0009`), the `dispatch-job` Edge
@@ -752,3 +752,46 @@ over-budget fixture fail."* — **MET**: live run `2bfca49e` (3 pages) passed th
 screenshot review) and the Track A budgets, re-verified independently; both fixtures fail on the named checks only.
 
 **M4–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
+
+## Step 4C — Cockpit UI/UX redesign: the control room (BUILT AND DEPLOYED 2026-10-01 — live signed-in check pending)
+
+Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 4C. Phase 1 proposal: `docs/step-4c/PHASE-1-PROPOSAL.md`; build evidence:
+`docs/step-4c/after/` (screens, `audit.json`, `lighthouse.json`, `walkthrough.json`). All browser evidence below comes from the unchanged
+Cockpit code run against rows copied read-only from the live database (one account request synthetic and labelled), because the agent
+can't sign in; it is not a live signed-in check.
+
+**Phase 1 — audit and plan**
+- [x] Capability inventory: rooms and actions, the 6 job kinds, CLI commands, SQL-only operations, future rooms (Steps 9, 10, 12, 14, 17, 23) — `70cd7d1`, proposal §1
+- [x] Heuristic review with screenshots at 1440/375 — `docs/step-4c/before/` (axe colour-contrast failures on every old room, 5 to 20 nodes each)
+- [x] Information architecture, design system ("signal-box panel") and copy guide — proposal §3–§4
+- [x] 5 mockups, axe 0 violations at 1440/375 in dark and light — `docs/step-4c/mockups/`
+- [x] Huraira approved the IA and direction and accepted D1–D8 (2026-10-01, in session)
+
+**Phase 2 — build**
+- [x] New shell and design system; every old room migrated (Pipeline → Projects, Approvals → Decisions, Actions → New request and Activity,
+      Runs → Activity › Fix rounds, Models → Costs); one URL per screen with redirects from the old names — `d838efc`
+- [x] Every capability reachable or deliberately CLI-only with a reason — proposal §1c/§1d; Add client/project (D5) and Close a stuck job (D7) added
+- [x] D3: the Cockpit never moves a project into Launch — `stageMoveBlock` in `apps/cockpit/src/stages.ts`, covered by tests
+- [x] D7: migration `0013_jobs_cancel` applied (live version `20261001171227`; `cancel_job` present; status constraint includes `cancelled`);
+      attack test `scripts/rls_attack_test_jobs_cancel.sql` 17/17, rolled back, nothing persisted — `e633112`, `RLS_ATTACK_TEST_RESULTS.md` Run 5
+- [x] Tests: 23 (pure logic, plus navigation and flow tests that count clicks) — re-run 2026-10-01 at sync: 23/23 pass, typecheck clean
+- [x] CI runs the Cockpit tests and fails the build if `service_role` is in the bundle — `cb2ffd5`; green on `main` in CI `36905237284`
+- [x] Installable PWA (manifest, service worker that caches only the app shell, icons), self-hosted fonts, lazy-loaded rooms
+- [x] Deployed: `main` fast-forwarded to `e76cff2` on Huraira's word; CI `36905237284` all 12 jobs success, deploy smoke check HTTP 200.
+      Checked directly at sync: `/`, `/decisions`, `/activity/<id>` return the app (Vercel rewrite works), `manifest.webmanifest`, `sw.js`
+      and icons are served, the live bundle contains the new screens and 0 `service_role`
+- [ ] Live check with a real signed-in session — waiting on Huraira (the agent can't type a password)
+- [ ] Projects on a phone: layout shift 0.118 (target < 0.1) — open
+
+**Verification**
+- [x] Walkthrough, 7 tasks × 1440/375, each ≤ 3 clicks from Home, 14/14 pass (automated timings 70–220 ms, which say nothing about human
+      speed) — `walkthrough.json`; the main flow (Home → plan → Approve as Track A → Start build) also done by hand in the browser pane
+- [x] axe 0 violations, no horizontal scroll at 375, no console errors: 21 screens × 2 widths — `audit.json`
+- [x] Lighthouse accessibility 100 on all 17 routes, desktop and mobile — `lighthouse.json`
+- [x] Design-quality rule: impeccable detector 0 findings on `apps/cockpit/src`; banned-pattern checklist in the proposal §4
+
+**Exit check**: *"Huraira approved the IA and design direction before build; every capability is reachable or deliberately excluded with a
+reason; the walkthrough passes; accessibility and responsiveness proven with evidence; CI green; no production client deploy path added."*
+— **PARTIALLY MET**. All parts are met with the evidence above (CI `36905237284`; no deploy button: Launch shows as a decision made outside
+the Cockpit and is blocked as a stage move), except that every room has only been checked with copied data, not with a live signed-in
+session. The phone layout shift on Projects (0.118, measured on the copied-data build) is also still open.
