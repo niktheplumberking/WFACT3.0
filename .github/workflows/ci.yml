@@ -282,8 +282,13 @@ jobs:
           node-version: "22"
       - name: Install
         run: npm ci
+      - name: Component and flow tests (Step 4C)
+        run: npm test
       - name: Build (tsc -b && vite build)
         run: npm run build
+      - name: No service key in the browser bundle
+        run: |
+          if grep -rl "service_role" dist; then echo "::error::service_role found in the Cockpit bundle"; exit 1; fi
 
   # Continuation Plan Stage 1 / Blueprint Phase 0 acceptance: "a commit can go from a laptop to a
   # deployed preview through CI with zero manual steps." Runs only on a push to trunk (main), and
