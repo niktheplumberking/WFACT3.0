@@ -45,7 +45,7 @@ rows, mark them done so there's a record of when they closed.
 | 2-3 reference sites per track (A local business, B motion-rich) | Before M1 | **PROPOSED 2026-10-01** by the coding agent at Huraira's request (A: guttergalaxy.com, wavehousecleaning.com, seattledentalco.com; B: houseofhoney.com, racing.porsche.com, linear.app), see `docs/FRONTEND-UPGRADE-DESIGN.md` §10. Huraira/Nick to confirm or swap. |
 | Niche taxonomy for the direction step (keep / add / remove categories) | Before M2 | **CLOSED 2026-10-01** - Huraira: keep the proposed list |
 | Image policy (AI-generated allowed if labelled?) and Higgsfield access and budget | Before M3 | **Policy CLOSED 2026-10-01** - Huraira: AI images OK if clearly labelled. **Image tool still OPEN** (Higgsfield access and budget unconfirmed). |
-| Builder model: stay on Agent 37 or approve a second provider | Before M1 | **OPEN** |
+| Builder model: stay on Agent 37 or approve a second provider | Before M3 (M1 ran on today's builder, per the Step 4B prompt) | **OPEN** |
 | Spend ceiling for builds (proposal: ask before any single build over $5) | Before M1 | **CLOSED 2026-10-01** - Huraira: ask before any single build over $5 |
 
 ## Budget & spend approval
@@ -56,6 +56,7 @@ rows, mark them done so there's a record of when they closed.
 | Vercel plan upgrade (fixes the 12-function serverless ceiling) | Day 16 | **OPEN** |
 | Agent 37 credits (the front-end builder's provider returned HTTP 402 "AI credits exhausted" on 2026-09-30) | **Now**, blocks Factory Completion Plan Step 4 | **CLOSED 2026-09-30** - credits restored (1-token call returned HTTP 200 and the re-run build completed, job `81c8607b`). Consider enabling auto top-up. |
 | Where the self-hosted second brain + Hermes run (infra, budget) | Day 3 | **OPEN** |
+| OpenAI API credits for the Step 4B screenshot reviewer (gpt-5.4, about $0.05-0.15 per review at list price, estimate). Found 2026-10-01: the live review returned HTTP 429 "You have no credits remaining". Alternative is a different reviewer vendor (Huraira's call; it must not be the builder's vendor). | **Now**: blocks Step 4B M1's live review; until then every Cockpit build ends "not verified" | **OPEN** (Huraira) |
 
 ## Nick's time
 

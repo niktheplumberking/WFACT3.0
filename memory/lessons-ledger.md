@@ -69,3 +69,12 @@ Format per entry: date, what happened, what it cost, the rule going forward.
    key is for client-facing, RLS-scoped access, not for an internal reader that needs to see
    everything a human operator could see. See `packages/hermes/README.md`'s verification table and
    `BLOCKED-ON-NICK.md` for where this is tracked.
+
+3. **[PROPOSED, unapproved] Pin the real escaped defect as the gate's acceptance fixture, and scope every exemption to the claim's own
+   block.** Step 4B M1, 2026-10-01: the Step 4 page that every check approved was re-downloaded, committed byte-identical with its
+   checkpoint sha256 asserted in a test, and the new claims gate must fail it on the exact defects the human review found. While building
+   it, the gate's own "labelled SAMPLE" exemption looked one level up the tree, so one labelled list item excused an invented phone number in
+   the next item; a one-defect fixture (`invented-fact.html`) passed when it should have failed, which is how it was caught. → Proposed rule:
+   every new verification gate ships with (a) the real artifact that escaped, hash-pinned, as a failing test, and (b) one fixture per defect
+   class that differs from a clean fixture by exactly that defect; any "this is allowed because…" exemption must be tested with the
+   exempting marker placed next to, not on, the violating content.
