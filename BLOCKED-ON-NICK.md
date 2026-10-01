@@ -1,6 +1,6 @@
 # Blocked on Nick
 
-Live tracker, consolidated from `docs/wfact-3.0-nick-requirements.html`. Per the Operator's Manual's
+Live tracker, consolidated from `docs/archive/old-reports/wfact-3.0-nick-requirements.html`. Per the Operator's Manual's
 own rule: fire off every access request on Day 0, don't sit idle waiting — keep this list visible
 instead of quietly absorbing the delay. Update the Status column as items close; don't delete resolved
 rows, mark them done so there's a record of when they closed.
@@ -14,7 +14,7 @@ rows, mark them done so there's a record of when they closed.
 | Vercel access | Day 1 — blocking | **CLOSED 2026-09-22** — verified: `vercel` CLI is installed and authenticated in this exact environment (`vercel whoami` → `niktheplumberking`, matching the GitHub org). |
 | Hostinger access | Day 1 — blocking | **DESCOPED for this sprint, per Huraira 2026-09-22** — not needed right now. Flagging a real tension this creates, not blocking on it: the hosting law (`CLAUDE.md` §5, "Hostinger for live sites, Vercel for previews only") and Step 5's exit check ("a site is actually live") both assume Hostinger exists by the time of the proof run. Worth deciding before Step 5 whether that still holds, or whether the proof run's "live" bar changes for this sprint. |
 | Higgsfield MCP credentials | Day 9 | **DESCOPED for this sprint, per Huraira 2026-09-22** — not needed right now. No tension flagged: nothing in Steps 1–5 of the Fast-Track Plan requires imagery/video generation. |
-| The 3 SOPs + Operations Manual (Google Drive) | Day 1 — blocking | **CLOSED 2026-09-22** — verified: `docs/WFACT SOPS/` now holds all 3 SOP PDFs (`WFact SOP 1 — Sales & Onboarding`, `SOP 2 — Production Pipeline`, `SOP 3 — Post-Launch, Automation & Team Operations`), plus `WFACT-Factory-Book.pdf` and `WFact Factory Audit.pdf`, plus markdown versions of each SOP under `Claude outputs/`. The Operations Manual (`docs/wfact-3.0-operator-manual.html`) was already present from Phase 1. |
+| The 3 SOPs + Operations Manual (Google Drive) | Day 1 — blocking | **CLOSED 2026-09-22** — verified: `docs/WFACT SOPS/` now holds all 3 SOP PDFs (`WFact SOP 1 — Sales & Onboarding`, `SOP 2 — Production Pipeline`, `SOP 3 — Post-Launch, Automation & Team Operations`), plus `WFACT-Factory-Book.pdf` and `WFact Factory Audit.pdf`, plus markdown versions of each SOP under `Claude outputs/`. The Operations Manual (`docs/archive/sprint-100-hour/wfact-3.0-operator-manual.html`) was already present from Phase 1. |
 | Motion Sites MCP credentials | Day 9 | **CLOSED 2026-09-21** — verified: `claude mcp list` shows `Motionsites AI: https://xgdzyqfalbibzelpdpvr.supabase.co/functions/v1/mcp — ✔ Connected` (the exact OAuth endpoint from motionsites.ai/mcp's own setup docs), and this session can actually call its tools (`search_prompts`, `list_prompts`, `get_prompt`, `get_related_prompts`). |
 | 21st.dev premium account credentials | Day 9 | **CLOSED 2026-09-21** — a real key (`21st_sk_...`) was provided and written to `.env.local` under both `TWENTYFIRST_DEV_TOKEN` and `API_KEY_21ST` (21st.dev's own docs name it `API_KEY_21ST` for CI/script use; neither name is read by any code yet — `packages/frontend-loop` still needs to be wired to actually use one, see Phase 4 in `PROGRESS.md`). Key itself not yet call-tested against 21st.dev's API from this environment. |
 | Claude / Anthropic API billing confirmation (existing WFACT billing, or standing one up) | Day 1 — blocking | **CLOSED 2026-09-21** — a real `ANTHROPIC_API_KEY` is now in `.env.local`. Not yet exercised by an actual live call (Phase 3's smoke test is blocked behind the Supabase schema row below, so the key's validity itself is still unconfirmed by a real request — first real call should be the Phase 3 smoke test itself, not a throwaway check, to avoid spending budget twice). |
@@ -42,7 +42,7 @@ rows, mark them done so there's a record of when they closed.
 
 | Item | Needed by | Status |
 |---|---|---|
-| 2-3 reference sites per track (A local business, B motion-rich) | Before M1 | **OPEN** |
+| 2-3 reference sites per track (A local business, B motion-rich) | Before M1 | **PROPOSED 2026-10-01** by the coding agent at Huraira's request (A: guttergalaxy.com, wavehousecleaning.com, seattledentalco.com; B: houseofhoney.com, racing.porsche.com, linear.app), see `docs/FRONTEND-UPGRADE-DESIGN.md` §10. Huraira/Nick to confirm or swap. |
 | Niche taxonomy for the direction step (keep / add / remove categories) | Before M2 | **OPEN** |
 | Image policy (AI-generated allowed if labelled?) and Higgsfield access and budget | Before M3 | **OPEN** |
 | Builder model: stay on Agent 37 or approve a second provider | Before M1 | **OPEN** |

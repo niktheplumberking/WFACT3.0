@@ -105,3 +105,43 @@ cannot load skills at run time, which is why the rules live in the repo.
 ## 9. What this does not change
 
 Launch and Money remain hard-gated to Nick; nothing is "done" on the builder's own report; synthetic inputs stay labelled.
+
+## 10. M0 inputs (recorded 2026-10-01)
+
+### Reference sites (researched and proposed by the coding agent at Huraira's request; Huraira/Nick may swap any)
+
+References show the **bar and the patterns to learn**, never a design to copy (copying would break the design-quality rule and
+the client's originality). Each was checked live on 2026-10-01 (HTTP 200 from curl, or page content read with a fetch).
+**Limit of the check**: the browser pane refused outside sites, so visual quality was judged from page structure plus the
+source listings and award entries, not from screenshots. A human look at each before M3/M4 is recommended.
+
+**Track A — local business, conversion-first**
+
+| Site | Niche | What to learn |
+|---|---|---|
+| [guttergalaxy.com](https://www.guttergalaxy.com) | Local trade (gutters, Twin Cities) | Closest match to our trade clients: "Get a Quote!" CTA plus phone in header, mid-page and footer; service pages (guards, repair, replacement, installation); 40+ **service-area pages**; real team photos; owner-led story; a memorable brand personality instead of a generic trade template. |
+| [wavehousecleaning.com](https://www.wavehousecleaning.com) | Home services (cleaning) | Booking-first: "Book a cleaning" in the hero plus an instant estimate form (address + service) and a call link in the header; transparent flat-rate "starting at" pricing with "no contracts"; one page per service; Locations and Help Center pages. |
+| [seattledentalco.com](https://www.seattledentalco.com) | Local health (dental) | "Schedule Online" in the header and repeated through the page; embedded scheduling; clickable phone, address and hours; real team bios and photos; patient testimonials; calm, warm tone. |
+
+**Track B — motion-rich brand site**
+
+| Site | Niche | What to learn |
+|---|---|---|
+| [houseofhoney.com](https://www.houseofhoney.com) | Premium studio / lifestyle (interior design) | Awwwards Site of the Day (2026-07-14, per the Awwwards motion listing): large-format photography, generous whitespace, refined type, a project gallery and an editorial column; motion that serves the work rather than decorating it. |
+| [racing.porsche.com](https://racing.porsche.com) | Premium brand / product | Awwwards Honorable Mention (2026-08-12): heritage told through an interactive timeline, technical deep-dives per component, team galleries, an events calendar; brand storytelling at scale. |
+| [linear.app](https://linear.app) | Product launch / brand-product | Restrained dark theme, large confident headlines, real product UI shown in motion instead of abstract illustration, clear repeated CTAs; the standard for "premium without slop". |
+
+**Considered and rejected**: `jeffersonelectricllc.com` (listed as an electrician in a 2026 roundup, now a solar company);
+`edmooreflorist.net` (listed as a florist, the domain now serves a gambling spam page); `mosaikdesign.com` and `powerhrg.com`
+(did not respond); `nativeedgelandscape.com`, `veribestcleaners.com`, `hellotend.com`, `bonedryroofing.com` (blocked automated
+checks, so they could not be verified). Lesson: "best websites" listicles go stale; every reference must be re-checked live.
+
+**Sources used**: freshysites.com "Best local service company websites for 2026"; WebFX, Hook Agency and others' 2026 roofing
+roundups; dental website roundups (Colorlib, Delmain, Azuro); the Awwwards Motion listing (awwwards.com/websites/motion/).
+
+### Still open before M1
+
+- Niche taxonomy (section 3): proposed list stands unless Huraira/Nick change it.
+- Image policy and Higgsfield access/budget.
+- Builder model (stay on Agent 37 or add a provider).
+- Spend ceiling (proposal: ask before any single build above $5).
