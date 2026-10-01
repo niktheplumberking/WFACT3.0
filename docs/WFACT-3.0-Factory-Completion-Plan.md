@@ -10,6 +10,9 @@ to a Continuation Stage, that is noted.
 **Revised 2026-10-01**: added **Step 4B** (front-end upgrade: two build tracks, chosen per client) and **Step 4C** (Cockpit UI/UX
 redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
+**Status as of 2026-10-01**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
+Step 4B design is approved and **M0 is 5 of 7 inputs decided**; everything else is not started. Each step heading below carries its
+status; Part E is the checklist.
 
 ## How to use this file
 
@@ -62,6 +65,7 @@ the goals · **P3** later or depends on Nick.
 | 1 | Fix Cockpit → GitHub dispatch | Confirms the dispatch token, gets a Cockpit job to run through GitHub Actions | Every Cockpit action depends on it; it has never worked | First successful `Cockpit job` run; queued plan built | P0 |
 | 2 | Write pilot brief and business rules | Drafts a realistic fictional client brief and provisional business rules | Unblocks Stage 7 and the real-memory test | `brief.json` and `memory/context.md`, both flagged provisional | P0 |
 | 3 | Retire plaintext secrets (Huraira acts, agent verifies) | Deletes `.env.local` files, rotates keys, revokes the leaked Doppler token | Stage 1 is unmet and a token is exposed | The plan's `grep` check passes | P0 |
+| 3A | Password sign-in and approval-gated accounts (added 2026-09-30) | Email + password sign-in, account requests, owner/admin approval, forgot-password; fixed an admin-to-owner escalation hole | Huraira asked for it; magic-link-only sign-in was a blocker | Live in the Cockpit; 32/32 attack checks pass | P0 |
 | 4 | Full run on the pilot brief | Intake → plan → approval → build → verify → human Launch | Proves the factory end to end; measures corrections | Verified live page, correction count, audit and trace rows | P0 |
 | 4B | Front-end upgrade: two build tracks | Track A (local business, conversion-first, multi-page static) and Track B (motion-rich, Next.js); a direction step detects niche, requirements and brand direction and recommends a track; the owner picks per build in the Cockpit; rendered screenshot QA; anti-slop design rulebook | Step 4 output was one text-only page and checks never looked at the rendered page | Both tracks build multi-page sites that pass rendered QA; track choice in the Cockpit; Summit Line rebuilt | P0 |
 | 4C | Cockpit UI/UX redesign | Information architecture, navigation, design system, plain copy, every factory action reachable, accessible and responsive | The Cockpit is the control room; today it grew room by room | A redesigned Cockpit verified in the browser at desktop and phone, with a usability walkthrough | P1 |
@@ -153,7 +157,11 @@ Part C above; if the agent has not been given this file, paste Part C first.
 
 ---
 
-### STEP 1 — Fix Cockpit → GitHub dispatch (P0)
+### STEP 1 — Fix Cockpit → GitHub dispatch (P0) — DONE 2026-09-30
+
+**Status: DONE.** Dispatch worked end to end: job `b952aaba` ran as `cockpit-job.yml` run `36455639903`; the browser leg was proven
+live on 2026-09-30 (job `1dd90f25`, dispatched 8 s after the click); the failure path was proven by job `e5d29358`. Open
+housekeeping: two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`) await Huraira's OK to close. The prompt is kept for the record.
 
 **Depends on**: none.
 **Maps to**: Cockpit jobs (unplanned work), Blueprint §14 headless runs; unblocks Steps 2–4.
@@ -199,7 +207,11 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 2 — Write the pilot brief and business rules (P0)
+### STEP 2 — Write the pilot brief and business rules (P0) — DONE 2026-09-30 (provisional inputs)
+
+**Status: DONE** (`2c188d0`). `memory/context.md` has concrete provisional rules and a 13-row register (R-01…R-13);
+`clients/summit-line-roofing/` holds the synthetic brief, raw request and memory. Nick's real brief and rules session remain open
+in `BLOCKED-ON-NICK.md` (Step 22). The prompt is kept for the record.
 
 **Depends on**: none (can run in parallel with Step 1).
 **Maps to**: Continuation Stage 7 prerequisites; Blueprint §8 context.md; Phase 2.
@@ -258,7 +270,11 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 3 — Retire plaintext secrets (P0, Huraira acts, agent verifies)
+### STEP 3 — Retire plaintext secrets (P0, Huraira acts, agent verifies) — DONE 2026-09-30
+
+**Status: DONE** (`f74b0bc`). Both `.env.local` files deleted, grep criterion passes, keys rotated and working from Doppler,
+CI deploys with the rotated keys (`main` runs `36698432470`, `36699308136`). Per this step's own acceptance, the old leaked CLI token
+is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler dashboard). The prompt is kept for the record.
 
 **Depends on**: none.
 **Maps to**: Continuation Stage 1 criterion 3; Blueprint §3 security.
@@ -300,7 +316,57 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 4 — Full run on the pilot brief (P0)
+### STEP 3A — Password sign-in and approval-gated accounts (P0, added 2026-09-30) — DONE 2026-09-30
+
+**Status: DONE** (`2223344`, `856e483`; CI `36698432470`, `36699308136`). Migration `0010_account_requests`: a sign-up creates a pending
+request and no profile, so it sees nothing until approved; owners approve any role, admins only `pm`; every decision audited; the
+older policy that let an admin promote themselves to owner was replaced with owner-only profile writes. Cockpit: password sign-in,
+"Create an account", "Forgot password?" and choose-new-password screens, magic link kept for existing accounts only, and an Account
+requests panel in Approvals. `scripts/rls_attack_test_accounts.sql`: 32/32. **Not yet proven live**: a real new account signed up,
+confirmed by email, approved and signed in (needs Huraira); the Supabase Auth settings below are Huraira's.
+
+Remaining verification prompt (run once Huraira has done the dashboard settings and created a test account):
+
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY the Step 3A live verification.
+
+CONTEXT
+Password sign-in and approval-gated accounts shipped (migration 0010, apps/cockpit Login, AccessPending,
+AccessRequests, SetPassword). Huraira has set Supabase Auth (email+password on, Confirm email on, minimum
+password length, leaked-password protection) and created ONE test account himself. You never create
+accounts or type passwords.
+
+TASK
+1. Read back by SQL (no secrets): the test account's account_requests row is 'pending' and it has no
+   profiles row.
+2. With Huraira signed in as owner in the browser pane, confirm the request appears in Approvals, then
+   ask Huraira to approve it as 'pm' (his click, not yours).
+3. Confirm by SQL: request 'approved', profiles row with role 'pm', an audit_log 'account.approved' row
+   whose actor is Huraira's user id.
+4. Ask Huraira to sign in as the test account in a private window and confirm it sees only what a pm
+   should (live RLS, not just hidden buttons).
+5. Ask Huraira to try "Forgot password?" for the test account and confirm the reset screen works.
+6. Re-run scripts/rls_attack_test_accounts.sql: 0 failures. Run get_advisors.
+7. Afterwards, with Huraira's OK, reject or remove the test account's access and confirm by SQL.
+
+ACCEPTANCE
+- One real account went pending -> approved -> signed in with the right access, end to end, audited.
+- Attack test still 32/32; advisors show no new findings.
+
+REPORT in the Part C format, then STOP.
+```
+
+---
+
+### STEP 4 — Full run on the pilot brief (P0) — PARTIAL 2026-09-30
+
+**Status: PARTIAL.** Met: a raw request became a verified built page through the Cockpit with no hand-written intermediate (jobs
+`1dd90f25` → `c62e24a4` re-plan → `81c8607b` build, run `36743601290`; 3 rounds, 2 requesting changes; 8m38s; $0.1741 priced plus 3
+unpriced Agent 37 calls); independent re-hash and verification CLI passed; human visual check done and defects listed (leaked tool
+text after `</html>`, unlabelled SAMPLE testimonials, invented phone/hours/areas). **Not met: the preview deploy.** It is not worth
+deploying a text-only page; Huraira moved the remaining work into Step 4B, whose M6 repeats the full run on the new builder and
+ends with a preview. Treat Step 4 as closed by Step 4B M6. The prompt is kept for the record.
 
 **Depends on**: Steps 1 and 2 (Step 3 recommended).
 **Maps to**: Continuation Stage 7 (third bullet); Blueprint Phase 7 acceptance; goal 1 (as a synthetic proof).
@@ -343,7 +409,11 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 4B — Front-end upgrade: two build tracks, chosen per client (P0)
+### STEP 4B — Front-end upgrade: two build tracks, chosen per client (P0) — IN PROGRESS (M0 mostly done)
+
+**Status: IN PROGRESS.** Design approved 2026-10-01. M0 decisions recorded in `docs/FRONTEND-UPGRADE-DESIGN.md` §10: reference sites
+per track (researched and checked live), niche taxonomy kept, AI images allowed if clearly labelled, $5 per-build spend ceiling.
+**Still open**: builder model (needed by M3) and image tool (needed by M5). **Next: M1.**
 
 **Depends on**: Step 4. Design approved by Huraira 2026-10-01: `docs/FRONTEND-UPGRADE-DESIGN.md` (v2 + Next.js for Track B).
 **Maps to**: Blueprint Phase 6-7 front-end loop, Playbook "Motion Sites + GSAP" and Stage 3 Assets; fixes the Step 4 finding that every
@@ -384,8 +454,10 @@ builder in its prompt, and make the screenshot reviewer check it. Distil it from
 not copy any third-party prompt text verbatim.
 
 MILESTONES
-M0  Record the inputs Huraira/Nick gave (reference sites per track, niche taxonomy, image policy,
-    builder model, spend ceiling) in docs/FRONTEND-UPGRADE-DESIGN.md. If any is missing, STOP and ask.
+M0  (Mostly done 2026-10-01, see docs/FRONTEND-UPGRADE-DESIGN.md section 10.) Reference sites per track,
+    niche taxonomy, image policy (AI images only if clearly labelled) and the $5 per-build ceiling are
+    decided. Before M3, get the builder-model decision; before M5, the image tool. If either is still
+    missing when you reach that milestone, STOP and ask. Never exceed $5 for one build without asking.
 M1  Rendered QA + claims gate on TODAY's builder. Headless Chromium (Playwright) screenshots at
     1440/768/375; axe accessibility; Lighthouse performance; link and asset crawl; console errors; text
     checks for content after </html>, required SAMPLE labels, banned claims, and factual claims with no
@@ -429,7 +501,7 @@ REPORT in the Part C format after each milestone, then STOP.
 
 ---
 
-### STEP 4C — Cockpit UI/UX redesign: the control room (P1)
+### STEP 4C — Cockpit UI/UX redesign: the control room (P1) — NOT STARTED
 
 **Depends on**: none hard. Best after Step 4B M2 (so the track choice is designed in). Must land **before** Steps 9, 10, 14 and 17,
 which then build their rooms inside this design system. Can run in parallel with Steps 5-8 (it only touches `apps/cockpit`).
@@ -498,7 +570,7 @@ REPORT in the Part C format (Phase 1 report first, then the build report), then 
 
 ---
 
-### STEP 5 — Stage 6: Documentation agent and episodic memory (P1)
+### STEP 5 — Stage 6: Documentation agent and episodic memory (P1) — NOT STARTED
 
 **Depends on**: Step 4.
 **Maps to**: Continuation Stage 6; Blueprint §8, §16D (Documentation agent).
@@ -541,7 +613,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 6 — Enforce agent permissions (P1)
+### STEP 6 — Enforce agent permissions (P1) — NOT STARTED
 
 **Depends on**: Step 4 (Step 5 preferred).
 **Maps to**: Blueprint §3 (tool calling, security/permissions), §12; Phase 5 note "Section 12 must land before this phase closes".
@@ -584,7 +656,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 7 — Expand the evaluation registry (P1)
+### STEP 7 — Expand the evaluation registry (P1) — NOT STARTED
 
 **Depends on**: Step 4.
 **Maps to**: Blueprint §14 (Evaluation Registry), Phase 8, §16C "highest priority", goal 3.
@@ -629,7 +701,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 8 — Task/event queue and durable execution (P1)
+### STEP 8 — Task/event queue and durable execution (P1) — NOT STARTED
 
 **Depends on**: Steps 4 and 6 (Step 7 preferred).
 **Maps to**: Blueprint §3 (queues, retries, failure recovery), §14, Phase 6; goal 2.
@@ -670,7 +742,7 @@ REPORT in the Part C format (include the approved design), then STOP.
 
 ---
 
-### STEP 9 — Cockpit: "is everything OK" and System room (P1)
+### STEP 9 — Cockpit: "is everything OK" and System room (P1) — NOT STARTED
 
 **Depends on**: Step 4 (Step 8 helps for queue depth).
 **Maps to**: Blueprint §9 (top-level status, System category); goal 6 (backup status).
@@ -714,7 +786,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 10 — Cockpit: Agents room and Workflows drill-down (P1)
+### STEP 10 — Cockpit: Agents room and Workflows drill-down (P1) — NOT STARTED
 
 **Depends on**: Steps 6 and 9 (Step 5 preferred).
 **Maps to**: Blueprint §9 (Agents, Workflows, drill-down); Phase 9 acceptance ("what is happening and why").
@@ -756,7 +828,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 11 — Extend model routing and add a second model (P1)
+### STEP 11 — Extend model routing and add a second model (P1) — NOT STARTED
 
 **Depends on**: Step 4.
 **Maps to**: Blueprint §7, Phase 4 acceptance; Continuation Plan "gaps" (routing covers only Intake and Planner).
@@ -801,7 +873,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 12 — Cost governance per client (P2)
+### STEP 12 — Cost governance per client (P2) — NOT STARTED
 
 **Depends on**: Steps 10 and 11.
 **Maps to**: Blueprint §3 (cost control), Fuel Gauges / Cost Sentinel "extend into Cost Governance"; goal 4.
@@ -840,7 +912,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 13 — Remaining core agents (P2)
+### STEP 13 — Remaining core agents (P2) — NOT STARTED
 
 **Depends on**: Steps 5, 6, 7, 8 and 11.
 **Maps to**: Blueprint §16D, §5 workflow table, Phase 7.
@@ -887,7 +959,7 @@ REPORT in the Part C format after each group, then STOP.
 
 ---
 
-### STEP 14 — Cockpit: Memory and Human Control rooms (P2)
+### STEP 14 — Cockpit: Memory and Human Control rooms (P2) — NOT STARTED
 
 **Depends on**: Steps 5, 10 and 13 (group E).
 **Maps to**: Blueprint §9 (Memory, Human Control).
@@ -929,7 +1001,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 15 — Cognee trial write-up (P2)
+### STEP 15 — Cognee trial write-up (P2) — NOT STARTED
 
 **Depends on**: Step 5.
 **Maps to**: Continuation Stage 6 bullet 2; Blueprint §8 ("leading candidate to trial, not a locked choice").
@@ -968,7 +1040,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 16 — Tool-call tracing (P2)
+### STEP 16 — Tool-call tracing (P2) — NOT STARTED
 
 **Depends on**: Steps 6 and 10.
 **Maps to**: Blueprint §3 (observability), §13 (Langfuse trigger); goal 5; Continuation "gaps" (traces cover model calls, not tool calls).
@@ -1007,7 +1079,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 17 — Alerts and role-based views (P2)
+### STEP 17 — Alerts and role-based views (P2) — NOT STARTED
 
 **Depends on**: Steps 9, 10 and 14.
 **Maps to**: Blueprint §9 (alerts, permissions).
@@ -1046,7 +1118,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 18 — Three-concurrent-clients test (P2)
+### STEP 18 — Three-concurrent-clients test (P2) — NOT STARTED
 
 **Depends on**: Steps 6, 8, 9, 10 and 12 (13 preferred).
 **Maps to**: Blueprint §16K item 2; Phase 12 infrastructure; goal 2.
@@ -1085,7 +1157,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 19 — Disaster-recovery drill (P2)
+### STEP 19 — Disaster-recovery drill (P2) — NOT STARTED
 
 **Depends on**: Step 3 (Step 9 for the backup-status signal).
 **Maps to**: Blueprint §16K item 6, Phase 12.
@@ -1128,7 +1200,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 20 — Fix the Vercel serverless ceiling (P2)
+### STEP 20 — Fix the Vercel serverless ceiling (P2) — NOT STARTED
 
 **Depends on**: none technically; needs Huraira's decision.
 **Maps to**: Blueprint §1 (FIX, infrastructure), Phase 9 "Fix"; BLOCKED-ON-NICK "Vercel plan upgrade".
@@ -1164,7 +1236,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 21 — Housekeeping (P2)
+### STEP 21 — Housekeeping (P2) — NOT STARTED (note: uncommitted edits to CLAUDE.md §0, docs/INDEX.md and docs/archive were seen on disk 2026-10-01; verify and commit them as sub-items A and G)
 
 **Depends on**: none (best after Step 4).
 **Maps to**: Continuation "Gaps noticed" list.
@@ -1202,7 +1274,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 22 — Nick's items (P3, Huraira acts, agent prepares)
+### STEP 22 — Nick's items (P3, Huraira acts, agent prepares) — NOT STARTED
 
 **Depends on**: none. Best after Step 4, so Nick sees real results.
 **Maps to**: BLOCKED-ON-NICK.md; goal 1 (real brief); Blueprint calibration note.
@@ -1247,7 +1319,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 23 — Product features: Owner's Key port (P3)
+### STEP 23 — Product features: Owner's Key port (P3) — NOT STARTED
 
 **Depends on**: Steps 7, 10 and 14 solid; Nick's real brief preferred.
 **Maps to**: Blueprint Phase 10; Business/Product category; keeps 2.0's security bar.
@@ -1293,7 +1365,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 
 ---
 
-### STEP 24 — Advanced autonomy and optimization (P3)
+### STEP 24 — Advanced autonomy and optimization (P3) — NOT STARTED
 
 **Depends on**: Steps 4, 7, 12, 18 and a real track record.
 **Maps to**: Blueprint Phases 11–12, §11.
@@ -1336,11 +1408,12 @@ REPORT in the Part C format after each sub-part, then STOP.
 
 | # | Step | Status | Reported | Approved by Huraira |
 |---|---|---|---|---|
-| 1 | Fix Cockpit → GitHub dispatch | done (job `b952aaba`, run `36455639903`; browser leg job `1dd90f25`) | 2026-09-30 | |
-| 2 | Pilot brief and business rules | done, provisional (`2c188d0`) | 2026-09-30 | |
-| 3 | Retire plaintext secrets | done; old CLI token revocation not independently verified (`f74b0bc`) | 2026-09-30 | |
-| 4 | Full run on the pilot brief | partial: built and QA-approved (job `81c8607b`); human review found defects; no preview | 2026-09-30 | |
-| 4B | Front-end upgrade: two build tracks | design approved 2026-10-01; not started | | 2026-10-01 (design) |
+| 1 | Fix Cockpit → GitHub dispatch | **DONE** (job `b952aaba`, run `36455639903`; browser leg job `1dd90f25`) | 2026-09-30 | yes |
+| 2 | Pilot brief and business rules | **DONE**, provisional inputs (`2c188d0`) | 2026-09-30 | yes |
+| 3 | Retire plaintext secrets | **DONE** (`f74b0bc`); old CLI token listed as not verified, per the step's acceptance | 2026-09-30 | yes |
+| 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove | 2026-09-30 | yes |
+| 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
+| 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 5 of 7 inputs decided; M1 next | 2026-10-01 | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | not started | | |
 | 5 | Documentation agent | not started | | |
 | 6 | Enforce agent permissions | not started | | |
@@ -1367,7 +1440,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 
 | # | Goal | Status | Closed by |
 |---|---|---|---|
-| 1 | One real client, fewer than 40 corrections | open (synthetic proof only after Step 4; real brief after Step 22) | 4, 22 |
+| 1 | One real client, fewer than 40 corrections | open (synthetic run done in Step 4: 2 change rounds, not comparable; comparable output needs Step 4B; real brief after Step 22) | 4B, 22 |
 | 2 | Three concurrent clients | open | 18 |
 | 3 | 50-point audit and registry re-run | partial | 7 |
 | 4 | Real cost per client | partial | 12 |
