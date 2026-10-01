@@ -18,18 +18,38 @@ steps; this file tracks the Continuation Stages.
 (3A = password sign-in with approval-gated accounts, added to the plan), Step 4 is **partial** (full synthetic run built and
 QA-approved, but a human review found defects the checks missed; its preview is superseded by Step 4B M6), and **Step 4B is in progress**:
 design approved 2026-10-01 (two build tracks chosen per client, Track B on Next.js, anti-slop design rulebook, rendered QA), M0 has 5 of 7
-inputs decided, **M1 is next**. `main` is at `4ecfe4a` (CI `36750897743` green); `huraira-work` is 5 commits ahead (`4cba33b`…`1ccae2b`, docs
-only), unpushed. **Biggest blockers**: builder model (before 4B M3) and image tool (before M5), Nick's real brief and business rules, and a
-real sign-up to prove Step 3A live.
+inputs decided, **M1 is PARTIAL** (2026-10-01, `c1345de`, `47cef2c`; see the Step 4B M1 entry below). `main` is at `4ecfe4a` (CI
+`36750897743` green); `huraira-work` is 8 commits ahead, unpushed. **Biggest blockers**: OpenAI credits for the screenshot reviewer (now),
+builder model (before 4B M3) and image tool (before M5), Nick's real brief and business rules, and a real sign-up to prove Step 3A live.
+
+**Step 4B M1 — rendered QA + claims gate (2026-10-01, PARTIAL).** Built: a claims gate in `packages/verification` (`claims.after-html`,
+`claims.sample-label`, `claims.banned` from R-10, `claims.unsourced-fact` with the approved brief as the only fact source; rules in
+`config/claims-rules.json` v1.0.0); the design rulebook `packages/frontend-loop/design/rulebook.json` v1.0.0 (12 banned patterns, 4 required
+qualities, one failing fixture each), now in the builder's system prompt; a new `packages/rendered-qa` (Chromium at 1440/768/375, axe,
+Lighthouse, links, console, layout, JS budget, reduced motion, rulebook DOM detectors, and an OpenAI gpt-5.4 screenshot reviewer). Wired into
+Cockpit jobs and the workflow CLI with no off switch. Evidence:
+- Step 4 artifact, re-downloaded from the private bucket, sha256 `960b61ba…` matches the checkpoint; it still passes the original six, and
+  now FAILS `claims.after-html` (leaked "File-mutation verifier" text), `claims.sample-label` (3 unlabelled testimonials), `claims.unsourced-fact`
+  ((555) 014-7732, Mon-Sat 7:00am-6:00pm, "within one business day", the six invented areas), `claims.banned` (★★★★★, "no automatic charges,
+  ever"), `render.design-rules` (initials avatars, ★ glyphs, eyebrow labels above 6 of 7 headings), `render.layout` (11.2px text, five
+  19px-tall nav links at 375) and `render.perf` (mobile LCP 2.87 s vs 2.0 s). Independent CLI run (`npm run qa`, separate process).
+- Clean fixture passes all 10 text checks and all 9 rendered checks (LCP 0.75 s, Lighthouse perf 1.0). Each planted fixture fails only its own
+  check: leaked text, missing SAMPLE, invented fact, banned claim, broken link, console error, over-budget JS, reduced motion ignored, and
+  each of the 11 DOM-detectable rules.
+- Tests: verification 35, frontend-loop 29, rendered-qa 18 (real Chromium), workflow 8, jobs 8, hermes 40, planning 12, agent-runtime 12,
+  audit 14, all passing, from a fresh clone of `47cef2c` with `npm ci`; fixtures regenerate with no drift; gitleaks clean on both commits.
+- **Not done**: the live screenshot review returned OpenAI **HTTP 429 "You have no credits remaining"**, so it reported NOT RUN (correctly,
+  never a pass). Until credits are added, every Cockpit build ends "not verified". The new CI job and the Chromium step in `cockpit-job.yml`
+  have not run on GitHub (branch unpushed). Reviewer calls are cost-logged in the CLI and `report.json`, not yet in `model_traces`.
 
 **Next up**:
-1. **Step 4B M1** (prompt in `docs/WFACT-3.0-Factory-Completion-Plan.md`): rendered screenshot QA plus the claims gate on today's builder;
-   it must fail the Step 4 page on the leaked tool text, unlabelled SAMPLE testimonials and invented phone/hours. Waits on Huraira's GO.
-2. **Huraira decisions**: builder model (before M3) and image tool / Higgsfield access (before M5); how to tidy commit `0fbdfce` (see
-   Incidents) and whether to commit the uncommitted archive-path fixes in `CLAUDE.md`, `README.md`, `docs/INDEX.md`, the Continuation plan
-   and `PROGRESS.md`.
-3. **Huraira actions**: Supabase Auth settings and one real sign-up to prove Step 3A live; the old Doppler CLI token check; OK to close
-   the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b` (still 2 queued as of this sync).
+1. **Huraira: OpenAI credits** for the screenshot reviewer (money, human only), or choose another reviewer vendor. Then re-run
+   `doppler run -- npm run qa -- … --review-always` on the Step 4 artifact and the review-only fixtures to finish M1.
+2. **Step 4B M2** (direction step + track choice) after Huraira's GO on the M1 report.
+3. **Huraira decisions**: builder model (before M3) and image tool / Higgsfield access (before M5); how to tidy commit `0fbdfce` (see
+   Incidents). The archive-path fixes were committed in `289ec00`.
+4. **Huraira actions**: push `huraira-work` when ready (runs the new `rendered-qa` CI job); Supabase Auth settings and one real sign-up to
+   prove Step 3A live; the old Doppler CLI token check; OK to close the orphaned `queued` jobs `a2a41d2d`, `cbf8bf7b`.
 
 **Gaps noticed**:
 - **The Factory Completion Plan has no step for richer or multi-page output.** The builder is limited by design to one text-only HTML
