@@ -10,8 +10,9 @@ to a Continuation Stage, that is noted.
 **Revised 2026-10-01**: added **Step 4B** (front-end upgrade: two build tracks, chosen per client) and **Step 4C** (Cockpit UI/UX
 redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
-**Status as of 2026-10-01**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
-Step 4B design is approved and **M0 is 5 of 7 inputs decided**; everything else is not started. Each step heading below carries its
+**Status as of 2026-10-01 (evening)**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
+Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done; M4–M6 not started); Step 4C is **BUILT AND DEPLOYED**
+(`main` `fb08be3`, live signed-in check pending); Steps 5–24 are not started. Each step heading below carries its
 status; Part E is the checklist.
 
 ## How to use this file
@@ -41,17 +42,17 @@ status; Part E is the checklist.
 
 | Blueprint category | Today | Step that closes it |
 |---|---|---|
-| Top-level "is everything OK" | missing | 9 |
+| Top-level "is everything OK" | partial: Home answers "what needs me" from real rows (Step 4C); factory health is not shown yet | 9 |
 | System | missing | 9 |
 | Agents | missing | 10 |
 | Workflows (with the specific failed check, drill-down) | partial | 10 |
-| Models | done (owner-only) | 11, 12 (extend) |
+| Models | done (owner-only; now the Costs room, Step 4C) | 11, 12 (extend) |
 | Memory | missing | 14 |
-| Human Control | partial (approvals only) | 14 |
+| Human Control | partial: plan, account and stage decisions in Decisions, Launch blocked as a stage move, stuck jobs closable (Step 4C); no escalations or intervention history | 14 |
 | Business / Product | missing | 23 |
 | Alerts (push / Telegram) and role tiers | missing | 17 |
 | Serverless-ceiling fix | open | 20 |
-| Overall UI/UX: clear navigation, plain copy, no clutter, every factory action reachable from the Cockpit | partial | 4C (rooms added later by 9, 10, 14, 17 follow its design system) |
+| Overall UI/UX: clear navigation, plain copy, no clutter, every factory action reachable from the Cockpit | done (Step 4C, deployed 2026-10-01; live signed-in check pending) | 4C; rooms added later by 9, 10, 14, 17 slot into its "Coming next" entries and design system |
 
 ---
 
@@ -413,7 +414,7 @@ REPORT in the Part C format, then STOP.
 
 **Status: IN PROGRESS.** Design approved 2026-10-01. M0 decisions recorded in `docs/FRONTEND-UPGRADE-DESIGN.md` §10: reference sites
 per track (researched and checked live), niche taxonomy kept, AI images allowed if clearly labelled, $5 per-build spend ceiling.
-**Still open**: builder model (needed by M3) and image tool (needed by M5). **M1 DONE 2026-10-01**: claims gate, design rulebook v1.0.0,
+**Still open**: image tool (needed by M5). **M1 DONE 2026-10-01**: claims gate, design rulebook v1.0.0,
 rendered QA and a live screenshot review. Deviation: the reviewer is Agent 37 (the builder's vendor), by Huraira's decision while OpenAI has no
 credits; recorded in `packages/rendered-qa/config/reviewer.json`. See `PROGRESS.md`. **M2 DONE 2026-10-01**: direction step, migration 0011 (owner's track, audited, no build without one), Cockpit
 track choice, 14-case evaluation (track 14/14, niche 13/14). **Builder model decided 2026-10-01: stays on Agent 37.** **M3 DONE 2026-10-01**:
@@ -507,7 +508,18 @@ REPORT in the Part C format after each milestone, then STOP.
 
 ---
 
-### STEP 4C — Cockpit UI/UX redesign: the control room (P1) — BUILT AND DEPLOYED 2026-10-01 (`main` `e76cff2`, CI `36905237284`), waiting for a live signed-in check (Phase 1 approved, D1–D8 accepted; evidence in `docs/step-4c/after/`)
+### STEP 4C — Cockpit UI/UX redesign: the control room (P1) — BUILT AND DEPLOYED 2026-10-01, live signed-in check pending
+
+**Status: BUILT AND DEPLOYED** (`70cd7d1`…`e76cff2`; CI `36905237284` green with the deploy, docs-only redeploy `fb08be3` CI `36907274448`).
+Phase 1 (audit, IA, "signal-box panel" design system, 5 mockups: `docs/step-4c/PHASE-1-PROPOSAL.md`) approved by Huraira with D1–D8.
+Phase 2: new shell (Home, Decisions, Projects, Activity, Costs, plus "Coming in Step N" entries for System 9, Agents 10, Memory 14,
+Business 23), every old room migrated with redirects, one URL per screen, lazy rooms, installable PWA, self-hosted fonts. Decisions:
+Launch is never a stage move (D3); multi-page re-check and the `qa` suite stay CLI-only until Step 7 (D4); Add client/project added (D5);
+team management deferred to Step 17 (D6); migration `0013_jobs_cancel` lets an owner/admin close a job that never started, attack test
+17/17 (D7). Evidence (`docs/step-4c/after/`): 23 tests in CI, walkthrough 7 tasks × 1440/375 each ≤ 3 clicks, axe 0 violations on 21
+screens × 2 widths, Lighthouse accessibility 100 on every route, 0 `service_role` in the live bundle. **Not yet proven**: any room with a
+real signed-in session (all browser evidence used rows copied read-only from the live DB). **Open**: Projects layout shift on phones
+(CLS 0.118, target < 0.1); launch decisions stay listed until a Launch record exists (Step 14).
 
 **Depends on**: none hard. Best after Step 4B M2 (so the track choice is designed in). Must land **before** Steps 9, 10, 14 and 17,
 which then build their rooms inside this design system. Can run in parallel with Steps 5-8 (it only touches `apps/cockpit`).
@@ -1420,7 +1432,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove | 2026-09-30 | yes |
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
 | 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done | 2026-10-01 | 2026-10-01 (design) |
-| 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
+| 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`; redeploy `fb08be3`, CI `36907274448`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
 | 5 | Documentation agent | not started | | |
 | 6 | Enforce agent permissions | not started | | |
 | 7 | Evaluation registry | not started | | |
