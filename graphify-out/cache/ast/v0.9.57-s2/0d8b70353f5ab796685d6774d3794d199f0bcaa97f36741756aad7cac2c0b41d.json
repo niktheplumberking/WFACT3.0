@@ -1,0 +1,1 @@
+{"nodes": [{"id": "$graphify-root$_packages_db_migrations_0012_artifacts_site_json_sql", "label": "0012_artifacts_site_json.sql", "file_type": "code", "source_file": "packages/db/migrations/0012_artifacts_site_json.sql", "source_location": null}], "edges": []}
