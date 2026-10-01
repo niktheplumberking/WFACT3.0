@@ -20,7 +20,7 @@ export interface FrontendBuildInput {
    * Stage 3: when present, revise this page against these specific issues (from the QA agent)
    * instead of generating from scratch.
    */
-  revision?: { html: string; issues: string[] };
+  revision?: { html: string; issues: string[]; contentJson?: string };
 }
 
 export interface FrontendBuilderAgentOptions {

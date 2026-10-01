@@ -24,10 +24,23 @@ export interface CorrectionRound {
   timestamp: string;
 }
 
+/**
+ * Step 4B M3: a multi-page build (Track A). `files` are the rendered pages, `contentJson` is the
+ * content-as-data source they were rendered from (what a revision edits), `pages` is the nav order.
+ */
+export interface SiteBuild {
+  files: Record<string, string>;
+  pages: string[];
+  contentJson: string;
+  starterVersion: string;
+}
+
 export interface FrontendLoopResult {
   brief: PilotBrief;
   template: PageTemplate;
+  /** Single-page builds: the page. Site builds: the home page (the full site is in `site`). */
   finalHtml: string | null;
+  site?: SiteBuild;
   rounds: CorrectionRound[];
   approved: boolean;
   needsHuman: boolean;
