@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-01 (19:10 +05), via `/progress-sync` — folds in Step 4B M2 (direction step, migration 0011, Cockpit track choice,
-14-case evaluation) against git, live Supabase (migration applied, attack test 19/19, advisors, plan `b5a45a8e`), live model runs and a
-browser check of the plan card. Earlier syncs: `289ec00`…`019ab16`.
+Last synced: 2026-10-01 (19:20 +05), via `/progress-sync` — re-sync after Step 4B M2: no new commits since `c0f3d29`; folds in `main` CI
+run `36871379578` (green, Cockpit deployed, HTTP 200), live `plan_approvals` (plan `b5a45a8e` still pending, no track) and `jobs` (9 rows,
+none since 2026-09-30, `a2a41d2d`/`cbf8bf7b` still queued). Earlier syncs: `289ec00`…`c0f3d29`.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -17,8 +17,8 @@ steps; this file tracks the Continuation Stages.
 **Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
 Step 4 is **partial** (its preview is superseded by Step 4B M6), and **Step 4B is in progress**: M0 has 5 of 7 inputs decided, **M1 is
 done** (reviewer on the builder's vendor by Huraira's recorded decision) and **M2 is done** (2026-10-01): a direction step recommends a
-track, the owner chooses it in the Cockpit, and no build starts without one. See the Step 4B section at the end. `main` is at `eaea97b` (CI `36859122425` green, Cockpit redeployed); `huraira-work` is 2 commits ahead
-(`5641f45`, `6a296f8`) plus this sync. **Biggest open items**: the builder model (before M3; also decides whether the
+track, the owner chooses it in the Cockpit, and no build starts without one. See the Step 4B section at the end; roughly a third of Step 4B is done (M0 mostly, M1, M2 of M0–M6). `main` and `huraira-work` are both at
+`c0f3d29` (CI `36871379578` green, Cockpit deployed). **Biggest open items**: the builder model (before M3; also decides whether the
 reviewer can return to a different vendor), image tool (before M5), Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
