@@ -36,15 +36,22 @@ const BASE_CSS = `
   #hero h1 { color: var(--cream); }
   #hero p { max-width: 46ch; }
   .cta { display: inline-block; background: var(--copper); color: #fff; padding: .9rem 1.4rem; border-radius: 6px; text-decoration: none; font-weight: 600; min-height: 44px; }
-  .services { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 3rem; max-width: 64rem; }
-  .services dt { font-weight: 700; color: var(--pine); } .services dd { margin: 0 0 1rem; }
+  #services { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 1rem 4rem; align-items: start; }
+  .services { margin: 0; max-width: 42rem; }
+  .services div { display: grid; grid-template-columns: 11rem 1fr; gap: 1.5rem; padding: .9rem 0; }
+  .services dt { font-weight: 700; color: var(--pine); } .services dd { margin: 0; }
   .packages { border-top: 2px solid var(--pine); max-width: 56rem; }
   .packages div { display: grid; grid-template-columns: 10rem 1fr; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--line); }
   .packages b { font-family: "Iowan Old Style", Palatino, serif; font-size: 1.3rem; color: var(--pine); }
-  ol.steps { max-width: 44rem; padding-left: 1.4rem; } ol.steps li { margin-bottom: .8rem; }
-  .proof { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1.5rem; }
-  .proof blockquote { margin: 0; padding: 1.2rem; background: #fff; border: 1px solid var(--line); }
-  .proof .label { display: block; font-size: .8rem; font-weight: 700; color: var(--copper); margin-bottom: .5rem; }
+  #process { background: #ebe3d3; }
+  ol.steps { list-style: none; counter-reset: step; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; padding: 2rem 0 0; margin: 0; border-top: 2px solid var(--pine); }
+  ol.steps li { counter-increment: step; }
+  ol.steps li::before { content: counter(step); display: block; font: 700 2.4rem/1 "Iowan Old Style", Palatino, serif; color: var(--copper); margin-bottom: .6rem; }
+  .proof { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem 4rem; max-width: 60rem; }
+  .proof blockquote { margin: 0; }
+  .proof blockquote:first-child { grid-column: 1 / -1; font: 1.7rem/1.35 "Iowan Old Style", Palatino, serif; color: var(--pine); max-width: 34ch; }
+  .proof .label { display: block; font: 700 .8rem/1.4 "Avenir Next", "Segoe UI", sans-serif; color: var(--copper); margin-bottom: .5rem; }
+  .proof footer { font: 600 1rem/1.4 "Avenir Next", "Segoe UI", sans-serif; color: var(--ink); }
   details { border-bottom: 1px solid var(--line); padding: .8rem 0; max-width: 46rem; } summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
   #contact { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
   form label { display: block; font-weight: 600; margin-top: 1rem; }
@@ -52,7 +59,8 @@ const BASE_CSS = `
   form button { margin-top: 1.2rem; background: var(--copper); color: #fff; border: 0; padding: .9rem 1.4rem; font: inherit; font-weight: 600; min-height: 44px; border-radius: 6px; }
   footer { padding: 2rem clamp(1rem, 4vw, 3rem); border-top: 1px solid var(--line); }
   @media (max-width: 760px) {
-    #hero, #contact, .services, .proof { grid-template-columns: 1fr; }
+    #hero, #contact, #services, .proof, ol.steps { grid-template-columns: 1fr; }
+    .services div { grid-template-columns: 1fr; gap: .2rem; }
     .packages div { grid-template-columns: 1fr; }
     header.site { flex-wrap: wrap; }
   }

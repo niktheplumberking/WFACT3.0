@@ -10,7 +10,8 @@
  * Like VerificationLoop, the review is skipped (no model spend) when a deterministic check failed,
  * unless --review-always is given (used to gather evidence on a page already known to fail).
  *
- * OPENAI_API_KEY comes from the environment (`doppler run -- npm run qa ...`); it is never printed.
+ * The reviewer is the one config/reviewer.json names; its key (AGENT37_API_KEY + AGENT37_BASE_URL, or
+ * OPENAI_API_KEY) comes from the environment (`doppler run -- npm run qa ...`) and is never printed.
  * WFACT_BUILDER_VENDOR names the builder's vendor (default "agent37", today's builder).
  * Exit 0 only when every check passed and the review ran and passed.
  */
@@ -20,7 +21,7 @@ import path from "node:path";
 import { QA_GATE_CHECKS, runChecks } from "@wfact/verification/registry";
 import { knownClientSlugs } from "@wfact/verification/paths";
 import type { CheckResult, VerificationContext } from "@wfact/verification/checks/types";
-import { createRenderedQa } from "./index.js";
+import { createRenderedQa, reviewerFromEnv } from "./index.js";
 
 function arg(name: string): string | undefined {
   const i = process.argv.indexOf(name);
@@ -61,10 +62,11 @@ async function main() {
     outDir,
     lighthouse: !flag("--no-lighthouse"),
     checkExternalLinks: flag("--external-links"),
-    reviewerApiKey: process.env.OPENAI_API_KEY,
+    reviewer: reviewerFromEnv(),
     builderVendor,
   });
 
+  console.log(`reviewer: ${qa.review.provider} ${qa.review.model}${qa.review.sameVendorAsBuilder ? ` (SAME VENDOR AS BUILDER ${builderVendor}; approved in config/reviewer.json)` : ""}`);
   const results: CheckResult[] = runChecks(ctx, QA_GATE_CHECKS);
   results.push(...(await qa.rendered.run(ctx)));
   const deterministicPassed = results.every((r) => r.passed);
@@ -83,7 +85,7 @@ async function main() {
     console.log(`metrics ${page}: JS ${(m.jsBytes / 1024).toFixed(1)} KB, LCP ${m.lcpMs === null ? "n/a" : `${(m.lcpMs / 1000).toFixed(2)} s`}, CLS ${m.cls ?? "n/a"}, Lighthouse perf ${m.performanceScore ?? "n/a"}`);
   }
   for (const c of qa.review.calls) {
-    console.log(`review call: ${c.model}, ${c.inputTokens} in / ${c.outputTokens} out tokens, ${c.costUsd === null ? "UNPRICED" : `$${c.costUsd.toFixed(4)}`}, ${(c.ms / 1000).toFixed(1)} s`);
+    console.log(`review call: ${c.provider} ${c.model}, ${c.inputTokens} in / ${c.outputTokens} out tokens, ${c.costUsd === null ? "UNPRICED" : `$${c.costUsd.toFixed(4)}`}, ${(c.ms / 1000).toFixed(1)} s`);
   }
   if (!reviewRan) console.log("screenshot review: not run because a deterministic check failed (no model spend on a page already failing)");
 
@@ -94,7 +96,9 @@ async function main() {
     JSON.stringify(
       {
         page: file, sha256, brief: briefPath, builderVendor, startedAt: started.toISOString(), finishedAt: new Date().toISOString(),
-        verdict, failed, results, metrics, reviewCalls: qa.review.calls, reviewFindings: qa.review.lastFindings,
+        verdict, failed, results, metrics,
+        reviewer: { provider: qa.review.provider, model: qa.review.model, sameVendorAsBuilder: qa.review.sameVendorAsBuilder },
+        reviewCalls: qa.review.calls, reviewFindings: qa.review.lastFindings,
         screenshots: qa.rendered.lastRun?.shots.map((s) => ({ page: s.page, viewport: s.viewport, width: s.width, file: s.file })) ?? [],
       },
       null,

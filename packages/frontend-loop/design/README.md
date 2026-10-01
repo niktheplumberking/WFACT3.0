@@ -21,9 +21,12 @@ Where it is used:
 - **Builder**: every system prompt carries the whole rulebook (`FrontendLoop.buildSystemPrompt`), because the factory's builder cannot load
   Claude skills at run time.
 - **Rendered QA**: `render.design-rules` runs every `dom` detector; a hit fails the page before any model is paid for.
-- **Screenshot review**: a vision model from a different vendor than the builder answers every rule on the screenshots.
+- **Screenshot review**: a vision model answers every rule on the screenshots. Which model is recorded in
+  `packages/rendered-qa/config/reviewer.json` (since 2026-10-01: Agent 37, the builder's own vendor, approved by Huraira and flagged in
+  every report).
 
 Limits, stated plainly: the DOM detectors are heuristics with fixed thresholds, tuned so `fixtures/clean.html` passes and each planted
 fixture fails; they will miss real cases and may flag a deliberate design. `DR-REPEATED-RHYTHM` and the four `DQ-*` qualities have no
-detector and are judged only by the reviewer. Changing a rule means bumping `version` and regenerating the fixtures (`npm run fixtures`
+detector and are judged only by the reviewer, except `DQ-MOBILE-READABLE`, which the reviewer missed in its live test (2026-10-01) and
+which `render.layout` checks deterministically (text under 12px, tap targets under 24px at 375). Changing a rule means bumping `version` and regenerating the fixtures (`npm run fixtures`
 in `packages/rendered-qa`); CI fails if the committed fixtures drift from the generator.

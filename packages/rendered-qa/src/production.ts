@@ -1,7 +1,7 @@
 /**
  * The production QA wiring (Step 4B M1), shared by the Cockpit job runner and the workflow CLI so
  * both verify a page the same way: the Phase 5 six + the claims gate, the rendered browser suite,
- * then the cross-vendor screenshot review, then the evaluator. There is no switch to turn rendered
+ * then the screenshot review (reviewer chosen in config/reviewer.json), then the evaluator. There is no switch to turn rendered
  * QA off: if the browser or the reviewer cannot run, the run ends "not verified", never "approved".
  */
 import { mkdtempSync } from "node:fs";
@@ -10,7 +10,7 @@ import path from "node:path";
 import { QA_GATE_CHECKS } from "@wfact/verification/registry";
 import type { QaEvaluatorAgentOptions } from "@wfact/verification/agent";
 import type { ModelClient } from "@wfact/verification/modelClient";
-import { createRenderedQa } from "./index.js";
+import { createRenderedQa, reviewerFromEnv } from "./index.js";
 
 export interface ProductionQaSetup {
   evaluatorModel: ModelClient | null;
@@ -25,7 +25,7 @@ export function productionQaOptions(setup: ProductionQaSetup): QaEvaluatorAgentO
   const env = setup.env ?? process.env;
   const qa = createRenderedQa({
     outDir: setup.outDir ?? mkdtempSync(path.join(tmpdir(), "wfact-rendered-qa-")),
-    reviewerApiKey: env.OPENAI_API_KEY,
+    reviewer: reviewerFromEnv(env),
     builderVendor: setup.builderVendor,
   });
   return {

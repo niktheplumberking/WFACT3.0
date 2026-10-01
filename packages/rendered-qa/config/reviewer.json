@@ -1,0 +1,15 @@
+{
+  "_doc": "Which model runs the Step 4B screenshot review (render.design-review). Versioned decision record, read by src/reviewer.ts. The Step 4B prompt asks for a reviewer from a different vendor than the builder (CLAUDE.md §6: ideally not the same model/vendor). Today's builder is Agent 37 hermes-agent, so choosing Agent 37 here is a SAME-VENDOR review: the guard refuses it unless sameVendorAsBuilder names who approved it and when. Every report and audit row marks such a review as same-vendor. Change = bump version.",
+  "version": "1.0.0",
+  "provider": "agent37",
+  "model": "hermes-agent",
+  "sameVendorAsBuilder": {
+    "vendor": "agent37",
+    "approvedBy": "Huraira",
+    "on": "2026-10-01",
+    "why": "OpenAI account has no credits (HTTP 429, 2026-10-01). Huraira: \"Use Agent37 Models, and finish M1\". Vision checked first: hermes-agent read a random number and its colour from an image correctly. Known weakness: the reviewer shares the builder's model, so it may share its blind spots; the deterministic checks (claims gate, rendered suite) run first and do not depend on it. Revisit when OpenAI credits or a second builder provider exist."
+  },
+  "alternatives": {
+    "openai": { "model": "gpt-5.4", "status": "blocked: no credits (HTTP 429, 2026-10-01)" }
+  }
+}
