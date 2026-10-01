@@ -33,6 +33,7 @@ export class ModelNotConfiguredError extends Error {
 }
 
 const DEFAULT_MODEL_ID = "claude-sonnet-5";
+const MAX_OUTPUT_TOKENS = 16000;
 
 export class ClaudeModelClient implements ModelClient {
   readonly name = "claude";
@@ -52,12 +53,18 @@ export class ClaudeModelClient implements ModelClient {
   async complete({ system, user }: ModelRequest): Promise<string> {
     const response = await this.client.messages.create({
       model: this.modelId,
-      max_tokens: 4096,
+      // claude-sonnet-5 thinks adaptively by default and thinking counts against max_tokens: at 4096 a
+      // multi-page review spent the whole budget thinking and returned no text (Step 4B M3 live run
+      // b2cd975e). 16000 is the recommended non-streaming ceiling; it is a cap, not a cost.
+      max_tokens: MAX_OUTPUT_TOKENS,
       system,
       messages: [{ role: "user", content: user }],
     });
     this.totalUsage.inputTokens += response.usage.input_tokens;
     this.totalUsage.outputTokens += response.usage.output_tokens;
+    if (response.stop_reason === "max_tokens") {
+      throw new Error(`Claude output truncated at max_tokens=${MAX_OUTPUT_TOKENS} (thinking included) — cannot verify a page from a cut-off answer.`);
+    }
     const textBlock = response.content.find((block) => block.type === "text");
     if (!textBlock || textBlock.type !== "text") {
       throw new Error("Claude response contained no text block — cannot verify a page from this.");
