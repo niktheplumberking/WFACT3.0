@@ -843,6 +843,14 @@ button, although the runner (`trackBWorkflow`) and the jobs trigger already acce
 track, Track B plans show under "Ready to build". Tests: rendered-qa 40/40, Cockpit 24/24 (new tests fail on the old code), jobs 12/12.
 Next: a fresh Track A build and the first live Track B build from the Cockpit.
 
+**Cockpit cleanup 2026-10-02 — archive finished runs (migration 0015, applied live)**. `jobs` stays undeletable (0009); a run is
+hidden, never erased. `archive_job(job, archived)` is owner/admin only, finished runs only, audited (`job.archived`/`job.unarchived`);
+the progress guard lets a finished job change only `archived_at`/`archived_by`. Attack check in a rolled-back transaction, 8/8 as
+intended (archive+edit, edit/delete of a finished run, archiving a queued run, and a non-owner caller all refused). Live cleanup as the
+owner through the same functions: the 2 queued 09-28 builds cancelled, 8 failed/cancelled runs archived (audit rows 2 + 8; all 14 runs
+still in `jobs`). Cockpit: Activity hides archived runs (Archived filter), finished runs get Archive/Unarchive, Home ignores archived
+runs; Cockpit tests 27/27.
+
 **M5–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
 
 ## Step 4C — Cockpit UI/UX redesign: the control room (BUILT AND DEPLOYED 2026-10-01 — live signed-in check pending)
