@@ -34,7 +34,7 @@ const toRgb = (hex: string): Rgb => {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 };
 const toHex = ([r, g, b]: Rgb) => `#${[r, g, b].map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`.toUpperCase();
-const mix = (a: string, b: string, t: number): string => {
+export const mix = (a: string, b: string, t: number): string => {
   const x = toRgb(a);
   const y = toRgb(b);
   return toHex([0, 1, 2].map((i) => x[i]! + (y[i]! - x[i]!) * t) as Rgb);

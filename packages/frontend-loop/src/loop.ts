@@ -33,6 +33,12 @@ export interface SiteBuild {
   pages: string[];
   contentJson: string;
   starterVersion: string;
+  /** Step 4B M4 (Track B): paths in `files` that are binary (fonts), as base64. */
+  binary?: string[];
+  /** Step 4B M4 (Track B): the exact project that was built, stored beside the output in the artifact. */
+  source?: Record<string, string>;
+  /** Step 4B M4 (Track B): how the build ran (isolation probe, timings, output hash). */
+  buildRecord?: unknown;
 }
 
 export interface FrontendLoopResult {

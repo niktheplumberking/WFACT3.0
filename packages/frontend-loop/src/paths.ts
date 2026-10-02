@@ -11,3 +11,6 @@ export function repoRoot(): string {
   // packages/frontend-loop/src -> repo root is three levels up.
   return path.resolve(import.meta.dirname, "..", "..", "..");
 }
+
+/** The committed Track B starter (Step 4B M4): a Next.js project the Track B build copies and fills. */
+export const TRACK_B_STARTER_DIR = path.resolve(import.meta.dirname, "..", "starters", "track-b");

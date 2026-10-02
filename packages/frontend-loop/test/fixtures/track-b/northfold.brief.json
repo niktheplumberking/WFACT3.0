@@ -1,0 +1,10 @@
+{
+  "clientSlug": "northfold-studio",
+  "entitySlug": "bennett-co",
+  "projectName": "Northfold Studio - Studio Website (SYNTHETIC Track B test fixture)",
+  "goal": "SYNTHETIC TEST FIXTURE written 2026-10-02 by the coding agent for Step 4B M4 (Track B). Northfold is a fictional small brand-design studio; it is not a real client, not a client folder, and not Nick's brief. The studio's site is its shop window: it must show ambitious digital work through experimental typography, scroll-driven case studies and smooth transitions, explain what the studio does and how a project runs, and give people who saw the work one clear way to start a conversation by email. Required sections: hero, work, approach, services, process, contact. Contact: email studio@northfold.example, shown as a SAMPLE placeholder. No phone line.",
+  "requiredSections": ["hero", "work", "approach", "services", "process", "contact"],
+  "brandNotes": "Tone: direct, confident, specific; short sentences; no hype, no exclamation marks, no emoji. Style direction: a dark, typographic stage: near-black (#0F1211) page, off-white text (#ECEEE9), one signal vermilion accent (#FF4F1A) used sparingly, and a deep graphite green (#1D2B27) for colour fields; a characterful grotesque for display type at poster scale with a quiet text face; expressive, purposeful motion that respects reduced-motion. Work shown must be clearly labelled SAMPLE until real case studies are supplied. FORBIDDEN CLAIMS: no awards, rankings, client counts, years in business, prices, results or guarantees; no real client names.",
+  "templatePreference": "track-b",
+  "source": "synthetic-provisional-2026-09-30"
+}

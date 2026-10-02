@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "track-b/1",
+  "business": {
+    "name": "Northfold",
+    "tagline": "Brand and digital design studio.",
+    "email": { "value": "studio@northfold.example", "source": "sample" }
+  },
+  "brand": {
+    "colors": { "ink": "#ECEEE9", "paper": "#0F1211", "accent": "#FF4F1A", "deep": "#1D2B27" },
+    "typePairing": "studio",
+    "motion": "expressive"
+  },
+  "primaryAction": { "label": "Start a project", "page": "contact" },
+  "pages": [
+    {
+      "slug": "index",
+      "navLabel": "Home",
+      "title": "Northfold, brand and digital design",
+      "description": "Northfold is a small studio designing brand identities and the websites that carry them.",
+      "sections": [
+        {
+          "type": "hero",
+          "id": "hero",
+          "heading": "Identities with a voice, and websites that move like them.",
+          "intro": "We are a small studio. We design the brand and build the site together, so the type, the motion and the words all come from one idea.",
+          "showAction": true
+        },
+        {
+          "type": "statement",
+          "id": "approach",
+          "label": "Our approach",
+          "text": "Most brand work stops at the logo and hands the website to someone else. We keep both on the same table. The typeface decides how a page scrolls, the colour decides what moves, and every animation has to explain something or it goes."
+        },
+        {
+          "type": "work",
+          "id": "work",
+          "heading": "Selected work",
+          "intro": "Examples of the kind of project we take on. Real case studies will replace these.",
+          "items": [
+            {
+              "title": "Tidewater Ferries",
+              "client": "Passenger ferry operator",
+              "summary": "A timetable you can read at a glance on a windy pier, and a wordmark cut from the shapes of harbour signage.",
+              "disciplines": ["Identity", "Wayfinding", "Website"],
+              "source": "sample"
+            },
+            {
+              "title": "Loam & Ash",
+              "client": "Ceramics workshop",
+              "summary": "An identity built from glaze tests, with a shop where each piece turns slowly as you scroll.",
+              "disciplines": ["Identity", "Art direction", "Online shop"],
+              "source": "sample"
+            },
+            {
+              "title": "Field Notes Radio",
+              "client": "Independent radio station",
+              "summary": "A moving logo that follows the live audio level, and a schedule that reads like a printed listing.",
+              "disciplines": ["Motion identity", "Website"],
+              "source": "sample"
+            }
+          ]
+        },
+        {
+          "type": "quote",
+          "id": "kind-words",
+          "heading": "From a client",
+          "quotes": [
+            {
+              "text": "They asked better questions about our timetable than we had ever asked ourselves.",
+              "attribution": "Operations lead, ferry operator",
+              "source": "sample"
+            }
+          ]
+        },
+        {
+          "type": "cta",
+          "id": "next-step",
+          "heading": "Have a brand that should move?",
+          "text": "Tell us what you are making and where it needs to go. We reply to every message ourselves."
+        }
+      ]
+    },
+    {
+      "slug": "services",
+      "navLabel": "Services",
+      "title": "What Northfold does",
+      "description": "Brand identity, motion and websites, designed and built by one small team.",
+      "sections": [
+        {
+          "type": "prose",
+          "id": "what-we-do",
+          "heading": "One team for the brand and the site.",
+          "paragraphs": [
+            "We work with organisations that have something to show: a product, a place, a body of work. We start with what makes them different and design outward from there.",
+            "Because the same people design the identity and build the website, nothing gets lost in a handover. The decisions made in the brand carry straight into the pages."
+          ],
+          "aside": {
+            "heading": "Who we work with",
+            "text": "Cultural organisations, makers and product teams who care how their work is presented."
+          }
+        },
+        {
+          "type": "services",
+          "id": "services",
+          "heading": "Services",
+          "intro": "Most projects combine two or three of these.",
+          "items": [
+            { "name": "Brand identity", "summary": "Name, wordmark, type, colour and the rules that hold them together.", "details": ["Positioning workshop", "Wordmark and type system", "Guidelines"] },
+            { "name": "Motion identity", "summary": "How the brand moves: logo animation, transitions and the timing behind them.", "details": ["Motion principles", "Animated logo", "Social templates"] },
+            { "name": "Websites", "summary": "Designed and built in house, with motion that respects the people who prefer less of it.", "details": ["Art direction", "Design and build", "Accessibility review"] },
+            { "name": "Art direction", "summary": "Photography and illustration briefs that keep everything the brand makes recognisable.", "details": ["Shoot briefs", "Image guidelines"] }
+          ]
+        },
+        {
+          "type": "process",
+          "id": "process",
+          "heading": "How a project runs",
+          "intro": "Every project follows the same four steps, at a pace set together at the start.",
+          "steps": [
+            { "title": "Listen", "text": "We read everything you have, talk to the people who use it, and agree what the work has to change." },
+            { "title": "Shape", "text": "We design two or three directions at full size, with type and motion, so you can judge them as they will be seen." },
+            { "title": "Build", "text": "The chosen direction becomes the identity system and the website, built and reviewed in stages." },
+            { "title": "Hand over", "text": "You get the files, the guidelines and a walk-through, so your team can keep it going." }
+          ]
+        },
+        {
+          "type": "cta",
+          "id": "services-next",
+          "heading": "Start with a conversation.",
+          "text": "Send a few lines about the project. We will come back with questions, not a sales pitch."
+        }
+      ]
+    },
+    {
+      "slug": "contact",
+      "navLabel": "Contact",
+      "title": "Start a project with Northfold",
+      "description": "Tell Northfold about your project.",
+      "sections": [
+        {
+          "type": "contact",
+          "id": "contact",
+          "heading": "Start a project",
+          "intro": "Tell us what you are making, who it is for and when it needs to be ready.",
+          "formNote": "This form is not connected yet. Until it is, nothing you type here is sent; please use the email address on this page.",
+          "showDetails": true
+        },
+        {
+          "type": "faq",
+          "id": "questions",
+          "heading": "Before you write",
+          "items": [
+            { "q": "What should I include?", "a": "A few lines on what you are making, who it is for, and any dates that matter. Links to what you have now help." },
+            { "q": "Do you only take full brand and website projects?", "a": "No. Some projects are a website for an existing identity, or a motion system for a brand that already exists." },
+            { "q": "How do you reply?", "a": "By email, from one of the people who would work on the project." }
+          ]
+        }
+      ]
+    }
+  ],
+  "openQuestions": [
+    "Real case studies: which projects can be shown, and with what images and permissions?",
+    "Is there a phone line or studio address the site should show?"
+  ]
+}

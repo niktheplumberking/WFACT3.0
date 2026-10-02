@@ -152,3 +152,34 @@ roundups; dental website roundups (Colorlib, Delmain, Azuro); the Awwwards Motio
 - **Builder model**: ~~stay on Agent 37 or add a second provider~~ **Decided 2026-10-01 (Huraira): the builder stays on Agent 37.**
   M3 makes this workable for multi-page output by having the builder write content JSON for a committed starter instead of HTML.
 - **Image source**: which tool generates the images (Higgsfield access and budget are unconfirmed); needed by M5, not M1.
+
+## 11. M4 build notes (Track B, recorded 2026-10-02)
+
+What was built and the decisions taken on the way; each one is reversible and listed for Huraira's review.
+
+- **Starter**: `packages/frontend-loop/starters/track-b/` (starter 1.0.0), Next.js 16.3.8 App Router, `output: 'export'`,
+  `trailingSlash`, React 19.3, Tailwind 4.3, GSAP 3.15 + ScrollTrigger, Lenis 1.3, Lucide, self-hosted fonts from pinned
+  `@fontsource-variable` packages (three pairings: studio, editorial, technical). The builder writes `content.json`
+  (schema `track-b/1`) only; `scripts/routes.mjs` turns it into route files; no content text is ever written into code.
+- **Not used in starter 1.0.0, although allow-listed**: Motion (its ~125 KB per page was the difference between passing and
+  failing the 2.5 s mobile LCP budget for one magnetic button; GSAP, already needed, does the same with `quickTo`) and
+  shadcn/Radix (the mobile menu is a native modal `<dialog>`: focus moves in, the page behind is inert, Escape closes,
+  no library shipped). **Decision for Huraira**: accept, or ask for them back with the budget raised.
+- **Motion design**: one authored moment per section type (hero words rise and the headline drifts away; the statement is lit
+  word by word as it is read; the work reel pins and pans on wide screens; the process spine fills; the closing action leans
+  toward the pointer). Content is visible in the server HTML; the motion libraries load after first paint. Reduced motion:
+  no spatial animation, no smooth scroll, no pinning. Transform, opacity and colour only.
+- **Build**: `src/trackB/build.ts` copies the starter, writes content and computed colour tokens, probes its isolation, then
+  runs `npm ci --offline --ignore-scripts` and `next build --webpack` with no network (macOS `sandbox-exec`, Linux network
+  namespace) and an allow-listed environment. Webpack, not Turbopack: Turbopack opens a loopback port the sandbox refuses,
+  and it shipped more JavaScript per page here (719 KB vs 602 KB). Same content and starter give byte-identical output.
+- **Budget (proposal)**: `TRACK_B_BUDGET` in `packages/rendered-qa/src/rendered.ts`: LCP < 2.5 s (Lighthouse mobile,
+  simulated), CLS < 0.1, JavaScript < 700 KB decoded per page (measured 625 KB: React + Next.js ~442 KB, GSAP + Lenis
+  ~125 KB), and a motion budget (`render.motion-budget`): no layout property animated while scrolling, no time-based
+  CSS/Web animation over 1.5 s, at most 250 ms of main-thread blocking (long animation frames) across a scroll-through.
+- **QA changes that affect both tracks** (Track A suites pass unchanged): the QA server gzips text like a real host;
+  external-script bytes come from the browser's resource timing (the response hook had undercounted a Next.js page about
+  4x); cancelled requests (`net::ERR_ABORTED`) are not console errors; `render.reduced-motion` also catches script-driven
+  animation and smooth-scroll hijacking; `no-console-errors` allows a script the site itself ships and parses it.
+- **Screenshots for Track B** are taken in the resting (reduced-motion) layout: a pinned scroll scene has no faithful
+  full-page still. Every check still runs with motion on.

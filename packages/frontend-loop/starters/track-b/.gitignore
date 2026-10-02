@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+# Written by the build from the validated content (src/trackB/build.ts); never committed.
+content/
+# Route folders generated from content/site.json by scripts/routes.mjs (each holds a .generated marker).
+app/*/
+!app/fonts/
+lib/type.generated.ts
