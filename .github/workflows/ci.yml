@@ -92,10 +92,61 @@ jobs:
         run: for p in audit hermes agent-runtime; do (cd ../$p && npm ci); done
       - name: Install
         run: npm ci
+      # Step 4B M4: the Track B build installs the starter with `npm ci --offline` inside a network sandbox,
+      # so the starter's pinned packages must already be in the npm cache. This step (network allowed) is
+      # the "package cache"; the build itself never reaches the network.
+      - name: Warm the package cache with the Track B starter's pinned packages
+        working-directory: packages/frontend-loop/starters/track-b
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Typecheck
         run: npm run typecheck
-      - name: Unit tests
+      - name: Unit tests (Track B tests run the real isolated Next.js build)
         run: npm test
+
+  # Step 4B M4 acceptance: "the build runs in CI with no secrets in the build step and no network beyond
+  # the package cache". This job holds no secrets at all (none are referenced). The build step runs the
+  # isolated build (src/trackB/isolate.ts: a network namespace on Linux, an allow-listed environment,
+  # `npm ci --offline`), which probes its own isolation first and fails unless the network is unreachable
+  # and no unexpected variable is visible; the probe result is printed in the record. The static export is
+  # kept as a workflow artifact for inspection.
+  track-b-build:
+    name: Track B — isolated static build (no secrets, no network)
+    runs-on: ubuntu-latest
+    needs: guardrails
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: packages/frontend-loop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install linked packages (audit, hermes, agent-runtime)
+        run: for p in audit hermes agent-runtime; do (cd ../$p && npm ci); done
+      - name: Install
+        run: npm ci
+      # Step 4B M4: the Track B build installs the starter with `npm ci --offline` inside a network sandbox,
+      # so the starter's pinned packages must already be in the npm cache. This step (network allowed) is
+      # the "package cache"; the build itself never reaches the network.
+      - name: Warm the package cache with the Track B starter's pinned packages
+        working-directory: packages/frontend-loop/starters/track-b
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Isolated Track B build of the SYNTHETIC Northfold fixture
+        env:
+          WFACT_CANARY: "if this name appears in the build record, the environment leaked"
+        run: |
+          npm run build-track-b -- test/fixtures/track-b/northfold.brief.json test/fixtures/track-b/northfold.content.json "$RUNNER_TEMP/track-b-out" | tee "$RUNNER_TEMP/track-b-record.json"
+          if grep -q WFACT_CANARY "$RUNNER_TEMP/track-b-record.json"; then echo "::error::the build saw a variable from the job environment"; exit 1; fi
+          grep -q '"network": "blocked"' "$RUNNER_TEMP/track-b-record.json"
+          test -f "$RUNNER_TEMP/track-b-out/index.html" && test -f "$RUNNER_TEMP/track-b-out/services/index.html" && test -f "$RUNNER_TEMP/track-b-out/contact/index.html"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: track-b-static-export
+          path: |
+            ${{ runner.temp }}/track-b-out
+            ${{ runner.temp }}/track-b-record.json
+          retention-days: 14
 
   # Phase 5: the check registry runs for real here — this is the Manual's own Phase 5 exit check
   # ("a deliberately broken test build gets caught and returned before being marked done") proven
@@ -177,7 +228,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: guardrails
     # A hung browser must fail in minutes, not hold the job for GitHub's 6-hour default (first run, 2026-10-01).
-    timeout-minutes: 20
+    # 30 since Step 4B M4 (the Track B acceptance tests build a real site and run five browser fixtures).
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: packages/rendered-qa
@@ -191,6 +243,12 @@ jobs:
         run: for p in audit hermes agent-runtime frontend-loop verification; do (cd ../$p && npm ci); done
       - name: Install
         run: npm ci
+      # Step 4B M4: the Track B build installs the starter with `npm ci --offline` inside a network sandbox,
+      # so the starter's pinned packages must already be in the npm cache. This step (network allowed) is
+      # the "package cache"; the build itself never reaches the network.
+      - name: Warm the package cache with the Track B starter's pinned packages
+        working-directory: packages/frontend-loop/starters/track-b
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Fixtures are up to date (regenerate and diff)
@@ -301,7 +359,7 @@ jobs:
     name: Deploy Cockpit to Vercel (trunk only)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [guardrails, audit, hermes, agent-runtime, frontend-loop, verification, rendered-qa, workflow, planning, jobs-runner, build]
+    needs: [guardrails, audit, hermes, agent-runtime, frontend-loop, track-b-build, verification, rendered-qa, workflow, planning, jobs-runner, build]
     concurrency:
       group: deploy-cockpit
       cancel-in-progress: false

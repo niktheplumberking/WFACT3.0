@@ -57,6 +57,13 @@ jobs:
       - name: "Install packages (dependency order; file: links don't install linked deps)"
         run: for p in audit hermes agent-runtime frontend-loop verification planning rendered-qa workflow jobs; do (cd "packages/$p" && npm ci --no-audit --no-fund); done
 
+      # Step 4B M4: a Track B build installs the starter with `npm ci --offline` inside a network sandbox
+      # with an allow-listed environment (DOPPLER_TOKEN and every Doppler secret stay outside it). This
+      # step fills the package cache it reads from.
+      - name: Warm the package cache with the Track B starter's pinned packages
+        working-directory: packages/frontend-loop/starters/track-b
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
       # Step 4B M1: QA renders every built page in headless Chromium (screenshots, axe, Lighthouse).
       - name: Install Chromium for rendered QA
         working-directory: packages/rendered-qa
