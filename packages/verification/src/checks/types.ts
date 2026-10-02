@@ -30,8 +30,30 @@ export interface VerificationContext {
    * Step 4B M3: a multi-page site. Every text check runs on every page (details prefixed with the page
    * file); required sections are checked across the whole site. `html` is then the home page.
    */
-  site?: { files: Record<string, string>; pages: string[] };
+  site?: SiteFiles;
+  /**
+   * Step 4B M4: set by runChecks while a per-page check runs on one page of a site: the page's own file
+   * name and the whole site's files, so a check can tell a file the site ships (a Next.js chunk) from an
+   * external dependency.
+   */
+  pageOf?: { page: string; site: SiteFiles };
 }
+
+/**
+ * A multi-page site's files (Step 4B M3; nested paths and binary files since M4, for a Next.js export
+ * with `_next/static/...` chunks and fonts). Binary files are base64 text and listed in `binary`.
+ */
+export interface SiteFiles {
+  files: Record<string, string>;
+  pages: string[];
+  binary?: string[];
+}
+
+/**
+ * A safe site-relative file path: folders and names of letters, digits, "_", "." and "-", no leading dot,
+ * no "..", and an extension a static site serves. Shared by the QA agent, rendered QA and the workflow.
+ */
+export const SITE_FILE_RE = /^(?!.*\.\.)[A-Za-z0-9_][A-Za-z0-9_.-]*(\/[A-Za-z0-9_][A-Za-z0-9_.-]*)*\.(html|json|txt|xml|js|css|svg|woff2|woff|ico|png|jpg|jpeg|webp|avif|webmanifest)$/;
 
 export interface CheckResult {
   checkId: string;

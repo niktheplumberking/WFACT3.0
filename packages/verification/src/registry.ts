@@ -39,7 +39,7 @@ export const QA_GATE_CHECKS: Check[] = [...CHECK_REGISTRY, ...CLAIMS];
 export function runChecks(ctx: VerificationContext, checks: Check[] = CHECK_REGISTRY): CheckResult[] {
   const site = ctx.site;
   if (!site) return checks.map((check) => check.run(ctx));
-  const pageCtx = (html: string): VerificationContext => ({ ...ctx, html, site: undefined });
+  const pageCtx = (html: string, page?: string): VerificationContext => ({ ...ctx, html, site: undefined, ...(page ? { pageOf: { page, site } } : {}) });
   return checks.map((check) => {
     if (check.id === requiredSectionsCheck.id) {
       const r = check.run(pageCtx(site.pages.map((p) => site.files[p] ?? "").join("\n")));
@@ -52,7 +52,7 @@ export function runChecks(ctx: VerificationContext, checks: Check[] = CHECK_REGI
         details.push(`${page}: the page is missing from the site files`);
         continue;
       }
-      details.push(...check.run(pageCtx(html)).details.map((d) => `${page}: ${d}`));
+      details.push(...check.run(pageCtx(html, page)).details.map((d) => `${page}: ${d}`));
     }
     return { checkId: check.id, passed: details.length === 0, details };
   });

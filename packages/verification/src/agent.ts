@@ -9,7 +9,7 @@
  * agent did its job. The workflow (Stage 3) routes on `output.status`.
  */
 import { AgentInputError, type Agent } from "@wfact/agent-runtime";
-import type { AsyncCheckSuite, Check, VerificationContext } from "./checks/types.js";
+import { SITE_FILE_RE, type AsyncCheckSuite, type Check, type VerificationContext } from "./checks/types.js";
 import type { ModelClient } from "./modelClient.js";
 import { VerificationLoop, type VerificationResult } from "./verificationLoop.js";
 
@@ -36,19 +36,27 @@ function stringArray(value: unknown, field: string): string[] {
   return value;
 }
 
-/** Step 4B M3: a multi-page site. Page files are plain names (no folders, no "..") and each must exist. */
+/**
+ * Step 4B M3: a multi-page site. Every file path must be safe (SITE_FILE_RE: no "..", no absolute paths;
+ * folders allowed since M4) and every page must exist. Binary files (M4: fonts) are base64 and listed.
+ */
 function parseSite(value: unknown): NonNullable<VerificationContext["site"]> {
-  const s = (value ?? {}) as { files?: unknown; pages?: unknown };
+  const s = (value ?? {}) as { files?: unknown; pages?: unknown; binary?: unknown };
   if (typeof s.files !== "object" || s.files === null) throw new AgentInputError("site.files must be an object of file name → content");
   const files = s.files as Record<string, unknown>;
   const pages = stringArray(s.pages, "site.pages");
   if (pages.length === 0) throw new AgentInputError("site.pages must list at least one page");
   for (const [name, content] of Object.entries(files)) {
-    if (!/^[a-z0-9][a-z0-9-]*\.(html|json|txt|xml)$/.test(name)) throw new AgentInputError(`site file name ${JSON.stringify(name)} is not allowed`);
+    if (!SITE_FILE_RE.test(name)) throw new AgentInputError(`site file name ${JSON.stringify(name)} is not allowed`);
     if (typeof content !== "string") throw new AgentInputError(`site file ${name} must be text`);
   }
-  for (const p of pages) if (typeof files[p] !== "string") throw new AgentInputError(`site page ${p} has no file`);
-  return { files: files as Record<string, string>, pages };
+  for (const p of pages) if (typeof files[p] !== "string" || !p.endsWith(".html")) throw new AgentInputError(`site page ${p} has no file`);
+  const binary = s.binary === undefined ? [] : stringArray(s.binary, "site.binary");
+  for (const b of binary) {
+    if (files[b] === undefined) throw new AgentInputError(`site.binary lists ${b} but there is no such file`);
+    if (pages.includes(b)) throw new AgentInputError(`site page ${b} cannot be binary`);
+  }
+  return { files: files as Record<string, string>, pages, ...(binary.length ? { binary } : {}) };
 }
 
 export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaInput, VerificationResult> {

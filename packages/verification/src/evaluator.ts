@@ -51,7 +51,9 @@ export async function runEvaluator(
 
 /**
  * Step 4B M3: every page of a site, in nav order. The stylesheet repeated on each page is sent once
- * (on the first page) so the reviewer reads the content, not the same CSS four times.
+ * (on the first page) so the reviewer reads the content, not the same CSS four times. Since M4, inline
+ * scripts over 2 KB (a Next.js page repeats its whole content as a script payload) are replaced by a
+ * note with their size: the reviewer reads the rendered HTML, not the same text twice.
  */
 export function siteForReview(site: NonNullable<VerificationContext["site"]>): string {
   let firstStyle: string | null = null;
@@ -65,7 +67,10 @@ export function siteForReview(site: NonNullable<VerificationContext["site"]>): s
         }
         return style;
       });
-      return `\n===== PAGE: ${page} =====\n${html}`;
+      const lean = html.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, (tag, attrs: string, body: string) =>
+        body.length > 2048 ? `<script${attrs}>/* ${body.length} characters of inline script omitted for review */</script>` : tag,
+      );
+      return `\n===== PAGE: ${page} =====\n${lean}`;
     })
     .join("\n");
 }
