@@ -7,7 +7,7 @@
  *
  * Service-role only (writes and reads). The Cockpit reads via RLS (owner/admin) for previews.
  */
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { ARTIFACT_PATH_RE, CheckpointIntegrityError, type ArtifactStore, type StoredArtifact } from "./buildAndVerify.js";
 
 const BUCKET = "artifacts";
@@ -42,9 +42,23 @@ export const contentTypeFor = (relPath: string): string => {
 
 export class SupabaseArtifactStore implements ArtifactStore {
   private readonly base: string;
+  private readonly readBase: string;
 
   constructor(url: string, private readonly serviceKey: string, private readonly fetchImpl: typeof fetch = fetch) {
-    this.base = `${url.replace(/\/+$/, "")}/storage/v1/object/${BUCKET}`;
+    const root = `${url.replace(/\/+$/, "")}/storage/v1/object`;
+    this.base = `${root}/${BUCKET}`;
+    this.readBase = `${root}/authenticated/${BUCKET}`;
+  }
+
+  /**
+   * Reads bypass Supabase's CDN. A plain GET of /object/<bucket>/<path> is served from the edge cache
+   * (cf-cache-status: HIT) for some time after an upsert, even with cacheControl "no-cache", so a
+   * correction cycle that overwrites the site manifest read the previous cycle's copy and the hash check
+   * refused it (Cockpit jobs 21350a42 and 5ed238ac, 2026-10-01). The authenticated endpoint plus a
+   * one-off query string returned fresh bytes on every overwrite-then-read in a live probe.
+   */
+  private readUrl(relPath: string): string {
+    return `${this.readBase}/${relPath}?fresh=${randomUUID()}`;
   }
 
   private headers(extra: Record<string, string> = {}) {
@@ -75,7 +89,7 @@ export class SupabaseArtifactStore implements ArtifactStore {
   /** Raw read for callers that don't hold a checkpoint (e.g. a Cockpit "verify this page" job). */
   async read(relPath: string): Promise<string | null> {
     if (!PATH_RE.test(relPath)) throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(relPath)} is outside clients/<slug>/pages/ and clients/<slug>/sites/`);
-    const res = await this.fetchImpl(`${this.base}/${relPath}`, { headers: this.headers() });
+    const res = await this.fetchImpl(this.readUrl(relPath), { headers: this.headers() });
     if (res.status === 400 || res.status === 404) return null;
     if (!res.ok) throw new Error(`artifact download failed (HTTP ${res.status})`);
     return res.text();
@@ -83,7 +97,7 @@ export class SupabaseArtifactStore implements ArtifactStore {
 
   async readVerifiedBytes(artifact: StoredArtifact): Promise<Buffer> {
     if (!PATH_RE.test(artifact.path)) throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(artifact.path)} is outside clients/<slug>/pages/ and clients/<slug>/sites/`);
-    const res = await this.fetchImpl(`${this.base}/${artifact.path}`, { headers: this.headers() });
+    const res = await this.fetchImpl(this.readUrl(artifact.path), { headers: this.headers() });
     if (res.status === 400 || res.status === 404) throw new CheckpointIntegrityError(`checkpointed artifact ${artifact.path} is missing from storage`);
     if (!res.ok) throw new Error(`artifact download failed (HTTP ${res.status})`);
     const bytes = Buffer.from(await res.arrayBuffer());
