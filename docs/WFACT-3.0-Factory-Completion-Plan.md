@@ -10,8 +10,9 @@ to a Continuation Stage, that is noted.
 **Revised 2026-10-01**: added **Step 4B** (front-end upgrade: two build tracks, chosen per client) and **Step 4C** (Cockpit UI/UX
 redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
-**Status as of 2026-10-01 (evening)**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
-Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done; M4–M6 not started); Step 4C is **BUILT AND DEPLOYED**
+**Status as of 2026-10-02**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
+Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done, M4 PARTIAL: built and verified locally, CI run and live
+pipeline build pending; M5–M6 not started); Step 4C is **BUILT AND DEPLOYED**
 (`main` `fb08be3`, live signed-in check pending); Steps 5–24 are not started. Each step heading below carries its
 status; Part E is the checklist.
 
@@ -415,7 +416,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 4B — Front-end upgrade: two build tracks, chosen per client (P0) — IN PROGRESS (M0 mostly done, M1, M2 and M3 done)
+### STEP 4B — Front-end upgrade: two build tracks, chosen per client (P0) — IN PROGRESS (M0 mostly done, M1, M2 and M3 done, M4 partial)
 
 **Status: IN PROGRESS.** Design approved 2026-10-01. M0 decisions recorded in `docs/FRONTEND-UPGRADE-DESIGN.md` §10: reference sites
 per track (researched and checked live), niche taxonomy kept, AI images allowed if clearly labelled, $5 per-build spend ceiling.
@@ -425,7 +426,11 @@ credits; recorded in `packages/rendered-qa/config/reviewer.json`. See `PROGRESS.
 track choice, 14-case evaluation (track 14/14, niche 13/14). **Builder model decided 2026-10-01: stays on Agent 37.** **M3 DONE 2026-10-01**:
 committed Track A starter + content-as-data builder (Agent 37 writes content only), multi-page sites through QA/workflow/jobs (manifest
 checkpoint), migration 0012; acceptance fixtures pass/fail as required; live Summit Line build `2bfca49e` passed the whole gate and an
-independent re-check. See `PROGRESS.md`. **Next: M4 on GO.**
+independent re-check. See `PROGRESS.md`. **M4 PARTIAL 2026-10-02** (`a9f4dcf`…`13ec854`): Track B Next.js starter, isolated build
+(no network, allow-listed env, `npm ci --offline`, deterministic), artifact (output + source) checkpointed in the private bucket
+(migration 0014), Track B budget + motion budget, all fixtures fail as required, all suites green locally. **Open**: the CI run
+(needs a push; Huraira's call), a live Agent 37 pipeline build (needs a decision on the synthetic client's entity), the screenshot
+review's DR-SINGLE-DEFAULT-FONT verdict, and Huraira's decisions on the budgets and on Motion/Radix (design doc §11).
 
 **Depends on**: Step 4. Design approved by Huraira 2026-10-01: `docs/FRONTEND-UPGRADE-DESIGN.md` (v2 + Next.js for Track B).
 **Maps to**: Blueprint Phase 6-7 front-end loop, Playbook "Motion Sites + GSAP" and Stage 3 Assets; fixes the Step 4 finding that every
@@ -1436,7 +1441,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 3 | Retire plaintext secrets | **DONE** (`f74b0bc`); old CLI token listed as not verified, per the step's acceptance | 2026-09-30 | yes |
 | 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove | 2026-09-30 | yes |
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
-| 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done | 2026-10-01 | 2026-10-01 (design) |
+| 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done; M4 partial (`a9f4dcf`…`13ec854`, migration 0014; CI run and live pipeline build pending) | 2026-10-02 | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`; redeploy `fb08be3`, CI `36907274448`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
 | 5 | Documentation agent | not started | | |
 | 6 | Enforce agent permissions | not started | | |

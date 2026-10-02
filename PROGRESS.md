@@ -1,8 +1,9 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-01 (23:30 +05), via `/progress-sync` — folds in `70cd7d1`…`e76cff2` (Step 4C Phase 1 + build, migration 0013),
-`main` fast-forwarded to `e76cff2` on Huraira's word, CI run `36905237284` green including the Cockpit deploy, live deployment checked.
-Previous syncs: 2026-10-01 (19:20 +05) after Step 4B M2 (CI `36871379578`); earlier `289ec00`…`c0f3d29`.
+Last synced: 2026-10-02 (18:55 +05), via `/step-close 4B M4` — folds in `a9f4dcf`…`7267575` (Step 4B M4, migration 0014); not pushed,
+so no CI run yet; `main` and `origin/huraira-work` are at `fb08be3`, local `huraira-work` is ahead.
+Previous syncs: 2026-10-01 (23:30 +05) via `/progress-sync` (`70cd7d1`…`e76cff2`, Step 4C, CI `36905237284`); 2026-10-01 (19:20 +05)
+after Step 4B M2 (CI `36871379578`); earlier `289ec00`…`c0f3d29`.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
@@ -15,9 +16,10 @@ phases to numbered steps 1–24 and is the source for "Next up" below. Its Part 
 steps; this file tracks the Continuation Stages.
 
 **Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
-Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is about half done** (M0 6 of 7 inputs, M1, M2, M3 done; M4–M6
-not started), and **Step 4C is built and deployed** (2026-10-01): the redesigned Cockpit is live from `main` `e76cff2` (CI `36905237284`),
-but it has only been exercised with copied data, not yet with a real signed-in session. `main` and `huraira-work` are both at `e76cff2`.
+Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is IN PROGRESS** (M0 6 of 7 inputs, M1, M2, M3 done; **M4 PARTIAL**
+2026-10-02: built and verified locally, CI run and a live pipeline build pending; M5–M6 not started), and **Step 4C is built and deployed**
+(2026-10-01): the redesigned Cockpit is live from `main` (CI `36905237284`), but it has only been exercised with copied data, not yet with
+a real signed-in session. `main` is at `fb08be3`; local `huraira-work` is ahead and unpushed.
 **Biggest open items**: a first live signed-in pass of the new Cockpit, image tool (before M5), a different-vendor screenshot reviewer,
 Nick's real brief, a real Step 3A sign-up.
 
@@ -26,7 +28,9 @@ Nick's real brief, a real Step 3A sign-up.
    (the agent can't type a password). While there, close the two stuck jobs `a2a41d2d`, `cbf8bf7b` with "Close it" on their run pages
    (Activity, filter "Never started"); both are still `queued` today. Approving plan `b5a45a8e` as Track A and pressing Start build would
    also prove a Track A build through the real Cockpit job path.
-2. **Huraira**: review the Track A starter and the Step 4B M3 report, then GO for **Step 4B M4** (Track B, Next.js static export).
+2. **Huraira**: review the Step 4B M4 report and decide: push `huraira-work` (or open a PR to `main`) so CI runs the isolated Track B
+   build on Linux; the entity for a synthetic Track B client (entity law blocks a third client); the Track B budgets and leaving
+   Motion/Radix out of the starter (`docs/FRONTEND-UPGRADE-DESIGN.md` §11). Then GO to finish M4 (CI + live build) or for M5.
 3. **Huraira**: the screenshot reviewer (still Agent 37, same vendor as the builder; false positives in M3); image tool before M5;
    Supabase Auth settings and one real sign-up for Step 3A; the old Doppler CLI token check.
 
@@ -635,7 +639,7 @@ demonstrates the factory but does not count against DreamSign's 40+.
 
 Steps 1–4 and 3A are summarised at the top and in the plan's Part E; from Step 4B on, each milestone gets its checklist here.
 
-## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 6 of 7 inputs, M1 DONE with a recorded deviation, M2 DONE, M3 DONE 2026-10-01)
+## Step 4B — Front-end upgrade: two build tracks (IN PROGRESS — M0 6 of 7 inputs, M1 DONE with a recorded deviation, M2 DONE, M3 DONE 2026-10-01, M4 PARTIAL 2026-10-02)
 
 **M0 — inputs** (`docs/FRONTEND-UPGRADE-DESIGN.md` §10)
 - [x] Reference sites per track, niche taxonomy, labelled-AI-images policy, $5 per-build ceiling — `0fbdfce`, `0bfb19c`
@@ -751,7 +755,61 @@ browser against stubbed data and in the database by the attack test; a live clic
 over-budget fixture fail."* — **MET**: live run `2bfca49e` (3 pages) passed the text gate, rendered QA, the rulebook (DOM detectors and the
 screenshot review) and the Track A budgets, re-verified independently; both fixtures fail on the named checks only.
 
-**M4–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
+**M4 — Track B starter (Next.js static export) + multi-page build** (PARTIAL 2026-10-02 — CI run and live pipeline build pending)
+- [x] Committed Track B starter `packages/frontend-loop/starters/track-b/` (starter 1.0.0): Next.js 16.3.8 App Router, `output: 'export'`,
+      Tailwind 4.3, GSAP 3.15 + ScrollTrigger and Lenis 1.3 loaded after first paint, Lucide, self-hosted font pairings (studio:
+      Bricolage Grotesque + Geist; editorial: Newsreader + Hanken Grotesk; technical: Unbounded + Geist), every dependency pinned.
+      Design skills loaded first (impeccable, design-taste-frontend, high-end-visual-design, ecc:frontend-design-direction,
+      ecc:motion-foundations, ecc:motion-patterns, ecc:frontend-a11y). One motion idea per section type; content visible without
+      scripts; reduced motion = still. `3987b59`, `13ec854`
+- [x] Content as data `src/trackB/content.ts` (schema `track-b/1`): brief-sourced facts checked, SAMPLE work/quotes/facts labelled,
+      one h1 opener per page, no repeated layouts, required sections site-wide; palette with a contrast-safe `dim` colour. Builder loop and
+      agent: Agent 37 writes content only, a separate reviewer approves, the build runs once after approval; build failures escalate.
+- [x] **Isolated build** `src/trackB/isolate.ts` + `build.ts`: macOS `sandbox-exec` / Linux network namespace, allow-listed environment,
+      a probe before every build (3 outbound attempts fail with EPERM, raw TCP fails, a canary variable never reaches the build),
+      `npm ci --offline --ignore-scripts` (2.1 s) + `next build --webpack` (10.4 s); output byte-identical across builds (hash `a19eed34…`
+      in two separate runs); the built source is kept. CLI `npm run build-track-b`.
+- [x] **Artifact in the private bucket**: migration `0014_artifacts_track_b_types` (applied, version `20261002130540`; bucket still
+      private, 2 MB, 1 owner/admin read policy; `get_advisors`: nothing new). The real build was checkpointed through the production
+      `SupabaseArtifactStore`: 85 objects (55 output, 29 source, content.json) + manifest sha256 `31a29f7f…`, fonts stored as bytes, read
+      back hash-verified and identical; unauthenticated and anon-key reads refused (HTTP 400). SYNTHETIC objects under
+      `clients/northfold-studio/sites/track-b/` in the bucket. `e8b2eb7`
+- [x] Workflow, jobs, CLI: nested and binary site files, source under `_source/`, build record in the manifest; `--track B`; Track B
+      plans build with the Track B builder and `TRACK_B_BUDGET`; a runner without it refuses. One existing jobs test was reworded (it
+      asserted the M2 placeholder refusal). Workflow 15/15, jobs 12/12. `e8b2eb7`
+- [x] **Rendered QA for Track B** `5a1711d`: `TRACK_B_BUDGET` (proposal: LCP < 2.5 s, CLS < 0.1, JS < 700 KB decoded/page) and
+      `render.motion-budget` (no layout property animated while scrolling, no time-based animation over 1.5 s, <= 250 ms of
+      long-animation-frame blocking per scroll-through); `render.reduced-motion` now catches script-driven animation and smooth-scroll
+      hijacking. Shared fixes: gzip in the QA server, JS bytes from resource timing (the response hook undercounted ~4x),
+      `net::ERR_ABORTED` not an error, `no-console-errors` allows a site's own scripts and parses them (`a9f4dcf`).
+- [x] **Acceptance fixtures** (real Chromium, `packages/rendered-qa/test/trackB.test.ts` 8/8): the SYNTHETIC Northfold 3-page site
+      (real isolated build) passes the text gate on every page and every rendered check, the Track B budget and the motion budget
+      (LCP 1.80–2.32 s, CLS 0, ~625 KB JS, 0 ms scroll blocking, 11 animations on the home page); **broken link** fails `render.links`
+      (plus the matching 404 in the console from Next's prefetch); **over-budget JS** fails only `render.js-budget`; **over-budget
+      animation** (layout animated on scroll, 60 ms per frame) fails only `render.motion-budget`; **reduced motion ignored** (a script
+      animation, and forced smooth scroll) each fail only `render.reduced-motion`. All three pairings measured inside budget.
+- [x] Suites: verification 38/38, frontend-loop 55/55, rendered-qa 37/37 (full run), workflow 15/15, jobs 12/12; typechecks clean.
+- [x] CI wired (`a917cc3`): required job `track-b-build` (no secrets referenced; canary variable; fails unless the network was blocked;
+      uploads the export), cache warming in frontend-loop, rendered-qa and `cockpit-job.yml`; deploy needs the new job. **Not yet run.**
+- [ ] **CI run**: needs `huraira-work` pushed or a PR to `main` (Huraira's call). The Linux isolation path (`unshare`) is untested.
+- [ ] **Live pipeline build** (Agent 37 builder, Claude reviewer, Cockpit job or CLI): not run. A synthetic Track B client would be a
+      third client on an existing entity (entity law); needs Huraira's decision.
+- [ ] **Screenshot review** (Agent 37, same vendor): FAILED DR-SINGLE-DEFAULT-FONT (and DQ-TYPE-HIERARCHY once) on studio and on technical
+      pairings, although the web fonts are loaded and render (headline 1012 px in Bricolage vs 1030 px in the fallback). Same false
+      positive as M3; needs the different-vendor reviewer or Huraira's call.
+- Decisions recorded for Huraira (`docs/FRONTEND-UPGRADE-DESIGN.md` §11): Motion and Radix allow-listed but not used (LCP budget; native
+  `<dialog>` menu); webpack not Turbopack (sandbox, smaller JS); fonts `display: optional`; Track B stills in the resting layout.
+- Found on the way: Turbopack needs a loopback port (refused by the sandbox); a random temp folder made webpack output differ; dimming
+  text by opacity failed axe; Archivo's width file pushed LCP to 2.55 s; Lighthouse charged uncompressed JS before the gzip fix.
+
+**Exit check**: *"Track B starter (Next.js static export) + multi-page build. The build runs in CI with no secrets in the build step and
+no network beyond the package cache; artifact = static output + source in the private artifacts bucket with a checkpoint hash.
+Acceptance as M3, plus reduced-motion respected and an over-budget animation fixture fails."* — **PARTIALLY MET**. Met: the starter,
+the multi-page build, the isolated build (proven locally on macOS), the artifact in the private bucket with its checkpoint hash, rendered
+QA and budgets, reduced motion, and every fixture. Not met yet: the build has not run in CI (no push), the screenshot review did not pass
+(likely reviewer noise, unproven), and no live pipeline build.
+
+**M5–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
 
 ## Step 4C — Cockpit UI/UX redesign: the control room (BUILT AND DEPLOYED 2026-10-01 — live signed-in check pending)
 
