@@ -1,21 +1,21 @@
 # Graph Report - wfact-3.0-build  (2026-10-02)
 
 ## Corpus Check
-- 287 files · ~776,207 words
+- 287 files · ~777,014 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2815 nodes · 4652 edges · 268 communities (221 shown, 35 thin omitted)
+- 2816 nodes · 4653 edges · 268 communities (221 shown, 35 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 139 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `2d969623`
+- Built from commit: `7d6367d2`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- PilotBrief
+- src/loop.ts
 - WFACT 3.0 Complete Ecosystem Blueprint
 - buildAndVerify.ts
 - make-fixtures.ts
@@ -89,7 +89,7 @@
 - pg_temp.attack
 - Verification loop (Phase 5 check registry + evaluator)
 - M2 direction agent + track choice
-- rendered.test.ts
+- trackA/loop.ts
 - dependencies
 - Cockpit job workflow (cockpit-job.yml)
 - Decisions.tsx
@@ -231,15 +231,15 @@
 - public.entities
 - public.tasks
 - render.ts
-- frontend-loop/src/modelClient.ts
-- trackA/palette.ts
+- frontend-loop/src/cli.ts
+- PilotBrief
 - 2026-10-02-step-4B-M4.md
-- trackB/loop.ts
+- frontend-loop/test/trackB.test.ts
 - gsap.ts
 - rendered-qa/test/trackA.test.ts
 - track-b/package.json
 - state.tsx
-- FrontendLoopResult
+- trackB/loop.ts
 - compilerOptions
 - Step 4C, Phase 1: Cockpit audit, information architecture and design system
 - SupabaseArtifactStore
@@ -253,7 +253,7 @@
 - dependencies
 - Product
 - layout.tsx
-- brief.ts
+- rendered-qa/test/trackB.test.ts
 - /step-close — close out a step in both trackers
 - trackBSite.test.ts
 - CheckpointIntegrityError
@@ -316,9 +316,9 @@
 
 ## Communities (268 total, 35 thin omitted)
 
-### Community 0 - "PilotBrief"
-Cohesion: 0.17
-Nodes (15): createFrontendBuilderAgent(), FrontendBuildInput, PilotBrief, FrontendLoop, parseReviewResponse(), ReviewResult, SiteBuild, DESIGN_RULEBOOK (+7 more)
+### Community 0 - "src/loop.ts"
+Cohesion: 0.09
+Nodes (26): FRONT_END_BUILDER_ROLE, FrontendBuilderAgentOptions, FrontendBuildInput, BRIEF_SOURCES, InvalidBriefError, parseBrief(), REQUIRED_STRING_FIELDS, FrontendLoopOptions (+18 more)
 
 ### Community 1 - "WFACT 3.0 Complete Ecosystem Blueprint"
 Cohesion: 0.05
@@ -366,7 +366,7 @@ Nodes (31): dependencies, @anthropic-ai/sdk, @wfact/agent-runtime, @wfact/audit,
 
 ### Community 12 - "rendered-qa/src/index.ts"
 Cohesion: 0.08
-Nodes (35): RenderedQa, RenderedQaSetup, ReviewerSetup, RenderedQaOptions, RenderedSuite, Shot, TRACK_A_BUDGET, VIEWPORTS (+27 more)
+Nodes (38): RenderedQa, RenderedQaSetup, ReviewerSetup, pageUrl(), RenderedQaOptions, RenderedSuite, Shot, TRACK_A_BUDGET (+30 more)
 
 ### Community 13 - "ToolRegistry"
 Cohesion: 0.11
@@ -385,8 +385,8 @@ Cohesion: 0.07
 Nodes (29): dependencies, @anthropic-ai/sdk, @wfact/agent-runtime, @wfact/audit, @wfact/hermes-lite, zod, description, devDependencies (+21 more)
 
 ### Community 17 - "rendered.ts"
-Cohesion: 0.10
-Nodes (28): DESIGN_DETECTORS, HELPERS, INLINE_JS_BYTES, LAYOUT_PROBE, LINK_PROBE, MOTION_MARK, MOTION_PROBE, MOTION_REPORT (+20 more)
+Cohesion: 0.12
+Nodes (21): DESIGN_DETECTORS, HELPERS, INLINE_JS_BYTES, LAYOUT_PROBE, LINK_PROBE, MOTION_MARK, MOTION_PROBE, MOTION_REPORT (+13 more)
 
 ### Community 18 - "direction.ts"
 Cohesion: 0.10
@@ -517,8 +517,8 @@ Cohesion: 0.17
 Nodes (11): compilerOptions, esModuleInterop, module, moduleResolution, noUncheckedIndexedAccess, outDir, resolveJsonModule, skipLibCheck (+3 more)
 
 ### Community 50 - "trackB/content.ts"
-Cohesion: 0.06
-Nodes (30): Contact, CONTENT_SCHEMA_VERSION, Cta, Fact, FactSchema, Faq, H1_TYPES, Hero (+22 more)
+Cohesion: 0.07
+Nodes (28): Contact, Cta, Fact, FactSchema, Faq, H1_TYPES, Hero, Hex (+20 more)
 
 ### Community 51 - "compilerOptions"
 Cohesion: 0.17
@@ -612,9 +612,9 @@ Nodes (8): graphify Honesty Rules (never invent an edge), Never trust done, only
 Cohesion: 0.25
 Nodes (8): CI workflow (ci.yml), Deploy Cockpit to Vercel (trunk only) job, Rendered QA CI job (real Chromium, fixtures diff), Repo law & structure guardrails job (gitleaks, required files, plaintext secret block), Cockpit (control room PWA, apps/cockpit), Doppler secrets manager, Migration 0011_plan_build_track (no build without a track), M2 direction agent + track choice
 
-### Community 74 - "rendered.test.ts"
-Cohesion: 0.22
-Nodes (6): RenderedRun, designDir, RENDER_CASES, renderDir, repo, run()
+### Community 74 - "trackA/loop.ts"
+Cohesion: 0.17
+Nodes (15): createTrackABuilderAgent(), CONTENT_SCHEMA_VERSION, extractJson(), SITE_CONTENT_JSON_SCHEMA, SiteContent, BANNED_CLAIMS, briefBlock(), TRACK_A_TEMPLATE (+7 more)
 
 ### Community 75 - "dependencies"
 Cohesion: 0.29
@@ -1053,8 +1053,8 @@ Cohesion: 0.40
 Nodes (5): scripts/rls_attack_test.sql, ast_hash, mtime, seen, semantic_hash
 
 ### Community 185 - "trackA/content.ts"
-Cohesion: 0.07
-Nodes (38): createTrackABuilderAgent(), Areas, briefFactText(), Contact, CONTENT_SCHEMA_VERSION, Cta, digits(), extractJson() (+30 more)
+Cohesion: 0.09
+Nodes (25): Areas, briefFactText(), Contact, Cta, digits(), FactSchema, Faq, Hero (+17 more)
 
 ### Community 186 - "Sample Lead: Harbor Street Bakery (synthetic, Bennett & Co)"
 Cohesion: 0.50
@@ -1070,19 +1070,19 @@ Nodes (3): allowedOrigin(), EXTRA_ORIGINS, respond()
 
 ### Community 217 - "render.ts"
 Cohesion: 0.13
-Nodes (35): Fact, Page, Section, callLine(), comment(), contactFacts(), Ctx, esc() (+27 more)
+Nodes (34): Fact, Page, Section, callLine(), comment(), contactFacts(), Ctx, esc() (+26 more)
 
-### Community 218 - "frontend-loop/src/modelClient.ts"
+### Community 218 - "frontend-loop/src/cli.ts"
+Cohesion: 0.22
+Nodes (8): main(), appendCorrectionLogRows(), formatCorrectionSummary(), formatRoundRow(), Agent37ModelClient, ClaudeModelClient, modelClientFromEnv(), repoRoot()
+
+### Community 219 - "PilotBrief"
+Cohesion: 0.42
+Nodes (4): createFrontendBuilderAgent(), PilotBrief, FrontendLoop, PageTemplate
+
+### Community 221 - "frontend-loop/test/trackB.test.ts"
 Cohesion: 0.09
-Nodes (20): FRONT_END_BUILDER_ROLE, FrontendBuilderAgentOptions, main(), appendCorrectionLogRows(), formatCorrectionSummary(), formatRoundRow(), FrontendLoopOptions, Agent37ModelClient (+12 more)
-
-### Community 219 - "trackA/palette.ts"
-Cohesion: 0.36
-Nodes (12): BrandColors, buildPalette(), contrast(), luminance(), mix(), Palette, reach(), Rgb (+4 more)
-
-### Community 221 - "trackB/loop.ts"
-Cohesion: 0.11
-Nodes (33): BuildRecord, buildTrackBSite(), pageFile(), SKIP, STARTER_VERSION, starterSourceFiles(), TEXT_EXT, TrackBBuild (+25 more)
+Nodes (44): loadBrief(), TRACK_B_STARTER_DIR, BrandColors, buildPalette(), contrast(), luminance(), mix(), Palette (+36 more)
 
 ### Community 222 - "gsap.ts"
 Cohesion: 0.20
@@ -1100,9 +1100,9 @@ Nodes (22): description, react, react-dom, @types/node, @types/react, @types/rea
 Cohesion: 0.19
 Nodes (21): canDecide(), FactoryContext, FactoryProvider(), fetchAccounts(), fetchJobs(), fetchPlan(), fetchPlans(), Loaded (+13 more)
 
-### Community 230 - "FrontendLoopResult"
-Cohesion: 0.33
-Nodes (5): CorrectionRound, FrontendLoopResult, createTrackBBuilderAgent(), TrackBLoop, trackBSystemPrompt()
+### Community 230 - "trackB/loop.ts"
+Cohesion: 0.24
+Nodes (11): CorrectionRound, FrontendLoopResult, createTrackBBuilderAgent(), TrackBBuild, CONTENT_SCHEMA_VERSION, SITE_CONTENT_JSON_SCHEMA, SiteContent, TRACK_B_TEMPLATE (+3 more)
 
 ### Community 231 - "compilerOptions"
 Cohesion: 0.11
@@ -1156,9 +1156,9 @@ Nodes (11): Accessibility & Inclusion, Brand Commitments, Capabilities and Const
 Cohesion: 0.20
 Nodes (9): jsonLd(), metadata, RootLayout(), vars, viewport, MotionRoot(), palette, lenis (+1 more)
 
-### Community 244 - "brief.ts"
-Cohesion: 0.13
-Nodes (13): BRIEF_SOURCES, InvalidBriefError, loadBrief(), parseBrief(), REQUIRED_STRING_FIELDS, TRACK_B_TEMPLATE, validBrief, TRACK_B_BUDGET (+5 more)
+### Community 244 - "rendered-qa/test/trackB.test.ts"
+Cohesion: 0.10
+Nodes (17): checkLink(), evaluate(), RenderedRun, result(), runRenderedQa(), watch(), wheelThrough(), designDir (+9 more)
 
 ### Community 245 - "/step-close — close out a step in both trackers"
 Cohesion: 0.20
@@ -1218,13 +1218,13 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `Step 4C: Cockpit UI/UX redesign` and `Migration 0010 (account requests, approval function)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
+- **Why does `WFACT 3.0 Continuation Build Plan` connect `WFACT 3.0 Continuation Build Plan` to `WFACT 3.0 Complete Ecosystem Blueprint`, `WFACT 3.0 Factory Completion Plan`, `CLAUDE.md law file`, `Archive README`, `Cockpit Jobs (COCKPIT-JOBS.md)`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Why does `apps/cockpit/package.json` connect `apps/cockpit/package.json` to `manifest.json`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `WFACT 3.0 Continuation Build Plan` connect `WFACT 3.0 Continuation Build Plan` to `WFACT 3.0 Complete Ecosystem Blueprint`, `WFACT 3.0 Factory Completion Plan`, `CLAUDE.md law file`, `Archive README`, `Cockpit Jobs (COCKPIT-JOBS.md)`?**
-  _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **Why does `CLAUDE.md law file` connect `CLAUDE.md law file` to `Verification loop (Phase 5 check registry + evaluator)`, `M2 direction agent + track choice`, `graphify skill (SKILL.md)`, `Cockpit job workflow (cockpit-job.yml)`, `BLOCKED-ON-NICK tracker`, `WFACT 3.0 Continuation Build Plan`, `M1 rendered QA (headless Chromium, axe, Lighthouse, rulebook detectors)`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **What connects `notification-token-display.sh script`, `post-write-token-diff.sh script`, `pre-tool-bash-guard.sh script` to the rest of the system?**
   _1245 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `WFACT 3.0 Complete Ecosystem Blueprint` be split into smaller, more focused modules?**
-  _Cohesion score 0.053410893707033315 - nodes in this community are weakly interconnected._
+- **Should `src/loop.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.09408033826638477 - nodes in this community are weakly interconnected._
