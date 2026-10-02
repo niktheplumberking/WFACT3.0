@@ -411,9 +411,9 @@ function AfterDecision({ row }: { row: PlanRow }) {
         <span className="quiet">{row.decided_at ? dateTime(row.decided_at) : null}</span>
       </div>
       <div className="plate-body stack-tight">
-        {row.status === "approved" && row.build_track === "A" && (
+        {row.status === "approved" && row.build_track && (
           <>
-            <Notice tone="clear">Approved as Track A{row.track_overridden ? ", against the recommendation" : ""}.</Notice>
+            <Notice tone="clear">Approved as Track {row.build_track}{row.track_overridden ? ", against the recommendation" : ""}.</Notice>
             {active ? (
               <Link className="btn primary" to={`/activity/${active.id}`}>
                 See the build that's running
@@ -430,9 +430,6 @@ function AfterDecision({ row }: { row: PlanRow }) {
             )}
             <p className="quiet fine">Building and checking takes a few minutes. The result waits for your launch decision; nothing is published.</p>
           </>
-        )}
-        {row.status === "approved" && row.build_track === "B" && (
-          <Notice tone="caution">Approved as Track B. The Track B builder arrives in Step 4B M4, so this plan can't be built yet.</Notice>
         )}
         {row.status === "approved" && !row.build_track && (
           <Notice tone="caution">This plan was approved before the track choice existed, so it can't be built. Start a new request for this client and approve the new plan with a track.</Notice>

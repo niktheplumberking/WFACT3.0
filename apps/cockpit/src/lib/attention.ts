@@ -124,7 +124,7 @@ export function buildAttention({ plans, jobs, accounts, myId, canDecide, now = D
     }
   }
 
-  for (const p of plans.filter((x) => x.status === "approved" && x.build_track === "A")) {
+  for (const p of plans.filter((x) => x.status === "approved" && x.build_track)) {
     const everBuilt = jobs.some((j) => BUILD_KINDS.has(j.kind) && j.status !== "cancelled" && planIdOfJob(j, jobs) === p.id);
     if (!everBuilt) {
       items.push({
@@ -134,7 +134,7 @@ export function buildAttention({ plans, jobs, accounts, myId, canDecide, now = D
         isDecision: false,
         label: "Ready to build",
         title: `Start the build for ${planName(p)}`,
-        why: `Approved as Track A${p.decided_at ? ` on ${shortDate(p.decided_at)}` : ""}. Building and checking takes a few minutes; nothing is published.`,
+        why: `Approved as Track ${p.build_track}${p.decided_at ? ` on ${shortDate(p.decided_at)}` : ""}. Building and checking takes a few minutes; nothing is published.`,
         href: `/decisions/plans/${p.id}`,
         at: p.decided_at ?? p.created_at,
       });

@@ -124,7 +124,7 @@ export const TRACKS: { id: Track; name: string; summary: string }[] = [
   {
     id: "B",
     name: "Track B: motion-rich brand site",
-    summary: "Scroll-driven motion and rich sections. Can be approved now; its builder arrives in Step 4B M4.",
+    summary: "Scroll-driven motion and rich sections, built as a Next.js static site.",
   },
 ];
 
@@ -183,11 +183,11 @@ export function explainJobError(j: Pick<JobRow, "error" | "result" | "kind" | "g
       todo: "Ask Huraira to set the dispatch token (docs/COCKPIT-JOBS.md), then start the request again.",
     };
   }
-  if (/Track B builder is not built/i.test(e)) {
+  if (/no Track B builder configured/i.test(e)) {
     return {
-      headline: "the Track B builder isn't built yet",
-      happened: "This plan was approved as Track B, and the Track B builder arrives in Step 4B M4. Nothing ran.",
-      todo: "Wait for Step 4B M4, or re-plan the client and approve it as Track A.",
+      headline: "the factory worker has no Track B builder",
+      happened: "This plan was approved as Track B, but the factory worker that picked it up has no Track B builder. It was not built as Track A. Nothing ran.",
+      todo: "Ask Huraira to check the factory worker's Track B setup, then start the build again.",
     };
   }
   if (/no build track/i.test(e)) {

@@ -21,8 +21,8 @@ import { SignedIn } from "./App";
 
 const T = { timeout: 3000 };
 
-function start(path = "/", role: Role = "owner") {
-  h.fake = createFake(fixtures());
+function start(path = "/", role: Role = "owner", fx = fixtures()) {
+  h.fake = createFake(fx);
   let clicks = 0;
   const user = userEvent.setup();
   const click = async (el: Element) => {
@@ -117,6 +117,16 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     await t.click(await screen.findByRole("button", { name: "Build it again" }, T));
     expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "build_plan", params: { planId: PLAN_APPROVED } }) }));
     expect(t.clicks()).toBe(3);
+  });
+
+  it("start the first build of a plan approved as Track B", async () => {
+    const fx = fixtures();
+    fx.plan_approvals = fx.plan_approvals.map((p) => (p.id === PLAN_APPROVED ? { ...p, build_track: "B", track_overridden: true } : p));
+    fx.jobs = fx.jobs.filter((j) => (j.params as { planId?: string })?.planId !== PLAN_APPROVED);
+    const t = start(`/decisions/plans/${PLAN_APPROVED}`, "owner", fx);
+    expect(await screen.findByText(/Approved as Track B, against the recommendation/, {}, T)).toBeInTheDocument();
+    await t.click(screen.getByRole("button", { name: "Start build" }));
+    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "build_plan", params: { planId: PLAN_APPROVED } }) }));
   });
 
   it("open a run and see why it failed, then resume", async () => {
