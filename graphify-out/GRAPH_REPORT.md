@@ -1,27 +1,27 @@
 # Graph Report - wfact-3.0-build  (2026-10-02)
 
 ## Corpus Check
-- 287 files · ~777,014 words
+- 288 files · ~778,300 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2816 nodes · 4653 edges · 268 communities (221 shown, 35 thin omitted)
+- 2823 nodes · 4662 edges · 271 communities (222 shown, 37 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 139 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7d6367d2`
+- Built from commit: `49c512ad`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- src/loop.ts
+- trackB/loop.ts
 - WFACT 3.0 Complete Ecosystem Blueprint
 - buildAndVerify.ts
 - make-fixtures.ts
 - audit/src/index.ts
 - render.design-review check (cross-vendor screenshot reviewer)
-- handlers.test.ts
+- SupabaseJobStore
 - agent-runtime/src/index.ts
 - jobs/package.json
 - workflow/package.json
@@ -45,10 +45,10 @@
 - verificationLoop.ts
 - compilerOptions
 - audit/package.json
-- jobsClient.ts
-- Shell.tsx
-- claims.test.ts
 - App.tsx
+- Decisions.tsx
+- claims.test.ts
+- Misc.tsx
 - pipeline.ts
 - intake.ts
 - ui.tsx
@@ -74,25 +74,25 @@
 - WFACT 3.0 Continuation Build Plan
 - Cockpit Jobs (COCKPIT-JOBS.md)
 - verificationLoop.test.ts
-- M1 rendered QA (headless Chromium, axe, Lighthouse, rulebook detectors)
+- jobStore.ts
 - 0010_account_requests.sql
 - Lessons Ledger
-- WFACT Business Context (memory/context.md)
+- WFACT 3.0 Factory Completion Plan
 - planStore.ts
 - PlanStore
 - createRenderedQa
-- WFACT 3.0 Factory Completion Plan
-- Front-end Upgrade Design (Step 4B)
+- dependencies
+- handlers.test.ts
 - 0001_init_schema.sql
 - 0002_entity_consistency_triggers.sql
 - 0007_plan_approvals.sql
 - pg_temp.attack
 - Verification loop (Phase 5 check registry + evaluator)
-- M2 direction agent + track choice
-- trackA/loop.ts
+- handlers.ts
+- frontend-loop/test/trackA.test.ts
 - dependencies
-- Cockpit job workflow (cockpit-job.yml)
-- Decisions.tsx
+- 0015_jobs_archive.sql
+- model.ts
 - apps/cockpit/index.html
 - 0003_rls_policies.sql
 - 0004_security_advisor_fixes.sql
@@ -232,14 +232,14 @@
 - public.tasks
 - render.ts
 - frontend-loop/src/cli.ts
-- PilotBrief
+- frontend-loop/src/agent.ts
 - 2026-10-02-step-4B-M4.md
 - frontend-loop/test/trackB.test.ts
 - gsap.ts
 - rendered-qa/test/trackA.test.ts
 - track-b/package.json
 - state.tsx
-- trackB/loop.ts
+- PilotBrief
 - compilerOptions
 - Step 4C, Phase 1: Cockpit audit, information architecture and design system
 - SupabaseArtifactStore
@@ -266,16 +266,19 @@
 - setup.ts
 - scripts
 - server.ts
+- devDependencies
 - next.config.mjs
 - 0013_jobs_cancel.sql
 - 2026-10-01-step-4b-m3-track-a.md
 - stop-tracker-guard.sh
 - public.jobs
+- scripts
+- public.jobs
 
 ## God Nodes (most connected - your core abstractions)
 1. `PilotBrief` - 32 edges
-2. `WFACT 3.0 Complete Ecosystem Blueprint` - 21 edges
-3. `RunPage()` - 20 edges
+2. `RunPage()` - 22 edges
+3. `WFACT 3.0 Complete Ecosystem Blueprint` - 21 edges
 4. `useMe()` - 19 edges
 5. `VerificationContext` - 19 edges
 6. `render.design-review check (cross-vendor screenshot reviewer)` - 19 edges
@@ -293,8 +296,8 @@
   docs/WFACT SOPS/Claude outputs/WFACT-SOP-3-Post-Launch-Automation-Team-Ops.md → docs/WFACT SOPS/WFact SOP 3 — Post-Launch, Automation & Team Operations.pdf
 - `Rendered QA CI job (real Chromium, fixtures diff)` --implements--> `M1 rendered QA (headless Chromium, axe, Lighthouse, rulebook detectors)`  [INFERRED]
   .github/workflows/ci.yml → PROGRESS.md
-- `Repo law & structure guardrails job (gitleaks, required files, plaintext secret block)` --references--> `CLAUDE.md law file`  [INFERRED]
-  .github/workflows/ci.yml → CLAUDE.md
+- `graphify reference: commit hook and CLAUDE.md integration` --conceptually_related_to--> `CLAUDE.md law file`  [INFERRED]
+  .claude/skills/graphify/references/hooks.md → CLAUDE.md
 
 ## Import Cycles
 - None detected.
@@ -314,11 +317,11 @@
 - **Claims gate planted-failure fixtures** — packages_verification_test_fixtures_claims_banned_claim_banned_claim, packages_verification_test_fixtures_claims_invented_fact_invented_fact, packages_verification_test_fixtures_claims_leaked_text_leaked_text, packages_verification_test_fixtures_claims_missing_sample_missing_sample, packages_rendered_qa_readme_claims_gate [INFERRED 0.95]
 - **Rendered suite planted-failure fixtures** — packages_rendered_qa_test_fixtures_broken_link_broken_link, packages_rendered_qa_test_fixtures_console_error_console_error, packages_rendered_qa_test_fixtures_over_budget_js_over_budget_js, packages_rendered_qa_test_fixtures_reduced_motion_ignored_reduced_motion_ignored, packages_rendered_qa_readme_rendered_suite [INFERRED 0.95]
 
-## Communities (268 total, 35 thin omitted)
+## Communities (271 total, 37 thin omitted)
 
-### Community 0 - "src/loop.ts"
-Cohesion: 0.09
-Nodes (26): FRONT_END_BUILDER_ROLE, FrontendBuilderAgentOptions, FrontendBuildInput, BRIEF_SOURCES, InvalidBriefError, parseBrief(), REQUIRED_STRING_FIELDS, FrontendLoopOptions (+18 more)
+### Community 0 - "trackB/loop.ts"
+Cohesion: 0.12
+Nodes (22): FrontendBuilderAgentOptions, FrontendLoopOptions, parseReviewResponse(), ReviewResult, SiteBuild, MockModelClient, ModelClient, ModelNotConfiguredError (+14 more)
 
 ### Community 1 - "WFACT 3.0 Complete Ecosystem Blueprint"
 Cohesion: 0.05
@@ -340,17 +343,17 @@ Nodes (27): AuditContext, AuditEvent, AuditOutcome, AuditReader, auditReaderFrom
 Cohesion: 0.11
 Nodes (46): clean.html fixture (passes every deterministic check), DQ-ART-DIRECTION fixture (ignores brand direction (generic grey, no pine/cream/copper)), DQ-CONTENT-HIERARCHY fixture (hero says nothing about the business, three competing actions), DQ-MOBILE-READABLE fixture (tiny text and tap targets on phones), DQ-TYPE-HIERARCHY fixture (flat type scale, headline same size as body), DR-CENTRED-EVERYTHING fixture (centred-everything layout), DR-EMOJI-ICONS fixture (emoji used as icons), DR-EYEBROW-OVERUSE fixture (uppercase eyebrow above every heading) (+38 more)
 
-### Community 6 - "handlers.test.ts"
-Cohesion: 0.08
-Nodes (23): handleJob(), HandlerDeps, JobOutcome, planningOutcome(), uuid(), workflowOutcome(), Job, JobKind (+15 more)
+### Community 6 - "SupabaseJobStore"
+Cohesion: 0.27
+Nodes (7): HandlerDeps, SupabaseJobStore, buildDeps(), ghRunUrl(), main(), need(), REPO_ROOT
 
 ### Community 7 - "agent-runtime/src/index.ts"
 Cohesion: 0.10
 Nodes (16): Agent, AgentInputError, AgentRun, AgentRunContext, AgentRunStatus, AgentTask, AgentDefinition, AgentNotRegisteredError (+8 more)
 
 ### Community 8 - "jobs/package.json"
-Cohesion: 0.06
-Nodes (33): dependencies, @wfact/agent-runtime, @wfact/audit, @wfact/frontend-loop, @wfact/hermes-lite, @wfact/planning, @wfact/rendered-qa, @wfact/verification (+25 more)
+Cohesion: 0.12
+Nodes (16): description, exports, tsx, @types/node, typescript, @wfact/agent-runtime, @wfact/audit, @wfact/frontend-loop (+8 more)
 
 ### Community 9 - "workflow/package.json"
 Cohesion: 0.06
@@ -436,21 +439,21 @@ Nodes (17): compilerOptions, isolatedModules, jsx, lib, module, moduleResolution
 Cohesion: 0.11
 Nodes (17): description, devDependencies, tsx, @types/node, typescript, exports, tsx, @types/node (+9 more)
 
-### Community 30 - "jobsClient.ts"
-Cohesion: 0.09
-Nodes (15): AccessPending(), Login(), MIN_PASSWORD_LENGTH, Mode, SetPassword(), Status, Notice(), cancelJob() (+7 more)
+### Community 30 - "App.tsx"
+Cohesion: 0.07
+Nodes (26): AccountsTab, Activity, App(), FixRounds, Home, NotFound, PlanPage, PlansTab (+18 more)
 
-### Community 31 - "Shell.tsx"
-Cohesion: 0.14
-Nodes (19): dispatchJob(), requestJob(), useFactory(), useToast(), AccountsTab(), decide(), go(), DecisionPanel() (+11 more)
+### Community 31 - "Decisions.tsx"
+Cohesion: 0.22
+Nodes (10): useFactory(), useToast(), AccountsTab(), decide(), DecisionPanel(), StageMove(), Tabs(), NewRequest() (+2 more)
 
 ### Community 32 - "claims.test.ts"
 Cohesion: 0.20
 Nodes (9): CLAIMS_CHECKS, CLAIMS_CHECKS, QA_GATE_CHECKS, brief, cleanCtx(), ctx(), PLANTED, read() (+1 more)
 
-### Community 33 - "App.tsx"
-Cohesion: 0.07
-Nodes (36): AccountsTab, Activity, App(), ComingSoon, Costs, FixRounds, Home, More (+28 more)
+### Community 33 - "Misc.tsx"
+Cohesion: 0.09
+Nodes (25): ComingSoon, Costs, More, Empty(), LoadError(), Plate(), applyTheme(), readThemePref() (+17 more)
 
 ### Community 34 - "pipeline.ts"
 Cohesion: 0.19
@@ -461,12 +464,12 @@ Cohesion: 0.14
 Nodes (10): entityAmbiguity(), IntakeResultSchema, LEAD_TYPES, MODEL_INTAKE_JSON_SCHEMA, ModelIntakeSchema, RawRequest, slugify(), JsonModelClient (+2 more)
 
 ### Community 36 - "ui.tsx"
-Cohesion: 0.12
-Nodes (23): ConfirmDialog(), PagePreview(), load(), RouteLine(), previewHtml(), statusLine(), accounts, f (+15 more)
+Cohesion: 0.22
+Nodes (13): PagePreview(), load(), RouteLine(), previewHtml(), move(), GATE_STAGES, LAUNCH_STAGE, Stage (+5 more)
 
 ### Community 37 - "CLAUDE.md law file"
-Cohesion: 0.16
-Nodes (15): Hermes-lite fallback disclosure, Hostinger descoped; Vercel substitutes for proof run, CLAUDE.md law file, Entity law (one client per entity, N-capable), Factory Completion Plan (Steps 1-24), The Five Pillars (Memory, Factory, Models, UI/UX, Build workflow), Governance split (Nick, Huraira, Atif, Toby), Hermes controller (decides, never executes) (+7 more)
+Cohesion: 0.10
+Nodes (25): CI workflow (ci.yml), Deploy Cockpit to Vercel (trunk only) job, Rendered QA CI job (real Chromium, fixtures diff), Repo law & structure guardrails job (gitleaks, required files, plaintext secret block), Cockpit job workflow (cockpit-job.yml), dispatch-job Supabase Edge Function, Mark job failed safety net (--mark-failed), job_id UUID validation (injection safety) (+17 more)
 
 ### Community 38 - "planning.test.ts"
 Cohesion: 0.18
@@ -477,8 +480,8 @@ Cohesion: 0.14
 Nodes (11): assemblePlan(), createPlannerAgent(), EXECUTABLE_STAGES, MODEL_PLAN_JSON_SCHEMA, ModelPlanSchema, PLAN_VERSION, PLANNER_DEFINITION, PlannerInput (+3 more)
 
 ### Community 40 - "Activity.tsx"
-Cohesion: 0.13
-Nodes (35): Aspect(), isActive(), isStaleQueued(), AttentionItem, AttentionKind, BUILD_KINDS, buildAttention(), latestBuildByPlan() (+27 more)
+Cohesion: 0.11
+Nodes (38): ConfirmDialog(), archiveJob(), cancelJob(), dispatchJob(), isActive(), isFinished(), isStaleQueued(), JOB_COLUMNS (+30 more)
 
 ### Community 41 - "graphify skill (SKILL.md)"
 Cohesion: 0.17
@@ -517,8 +520,8 @@ Cohesion: 0.17
 Nodes (11): compilerOptions, esModuleInterop, module, moduleResolution, noUncheckedIndexedAccess, outDir, resolveJsonModule, skipLibCheck (+3 more)
 
 ### Community 50 - "trackB/content.ts"
-Cohesion: 0.07
-Nodes (28): Contact, Cta, Fact, FactSchema, Faq, H1_TYPES, Hero, Hex (+20 more)
+Cohesion: 0.06
+Nodes (30): Contact, CONTENT_SCHEMA_VERSION, Cta, Fact, FactSchema, Faq, H1_TYPES, Hero (+22 more)
 
 ### Community 51 - "compilerOptions"
 Cohesion: 0.17
@@ -533,12 +536,12 @@ Cohesion: 0.17
 Nodes (11): compilerOptions, esModuleInterop, module, moduleResolution, noUncheckedIndexedAccess, outDir, resolveJsonModule, skipLibCheck (+3 more)
 
 ### Community 54 - "BLOCKED-ON-NICK tracker"
-Cohesion: 0.29
-Nodes (11): BLOCKED-ON-NICK tracker, Agent 37 (self-hosted Hermes Agent gateway), $5 per-build spend ceiling, Comp and scope, closed in writing, One real pilot project brief (from Nick), dreamsign-pilot client memory, clean-agency template, DreamSign clean-agency homepage (built page) (+3 more)
+Cohesion: 0.13
+Nodes (24): Completion: Step 4B M1 rendered QA + claims gate, BLOCKED-ON-NICK tracker, Agent 37 (self-hosted Hermes Agent gateway), $5 per-build spend ceiling, Builder model decision (Agent 37 vs second provider), Comp and scope, closed in writing, OpenAI credits for Step 4B screenshot reviewer (worked around), One real pilot project brief (from Nick) (+16 more)
 
 ### Community 55 - "Archive README"
-Cohesion: 0.20
-Nodes (11): Graph Report snapshot 2026-09-28, WFACT 3.0 Nick Progress Update (archived), WFACT 3.0 Nick Requirements (archived), Archive README, Fast-Track Plan (old copy), WFACT 3.0 Fast-Track Plan, Non-skippable quality gates, WFACT 3.0 100-Hour Build Plan (Nick) (+3 more)
+Cohesion: 0.17
+Nodes (13): Graph Report snapshot 2026-09-28, WFACT 3.0 Nick Progress Update (archived), WFACT 3.0 Nick Requirements (archived), Archive README, Fast-Track Plan (old copy), WFACT 3.0 Execution Roadmap, Operating principles (verify, revenue first, one loop), WFACT 3.0 Fast-Track Plan (+5 more)
 
 ### Community 56 - "WFACT 3.0 Continuation Build Plan"
 Cohesion: 0.20
@@ -552,21 +555,21 @@ Nodes (11): Cockpit Jobs (COCKPIT-JOBS.md), cockpit-job.yml GitHub workflow, dis
 Cohesion: 0.18
 Nodes (5): MockModelClient, FIXTURES_DIR, brokenCtx, cleanCtx, FIXTURES_DIR
 
-### Community 59 - "M1 rendered QA (headless Chromium, axe, Lighthouse, rulebook detectors)"
-Cohesion: 0.24
-Nodes (10): Completion: Step 4B M1 rendered QA + claims gate, Builder model decision (Agent 37 vs second provider), OpenAI credits for Step 4B screenshot reviewer (worked around), Evaluator never same instance/vendor as builder, Correction-round log (vs DreamSign 2.0 40+ baseline), Design rulebook v1.0.0 (frontend-loop/design/rulebook.json), Same-vendor screenshot reviewer deviation (reviewer.json), Step 4B: front-end upgrade, two build tracks (+2 more)
+### Community 59 - "jobStore.ts"
+Cohesion: 0.18
+Nodes (5): Job, JobKind, JobStatus, JobStore, MemoryJobStore
 
 ### Community 60 - "0010_account_requests.sql"
 Cohesion: 0.22
 Nodes (8): auth, on_auth_user_created_request, private.is_owner(), public.account_requests, public.decide_account_request(), auth.users, public.profiles, private.handle_new_auth_user
 
 ### Community 61 - "Lessons Ledger"
-Cohesion: 0.27
-Nodes (10): Direction step agent (niche, brand direction, track recommendation), Step 8: Task/event queue and durable execution, Lessons Ledger, Connects is not works: anon key returns zero rows, RLS helper recursion lesson (SECURITY DEFINER in private schema), RLS Attack Test Results, Cross-entity isolation attack test, is_owner_or_admin() helper (+2 more)
+Cohesion: 0.21
+Nodes (12): Claims gate (content-as-data, cited facts or SAMPLE labels), Step 4C: Cockpit UI/UX redesign, Step 8: Task/event queue and durable execution, Lessons Ledger, Connects is not works: anon key returns zero rows, Pin the escaped defect as gate acceptance fixture, RLS helper recursion lesson (SECURITY DEFINER in private schema), RLS Attack Test Results (+4 more)
 
-### Community 62 - "WFACT Business Context (memory/context.md)"
-Cohesion: 0.24
-Nodes (10): Step 4B milestones M0-M6, Definition of Done goals (Blueprint 16K), Step 4: Full run on the pilot brief, WFACT Business Context (memory/context.md), Bennett & Co entity, Correction-batch benchmark (DreamSign 40+), DreamSign entity, 11-stage pipeline (Playbook section 7) (+2 more)
+### Community 62 - "WFACT 3.0 Factory Completion Plan"
+Cohesion: 0.13
+Nodes (24): No deploy button rule, Front-end Upgrade Design (Step 4B), Design rulebook (rulebook.json, anti-AI-slop), Step 4B milestones M0-M6, Rendered QA (screenshots at 1440/768/375, cross-vendor review), Track A: local business, conversion-first, Track B: motion-rich brand site (Next.js), Documentation Index (+16 more)
 
 ### Community 63 - "planStore.ts"
 Cohesion: 0.38
@@ -580,13 +583,13 @@ Nodes (4): PlanningDeps, PlanStore, SupabasePlanStore, toStored()
 Cohesion: 0.38
 Nodes (8): arg(), flag(), main(), createRenderedQa(), reviewerFromEnv(), productionQaOptions(), ProductionQaSetup, Budget
 
-### Community 66 - "WFACT 3.0 Factory Completion Plan"
+### Community 66 - "dependencies"
 Cohesion: 0.22
-Nodes (9): WFACT 3.0 Execution Roadmap, Operating principles (verify, revenue first, one loop), Stage 6: Episodic memory v1.5, WFACT 3.0 Factory Completion Plan, Standard Operating Rules (Part C), Step 4C: Cockpit UI/UX redesign, Step 5: Documentation agent and episodic memory, Step report format and GO gate (+1 more)
+Nodes (9): dependencies, @wfact/agent-runtime, @wfact/audit, @wfact/frontend-loop, @wfact/hermes-lite, @wfact/planning, @wfact/rendered-qa, @wfact/verification (+1 more)
 
-### Community 67 - "Front-end Upgrade Design (Step 4B)"
-Cohesion: 0.31
-Nodes (9): Front-end Upgrade Design (Step 4B), Claims gate (content-as-data, cited facts or SAMPLE labels), Design rulebook (rulebook.json, anti-AI-slop), Rendered QA (screenshots at 1440/768/375, cross-vendor review), Track A: local business, conversion-first, Track B: motion-rich brand site (Next.js), Design quality rule (no AI slop), Step 4B: Front-end upgrade, two build tracks (+1 more)
+### Community 67 - "handlers.test.ts"
+Cohesion: 0.22
+Nodes (6): BROKEN, CLEAN, FIXTURES, intakeOut, planOut, @wfact/workflow
 
 ### Community 68 - "0001_init_schema.sql"
 Cohesion: 0.44
@@ -605,28 +608,24 @@ Cohesion: 0.22
 Nodes (8): public.account_requests, public.model_traces, pg_temp.attack(), public.audit_log, public.clients, public.jobs, public.plan_approvals, public.profiles
 
 ### Community 72 - "Verification loop (Phase 5 check registry + evaluator)"
-Cohesion: 0.25
-Nodes (8): graphify Honesty Rules (never invent an edge), Never trust done, only verified, Step 4 defects the automated checks missed (leaked tool text, unlabelled testimonials, invented facts), 6 deterministic checks (secrets, responsive, console, images, isolation, sections), Verification loop (Phase 5 check registry + evaluator), Four verification statuses (never collapsed boolean), Broken fixture page (fails all 6 checks), Clean fixture page (passes all 6 checks)
+Cohesion: 0.22
+Nodes (9): graphify Honesty Rules (never invent an edge), Evaluator never same instance/vendor as builder, Never trust done, only verified, Step 4 defects the automated checks missed (leaked tool text, unlabelled testimonials, invented facts), 6 deterministic checks (secrets, responsive, console, images, isolation, sections), Verification loop (Phase 5 check registry + evaluator), Four verification statuses (never collapsed boolean), Broken fixture page (fails all 6 checks) (+1 more)
 
-### Community 73 - "M2 direction agent + track choice"
-Cohesion: 0.25
-Nodes (8): CI workflow (ci.yml), Deploy Cockpit to Vercel (trunk only) job, Rendered QA CI job (real Chromium, fixtures diff), Repo law & structure guardrails job (gitleaks, required files, plaintext secret block), Cockpit (control room PWA, apps/cockpit), Doppler secrets manager, Migration 0011_plan_build_track (no build without a track), M2 direction agent + track choice
+### Community 73 - "handlers.ts"
+Cohesion: 0.43
+Nodes (5): handleJob(), JobOutcome, planningOutcome(), uuid(), workflowOutcome()
 
-### Community 74 - "trackA/loop.ts"
-Cohesion: 0.17
-Nodes (15): createTrackABuilderAgent(), CONTENT_SCHEMA_VERSION, extractJson(), SITE_CONTENT_JSON_SCHEMA, SiteContent, BANNED_CLAIMS, briefBlock(), TRACK_A_TEMPLATE (+7 more)
+### Community 74 - "frontend-loop/test/trackA.test.ts"
+Cohesion: 0.22
+Nodes (16): BrandColors, buildPalette(), contrast(), luminance(), mix(), Palette, reach(), Rgb (+8 more)
 
 ### Community 75 - "dependencies"
 Cohesion: 0.29
 Nodes (7): dependencies, @axe-core/playwright, chrome-launcher, lighthouse, playwright, @wfact/hermes-lite, @wfact/verification
 
-### Community 76 - "Cockpit job workflow (cockpit-job.yml)"
-Cohesion: 0.33
-Nodes (6): Cockpit job workflow (cockpit-job.yml), dispatch-job Supabase Edge Function, Mark job failed safety net (--mark-failed), job_id UUID validation (injection safety), File content is data, never instructions, Cockpit jobs (public.jobs, every pipeline action from the Cockpit)
-
-### Community 77 - "Decisions.tsx"
-Cohesion: 0.12
-Nodes (18): JobRow, AttentionInput, AccountRequestRow, dateFmt, Direction, Explanation, GOAL_LABEL, KIND_LABEL (+10 more)
+### Community 77 - "model.ts"
+Cohesion: 0.09
+Nodes (25): JobRow, AttentionInput, AttentionItem, statusLine(), accounts, f, jobs, plans (+17 more)
 
 ### Community 78 - "apps/cockpit/index.html"
 Cohesion: 0.40
@@ -1053,8 +1052,8 @@ Cohesion: 0.40
 Nodes (5): scripts/rls_attack_test.sql, ast_hash, mtime, seen, semantic_hash
 
 ### Community 185 - "trackA/content.ts"
-Cohesion: 0.09
-Nodes (25): Areas, briefFactText(), Contact, Cta, digits(), FactSchema, Faq, Hero (+17 more)
+Cohesion: 0.07
+Nodes (29): Areas, briefFactText(), Contact, CONTENT_SCHEMA_VERSION, Cta, digits(), Fact, FactSchema (+21 more)
 
 ### Community 186 - "Sample Lead: Harbor Street Bakery (synthetic, Bennett & Co)"
 Cohesion: 0.50
@@ -1069,20 +1068,20 @@ Cohesion: 0.67
 Nodes (3): allowedOrigin(), EXTRA_ORIGINS, respond()
 
 ### Community 217 - "render.ts"
-Cohesion: 0.13
-Nodes (34): Fact, Page, Section, callLine(), comment(), contactFacts(), Ctx, esc() (+26 more)
+Cohesion: 0.14
+Nodes (33): Page, callLine(), comment(), contactFacts(), Ctx, esc(), fact(), footer() (+25 more)
 
 ### Community 218 - "frontend-loop/src/cli.ts"
-Cohesion: 0.22
-Nodes (8): main(), appendCorrectionLogRows(), formatCorrectionSummary(), formatRoundRow(), Agent37ModelClient, ClaudeModelClient, modelClientFromEnv(), repoRoot()
+Cohesion: 0.20
+Nodes (10): main(), appendCorrectionLogRows(), formatCorrectionSummary(), formatRoundRow(), CorrectionRound, Agent37ModelClient, ClaudeModelClient, modelClientFromEnv() (+2 more)
 
-### Community 219 - "PilotBrief"
-Cohesion: 0.42
-Nodes (4): createFrontendBuilderAgent(), PilotBrief, FrontendLoop, PageTemplate
+### Community 219 - "frontend-loop/src/agent.ts"
+Cohesion: 0.27
+Nodes (6): createFrontendBuilderAgent(), FRONT_END_BUILDER_ROLE, FrontendBuildInput, FrontendLoop, PageTemplate, rawBrief
 
 ### Community 221 - "frontend-loop/test/trackB.test.ts"
-Cohesion: 0.09
-Nodes (44): loadBrief(), TRACK_B_STARTER_DIR, BrandColors, buildPalette(), contrast(), luminance(), mix(), Palette (+36 more)
+Cohesion: 0.08
+Nodes (38): BRIEF_SOURCES, InvalidBriefError, loadBrief(), parseBrief(), REQUIRED_STRING_FIELDS, TRACK_B_STARTER_DIR, BuildRecord, buildTrackBSite() (+30 more)
 
 ### Community 222 - "gsap.ts"
 Cohesion: 0.20
@@ -1097,12 +1096,12 @@ Cohesion: 0.09
 Nodes (22): description, react, react-dom, @types/node, @types/react, @types/react-dom, typescript, name (+14 more)
 
 ### Community 229 - "state.tsx"
-Cohesion: 0.19
-Nodes (21): canDecide(), FactoryContext, FactoryProvider(), fetchAccounts(), fetchJobs(), fetchPlan(), fetchPlans(), Loaded (+13 more)
+Cohesion: 0.16
+Nodes (16): PLAN_COLUMNS, FactoryContext, FactoryProvider(), fetchAccounts(), fetchJob(), fetchJobs(), fetchPlan(), fetchPlans() (+8 more)
 
-### Community 230 - "trackB/loop.ts"
+### Community 230 - "PilotBrief"
 Cohesion: 0.24
-Nodes (11): CorrectionRound, FrontendLoopResult, createTrackBBuilderAgent(), TrackBBuild, CONTENT_SCHEMA_VERSION, SITE_CONTENT_JSON_SCHEMA, SiteContent, TRACK_B_TEMPLATE (+3 more)
+Nodes (11): PilotBrief, FrontendLoopResult, createTrackABuilderAgent(), SiteContent, briefBlock(), TrackALoop, trackASystemPrompt(), createTrackBBuilderAgent() (+3 more)
 
 ### Community 231 - "compilerOptions"
 Cohesion: 0.11
@@ -1125,8 +1124,8 @@ Cohesion: 0.13
 Nodes (14): Contact, Cta, Faq, Hero, Page, Process, Prose, Quote (+6 more)
 
 ### Community 236 - "Work.tsx"
-Cohesion: 0.15
-Nodes (11): NewRequest, ProjectPage, Projects, Loading(), PageHead(), RoundRow, AddClientOrProject(), ClientRow (+3 more)
+Cohesion: 0.13
+Nodes (27): NewRequest, ProjectPage, Aspect(), Loading(), PageHead(), recentlyFinished(), KIND_LABEL, RoundRow (+19 more)
 
 ### Community 237 - "PageView.tsx"
 Cohesion: 0.29
@@ -1200,6 +1199,14 @@ Nodes (6): scripts, build, dev, preview, test, typecheck
 Cohesion: 0.40
 Nodes (4): COMPRESSIBLE, serveDirectory(), StaticServer, TYPES
 
+### Community 257 - "devDependencies"
+Cohesion: 0.50
+Nodes (4): devDependencies, tsx, @types/node, typescript
+
+### Community 269 - "scripts"
+Cohesion: 0.50
+Nodes (4): scripts, run-job, test, typecheck
+
 ## Ambiguous Edges - Review These
 - `WFACT SOP (PDF)` → `WFact SOP 1 — Sales & Onboarding (PDF)`  [AMBIGUOUS]
   docs/WFACT SOPS/WFACT SOP.pdf · relation: conceptually_related_to
@@ -1208,8 +1215,8 @@ Nodes (4): COMPRESSIBLE, serveDirectory(), StaticServer, TYPES
 
 ## Knowledge Gaps
 - **1245 isolated node(s):** `notification-token-display.sh script`, `post-write-token-diff.sh script`, `pre-tool-bash-guard.sh script`, `pre-tool-read-guard.sh script`, `pre-tool-token-guard.sh script` (+1240 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1513 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **35 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 1516 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -1218,13 +1225,13 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `Step 4C: Cockpit UI/UX redesign` and `Migration 0010 (account requests, approval function)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `WFACT 3.0 Continuation Build Plan` connect `WFACT 3.0 Continuation Build Plan` to `WFACT 3.0 Complete Ecosystem Blueprint`, `WFACT 3.0 Factory Completion Plan`, `CLAUDE.md law file`, `Archive README`, `Cockpit Jobs (COCKPIT-JOBS.md)`?**
+- **Why does `WFACT 3.0 Continuation Build Plan` connect `WFACT 3.0 Continuation Build Plan` to `WFACT 3.0 Complete Ecosystem Blueprint`, `CLAUDE.md law file`, `Archive README`, `Cockpit Jobs (COCKPIT-JOBS.md)`, `WFACT 3.0 Factory Completion Plan`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `apps/cockpit/package.json` connect `apps/cockpit/package.json` to `manifest.json`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `CLAUDE.md law file` connect `CLAUDE.md law file` to `Verification loop (Phase 5 check registry + evaluator)`, `M2 direction agent + track choice`, `graphify skill (SKILL.md)`, `Cockpit job workflow (cockpit-job.yml)`, `BLOCKED-ON-NICK tracker`, `WFACT 3.0 Continuation Build Plan`, `M1 rendered QA (headless Chromium, axe, Lighthouse, rulebook detectors)`?**
+- **Why does `CLAUDE.md law file` connect `CLAUDE.md law file` to `Verification loop (Phase 5 check registry + evaluator)`, `graphify skill (SKILL.md)`, `WFACT 3.0 Continuation Build Plan`, `BLOCKED-ON-NICK tracker`?**
+  _High betweenness centrality (0.003) - this node is a cross-community bridge._
+- **Why does `WFACT 3.0 Complete Ecosystem Blueprint` connect `WFACT 3.0 Complete Ecosystem Blueprint` to `WFACT 3.0 Continuation Build Plan`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **What connects `notification-token-display.sh script`, `post-write-token-diff.sh script`, `pre-tool-bash-guard.sh script` to the rest of the system?**
   _1245 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `src/loop.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.09408033826638477 - nodes in this community are weakly interconnected._
+- **Should `trackB/loop.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.11904761904761904 - nodes in this community are weakly interconnected._

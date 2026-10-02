@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1790951207.4799457,
-    "seen": 1790961764.7771578,
-    "ast_hash": "a78144220575d8fc980c346a5a5ed3d8",
+    "mtime": 1790962797.59981,
+    "seen": 1790962811.8629801,
+    "ast_hash": "28d2ff8e684ecf51f53b3660d6c3f6fe",
     "semantic_hash": ""
   },
   "README.md": {
@@ -978,9 +978,9 @@
     "semantic_hash": "80f9adff6743f67eb51ed83977eae2c3"
   },
   "apps/cockpit/src/jobsClient.ts": {
-    "mtime": 1790875079.7199588,
-    "seen": 1790949140.3589702,
-    "ast_hash": "df2ede6a9f56f5440d4708260bd7dc54",
+    "mtime": 1790962333.7608159,
+    "seen": 1790962811.856413,
+    "ast_hash": "dd8b357dc144d7c3ef065f862db88d37",
     "semantic_hash": ""
   },
   "packages/db/migrations/0009_jobs.sql": {
@@ -1656,15 +1656,15 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/flows.test.tsx": {
-    "mtime": 1790960899.9993355,
-    "seen": 1790961764.7741141,
-    "ast_hash": "ee76b4d71688b0d724d4830f1e9c3860",
+    "mtime": 1790962372.2186759,
+    "seen": 1790962811.85641,
+    "ast_hash": "bfef11f37ba266a04c76f49803ed5043",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/attention.ts": {
-    "mtime": 1790960883.2548947,
-    "seen": 1790961764.7741282,
-    "ast_hash": "49fba3553facc9e5442ca0519c49c0fb",
+    "mtime": 1790962333.7609494,
+    "seen": 1790962811.856415,
+    "ast_hash": "043f2b310b2bdf063f37d2e131dc0e1b",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/lib.test.ts": {
@@ -1686,9 +1686,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Activity.tsx": {
-    "mtime": 1790875720.4762242,
-    "seen": 1790949140.358977,
-    "ast_hash": "9e3cb60b151041e1bab84a865540c914",
+    "mtime": 1790962363.4655497,
+    "seen": 1790962811.856608,
+    "ast_hash": "d5244a52c770a9eb42ee79c8cb0e2561",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Decisions.tsx": {
@@ -1722,9 +1722,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/test/fake.ts": {
-    "mtime": 1790876211.7382767,
-    "seen": 1790949140.359025,
-    "ast_hash": "caa08d2eea8a15a614a17bb9487382e8",
+    "mtime": 1790962351.7843328,
+    "seen": 1790962811.857086,
+    "ast_hash": "669fa540ae51e8dc684af6ca2b3f71d1",
     "semantic_hash": ""
   },
   "apps/cockpit/src/test/setup.ts": {
@@ -2751,6 +2751,12 @@
     "mtime": 1790949243.8622818,
     "seen": 1790950701.930492,
     "ast_hash": "ffffa40eacf90b7f3dfec255555629fc",
+    "semantic_hash": ""
+  },
+  "packages/db/migrations/0015_jobs_archive.sql": {
+    "mtime": 1790962268.1863697,
+    "seen": 1790962811.8586922,
+    "ast_hash": "7f4f160becec0b43667569f0c3654c7f",
     "semantic_hash": ""
   }
 }
