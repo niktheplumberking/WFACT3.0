@@ -1,8 +1,10 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-02 (18:55 +05), via `/step-close 4B M4` — folds in `a9f4dcf`…`7267575` (Step 4B M4, migration 0014); not pushed,
-so no CI run yet; `main` and `origin/huraira-work` are at `fb08be3`, local `huraira-work` is ahead.
-Previous syncs: 2026-10-01 (23:30 +05) via `/progress-sync` (`70cd7d1`…`e76cff2`, Step 4C, CI `36905237284`); 2026-10-01 (19:20 +05)
+Last synced: 2026-10-02 (20:05 +05), via `/progress-sync` — folds in the push of `a9f4dcf`…`2d96962` to both branches (Huraira's word),
+CI `37016971442` green on `2d96962` (all 13 jobs incl. the new isolated Track B build and the Cockpit deploy), the other session's
+`c857150`…`0f00cde` (artifact-store CDN fix; CI `37019326469` still running at sync), and the live `jobs`/`plan_approvals`/`audit_log`
+rows. `main`, `origin/huraira-work` and local `huraira-work` are all at `0f00cde`.
+Previous syncs: 2026-10-02 (18:55 +05) via `/step-close 4B M4` (`a9f4dcf`…`7267575`); 2026-10-01 (23:30 +05) via `/progress-sync` (`70cd7d1`…`e76cff2`, Step 4C, CI `36905237284`); 2026-10-01 (19:20 +05)
 after Step 4B M2 (CI `36871379578`); earlier `289ec00`…`c0f3d29`.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
@@ -17,20 +19,20 @@ steps; this file tracks the Continuation Stages.
 
 **Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
 Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is IN PROGRESS** (M0 6 of 7 inputs, M1, M2, M3 done; **M4 PARTIAL**
-2026-10-02: built and verified locally, CI run and a live pipeline build pending; M5–M6 not started), and **Step 4C is built and deployed**
-(2026-10-01): the redesigned Cockpit is live from `main` (CI `36905237284`), but it has only been exercised with copied data, not yet with
-a real signed-in session. `main` is at `fb08be3`; local `huraira-work` is ahead and unpushed.
-**Biggest open items**: a first live signed-in pass of the new Cockpit, image tool (before M5), a different-vendor screenshot reviewer,
-Nick's real brief, a real Step 3A sign-up.
+2026-10-02: built, verified locally and in CI `37016971442`; screenshot review and a live pipeline build pending; M5–M6 not started), and
+**Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
+signed-in use on 2026-10-01: plan `b5a45a8e` approved as Track A (audited) and two Track A builds started from the Cockpit; both halted
+on a CDN bug that is now fixed but not yet re-run live. A full room-by-room signed-in check is still Huraira's to confirm.
+**Biggest open items**: a fresh live Track A build after the CDN fix, the claims-gate "best time" false positive (it now costs live
+correction rounds), a different-vendor screenshot reviewer, the image tool (before M5), Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
-1. **Huraira**: sign in to the live Cockpit once and click through Home, a plan, a run and Settings: the first check with a real session
-   (the agent can't type a password). While there, close the two stuck jobs `a2a41d2d`, `cbf8bf7b` with "Close it" on their run pages
-   (Activity, filter "Never started"); both are still `queued` today. Approving plan `b5a45a8e` as Track A and pressing Start build would
-   also prove a Track A build through the real Cockpit job path.
-2. **Huraira**: review the Step 4B M4 report and decide: push `huraira-work` (or open a PR to `main`) so CI runs the isolated Track B
-   build on Linux; the entity for a synthetic Track B client (entity law blocks a third client); the Track B budgets and leaving
-   Motion/Radix out of the starter (`docs/FRONTEND-UPGRADE-DESIGN.md` §11). Then GO to finish M4 (CI + live build) or for M5.
+1. **Huraira**: once CI `37019326469` (the CDN fix) is green and deployed, start a **fresh** Track A build of plan `b5a45a8e` from the
+   Cockpit (do not resume the halted runs). While there, close the two stuck jobs `a2a41d2d`, `cbf8bf7b` (still `queued` today) and
+   confirm you clicked through Home, a plan, a run and Settings, which closes Step 4C's live check.
+2. **Huraira**: decide on the Step 4B M4 open items: the entity for a synthetic Track B client (entity law blocks a third client; needed
+   for the live Track B build), the Track B budgets, and leaving Motion/Radix out of the starter (`docs/FRONTEND-UPGRADE-DESIGN.md` §11).
+   Then GO to finish M4 (live build) or for M5.
 3. **Huraira**: the screenshot reviewer (still Agent 37, same vendor as the builder; false positives in M3); image tool before M5;
    Supabase Auth settings and one real sign-up for Step 3A; the old Doppler CLI token check.
 
@@ -39,9 +41,14 @@ Nick's real brief, a real Step 3A sign-up.
   (the only dead path found in a link check of the 7 main docs this sync).
 - **Two ways in to QA still differ**: `packages/verification`'s old `npm run verify` CLI runs only the original six checks; the M1 gate is
   in `npm run qa` (rendered-qa), the jobs runner and the workflow CLI.
-- **The Factory Completion Plan has no step for richer or multi-page output.** The builder is limited by design to one text-only HTML
-  file (`frontend-loop/src/loop.ts:140`, `planner.ts:93`) and every check reads text only. Added as Step 4B (Option B), design in
-  `docs/FRONTEND-UPGRADE-DESIGN.md`, now in the committed plan. M1 adds rendered checks; multi-page output is M3/M4.
+- **The claims gate's BC-SUPERLATIVE rule flags "the best time to reach you"** (noted in M3) and has now cost live correction rounds:
+  both Cockpit Track A jobs (`21350a42`, `5ed238ac`) failed QA cycle 0 on exactly this ("best time", "what time of day works best"). The
+  rule (`packages/verification/config/claims-rules.json` v1.0.0) needs a narrower pattern; not changed in this sync.
+- **Track B output is reproducible per platform, not across platforms**: the same content gives output hash `a19eed34…` on macOS (two
+  runs) and `0209e11b…` on the Linux CI runner. A checkpoint is always re-hashed against its own build, so nothing breaks, but "same
+  content = same bytes" holds per platform only.
+- **On GitHub's runner, unprivileged user namespaces are refused**, so the Track B build isolates with `sudo unshare --net` and drops back
+  to the runner user (`linux-sudo-unshare`); a host without passwordless sudo or unprivileged namespaces refuses to build, by design.
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
   moment Stage 6 finishes". The rows exist ("One real pilot project brief", "business rules session")
   but are still framed as sprint Day 3–9 items.
@@ -674,7 +681,8 @@ Steps 1–4 and 3A are summarised at the top and in the plan's Part E; from Step
 - [x] Clean fixture is clean by the rulebook, not only by the detectors: the first live review failed it on DR-THREE-CARD-ROW and
       DR-REPEATED-RHYTHM (fair: three white cards; three list sections in a row); the generator's base was redesigned (featured pull-quote,
       split services, numbered timeline) and all fixtures regenerated; it then passed. rendered-qa 24/24, verification 35/35.
-- [ ] Chromium step in `.github/workflows/cockpit-job.yml` exercised by a real Cockpit job: none run since 2026-09-30 (`jobs` table checked)
+- [ ] Chromium step in `.github/workflows/cockpit-job.yml` exercised by a real Cockpit job: the 2026-10-01 jobs `21350a42` and `5ed238ac` ran
+      QA on the runner but failed on the text gate (`claims.banned`) before any rendered result is recorded; not yet proven (`audit_log` checked)
 - [ ] Reviewer cost written to `model_traces` (today only in CLI output and `report.json`)
 
 **Exit check**: *"re-checking the Step 4 artifact (sha256 960b61ba...) FAILS on the leaked tool text, the unlabelled testimonials and the
@@ -701,7 +709,9 @@ works, but on the builder's own vendor by Huraira's recorded decision, so this p
       pre-selected, overridable; approve disabled until a track is chosen; Actions builds Track A only (Track B waits for M4). Checked in the
       browser with the real component and stubbed data (desktop + 375 px: no overflow, 76 px options, approve sends `build_track`).
 - [x] Jobs handler refuses no-track and Track B builds (jobs 10/10; 2 existing tests now approve with Track A, as M2 requires).
-- [ ] Live owner choice in the deployed Cockpit: waiting on **Huraira** (approve `b5a45a8e`); the database side is proven by the attack test.
+- [x] Live owner choice: plan `b5a45a8e` approved as **Track A** by a signed-in owner (actor `baf92ea7…`) at 2026-10-01 18:23:35 UTC,
+      recommended A, not overridden, written to `audit_log` as `plan.decision` (queried at sync). Deployed vs local Cockpit is not
+      distinguishable from the rows.
 - Known effects: the 2 plans approved before 0011 cannot be built (no track); all 14 eval requests were entity-ambiguous at Intake (they
   name no WFACT entity), which in the live pipeline stops before Direction until a human assigns the entity.
 
@@ -747,7 +757,9 @@ browser against stubbed data and in the database by the attack test; a live clic
 - **Reviewer noise** (Agent 37, same vendor): DR-SINGLE-DEFAULT-FONT failed twice on pages whose fonts (Iowan Old Style + Avenir Next)
   were proven loaded in the QA browser; DR-THIN-LOW-CONTRAST once although axe colour-contrast passed. Claims-gate false positive:
   BC-SUPERLATIVE matches "the best time to reach you"
-- [ ] Track A built by a real Cockpit job (GitHub Actions): not run (needs a push to `main` and plan `b5a45a8e` approved; Huraira's call).
+- [ ] Track A built by a real Cockpit job (GitHub Actions): run twice (jobs `21350a42`, `5ed238ac`, 2026-10-01): build checkpointed, QA
+      cycle 0 failed `claims.banned` (BC-SUPERLATIVE false positive), cycle 1 halted `checkpoint_corrupt` (Supabase CDN served the old
+      manifest). CDN fix `c857150`; a fresh live build is still owed (Huraira).
       On the Linux runner the starter's system fonts are not installed, so screenshots there show fallback faces
 - [ ] "Human-reviewed starter": waiting on Huraira's look
 
@@ -755,7 +767,7 @@ browser against stubbed data and in the database by the attack test; a live clic
 over-budget fixture fail."* — **MET**: live run `2bfca49e` (3 pages) passed the text gate, rendered QA, the rulebook (DOM detectors and the
 screenshot review) and the Track A budgets, re-verified independently; both fixtures fail on the named checks only.
 
-**M4 — Track B starter (Next.js static export) + multi-page build** (PARTIAL 2026-10-02 — CI run and live pipeline build pending)
+**M4 — Track B starter (Next.js static export) + multi-page build** (PARTIAL 2026-10-02 — CI green; screenshot review and live pipeline build pending)
 - [x] Committed Track B starter `packages/frontend-loop/starters/track-b/` (starter 1.0.0): Next.js 16.3.8 App Router, `output: 'export'`,
       Tailwind 4.3, GSAP 3.15 + ScrollTrigger and Lenis 1.3 loaded after first paint, Lucide, self-hosted font pairings (studio:
       Bricolage Grotesque + Geist; editorial: Newsreader + Hanken Grotesk; technical: Unbounded + Geist), every dependency pinned.
@@ -790,8 +802,11 @@ screenshot review) and the Track A budgets, re-verified independently; both fixt
       animation, and forced smooth scroll) each fail only `render.reduced-motion`. All three pairings measured inside budget.
 - [x] Suites: verification 38/38, frontend-loop 55/55, rendered-qa 37/37 (full run), workflow 15/15, jobs 12/12; typechecks clean.
 - [x] CI wired (`a917cc3`): required job `track-b-build` (no secrets referenced; canary variable; fails unless the network was blocked;
-      uploads the export), cache warming in frontend-loop, rendered-qa and `cockpit-job.yml`; deploy needs the new job. **Not yet run.**
-- [ ] **CI run**: needs `huraira-work` pushed or a PR to `main` (Huraira's call). The Linux isolation path (`unshare`) is untested.
+      uploads the export), cache warming in frontend-loop, rendered-qa and `cockpit-job.yml`; deploy needs the new job.
+- [x] **CI run** `37016971442` on `2d96962` (pushed on Huraira's word): all 13 jobs green, including **Track B — isolated static build**:
+      isolation `linux-sudo-unshare`, network blocked (registry EAI_AGAIN, 1.1.1.1 ENETUNREACH, IPv6 EADDRNOTAVAIL), `unexpectedEnv: []`,
+      canary absent, install 7.8 s, build 21.3 s, output hash `0209e11b…`; the frontend-loop and rendered-qa jobs ran the real Track B
+      build and the 8 acceptance fixtures on Linux; the Cockpit deploy also succeeded.
 - [ ] **Live pipeline build** (Agent 37 builder, Claude reviewer, Cockpit job or CLI): not run. A synthetic Track B client would be a
       third client on an existing entity (entity law); needs Huraira's decision.
 - [ ] **Screenshot review** (Agent 37, same vendor): FAILED DR-SINGLE-DEFAULT-FONT (and DQ-TYPE-HIERARCHY once) on studio and on technical
@@ -806,8 +821,8 @@ screenshot review) and the Track A budgets, re-verified independently; both fixt
 no network beyond the package cache; artifact = static output + source in the private artifacts bucket with a checkpoint hash.
 Acceptance as M3, plus reduced-motion respected and an over-budget animation fixture fails."* — **PARTIALLY MET**. Met: the starter,
 the multi-page build, the isolated build (proven locally on macOS), the artifact in the private bucket with its checkpoint hash, rendered
-QA and budgets, reduced motion, and every fixture. Not met yet: the build has not run in CI (no push), the screenshot review did not pass
-(likely reviewer noise, unproven), and no live pipeline build.
+QA and budgets, reduced motion, and every fixture, and (since this sync) the isolated build in CI `37016971442` on Linux. Not met yet:
+the screenshot review did not pass (likely reviewer noise, unproven), and no live pipeline build.
 
 **Fix 2026-10-02 — live Cockpit site builds refused their own checkpoint** (FIXED locally and against the live bucket; live Cockpit build
 not yet re-run). Cockpit jobs `21350a42` and `5ed238ac` (Summit Line, Track A) both halted `checkpoint_corrupt` on cycle 1: the
