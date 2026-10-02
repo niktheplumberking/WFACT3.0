@@ -809,6 +809,15 @@ the multi-page build, the isolated build (proven locally on macOS), the artifact
 QA and budgets, reduced motion, and every fixture. Not met yet: the build has not run in CI (no push), the screenshot review did not pass
 (likely reviewer noise, unproven), and no live pipeline build.
 
+**Fix 2026-10-02 — live Cockpit site builds refused their own checkpoint** (FIXED locally and against the live bucket; live Cockpit build
+not yet re-run). Cockpit jobs `21350a42` and `5ed238ac` (Summit Line, Track A) both halted `checkpoint_corrupt` on cycle 1: the
+correction round overwrote `site.manifest.json` and the read-back was served from Supabase's CDN (`cf-cache-status: HIT`, the
+previous cycle's bytes) despite `cacheControl: no-cache`. Live probe: plain GETs stale 6/6 after overwrite; authenticated endpoint and a
+one-off query string fresh 6/6. `SupabaseArtifactStore` now reads via `/object/authenticated/artifacts/…?fresh=<uuid>`; the hash check
+is unchanged. New `packages/workflow/test/supabaseArtifacts.test.ts` fails on the old code, passes now; workflow tests 17/17;
+live overwrite-then-verify 8/8 with the real store. Job `8e577598` ("already ended with workflow.halt") was a resume of a halted run,
+correctly refused. Next: start a fresh build from the Cockpit (do not resume the halted runs).
+
 **M5–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
 
 ## Step 4C — Cockpit UI/UX redesign: the control room (BUILT AND DEPLOYED 2026-10-01 — live signed-in check pending)
