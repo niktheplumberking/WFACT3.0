@@ -6,7 +6,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { MockModelClient } from "../src/modelClient.js";
@@ -174,4 +174,16 @@ test("agent: Track B revisions need the content JSON; the builder and reviewer m
   assert.equal(agent.parseInput({ brief }).template.id, "track-b");
   assert.throws(() => agent.parseInput({ brief, revision: { html: "", issues: ["x"] } }), /revision\.contentJson/);
   assert.equal(agent.parseInput({ brief, revision: { issues: ["[render.links] x"], contentJson: "{}" } }).revision!.contentJson, "{}");
+});
+
+test("every type pairing stays inside the font weight that keeps mobile LCP in budget (M4: a 90 KB display file broke it)", () => {
+  const starter = path.join(import.meta.dirname, "..", "starters", "track-b");
+  const routes = readFileSync(path.join(starter, "scripts", "routes.mjs"), "utf-8");
+  const faces = Object.fromEntries([...routes.matchAll(/^\s+(\w+): \["([^"]+)"/gm)].map((m) => [m[1]!, m[2]!]));
+  const pairings = JSON.parse(routes.match(/const PAIRINGS = (\{[^\n]+\});/)![1]!.replace(/(\w+):/g, '"$1":'));
+  for (const [name, [display, text]] of Object.entries(pairings as Record<string, [string, string]>)) {
+    const bytes = [display, text].reduce((n, f) => n + statSync(path.join(starter, "node_modules", "@fontsource-variable", faces[f]!)).size, 0);
+    assert.ok(bytes <= 100 * 1024, `${name}: ${bytes} bytes of fonts`);
+  }
+  assert.deepEqual(Object.keys(pairings).sort(), ["editorial", "studio", "technical"]);
 });

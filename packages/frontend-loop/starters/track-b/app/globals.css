@@ -34,9 +34,8 @@
   --display-track: -0.025em;
 }
 [data-pairing="technical"] {
-  --display-weight: 700;
-  --display-track: -0.02em;
-  --display-stretch: 118%;
+  --display-weight: 600;
+  --display-track: -0.03em;
 }
 
 html {

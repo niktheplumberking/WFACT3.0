@@ -36,12 +36,14 @@ for (const page of pages.slice(1)) {
 const FACES = {
   bricolage: ["bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2", "200 800", '"ui-sans-serif", "system-ui", "sans-serif"'],
   newsreader: ["newsreader/files/newsreader-latin-wght-normal.woff2", "200 800", '"ui-serif", "Georgia", "serif"'],
-  archivo: ["archivo/files/archivo-latin-wdth-normal.woff2", "100 900", '"ui-sans-serif", "system-ui", "sans-serif"'],
+  unbounded: ["unbounded/files/unbounded-latin-wght-normal.woff2", "200 900", '"ui-sans-serif", "system-ui", "sans-serif"'],
   geist: ["geist/files/geist-latin-wght-normal.woff2", "100 900", '"ui-sans-serif", "system-ui", "sans-serif"'],
   hanken: ["hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2", "100 900", '"ui-sans-serif", "system-ui", "sans-serif"'],
 };
-// studio: characterful grotesque + neutral text; editorial: sharp text serif + grotesque; technical: expanded width axis + neutral text.
-const PAIRINGS = { studio: ["bricolage", "geist"], editorial: ["newsreader", "hanken"], technical: ["archivo", "geist"] };
+// studio: characterful grotesque + neutral text; editorial: sharp text serif + grotesque; technical: wide engineered
+// display (Unbounded) + neutral text. Each display file is 41-58 KB; Archivo's width-axis file (90 KB) pushed mobile
+// LCP over the 2.5 s budget in M4 and was replaced.
+const PAIRINGS = { studio: ["bricolage", "geist"], editorial: ["newsreader", "hanken"], technical: ["unbounded", "geist"] };
 const pairing = site.brand?.typePairing;
 if (!Object.hasOwn(PAIRINGS, pairing)) throw new Error(`content: brand.typePairing ${JSON.stringify(pairing)} is not one of ${Object.keys(PAIRINGS).join(", ")}`);
 const [display, text] = PAIRINGS[pairing];
