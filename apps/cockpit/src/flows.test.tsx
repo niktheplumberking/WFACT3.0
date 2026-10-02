@@ -129,6 +129,29 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "build_plan", params: { planId: PLAN_APPROVED } }) }));
   });
 
+  it("archive a failed run from its page; nothing is deleted", async () => {
+    const t = start(`/activity/${JOB_FAILED}`);
+    await t.click(await screen.findByRole("button", { name: "Archive" }, T));
+    expect(t.calls()).toContainEqual({ op: "rpc", name: "archive_job", args: { p_job_id: JOB_FAILED, p_archived: true } });
+    expect(t.calls().some((c) => c.op === "update" && c.table === "jobs")).toBe(false);
+  });
+
+  it("archived runs leave Activity and Home, and come back under the Archived filter", async () => {
+    const fx = fixtures();
+    fx.jobs = fx.jobs.map((j) => (j.id === JOB_FAILED ? { ...j, archived_at: new Date().toISOString() } : j));
+    start("/activity", "owner", fx);
+    expect(await screen.findByText("2 of 2", {}, T)).toBeInTheDocument();
+    expect(screen.queryByText(/out of credits/i)).not.toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Archived" }));
+    expect(await screen.findByText("1 of 1", {}, T)).toBeInTheDocument();
+  });
+
+  it("a running or never-started run cannot be archived", async () => {
+    start(`/activity/${JOB_STUCK}`);
+    expect(await screen.findByRole("button", { name: "Close it" }, T)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Archive" })).not.toBeInTheDocument();
+  });
+
   it("open a run and see why it failed, then resume", async () => {
     const t = start(`/activity/${JOB_FAILED}`);
     expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: the site builder is out of credits" }, T)).toBeInTheDocument();

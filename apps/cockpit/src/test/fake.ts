@@ -154,7 +154,7 @@ function plan(id: string, status: string, extra: Row = {}): Row {
 }
 
 function job(id: string, kind: string, status: string, extra: Row = {}): Row {
-  return { id, created_at: ago(240), kind, params: {}, status, started_at: null, finished_at: null, result: null, error: null, gh_run_url: null, ...extra };
+  return { id, created_at: ago(240), kind, params: {}, status, started_at: null, finished_at: null, result: null, error: null, gh_run_url: null, archived_at: null, ...extra };
 }
 
 export function fixtures(): Record<string, Row[]> {

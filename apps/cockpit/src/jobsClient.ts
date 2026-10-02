@@ -21,9 +21,13 @@ export interface JobRow {
   result: Record<string, unknown> | null;
   error: string | null;
   gh_run_url: string | null;
+  /** Migration 0015: a finished run an owner/admin hid from Activity and Home. Never deleted. */
+  archived_at: string | null;
 }
 
-export const JOB_COLUMNS = "id,created_at,kind,params,status,started_at,finished_at,result,error,gh_run_url";
+export const JOB_COLUMNS = "id,created_at,kind,params,status,started_at,finished_at,result,error,gh_run_url,archived_at";
+
+export const isFinished = (j: Pick<JobRow, "status">) => j.status === "succeeded" || j.status === "failed" || j.status === "cancelled";
 
 // A job still `queued` after this long was never dispatched (the function flips it to `dispatched` or
 // `failed` within seconds) — stop polling for it and offer Start or Cancel instead. Same 2 minutes as
@@ -79,6 +83,12 @@ export async function dispatchJob(jobId: string): Promise<string | null> {
 }
 
 /** Close a job that never started (migration 0013). The database checks role, status, age and reason. */
+/** Hide (or bring back) a finished run. The database keeps it; archive_job (0015) checks role and status. */
+export async function archiveJob(jobId: string, archived = true): Promise<string | null> {
+  const { error } = await supabase.rpc("archive_job", { p_job_id: jobId, p_archived: archived });
+  return error ? error.message : null;
+}
+
 export async function cancelJob(jobId: string, reason: string): Promise<string | null> {
   const { error } = await supabase.rpc("cancel_job", { p_job_id: jobId, p_reason: reason });
   return error ? error.message : null;

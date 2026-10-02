@@ -60,6 +60,8 @@ export interface AttentionInput {
 
 export function buildAttention({ plans, jobs, accounts, myId, canDecide, now = Date.now() }: AttentionInput): AttentionItem[] {
   if (!canDecide) return [];
+  // An archived run was dealt with by a person (migration 0015); it never asks for attention again.
+  jobs = jobs.filter((j) => !j.archived_at);
   const items: AttentionItem[] = [];
   const planById = new Map(plans.map((p) => [p.id, p]));
   const latest = latestBuildByPlan(jobs);
@@ -197,7 +199,7 @@ export function runningJobs(jobs: JobRow[], now = Date.now()): JobRow[] {
 
 export function recentlyFinished(jobs: JobRow[], limit = 4): JobRow[] {
   return jobs
-    .filter((j) => j.status === "succeeded" || j.status === "failed" || j.status === "cancelled")
+    .filter((j) => !j.archived_at && (j.status === "succeeded" || j.status === "failed" || j.status === "cancelled"))
     .sort((a, b) => (b.finished_at ?? b.created_at).localeCompare(a.finished_at ?? a.created_at))
     .slice(0, limit);
 }

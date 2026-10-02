@@ -4,9 +4,9 @@
  */
 import { useState } from "react";
 import { Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowClockwise, ArrowSquareOut, Play, XCircle } from "@phosphor-icons/react";
+import { Archive, ArrowClockwise, ArrowCounterClockwise, ArrowSquareOut, Play, XCircle } from "@phosphor-icons/react";
 import { supabase } from "../supabaseClient";
-import { cancelJob, dispatchJob, isActive, isStaleQueued, requestJob, type JobRow } from "../jobsClient";
+import { archiveJob, cancelJob, dispatchJob, isActive, isFinished, isStaleQueued, requestJob, type JobRow } from "../jobsClient";
 import { latestBuildByPlan, planIdOfJob } from "../lib/attention";
 import {
   KIND_LABEL, clock, dateTime, duration, explainJobError, jobState, planName, shortId,
@@ -19,11 +19,13 @@ import { subjectOf } from "./Home";
 
 /* ---------------- list ---------------- */
 
+// Archived runs (migration 0015) are hidden everywhere except their own filter.
 const FILTERS: { id: string; label: string; test: (j: JobRow) => boolean }[] = [
-  { id: "all", label: "All", test: () => true },
-  { id: "failed", label: "Failed", test: (j) => j.status === "failed" },
-  { id: "stuck", label: "Never started", test: (j) => isStaleQueued(j) },
+  { id: "all", label: "All", test: (j) => !j.archived_at },
+  { id: "failed", label: "Failed", test: (j) => !j.archived_at && j.status === "failed" },
+  { id: "stuck", label: "Never started", test: (j) => !j.archived_at && isStaleQueued(j) },
   { id: "running", label: "Running", test: (j) => isActive(j) },
+  { id: "archived", label: "Archived", test: (j) => !!j.archived_at },
 ];
 
 function ActivityTabs() {
@@ -53,10 +55,10 @@ export default function Activity() {
           </button>
         ))}
       </div>
-      <Plate title={show.id === "all" ? "Runs" : `${show.label} runs`} note={f.jobs ? `${jobs!.length} of ${f.jobs.length}` : undefined}>
+      <Plate title={show.id === "all" ? "Runs" : `${show.label} runs`} note={f.jobs ? `${jobs!.length} of ${f.jobs.filter((j) => (show.id === "archived") === !!j.archived_at).length}` : undefined}>
         {f.error && <div className="plate-body"><LoadError what="runs" error={f.error} onRetry={f.reload} /></div>}
         {!f.jobs && !f.error && <Loading rows={4} label="Loading runs" />}
-        {jobs && jobs.length === 0 && <Empty title={show.id === "all" ? "Nothing has run yet." : "No runs match this filter."}>Requests you start appear here.</Empty>}
+        {jobs && jobs.length === 0 && <Empty title={show.id === "all" ? "Nothing has run yet." : show.id === "archived" ? "Nothing is archived." : "No runs match this filter."}>{show.id === "archived" ? "Archive a finished run from its page to hide it here." : "Requests you start appear here."}</Empty>}
         {jobs && jobs.length > 0 && (
           <ul className="rows">
             {jobs.map((j) => {
@@ -389,6 +391,17 @@ export function RunPage() {
                 Close it
               </button>
             )}
+            {isFinished(j) && (
+              <button
+                className="btn ghost"
+                type="button"
+                disabled={busy}
+                onClick={() => act(() => archiveJob(j.id, !j.archived_at), j.archived_at ? "Back in Activity." : "Archived. It's hidden from Activity and Home; nothing was deleted.")}
+              >
+                {j.archived_at ? <ArrowCounterClockwise aria-hidden="true" /> : <Archive aria-hidden="true" />}
+                {j.archived_at ? "Unarchive" : "Archive"}
+              </button>
+            )}
             {planId && (
               <Link className="btn ghost" to={`/decisions/plans/${planId}`}>
                 Open the plan
@@ -413,6 +426,11 @@ export function RunPage() {
           {build && j.status === "succeeded" && j.result?.status === "awaiting_launch_approval" && (
             <Notice tone="clear" title="Verified, not published.">
               Every check passed. Launch is Nick's decision and happens outside the Cockpit; nothing here deploys a site.
+            </Notice>
+          )}
+          {j.archived_at && (
+            <Notice tone="info" title="Archived.">
+              Hidden from Activity and Home since {dateTime(j.archived_at)}. The record is kept; Unarchive brings it back.
             </Notice>
           )}
           {actionError && <Notice tone="stop" title="That didn't work.">{actionError} Nothing changed.</Notice>}
