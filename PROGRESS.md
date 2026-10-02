@@ -832,6 +832,16 @@ one-off query string fresh 6/6. `SupabaseArtifactStore` now reads via `/object/a
 is unchanged. New `packages/workflow/test/supabaseArtifacts.test.ts` fails on the old code, passes now; workflow tests 17/17;
 live overwrite-then-verify 8/8 with the real store. Job `8e577598` ("already ended with workflow.halt") was a resume of a halted run,
 correctly refused. Next: start a fresh build from the Cockpit (do not resume the halted runs).
+The fresh Track A build (job `6dec53e7`, run `24d8fc72`) got past the checkpoint read (CDN fix holds live) and halted
+`not_verified_no_evaluator`: `render.design-review` NOT RUN, Agent 37 HTTP 502 `upstream_unreachable` on two back-to-back attempts
+(Agent 37 answered normally minutes later).
+
+**Fix 2026-10-02 — reviewer outage retry and Cockpit Track B builds** (`8318c57`, `7d6367d`; live builds not yet re-run).
+The design reviewer now waits 15 s / 45 s / 120 s on a gateway or network failure (5xx, 429, no response), 4 calls at most, then NOT RUN;
+an unusable answer keeps one immediate retry. The Cockpit still said "the Track B builder arrives in Step 4B M4" and offered no build
+button, although the runner (`trackBWorkflow`) and the jobs trigger already accept Track B: Decisions now offers Start build for either
+track, Track B plans show under "Ready to build". Tests: rendered-qa 40/40, Cockpit 24/24 (new tests fail on the old code), jobs 12/12.
+Next: a fresh Track A build and the first live Track B build from the Cockpit.
 
 **M5–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
 
