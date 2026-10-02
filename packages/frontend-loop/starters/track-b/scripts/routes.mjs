@@ -47,7 +47,11 @@ if (!Object.hasOwn(PAIRINGS, pairing)) throw new Error(`content: brand.typePairi
 const [display, text] = PAIRINGS[pairing];
 const face = (name, variable) => {
   const [file, weight, fallback] = FACES[name];
-  return `localFont({\n  src: "../node_modules/@fontsource-variable/${file}",\n  variable: "${variable}",\n  weight: "${weight}",\n  display: "swap",\n  fallback: [${fallback}],\n})`;
+  // display "optional": the preloaded font is used when it arrives in time (it nearly always does, and it is
+  // cached after the first page); otherwise that view keeps the metric-matched fallback instead of
+  // repainting. This takes font timing out of the LCP path (Step 4B M4: mobile LCP 3.0 s with "swap",
+  // 2.3 s with "optional", identical across four runs each).
+  return `localFont({\n  src: "../node_modules/@fontsource-variable/${file}",\n  variable: "${variable}",\n  weight: "${weight}",\n  display: "optional",\n  fallback: [${fallback}],\n})`;
 };
 writeFileSync(
   path.join(root, "lib/type.generated.ts"),

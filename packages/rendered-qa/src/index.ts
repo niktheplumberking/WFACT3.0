@@ -51,6 +51,6 @@ export function createRenderedQa(setup: RenderedQaSetup): RenderedQa {
   return { rendered, review };
 }
 
-export { TRACK_A_BUDGET, VIEWPORTS, runRenderedQa, createRenderedSuite } from "./rendered.js";
+export { TRACK_A_BUDGET, TRACK_B_BUDGET, VIEWPORTS, runRenderedQa, createRenderedSuite, pageUrl } from "./rendered.js";
 export { createScreenshotReviewSuite, parseReview, loadReviewerDecision, REVIEW_CHECK_ID, DEFAULT_MODELS } from "./reviewer.js";
 export { loadRulebook } from "./rulebook.js";

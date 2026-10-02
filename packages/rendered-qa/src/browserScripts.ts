@@ -185,6 +185,11 @@ export const MOTION_PROBE = String.raw`() => document.getAnimations()
   .filter((x) => x.t.iterations === Infinity || x.t.endTime > 1000)
   .map((x) => x.name + (x.t.iterations === Infinity ? " (infinite)" : " (" + Math.round(x.t.endTime) + "ms)"))`;
 
+/** Decoded bytes of every external script the page loaded, from the browser's resource timing. */
+export const SCRIPT_RESOURCE_BYTES = String.raw`() => performance.getEntriesByType("resource")
+  .filter((e) => e.initiatorType === "script" || /\.m?js(\?|$)/.test(e.name))
+  .reduce((n, e) => n + (e.decodedBodySize || 0), 0)`;
+
 /** Total bytes of inline <script> text. */
 export const INLINE_JS_BYTES = String.raw`() => [...document.querySelectorAll("script:not([src])")].reduce((n, s) => n + new TextEncoder().encode(s.textContent || "").length, 0)`;
 
@@ -196,4 +201,89 @@ export const SCROLL_THROUGH = String.raw`async () => {
   }
   window.scrollTo(0, 0);
   await new Promise((r) => setTimeout(r, 300));
+}`;
+
+/**
+ * Step 4B M4: installed with addInitScript, so it runs before any page script. Records what motion the
+ * page actually performs, including script-driven motion (GSAP, Motion, Lenis) that never shows up in
+ * document.getAnimations():
+ *   - every inline-style change, per element and property, as the set of distinct values it took;
+ *   - long animation frames (the browser's own measure of main-thread jank), split at mark();
+ *   - every CSS / Web Animations animation that started, with its properties and timing.
+ * Read back with MOTION_REPORT. Not a check by itself: rendered.ts turns it into results.
+ */
+export const MOTION_WATCH = String.raw`(() => {
+  const SPATIAL = ["transform", "translate", "scale", "rotate", "opacity"];
+  const LAYOUT = ["width", "height", "top", "left", "right", "bottom", "margin-top", "margin-left", "margin-right", "margin-bottom",
+    "padding-top", "padding-left", "padding-right", "padding-bottom", "font-size", "line-height", "max-width", "min-height", "inset"];
+  const W = { phase: "load", values: new Map(), frames: [], anims: new Map(), ids: new WeakMap(), next: 0 };
+  window.__wfactMotion = W;
+  const idOf = (el) => {
+    if (!W.ids.has(el)) W.ids.set(el, el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") + (el.classList && el.classList.length ? "." + [...el.classList].slice(0, 2).join(".") : "") + "@" + (W.next++));
+    return W.ids.get(el);
+  };
+  const record = (el) => {
+    if (!el.style) return;
+    for (const p of [...SPATIAL, ...LAYOUT]) {
+      const v = el.style.getPropertyValue(p);
+      if (!v) continue;
+      const key = W.phase + "|" + idOf(el) + "|" + p;
+      let set = W.values.get(key);
+      if (!set) W.values.set(key, (set = new Set()));
+      if (set.size < 50) set.add(v);
+    }
+  };
+  new MutationObserver((list) => { for (const m of list) record(m.target); })
+    .observe(document, { attributes: true, attributeFilter: ["style"], subtree: true });
+  try {
+    new PerformanceObserver((l) => { for (const e of l.getEntries()) W.frames.push({ phase: W.phase, duration: e.duration, blocking: e.blockingDuration || 0 }); })
+      .observe({ type: "long-animation-frame", buffered: false });
+  } catch {}
+  const seeAnimations = () => {
+    for (const a of document.getAnimations()) {
+      if (W.anims.has(a)) continue;
+      const kf = a.effect && a.effect.getKeyframes ? a.effect.getKeyframes() : [];
+      const props = [...new Set(kf.flatMap((k) => Object.keys(k)).filter((k) => !["offset", "easing", "composite", "computedOffset"].includes(k)))];
+      const t = a.effect ? a.effect.getComputedTiming() : {};
+      const scrollLinked = !!(a.timeline && a.timeline.constructor && /Scroll|View/.test(a.timeline.constructor.name));
+      W.anims.set(a, { phase: W.phase, name: a.animationName || a.transitionProperty || a.id || "script animation", props, endTime: t.endTime, iterations: t.iterations, scrollLinked });
+    }
+  };
+  const tick = () => { seeAnimations(); requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+})()`;
+
+/** Starts a new measurement phase (e.g. "scroll") so load-time work is not counted against scrolling. */
+export const MOTION_MARK = String.raw`(phase) => { if (window.__wfactMotion) window.__wfactMotion.phase = phase; }`;
+
+/** What the watcher saw, for one phase: style properties that changed, long frames, animations. */
+export const MOTION_REPORT = String.raw`(phase) => {
+  const W = window.__wfactMotion;
+  if (!W) return null;
+  const styles = [];
+  for (const [key, set] of W.values) {
+    const [ph, el, prop] = key.split("|");
+    if (ph === phase) styles.push({ el: el.replace(/@\d+$/, ""), prop, distinct: set.size });
+  }
+  const frames = W.frames.filter((f) => f.phase === phase);
+  const anims = [...W.anims.values()].filter((a) => a.phase === phase);
+  return {
+    styles,
+    longFrames: frames.length,
+    blockingMs: Math.round(frames.reduce((n, f) => n + f.blocking, 0)),
+    worstFrameMs: Math.round(frames.reduce((n, f) => Math.max(n, f.duration), 0)),
+    anims: anims.map((a) => ({ name: a.name, props: a.props, endTime: a.endTime === Infinity ? -1 : Math.round(a.endTime || 0), infinite: a.iterations === Infinity, scrollLinked: a.scrollLinked })),
+    loafSupported: PerformanceObserver.supportedEntryTypes.includes("long-animation-frame"),
+  };
+}`;
+
+/** Scroll position sampled every frame after one wheel step: many in-between values = smooth-scroll hijacking. */
+export const SCROLL_SAMPLE = String.raw`async () => {
+  const seen = [];
+  const start = performance.now();
+  await new Promise((resolve) => {
+    const f = () => { seen.push(Math.round(scrollY)); performance.now() - start < 700 ? requestAnimationFrame(f) : resolve(); };
+    requestAnimationFrame(f);
+  });
+  return [...new Set(seen)];
 }`;

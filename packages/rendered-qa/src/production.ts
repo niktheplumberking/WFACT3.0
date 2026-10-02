@@ -11,6 +11,7 @@ import { QA_GATE_CHECKS } from "@wfact/verification/registry";
 import type { QaEvaluatorAgentOptions } from "@wfact/verification/agent";
 import type { ModelClient } from "@wfact/verification/modelClient";
 import { createRenderedQa, reviewerFromEnv } from "./index.js";
+import type { Budget } from "./rendered.js";
 
 export interface ProductionQaSetup {
   evaluatorModel: ModelClient | null;
@@ -19,6 +20,8 @@ export interface ProductionQaSetup {
   /** Screenshot folder; defaults to a fresh temp directory. */
   outDir?: string;
   env?: NodeJS.ProcessEnv;
+  /** The track's budget (TRACK_A_BUDGET by default; TRACK_B_BUDGET, with its motion budget, for Track B). */
+  budget?: Budget;
 }
 
 export function productionQaOptions(setup: ProductionQaSetup): QaEvaluatorAgentOptions {
@@ -27,6 +30,7 @@ export function productionQaOptions(setup: ProductionQaSetup): QaEvaluatorAgentO
     outDir: setup.outDir ?? mkdtempSync(path.join(tmpdir(), "wfact-rendered-qa-")),
     reviewer: reviewerFromEnv(env),
     builderVendor: setup.builderVendor,
+    ...(setup.budget ? { budget: setup.budget } : {}),
   });
   return {
     evaluatorModel: setup.evaluatorModel,

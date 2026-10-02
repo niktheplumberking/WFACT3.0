@@ -12,6 +12,13 @@
  *   render.reduced-motion  animations still running with prefers-reduced-motion: reduce
  *   render.design-rules    the design rulebook's DOM detectors (packages/frontend-loop/design/rulebook.json)
  *   render.perf            Lighthouse (mobile, simulated throttling): LCP and CLS against the track budget
+ *   render.motion-budget   (budgets with a motion part, i.e. Track B) what scrolling the page costs: no
+ *                          layout properties animated, no long CSS/WAAPI entrances, main-thread blocking
+ *                          during a scroll-through within the budget (Step 4B M4)
+ *
+ * render.reduced-motion also watches script-driven motion (GSAP, Motion, Lenis) since Step 4B M4: with
+ * prefers-reduced-motion: reduce, no element may keep changing its transform or opacity while the page is
+ * scrolled, and scrolling may not be smoothed by script.
  *
  * Screenshots are written to `outDir` (full page per viewport) and kept as viewport-sized JPEG slices
  * for the cross-vendor screenshot reviewer (`reviewer.ts`).
@@ -21,18 +28,73 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { AxeBuilder } from "@axe-core/playwright";
-import type { AsyncCheckSuite, CheckResult, VerificationContext } from "@wfact/verification/checks/types";
+import { SITE_FILE_RE, type AsyncCheckSuite, type CheckResult, type VerificationContext } from "@wfact/verification/checks/types";
 import { serveDirectory } from "./server.js";
-import { DESIGN_DETECTORS, INLINE_JS_BYTES, LAYOUT_PROBE, LINK_PROBE, MOTION_PROBE, SCROLL_THROUGH } from "./browserScripts.js";
+import { DESIGN_DETECTORS, INLINE_JS_BYTES, SCRIPT_RESOURCE_BYTES, LAYOUT_PROBE, LINK_PROBE, MOTION_MARK, MOTION_PROBE, MOTION_REPORT, MOTION_WATCH, SCROLL_SAMPLE, SCROLL_THROUGH } from "./browserScripts.js";
 import { loadRulebook, type Rulebook } from "./rulebook.js";
 
+export interface MotionBudget {
+  /** Main-thread blocking (long animation frames) allowed during one scroll-through of the page, ms. */
+  maxBlockingMs: number;
+  /** Longest allowed time-based (not scroll-linked, not infinite) CSS / Web Animations animation, ms. */
+  maxAnimationMs: number;
+  /** A layout property (width, top, margin...) that takes more distinct inline values than this while scrolling is being animated. */
+  maxLayoutSteps: number;
+}
 export interface Budget {
   lcpMs: number;
   cls: number;
   jsKb: number;
+  /** Track B only: what the site's motion may cost (render.motion-budget). */
+  motion?: MotionBudget;
 }
 /** Track A (local business): LCP < 2.0 s mobile, total JS < 50 KB, CLS < 0.1 (FRONTEND-UPGRADE-DESIGN.md §2). */
 export const TRACK_A_BUDGET: Budget = { lcpMs: 2000, cls: 0.1, jsKb: 50 };
+/**
+ * Track B (motion-rich brand site, Step 4B M4): LCP < 2.5 s mobile and CLS < 0.1 (FRONTEND-UPGRADE-DESIGN.md
+ * §2), JavaScript per page within 700 KB (decoded bytes, as for Track A; about 200 KB gzipped), and the
+ * motion budget. 700 KB is the starter's measured 625 KB (React + Next.js runtime about 442 KB, GSAP +
+ * ScrollTrigger + Lenis about 125 KB) plus about 12% headroom; the motion numbers are set so the starter
+ * passes with a wide margin and the planted fixture fails. Both are a proposal for Huraira to confirm,
+ * not a published standard (PROGRESS.md, Step 4B M4).
+ */
+export const TRACK_B_BUDGET: Budget = { lcpMs: 2500, cls: 0.1, jsKb: 700, motion: { maxBlockingMs: 250, maxAnimationMs: 1500, maxLayoutSteps: 4 } };
+
+/** Layout-affecting properties (Web Animations keyframe names). Animating any of them is over the motion budget. */
+const LAYOUT_KEYFRAME_PROPS = new Set([
+  "width", "height", "minWidth", "maxWidth", "minHeight", "maxHeight", "top", "left", "right", "bottom", "inset",
+  "marginTop", "marginRight", "marginBottom", "marginLeft", "margin", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "padding",
+  "fontSize", "lineHeight", "letterSpacing", "borderWidth", "gridTemplateColumns", "gridTemplateRows", "flexBasis",
+]);
+const LAYOUT_STYLE_PROPS = new Set([
+  "width", "height", "top", "left", "right", "bottom", "margin-top", "margin-left", "margin-right", "margin-bottom",
+  "padding-top", "padding-left", "padding-right", "padding-bottom", "font-size", "line-height", "max-width", "min-height", "inset",
+]);
+const SPATIAL_STYLE_PROPS = new Set(["transform", "translate", "scale", "rotate", "opacity"]);
+
+/** URL of a page file: a folder's index.html is requested as the folder ("services/"), as a host would serve it. */
+export const pageUrl = (origin: string, pageName: string) => `${origin}/${pageName.replace(/(^|\/)index\.html$/, "$1")}`;
+
+interface MotionReport {
+  styles: { el: string; prop: string; distinct: number }[];
+  longFrames: number;
+  blockingMs: number;
+  worstFrameMs: number;
+  anims: { name: string; props: string[]; endTime: number; infinite: boolean; scrollLinked: boolean }[];
+  loafSupported: boolean;
+}
+
+/** Scrolls like a visitor (wheel steps), so smooth-scroll libraries and scroll-linked motion actually run. */
+async function wheelThrough(page: Page, step = 300, gapMs = 45): Promise<void> {
+  await page.mouse.move(200, 300);
+  for (let i = 0; i < 160; i += 1) {
+    await page.mouse.wheel(0, step);
+    await page.waitForTimeout(gapMs);
+    const atEnd = await evaluate<boolean>(page, "() => Math.ceil(scrollY + innerHeight) >= document.documentElement.scrollHeight - 2");
+    if (atEnd) break;
+  }
+  await page.waitForTimeout(500);
+}
 
 export interface Viewport {
   name: "desktop" | "tablet" | "phone";
@@ -58,6 +120,8 @@ export interface Shot {
 }
 
 export interface RenderedMetrics {
+  /** Track B motion pass: main-thread blocking while scrolling, long frames, animations seen. */
+  motion?: { blockingMs: number | null; longFrames: number | null; animations: number };
   jsBytes: number;
   lcpMs: number | null;
   cls: number | null;
@@ -101,7 +165,13 @@ function watch(page: Page, origin: string, sink: { console: string[]; assets: st
     if (m.type() === "error") sink.console.push(`console error: ${m.text().slice(0, 200)}`);
   });
   page.on("pageerror", (e) => sink.console.push(`uncaught exception: ${String(e.message ?? e).slice(0, 200)}`));
-  page.on("requestfailed", (r) => sink.console.push(`request failed: ${r.url().slice(0, 120)} (${r.failure()?.errorText ?? "unknown"})`));
+  page.on("requestfailed", (r) => {
+    const reason = r.failure()?.errorText ?? "unknown";
+    // A request the page or the test cancelled (a framework's background prefetch when the page closes) is
+    // not a failure of the site; a missing file shows as an HTTP status below, a dead host as another error.
+    if (reason === "net::ERR_ABORTED") return;
+    sink.console.push(`request failed: ${r.url().slice(0, 120)} (${reason})`);
+  });
   page.on("response", async (r) => {
     const url = r.url();
     if (r.status() >= 400) sink.assets.push(`${r.request().resourceType()} ${url.replace(origin, "")} returned HTTP ${r.status()}`);
@@ -176,15 +246,17 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
   const details: Record<string, string[]> = {
     "render.load": [], "render.console": [], "render.links": [], "render.a11y": [], "render.layout": [],
     "render.js-budget": [], "render.reduced-motion": [], "render.design-rules": [], "render.perf": [],
+    ...(budget.motion ? { "render.motion-budget": [] as string[] } : {}),
   };
   const shots: Shot[] = [];
   const metrics: Record<string, RenderedMetrics> = {};
   const server = await serveDirectory(siteDir);
   let browser: Browser | null = null;
   try {
-    browser = await chromium.launch();
+    // Native smooth scrolling off, so any smoothing the reduced-motion probe sees comes from page script.
+    browser = await chromium.launch({ args: ["--disable-smooth-scrolling"] });
     for (const pageName of pages) {
-      const url = `${server.origin}/${pageName}`;
+      const url = pageUrl(server.origin, pageName);
       const sink = { console: [] as string[], assets: [] as string[], scriptBytes: 0 };
       const m: RenderedMetrics = { jsBytes: 0, lcpMs: null, cls: null, performanceScore: null };
       metrics[pageName] = m;
@@ -210,6 +282,14 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
           details["render.layout"]!.push(`${where}${vp.width}px: ${d}`);
         }
 
+        // Track B (budgets with a motion part): a pinned, scroll-driven scene has no faithful full-page still
+        // (its pin leaves the scroll distance as an empty band). The stills are taken in the resting layout
+        // the site shows with reduced motion, where every element is in place; all checks above ran with
+        // motion on. Restored after the screenshots.
+        if (budget.motion) {
+          await page.emulateMedia({ reducedMotion: "reduce" });
+          await page.waitForTimeout(400);
+        }
         const file = path.join(opts.outDir, `${pageName.replace(/[^a-z0-9.-]/gi, "_")}-${vp.width}.png`);
         await page.screenshot({ path: file, fullPage: true });
         const height = await evaluate<number>(page, "() => document.documentElement.scrollHeight");
@@ -222,6 +302,10 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
           slices.push(await page.screenshot({ type: "jpeg", quality: 60, fullPage: true, clip: { x: 0, y, width: vp.width, height: Math.min(vp.height, height - y) } }));
         }
         shots.push({ page: pageName, viewport: vp.name, width: vp.width, file, slices });
+        if (budget.motion) {
+          await page.emulateMedia({ reducedMotion: null });
+          await page.waitForTimeout(300);
+        }
 
         if (vp.name !== "tablet") {
           const axe = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
@@ -237,20 +321,69 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
           for (const issue of await Promise.all(unique.map((l) => checkLink(l, server.origin, opts.checkExternalLinks ?? false)))) {
             if (issue) details["render.links"]!.push(`${where}${issue}`);
           }
-          m.jsBytes = (await evaluate<number>(page, INLINE_JS_BYTES)) + sink.scriptBytes;
+          // External scripts: the larger of what the response hook read and what the browser's own resource
+          // timing reports (decoded bytes). Since Step 4B M4: the hook alone missed chunks whose bodies were
+          // already evicted, undercounting a Next.js page about 4x.
+          m.jsBytes = (await evaluate<number>(page, INLINE_JS_BYTES)) + Math.max(sink.scriptBytes, await evaluate<number>(page, SCRIPT_RESOURCE_BYTES));
         }
         await context.close();
       }
 
       // Reduced motion: a fresh context that asks for it, checked after load settles.
       const rm = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+      await rm.addInitScript(MOTION_WATCH);
       const rmPage = await rm.newPage();
       if (await rmPage.goto(url, { waitUntil: "load" }).catch(() => null)) {
         await rmPage.waitForTimeout(800);
         const still = await evaluate<string[]>(rmPage, MOTION_PROBE);
         if (still.length) details["render.reduced-motion"]!.push(`${where}${still.length} animation(s) still run with prefers-reduced-motion: reduce: ${[...new Set(still)].slice(0, 5).join(", ")}`);
+        // Script-driven motion (Step 4B M4): scroll like a visitor and watch inline transform/opacity changes.
+        await evaluate(rmPage, MOTION_MARK, "rm-scroll");
+        await wheelThrough(rmPage);
+        const seen = await evaluate<MotionReport | null>(rmPage, MOTION_REPORT, "rm-scroll");
+        const moving = (seen?.styles ?? []).filter((x) => SPATIAL_STYLE_PROPS.has(x.prop) && x.distinct >= 4);
+        if (moving.length) {
+          details["render.reduced-motion"]!.push(`${where}${moving.length} element(s) still animated by script with prefers-reduced-motion: reduce: ${moving.slice(0, 5).map((x) => `${x.el} ${x.prop} took ${x.distinct} values`).join(", ")}`);
+        }
+        await evaluate(rmPage, "() => window.scrollTo(0, 0)");
+        await rmPage.waitForTimeout(300);
+        const sampled = evaluate<number[]>(rmPage, SCROLL_SAMPLE);
+        await rmPage.mouse.wheel(0, 600);
+        const positions = await sampled;
+        if (positions.length > 4) details["render.reduced-motion"]!.push(`${where}scrolling is smoothed by script with prefers-reduced-motion: reduce (one wheel step passed through ${positions.length} positions)`);
       }
       await rm.close();
+
+      // Motion budget (Track B): what one scroll-through of the page costs with motion allowed.
+      if (budget.motion) {
+        const mb = budget.motion;
+        const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+        await ctx.addInitScript(MOTION_WATCH);
+        const mp = await ctx.newPage();
+        if (await mp.goto(url, { waitUntil: "load" }).catch(() => null)) {
+          await mp.waitForTimeout(1200);
+          await evaluate(mp, MOTION_MARK, "scroll");
+          await wheelThrough(mp);
+          const load = await evaluate<MotionReport | null>(mp, MOTION_REPORT, "load");
+          const scroll = await evaluate<MotionReport | null>(mp, MOTION_REPORT, "scroll");
+          const out = details["render.motion-budget"]!;
+          for (const a of [...(load?.anims ?? []), ...(scroll?.anims ?? [])]) {
+            const layout = a.props.filter((p) => LAYOUT_KEYFRAME_PROPS.has(p));
+            if (layout.length) out.push(`${where}animation "${a.name}" animates layout (${layout.join(", ")}); animate transform or opacity instead`);
+            if (!a.infinite && !a.scrollLinked && a.endTime > mb.maxAnimationMs) out.push(`${where}animation "${a.name}" runs ${a.endTime} ms; the budget is ${mb.maxAnimationMs} ms`);
+          }
+          const layoutSteps = (scroll?.styles ?? []).filter((x) => LAYOUT_STYLE_PROPS.has(x.prop) && x.distinct > mb.maxLayoutSteps);
+          if (layoutSteps.length) {
+            out.push(`${where}${layoutSteps.length} element(s) animate layout while scrolling: ${layoutSteps.slice(0, 5).map((x) => `${x.el} ${x.prop} took ${x.distinct} values`).join(", ")}`);
+          }
+          if (scroll && !scroll.loafSupported) out.push(`${where}long animation frames cannot be measured in this browser; scroll cost is unverified`);
+          else if (scroll && scroll.blockingMs > mb.maxBlockingMs) {
+            out.push(`${where}scrolling the page blocked the main thread for ${scroll.blockingMs} ms over ${scroll.longFrames} long frame(s) (worst ${scroll.worstFrameMs} ms); the budget is ${mb.maxBlockingMs} ms`);
+          }
+          m.motion = { blockingMs: scroll?.blockingMs ?? null, longFrames: scroll?.longFrames ?? null, animations: (load?.anims.length ?? 0) + (scroll?.anims.length ?? 0) };
+        } else details["render.motion-budget"]!.push(`${where}page did not load for the motion pass`);
+        await ctx.close();
+      }
 
       details["render.console"]!.push(...sink.console.map((c) => `${where}${c}`));
       details["render.links"]!.push(...sink.assets.map((a) => `${where}${a}`));
@@ -296,10 +429,15 @@ export function createRenderedSuite(opts: RenderedQaOptions): RenderedSuite {
       const dir = mkdtempSync(path.join(tmpdir(), "wfact-rqa-"));
       try {
         if (ctx.site) {
-          // Step 4B M3: the whole site is served, so cross-page links and every page are checked.
+          // Step 4B M3: the whole site is served, so cross-page links and every page are checked. Since M4
+          // files may sit in folders (a Next.js export) and fonts arrive as base64 (listed in site.binary).
+          const binary = new Set(ctx.site.binary ?? []);
           for (const [name, content] of Object.entries(ctx.site.files)) {
-            if (!/^[a-z0-9][a-z0-9-]*\.(html|json|txt|xml)$/.test(name)) throw new Error(`refusing site file name ${JSON.stringify(name)}`);
-            writeFileSync(path.join(dir, name), content, "utf-8");
+            if (!SITE_FILE_RE.test(name)) throw new Error(`refusing site file name ${JSON.stringify(name)}`);
+            const target = path.join(dir, name);
+            if (!target.startsWith(dir + path.sep)) throw new Error(`refusing site file name ${JSON.stringify(name)}`);
+            mkdirSync(path.dirname(target), { recursive: true });
+            writeFileSync(target, binary.has(name) ? Buffer.from(content, "base64") : Buffer.from(content, "utf-8"));
           }
           suite.lastRun = await runRenderedQa(dir, { ...opts, pages: ctx.site.pages });
         } else {

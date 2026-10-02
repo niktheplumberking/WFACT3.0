@@ -2,10 +2,17 @@
  * Minimal static file server for rendered QA: the page is loaded over http://127.0.0.1 (not file://)
  * so relative links, assets and Lighthouse behave as they would on a host. Read-only, bound to the
  * loopback interface, refuses any path outside the site root.
+ *
+ * Text files are gzip-compressed when the browser asks for it, as every production host does (Step 4B
+ * M4: serving a Next.js export's scripts uncompressed made Lighthouse charge ~3x their real transfer
+ * time). Fonts and images are sent as they are; they are already compressed formats.
  */
 import { createServer, type Server } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import { gzipSync } from "node:zlib";
+
+const COMPRESSIBLE = new Set([".html", ".css", ".js", ".mjs", ".json", ".svg", ".txt", ".xml"]);
 
 const TYPES: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -46,8 +53,16 @@ export async function serveDirectory(root: string): Promise<StaticServer> {
         res.writeHead(404, { "content-type": "text/plain" }).end("not found");
         return;
       }
-      res.writeHead(200, { "content-type": TYPES[path.extname(abs).toLowerCase()] ?? "application/octet-stream" });
-      res.end(await readFile(abs));
+      const ext = path.extname(abs).toLowerCase();
+      const body = await readFile(abs);
+      const headers: Record<string, string> = { "content-type": TYPES[ext] ?? "application/octet-stream", vary: "accept-encoding" };
+      if (COMPRESSIBLE.has(ext) && /\bgzip\b/.test(String(req.headers["accept-encoding"] ?? ""))) {
+        res.writeHead(200, { ...headers, "content-encoding": "gzip" });
+        res.end(req.method === "HEAD" ? undefined : gzipSync(body));
+        return;
+      }
+      res.writeHead(200, headers);
+      res.end(req.method === "HEAD" ? undefined : body);
     } catch {
       res.writeHead(500).end();
     }
