@@ -24,6 +24,7 @@ import { stateReaderFromEnv } from "@wfact/hermes-lite/state";
 import { modelClientFromEnv as hermesModelFromEnv } from "@wfact/hermes-lite/modelClient";
 import { createFrontendBuilderAgent } from "@wfact/frontend-loop/agent";
 import { createTrackABuilderAgent } from "@wfact/frontend-loop/trackA/agent";
+import { createTrackBBuilderAgent } from "@wfact/frontend-loop/trackB/agent";
 import { modelClientFromEnv } from "@wfact/frontend-loop/modelClient";
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
 import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
@@ -32,6 +33,7 @@ import { ClaudeJsonClient } from "@wfact/planning/modelClient";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
 import { SupabaseArtifactStore } from "@wfact/workflow/supabaseArtifacts";
 import { productionQaOptions } from "@wfact/rendered-qa/production";
+import { TRACK_B_BUDGET } from "@wfact/rendered-qa/rendered";
 import { SupabaseJobStore } from "./jobStore.js";
 import { handleJob, type HandlerDeps } from "./handlers.js";
 
@@ -100,6 +102,16 @@ function buildDeps(): HandlerDeps {
         builderModel: traceModelClient(builder.client, traces, actor),
         evaluatorModel: traceModelClient(reviewer.client, traces, actor),
       }),
+    },
+    // Step 4B M4: Track B plans: Agent 37 fills the Next.js starter's content, the static build runs with no
+    // network and no secrets, and QA holds the site to the Track B budget (including the motion budget).
+    trackBWorkflow: {
+      ...workflow,
+      frontEndAgent: createTrackBBuilderAgent({
+        builderModel: traceModelClient(builder.client, traces, actor),
+        evaluatorModel: traceModelClient(reviewer.client, traces, actor),
+      }),
+      qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, budget: TRACK_B_BUDGET })),
     },
     workflow,
     readArtifact: (p) => artifacts.read(p),

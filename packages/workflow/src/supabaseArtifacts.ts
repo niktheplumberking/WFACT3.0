@@ -13,7 +13,32 @@ import { ARTIFACT_PATH_RE, CheckpointIntegrityError, type ArtifactStore, type St
 const BUCKET = "artifacts";
 // Same allow-list as the file store: one page under pages/, or a site's files under sites/<site>/ (Step 4B M3).
 const PATH_RE = ARTIFACT_PATH_RE;
-const sha256 = (s: string) => createHash("sha256").update(s, "utf8").digest("hex");
+const sha256 = (s: string | Buffer) => (typeof s === "string" ? createHash("sha256").update(s, "utf8") : createHash("sha256").update(s)).digest("hex");
+
+/**
+ * Content type per file extension. Must stay inside the bucket's allowed list (migrations 0009, 0012, 0014):
+ * the static export (html, css, js, txt, svg, woff2, ico) and the Track B source (ts, tsx, mjs as text/plain).
+ */
+const CONTENT_TYPES: Record<string, string> = {
+  html: "text/html",
+  json: "application/json",
+  webmanifest: "application/json",
+  css: "text/css",
+  js: "text/javascript",
+  txt: "text/plain",
+  xml: "text/plain",
+  ts: "text/plain",
+  tsx: "text/plain",
+  mjs: "text/plain",
+  svg: "image/svg+xml",
+  woff2: "font/woff2",
+  ico: "image/x-icon",
+};
+export const contentTypeFor = (relPath: string): string => {
+  const type = CONTENT_TYPES[relPath.slice(relPath.lastIndexOf(".") + 1).toLowerCase()];
+  if (!type) throw new CheckpointIntegrityError(`no artifact content type for ${JSON.stringify(relPath)}`);
+  return type;
+};
 
 export class SupabaseArtifactStore implements ArtifactStore {
   private readonly base: string;
@@ -27,14 +52,24 @@ export class SupabaseArtifactStore implements ArtifactStore {
   }
 
   async write(relPath: string, content: string): Promise<StoredArtifact> {
+    await this.upload(relPath, content);
+    return { path: relPath, sha256: sha256(content), bytes: Buffer.byteLength(content, "utf8") };
+  }
+
+  /** Step 4B M4: fonts and other binary files of a Track B site, stored as real bytes. */
+  async writeBytes(relPath: string, bytes: Buffer): Promise<StoredArtifact> {
+    await this.upload(relPath, bytes);
+    return { path: relPath, sha256: sha256(bytes), bytes: bytes.length };
+  }
+
+  private async upload(relPath: string, body: string | Buffer): Promise<void> {
     if (!PATH_RE.test(relPath)) throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(relPath)} is outside clients/<slug>/pages/ and clients/<slug>/sites/`);
     const res = await this.fetchImpl(`${this.base}/${relPath}`, {
       method: "POST",
-      headers: this.headers({ "Content-Type": relPath.endsWith(".json") ? "application/json" : "text/html", "x-upsert": "true" }),
-      body: content,
+      headers: this.headers({ "Content-Type": contentTypeFor(relPath), "x-upsert": "true" }),
+      body: typeof body === "string" ? body : new Uint8Array(body),
     });
     if (!res.ok) throw new Error(`artifact upload failed (HTTP ${res.status}): ${(await res.text()).slice(0, 300)}`);
-    return { path: relPath, sha256: sha256(content), bytes: Buffer.byteLength(content, "utf8") };
   }
 
   /** Raw read for callers that don't hold a checkpoint (e.g. a Cockpit "verify this page" job). */
@@ -44,6 +79,18 @@ export class SupabaseArtifactStore implements ArtifactStore {
     if (res.status === 400 || res.status === 404) return null;
     if (!res.ok) throw new Error(`artifact download failed (HTTP ${res.status})`);
     return res.text();
+  }
+
+  async readVerifiedBytes(artifact: StoredArtifact): Promise<Buffer> {
+    if (!PATH_RE.test(artifact.path)) throw new CheckpointIntegrityError(`artifact path ${JSON.stringify(artifact.path)} is outside clients/<slug>/pages/ and clients/<slug>/sites/`);
+    const res = await this.fetchImpl(`${this.base}/${artifact.path}`, { headers: this.headers() });
+    if (res.status === 400 || res.status === 404) throw new CheckpointIntegrityError(`checkpointed artifact ${artifact.path} is missing from storage`);
+    if (!res.ok) throw new Error(`artifact download failed (HTTP ${res.status})`);
+    const bytes = Buffer.from(await res.arrayBuffer());
+    if (sha256(bytes) !== artifact.sha256) {
+      throw new CheckpointIntegrityError(`checkpointed artifact ${artifact.path} no longer matches its checkpoint hash — refusing to verify a changed file`);
+    }
+    return bytes;
   }
 
   async readVerified(artifact: StoredArtifact): Promise<string> {

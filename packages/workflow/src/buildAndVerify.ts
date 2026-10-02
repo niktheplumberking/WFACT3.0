@@ -54,6 +54,9 @@ export interface ArtifactStore {
   write(relPath: string, content: string): Promise<StoredArtifact>;
   /** Returns the content only if it still hashes to `sha256`; throws `CheckpointIntegrityError` otherwise. */
   readVerified(artifact: StoredArtifact): Promise<string>;
+  /** Step 4B M4: binary files (a Track B site's fonts). Same contract, bytes instead of text. */
+  writeBytes?(relPath: string, bytes: Buffer): Promise<StoredArtifact>;
+  readVerifiedBytes?(artifact: StoredArtifact): Promise<Buffer>;
 }
 
 export class CheckpointIntegrityError extends Error {
@@ -63,13 +66,16 @@ export class CheckpointIntegrityError extends Error {
   }
 }
 
-const sha256 = (s: string) => createHash("sha256").update(s, "utf8").digest("hex");
+const sha256 = (s: string | Buffer) => (typeof s === "string" ? createHash("sha256").update(s, "utf8") : createHash("sha256").update(s)).digest("hex");
 
 /**
  * Where artifacts may live: a single page under clients/<slug>/pages/, or (Step 4B M3) the files of a
- * multi-page site under clients/<slug>/sites/<site>/ (pages, content.json, site.manifest.json).
+ * multi-page site under clients/<slug>/sites/<site>/ (pages, content.json, site.manifest.json). Since M4 a
+ * site's files may sit in folders (a Next.js export's _next/static/..., the built source under _source/),
+ * with the extensions a static site and its source use; never "..", never a dotfile.
  */
-export const ARTIFACT_PATH_RE = /^clients\/[a-z][a-z0-9-]*\/(pages\/[a-z0-9-]+\.html|sites\/[a-z0-9-]+\/[a-z0-9][a-z0-9-.]*\.(html|json))$/;
+export const ARTIFACT_PATH_RE =
+  /^clients\/[a-z][a-z0-9-]*\/(pages\/[a-z0-9-]+\.html|sites\/[a-z0-9-]+\/(?!.*\.\.)[A-Za-z0-9_][A-Za-z0-9_.-]*(\/[A-Za-z0-9_][A-Za-z0-9_.-]*)*\.(html|json|txt|xml|js|mjs|css|svg|woff2|ico|webmanifest|ts|tsx))$/;
 
 function assertSafeRelPath(relPath: string): void {
   const normalized = path.posix.normalize(relPath);
@@ -84,6 +90,8 @@ function assertSafeRelPath(relPath: string): void {
 
 export const SITE_MANIFEST = "site.manifest.json";
 const SITE_SOURCE = "content.json";
+/** Step 4B M4: the project a Track B site was built from is stored beside its output, under this folder. */
+export const SITE_SOURCE_DIR = "_source";
 
 export interface SiteManifest {
   version: 1;
@@ -92,19 +100,37 @@ export interface SiteManifest {
   /** Every file of the site, including the content source; each re-hashed before QA. */
   files: { name: string; sha256: string; bytes: number }[];
   source: string;
+  /** Step 4B M4: files stored as bytes (fonts); hashes are over the bytes. */
+  binary?: string[];
+  /** Step 4B M4: how the static build ran (isolation probe, timings, output hash). */
+  build?: unknown;
 }
 
 const isSiteManifest = (artifact: StoredArtifact) => artifact.path.endsWith(`/${SITE_MANIFEST}`);
 
-/** Writes every site file, then the manifest that pins their hashes. The manifest is the checkpoint. */
-async function writeSite(store: ArtifactStore, dir: string, site: NonNullable<FrontendLoopResult["site"]>): Promise<StoredArtifact> {
-  const entries = Object.entries({ ...site.files, [SITE_SOURCE]: site.contentJson }).sort(([a], [b]) => a.localeCompare(b));
+/**
+ * Writes every site file, then the manifest that pins their hashes. The manifest is the checkpoint.
+ * Track B (M4) adds the built project under _source/ and stores fonts as bytes, not base64 text.
+ */
+export async function writeSite(store: ArtifactStore, dir: string, site: NonNullable<FrontendLoopResult["site"]>): Promise<StoredArtifact> {
+  const binary = new Set(site.binary ?? []);
+  if (binary.size && !store.writeBytes) throw new CheckpointIntegrityError("this artifact store cannot hold binary files, so the site cannot be checkpointed");
+  const sourceFiles = Object.fromEntries(Object.entries(site.source ?? {}).map(([rel, text]) => [`${SITE_SOURCE_DIR}/${rel}`, text]));
+  const entries = Object.entries({ ...site.files, ...sourceFiles, [SITE_SOURCE]: site.contentJson }).sort(([a], [b]) => a.localeCompare(b));
   const files: SiteManifest["files"] = [];
   for (const [name, content] of entries) {
-    const stored = await store.write(`${dir}/${name}`, content);
+    const stored = binary.has(name) ? await store.writeBytes!(`${dir}/${name}`, Buffer.from(content, "base64")) : await store.write(`${dir}/${name}`, content);
     files.push({ name, sha256: stored.sha256, bytes: stored.bytes });
   }
-  const manifest: SiteManifest = { version: 1, starterVersion: site.starterVersion, pages: site.pages, files, source: SITE_SOURCE };
+  const manifest: SiteManifest = {
+    version: 1,
+    starterVersion: site.starterVersion,
+    pages: site.pages,
+    files,
+    source: SITE_SOURCE,
+    ...(binary.size ? { binary: [...binary].sort() } : {}),
+    ...(site.buildRecord ? { build: site.buildRecord } : {}),
+  };
   return store.write(`${dir}/${SITE_MANIFEST}`, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
@@ -112,20 +138,24 @@ async function writeSite(store: ArtifactStore, dir: string, site: NonNullable<Fr
 export async function readSiteVerified(
   store: ArtifactStore,
   manifestArtifact: StoredArtifact,
-): Promise<{ files: Record<string, string>; pages: string[]; contentJson: string }> {
+): Promise<{ files: Record<string, string>; pages: string[]; contentJson: string; binary?: string[] }> {
   const manifest = JSON.parse(await store.readVerified(manifestArtifact)) as SiteManifest;
   const dir = manifestArtifact.path.slice(0, -SITE_MANIFEST.length - 1);
+  const binary = new Set(manifest.binary ?? []);
+  if (binary.size && !store.readVerifiedBytes) throw new CheckpointIntegrityError("this artifact store cannot read binary files back");
   const files: Record<string, string> = {};
   let contentJson = "";
   for (const f of manifest.files) {
-    const content = await store.readVerified({ path: `${dir}/${f.name}`, sha256: f.sha256, bytes: f.bytes });
+    const artifact = { path: `${dir}/${f.name}`, sha256: f.sha256, bytes: f.bytes };
+    // Every file is re-hashed, the built source included, even though QA only serves the output.
+    const content = binary.has(f.name) ? (await store.readVerifiedBytes!(artifact)).toString("base64") : await store.readVerified(artifact);
     if (f.name === manifest.source) contentJson = content;
-    else files[f.name] = content;
+    else if (!f.name.startsWith(`${SITE_SOURCE_DIR}/`)) files[f.name] = content;
   }
   for (const p of manifest.pages) {
     if (files[p] === undefined) throw new CheckpointIntegrityError(`site manifest lists page ${p} but has no file for it`);
   }
-  return { files, pages: manifest.pages, contentJson };
+  return { files, pages: manifest.pages, contentJson, ...(binary.size ? { binary: [...binary] } : {}) };
 }
 
 /** Files under the repo root — the same location the front-end CLI has always written pages to. */
@@ -138,6 +168,28 @@ export class FileArtifactStore implements ArtifactStore {
     mkdirSync(path.dirname(abs), { recursive: true });
     writeFileSync(abs, content, "utf-8");
     return { path: relPath, sha256: sha256(content), bytes: Buffer.byteLength(content, "utf8") };
+  }
+
+  async writeBytes(relPath: string, bytes: Buffer): Promise<StoredArtifact> {
+    assertSafeRelPath(relPath);
+    const abs = path.join(this.root, relPath);
+    mkdirSync(path.dirname(abs), { recursive: true });
+    writeFileSync(abs, bytes);
+    return { path: relPath, sha256: sha256(bytes), bytes: bytes.length };
+  }
+
+  async readVerifiedBytes(artifact: StoredArtifact): Promise<Buffer> {
+    assertSafeRelPath(artifact.path);
+    let bytes: Buffer;
+    try {
+      bytes = readFileSync(path.join(this.root, artifact.path));
+    } catch (err) {
+      throw new CheckpointIntegrityError(`checkpointed artifact ${artifact.path} is unreadable: ${String(err)}`);
+    }
+    if (sha256(bytes) !== artifact.sha256) {
+      throw new CheckpointIntegrityError(`checkpointed artifact ${artifact.path} no longer matches its checkpoint hash — refusing to verify a changed file`);
+    }
+    return bytes;
   }
 
   async readVerified(artifact: StoredArtifact): Promise<string> {
@@ -160,6 +212,18 @@ export class FileArtifactStore implements ArtifactStore {
 /** For tests. */
 export class MemoryArtifactStore implements ArtifactStore {
   readonly files = new Map<string, string>();
+  readonly blobs = new Map<string, Buffer>();
+  async writeBytes(relPath: string, bytes: Buffer): Promise<StoredArtifact> {
+    assertSafeRelPath(relPath);
+    this.blobs.set(relPath, Buffer.from(bytes));
+    return { path: relPath, sha256: sha256(bytes), bytes: bytes.length };
+  }
+  async readVerifiedBytes(artifact: StoredArtifact): Promise<Buffer> {
+    const bytes = this.blobs.get(artifact.path);
+    if (bytes === undefined) throw new CheckpointIntegrityError(`checkpointed artifact ${artifact.path} is missing`);
+    if (sha256(bytes) !== artifact.sha256) throw new CheckpointIntegrityError(`checkpointed artifact ${artifact.path} changed since checkpoint`);
+    return bytes;
+  }
   async write(relPath: string, content: string): Promise<StoredArtifact> {
     assertSafeRelPath(relPath);
     this.files.set(relPath, content);
@@ -355,7 +419,7 @@ class Workflow {
     let cp = initial;
     for (;;) {
       let html: string;
-      let site: { files: Record<string, string>; pages: string[]; contentJson: string } | null = null;
+      let site: { files: Record<string, string>; pages: string[]; contentJson: string; binary?: string[] } | null = null;
       try {
         if (isSiteManifest(cp.artifact)) {
           site = await readSiteVerified(this.deps.artifacts, cp.artifact);
@@ -381,7 +445,7 @@ class Workflow {
             goal: this.brief.goal,
             // Step 4B M1 claims gate: the approved brief is the only place a page fact may come from.
             factSources: [this.brief.goal, this.brief.brandNotes],
-            ...(site ? { site: { files: site.files, pages: site.pages } } : {}),
+            ...(site ? { site: { files: site.files, pages: site.pages, ...(site.binary ? { binary: site.binary } : {}) } } : {}),
           },
         },
         { registry: this.deps.registry, audit: { sink: this.deps.audit }, runId: this.runId },

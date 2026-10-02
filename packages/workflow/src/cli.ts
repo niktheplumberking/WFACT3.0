@@ -5,7 +5,8 @@
  *
  *   npm run build-and-verify -- ../../clients/<slug>/brief.json
  *   npm run build-and-verify -- --resume <workflow-run-id>
- *   add --track A to build with the Track A builder (multi-page site from the Track A starter, Step 4B M3);
+ *   add --track A to build with the Track A builder (multi-page site from the Track A starter, Step 4B M3),
+ *   or --track B for the Track B builder (Next.js static export, built with no network and no secrets, M4);
  *   with --plan the owner's chosen track is used.
  *
  * Secrets come from the environment (Doppler: `doppler run -- npm run build-and-verify -- …`, see
@@ -19,10 +20,12 @@ import { auditReaderFromEnv, auditSinkFromEnv, traceSinkFromEnv } from "@wfact/a
 import { createSeedRegistry } from "@wfact/agent-runtime";
 import { createFrontendBuilderAgent } from "@wfact/frontend-loop/agent";
 import { createTrackABuilderAgent } from "@wfact/frontend-loop/trackA/agent";
+import { createTrackBBuilderAgent } from "@wfact/frontend-loop/trackB/agent";
 import { modelClientFromEnv } from "@wfact/frontend-loop/modelClient";
 import { appendCorrectionLogRows, formatCorrectionSummary } from "@wfact/frontend-loop/correctionLog";
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
 import { productionQaOptions } from "@wfact/rendered-qa/production";
+import { TRACK_B_BUDGET } from "@wfact/rendered-qa/rendered";
 import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
 import { traceModelClient } from "@wfact/hermes-lite/tracing";
 import { knownClientSlugs } from "@wfact/verification/paths";
@@ -53,8 +56,8 @@ async function main() {
   const planId = planIdx >= 0 ? args[planIdx + 1] : undefined;
   const trackIdx = args.indexOf("--track");
   let track = trackIdx >= 0 ? args[trackIdx + 1] : undefined;
-  if (track !== undefined && track !== "A") {
-    console.error(`--track must be A (Track B arrives in Step 4B M4); got ${JSON.stringify(track)}`);
+  if (track !== undefined && track !== "A" && track !== "B") {
+    console.error(`--track must be A or B; got ${JSON.stringify(track)}`);
     process.exitCode = 1;
     return;
   }
@@ -80,7 +83,6 @@ async function main() {
     planBrief = stored.plan.brief;
     // Step 4B M2/M3: the owner's track choice decides the builder.
     if (!stored.buildTrack) blocked(`plan ${planId} has no build track; the owner chooses one when approving`);
-    if (stored.buildTrack === "B") blocked(`plan ${planId} is Track B; the Track B builder arrives in Step 4B M4`);
     track = stored.buildTrack;
   }
 
@@ -106,15 +108,25 @@ async function main() {
   const reviewerModel = traceModelClient(builderReviewer.client, traceSink, "cli:build-and-verify");
   const qaModel = qa.client ? traceModelClient(qa.client, traceSink, "cli:build-and-verify") : null;
 
-  if (resumeRunId && (await recordedBuilderTemplate(resumeRunId, reader)) === "track-a") track = "A";
+  if (resumeRunId) {
+    const recorded = await recordedBuilderTemplate(resumeRunId, reader);
+    if (recorded === "track-a") track = "A";
+    if (recorded === "track-b") track = "B";
+  }
   if (track === "A") console.error("(builder: Track A starter, multi-page; the builder model writes the content only)");
+  if (track === "B") console.error("(builder: Track B starter, Next.js static export built with no network and no secrets; the builder model writes the content only)");
   const deps: WorkflowDeps = {
     frontEndAgent:
       track === "A"
         ? createTrackABuilderAgent({ builderModel, evaluatorModel: reviewerModel })
-        : createFrontendBuilderAgent({ builderModel, evaluatorModel: reviewerModel }),
-    // Step 4B M1: claims gate + rendered QA + cross-vendor screenshot review, then the evaluator.
-    qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name })),
+        : track === "B"
+          ? createTrackBBuilderAgent({ builderModel, evaluatorModel: reviewerModel })
+          : createFrontendBuilderAgent({ builderModel, evaluatorModel: reviewerModel }),
+    // Step 4B M1: claims gate + rendered QA + cross-vendor screenshot review, then the evaluator. Track B is
+    // held to its own budget (LCP 2.5 s, its JS ceiling, the motion budget).
+    qaAgent: createQaEvaluatorAgent(
+      productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, ...(track === "B" ? { budget: TRACK_B_BUDGET } : {}) }),
+    ),
     registry: createSeedRegistry(),
     audit: sink,
     reader,

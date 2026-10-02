@@ -109,14 +109,38 @@ test("Step 4B M2: build_plan refuses an approved plan with no track (a pre-M2 ap
   assert.equal(artifacts.files.size, 0);
 });
 
-test("Step 4B M2: a Track B plan is refused until the Track B builder exists (M4), not built as Track A", async () => {
+// Changed in Step 4B M4 (was: "refused until the Track B builder exists"). A runner without a Track B
+// builder still refuses, and never builds the plan as Track A.
+test("Step 4B M4: a Track B plan on a runner with no Track B builder is refused, not built as Track A", async () => {
   const { d, planStore, artifacts } = deps(CLEAN);
   const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
   planStore.decide(intake.result.planId as string, "approved", null, "B");
   const out = await handleJob(job("build_plan", { planId: intake.result.planId }), d);
   assert.equal(out.ok, false);
-  assert.match(out.reason ?? "", /Track B builder is not built yet/);
+  assert.match(out.reason ?? "", /no Track B builder configured; it is not built as Track A/);
   assert.equal(artifacts.files.size, 0);
+});
+
+test("Step 4B M4: a Track B plan is built by the Track B workflow, and only by it", async () => {
+  const { d, planStore, artifacts } = deps(CLEAN);
+  let trackBRuns = 0;
+  const trackB = {
+    ...d.workflow,
+    frontEndAgent: {
+      ...d.workflow.frontEndAgent,
+      execute: async (input: Parameters<typeof d.workflow.frontEndAgent.execute>[0], ctx: Parameters<typeof d.workflow.frontEndAgent.execute>[1]) => {
+        trackBRuns += 1;
+        return d.workflow.frontEndAgent.execute(input, ctx);
+      },
+    },
+  };
+  const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
+  planStore.decide(intake.result.planId as string, "approved", null, "B");
+  const out = await handleJob(job("build_plan", { planId: intake.result.planId }), { ...d, trackBWorkflow: trackB });
+  assert.equal(out.ok, true, out.reason ?? "");
+  assert.equal(out.result.buildTrack, "B");
+  assert.equal(trackBRuns, 1);
+  assert.ok(artifacts.files.size > 0);
 });
 
 test("build_plan job with a page QA keeps failing → ok:false with the specific failed checks", async () => {

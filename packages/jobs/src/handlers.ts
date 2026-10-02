@@ -28,6 +28,11 @@ export interface HandlerDeps {
    * M2 used), which only older tests rely on.
    */
   trackAWorkflow?: WorkflowDeps;
+  /**
+   * Step 4B M4: the same workflow with the Track B builder (Next.js static export, isolated build) and the
+   * Track B QA budget. Production sets it; without it a Track B plan is refused, never built as Track A.
+   */
+  trackBWorkflow?: WorkflowDeps;
   /** Reads a page by repo-relative path from the artifact store (null if absent). */
   readArtifact: (relPath: string) => Promise<string | null>;
   repoRoot: string;
@@ -131,12 +136,13 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       if (!stored.buildTrack) {
         return { ok: false, reason: `plan ${planId} has no build track — the owner chooses Track A or B when approving`, result: { planId } };
       }
-      // Track A builds the multi-page site from the Track A starter (M3). Track B (Next.js) arrives in M4;
-      // building a Track B plan with the Track A builder would silently ignore the owner's choice.
-      if (stored.buildTrack === "B") {
-        return { ok: false, reason: `plan ${planId} is Track B; the Track B builder is not built yet (Step 4B M4)`, result: { planId, buildTrack: "B" } };
+      // Track A builds from the Track A starter (M3), Track B from the Next.js starter (M4). A Track B plan is
+      // never built by another builder: that would silently ignore the owner's choice.
+      if (stored.buildTrack === "B" && !deps.trackBWorkflow) {
+        return { ok: false, reason: `plan ${planId} is Track B, but this runner has no Track B builder configured; it is not built as Track A`, result: { planId, buildTrack: "B" } };
       }
-      const outcome = workflowOutcome(await buildAndVerify(stored.plan.brief, deps.trackAWorkflow ?? deps.workflow));
+      const wf = stored.buildTrack === "B" ? deps.trackBWorkflow! : deps.trackAWorkflow ?? deps.workflow;
+      const outcome = workflowOutcome(await buildAndVerify(stored.plan.brief, wf));
       return { ...outcome, result: { planId, buildTrack: stored.buildTrack, ...outcome.result } };
     }
 
@@ -144,7 +150,8 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       const runId = uuid(p, "workflowRunId");
       // Resume with the builder that started the run (a Track A site is revised as content, not HTML).
       const template = await recordedBuilderTemplate(runId, deps.workflow.reader);
-      const wf = template === "track-a" && deps.trackAWorkflow ? deps.trackAWorkflow : deps.workflow;
+      const wf =
+        template === "track-a" && deps.trackAWorkflow ? deps.trackAWorkflow : template === "track-b" && deps.trackBWorkflow ? deps.trackBWorkflow : deps.workflow;
       return workflowOutcome(await resumeBuildAndVerify(runId, wf));
     }
 
