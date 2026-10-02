@@ -5,7 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createScreenshotReviewSuite, parseReview, REVIEW_CHECK_ID } from "../src/reviewer.js";
+import { REVIEW_RETRY_DELAYS_MS, createScreenshotReviewSuite, parseReview, REVIEW_CHECK_ID } from "../src/reviewer.js";
 import { loadRulebook } from "../src/rulebook.js";
 import type { Shot } from "../src/rendered.js";
 import type { VerificationContext } from "@wfact/verification/checks/types";
@@ -95,6 +95,27 @@ test("an auth error is not retried and is NOT RUN", async () => {
   assert.equal(calls.length, 1);
   assert.equal(r!.notRun, true);
   assert.match(r!.details[0]!, /HTTP 401/);
+});
+
+test("a gateway outage (HTTP 502) is retried after a wait and recovers", async () => {
+  const { impl, calls } = mockFetch([{ status: 502 }, { status: 502 }, allPass()]);
+  const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, retryDelaysMs: [0, 0, 0] }).run(ctx);
+  assert.equal(calls.length, 3);
+  assert.equal(r!.passed, true);
+  assert.equal(r!.notRun, undefined);
+});
+
+test("a gateway outage that outlasts every wait is NOT RUN after a hard cap, never a pass", async () => {
+  const { impl, calls } = mockFetch([{ status: 502 }]);
+  const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, retryDelaysMs: [0, 0, 0] }).run(ctx);
+  assert.equal(calls.length, 4);
+  assert.equal(r!.notRun, true);
+  assert.match(r!.details[0]!, /after 4 attempts \(HTTP 502/);
+});
+
+test("the default waits grow and are capped", () => {
+  assert.ok(REVIEW_RETRY_DELAYS_MS.length >= 2 && REVIEW_RETRY_DELAYS_MS.length <= 4);
+  for (let i = 1; i < REVIEW_RETRY_DELAYS_MS.length; i++) assert.ok(REVIEW_RETRY_DELAYS_MS[i]! > REVIEW_RETRY_DELAYS_MS[i - 1]!);
 });
 
 test("parseReview rejects unknown ids and duplicate answers", () => {

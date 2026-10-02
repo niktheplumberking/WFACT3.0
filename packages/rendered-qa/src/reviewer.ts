@@ -72,7 +72,18 @@ export interface ScreenshotReviewOptions {
   decision?: ReviewerDecision;
   rulebook?: Rulebook;
   fetchImpl?: typeof fetch;
+  /** Waits before each retry of a gateway/network failure (5xx, 429, no response); tests pass zeros. */
+  retryDelaysMs?: number[];
 }
+
+/**
+ * Gateway or network failures (HTTP 5xx/429, no response) are retried after a wait, with a hard cap,
+ * then NOT RUN (CLAUDE.md §6: bounded, exponential backoff, then escalate). Two back-to-back attempts
+ * lost a live build to a short Agent 37 outage (HTTP 502 upstream_unreachable, run 24d8fc72, 2026-10-02).
+ * An unusable answer is a different failure: one immediate retry, as before.
+ */
+export const REVIEW_RETRY_DELAYS_MS = [15_000, 45_000, 120_000];
+const MAX_ANSWER_ATTEMPTS = 2;
 
 export interface ScreenshotReviewSuite extends AsyncCheckSuite {
   provider: ReviewerProvider;
@@ -201,8 +212,19 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
         body.max_tokens = 4000;
       }
 
+      const delays = opts.retryDelaysMs ?? REVIEW_RETRY_DELAYS_MS;
       let lastError = "";
-      for (let attempt = 1; attempt <= 2; attempt += 1) {
+      let calls = 0;
+      let answerAttempts = 0;
+      let transportRetries = 0;
+      // Returns false once the cap is reached; otherwise waits (transport failures only) and allows another call.
+      const retryAfterTransportError = async () => {
+        if (transportRetries >= delays.length) return false;
+        await new Promise((r) => setTimeout(r, delays[transportRetries++]));
+        return true;
+      };
+      for (;;) {
+        calls += 1;
         const started = Date.now();
         let res: Response;
         try {
@@ -214,7 +236,8 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
           });
         } catch (err) {
           lastError = `request failed: ${err instanceof Error ? err.message : String(err)}`;
-          continue;
+          if (await retryAfterTransportError()) continue;
+          break;
         }
         const json = (await res.json().catch(() => ({}))) as {
           choices?: { message?: { content?: string; refusal?: string }; finish_reason?: string }[];
@@ -230,6 +253,9 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
           const msg = typeof json.error === "string" ? json.error : json.error?.message;
           lastError = `HTTP ${res.status}: ${msg?.slice(0, 200) ?? "no message"}`;
           if (res.status === 401 || res.status === 402 || res.status === 403 || res.status === 404) break;
+          if ((res.status >= 500 || res.status === 429) && (await retryAfterTransportError())) continue;
+          if (res.status >= 500 || res.status === 429) break;
+          if (++answerAttempts >= MAX_ANSWER_ATTEMPTS) break;
           continue;
         }
         const choice = json.choices?.[0];
@@ -237,6 +263,7 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
         // Agent 37 can return HTTP 200 with an upstream error as the content (see frontend-loop modelClient).
         if (!raw || choice?.finish_reason === "error") {
           lastError = `empty or errored answer${choice?.message?.refusal ? ` (refusal: ${choice.message.refusal.slice(0, 120)})` : ""}${raw ? `: ${raw.slice(0, 120)}` : ""}`;
+          if (++answerAttempts >= MAX_ANSWER_ATTEMPTS) break;
           continue;
         }
         try {
@@ -250,9 +277,10 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
           }];
         } catch (err) {
           lastError = `invalid answer: ${err instanceof Error ? err.message : String(err)}`;
+          if (++answerAttempts >= MAX_ANSWER_ATTEMPTS) break;
         }
       }
-      return notRun(`the ${provider} reviewer gave no valid answer after 2 attempts (${lastError})`);
+      return notRun(`the ${provider} reviewer gave no valid answer after ${calls} attempt${calls === 1 ? "" : "s"} (${lastError})`);
     },
   };
   return suite;
