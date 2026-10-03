@@ -851,6 +851,17 @@ owner through the same functions: the 2 queued 09-28 builds cancelled, 8 failed/
 still in `jobs`). Cockpit: Activity hides archived runs (Archived filter), finished runs get Archive/Unarchive, Home ignores archived
 runs; Cockpit tests 27/27.
 
+**Fix 2026-10-03 — "no evaluator model was configured" on a Track B build that was fine** (`bad6d57`; not pushed, not deployed).
+First live Track B build from the Cockpit, job `5c85914b` (Harbor Street Bakery plan, GitHub run `37113126761`): cycle 0 failed only
+`render.perf` (mobile LCP 2.63 s), the builder revised, and cycle 1 passed **every** deterministic check (text gate, all rendered checks,
+LCP, motion budget). The design review then returned NOT RUN ("HTTP 502: upstream_unreachable", 4 attempts, `audit_log`
+`verification.decision` 2026-10-03 09:56:22 UTC), so the run was rightly **not verified**, but the halt reason claimed no evaluator was
+configured (the evaluator was `claude`). `notVerifiedReason()` now names the review that did not run and its error; the Cockpit explains
+both the new and the older wording. Tests: workflow 19/19 (+2), Cockpit 28/28 (+1), verification 38/38, jobs 12/12. The Agent 37 gateway
+answered `GET /models` with HTTP 200 at 2026-10-03 (gateway up; a full review call not tested).
+- [ ] Re-run the Track B build of that plan from the Cockpit (Huraira; after this fix is deployed, or as is: the outcome is the same, only
+      the message changes).
+
 **M5–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
 
 ## Step 4C — Cockpit UI/UX redesign: the control room (BUILT AND DEPLOYED 2026-10-01 — live signed-in check pending)
