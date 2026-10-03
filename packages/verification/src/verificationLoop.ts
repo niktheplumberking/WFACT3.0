@@ -136,8 +136,11 @@ export function formatVerificationSummary(result: VerificationResult): string {
       break;
     case "blocked_no_evaluator":
       lines.push(
-        "VERIFICATION: NOT VERIFIED — all deterministic checks passed, but no evaluator model " +
-          "was configured. Per CLAUDE.md §1, checks-only is not the same as verified.",
+        result.checkResults.some((c) => c.notRun)
+          ? "VERIFICATION: NOT VERIFIED — all deterministic checks passed, but a required review could not run (NOT RUN above). " +
+              "Per CLAUDE.md §1, checks-only is not the same as verified; run it again once the reviewer is reachable."
+          : "VERIFICATION: NOT VERIFIED — all deterministic checks passed, but no evaluator model " +
+              "was configured. Per CLAUDE.md §1, checks-only is not the same as verified.",
       );
       break;
     case "changes_requested":

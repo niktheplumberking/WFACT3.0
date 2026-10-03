@@ -293,6 +293,21 @@ function requiredSectionsFor(brief: PilotBrief, templateSections: string[]): str
   return [...new Set([...templateSections, ...brief.requiredSections])];
 }
 
+/**
+ * Why a run that passed every deterministic check is still not verified. Two different situations share
+ * that status: a required review that could not run (e.g. the design reviewer's gateway was down: 2026-10-03,
+ * Cockpit job 5c85914b, HTTP 502 four times) and no evaluator model at all. The reason names which, so
+ * the Cockpit does not tell the owner to fix a configuration that is fine.
+ */
+export function notVerifiedReason(checkResults: { checkId: string; details: string[]; notRun?: boolean }[]): string {
+  const notRun = checkResults.filter((c) => c.notRun);
+  if (notRun.length === 0) {
+    return "deterministic checks passed but no evaluator model was configured — checks alone are not verification";
+  }
+  const what = notRun.map((c) => `${c.checkId}: ${c.details.join(" ").slice(0, 300) || "no answer"}`).join("; ");
+  return `deterministic checks passed but a required review could not run (${what}) — checks alone are not verification; nothing is wrong with the site's checks, start the build again once the reviewer is reachable`;
+}
+
 /** QA failure → the exact issue list the builder gets back. Specific check ids, never "try again". */
 export function qaFailureToIssues(failure: QaFailure): string[] {
   return [
@@ -474,13 +489,7 @@ class Workflow {
       }
 
       if (verdict.status === "blocked_no_evaluator") {
-        return this.halt(
-          "not_verified_no_evaluator",
-          "qa",
-          cp.cycle + 1,
-          cp,
-          "deterministic checks passed but no evaluator model was configured — checks alone are not verification",
-        );
+        return this.halt("not_verified_no_evaluator", "qa", cp.cycle + 1, cp, notVerifiedReason(verdict.checkResults));
       }
 
       const failure: QaFailure = {

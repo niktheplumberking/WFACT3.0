@@ -197,6 +197,25 @@ export function explainJobError(j: Pick<JobRow, "error" | "result" | "kind" | "g
       todo: "Start a new request for this client and approve the new plan with a track.",
     };
   }
+  // A required review (the design reviewer) could not run, e.g. its gateway was down: the site passed every
+  // automatic check but cannot be called verified (2026-10-03, job 5c85914b, HTTP 502 four times).
+  if (/a required review could not run/i.test(e)) {
+    return {
+      headline: "the final review couldn't run",
+      happened:
+        "The site was built and passed every automatic check, but the design review service didn't answer, so the result is not marked verified. Nothing is wrong with the site's checks.",
+      todo: "Start the build again in a little while. If it happens twice in a row, ask Huraira to check the reviewer service.",
+    };
+  }
+  // Older runs recorded both situations with one message, so it cannot tell them apart.
+  if (/no evaluator model was configured/i.test(e)) {
+    return {
+      headline: "the final review didn't run",
+      happened:
+        "The site was built and passed every automatic check, but the last review step didn't run, so the result is not marked verified. On this kind of older run that usually means the review service was briefly unreachable; it can also mean a reviewer key is missing.",
+      todo: "Start the build again. If it happens again, ask Huraira to check the reviewer and evaluator setup.",
+    };
+  }
   if (/^Cancelled by/i.test(e)) {
     return { headline: "it was cancelled", happened: e, todo: "Nothing to do. Start a new request if the work is still needed." };
   }

@@ -56,6 +56,20 @@ describe("plain-language job copy", () => {
     expect(e.todo).toMatch(/Resume build/);
   });
 
+  it("explains a review that could not run (reviewer outage), and the older ambiguous wording, without blaming the site", () => {
+    const outage = explainJobError({
+      kind: "build_plan",
+      error: "deterministic checks passed but a required review could not run (render.design-review: NOT RUN: the agent37 reviewer gave no valid answer after 4 attempts (HTTP 502: upstream_unreachable).) — checks alone are not verification",
+      result: { status: "not_verified_no_evaluator" },
+      gh_run_url: "x",
+    });
+    expect(outage.headline).toBe("the final review couldn't run");
+    expect(outage.todo).toMatch(/Start the build again/);
+    const older = explainJobError({ kind: "build_plan", error: "deterministic checks passed but no evaluator model was configured — checks alone are not verification", result: null, gh_run_url: "x" });
+    expect(older.headline).toBe("the final review didn't run");
+    expect(older.happened).toMatch(/passed every automatic check/);
+  });
+
   it("explains a missing dispatch token and an unknown error", () => {
     expect(explainJobError({ kind: "build_plan", error: "Dispatcher not configured: GITHUB_DISPATCH_TOKEN is not set", result: null, gh_run_url: null }).headline).toBe("the factory worker isn't connected");
     const unknown = explainJobError({ kind: "ask", error: "Something odd. More detail here.", result: null, gh_run_url: "x" });
