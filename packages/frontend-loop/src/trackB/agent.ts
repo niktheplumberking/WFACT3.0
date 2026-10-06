@@ -4,7 +4,9 @@
  * static export (`result.site`, binary fonts as base64, plus the source that was built and the build
  * record); revisions edit the content (`revision.contentJson`), never the code.
  */
-import { AgentInputError, type Agent } from "@wfact/agent-runtime";
+import { AgentInputError, guardModelPair, requirePermission, type Agent } from "@wfact/agent-runtime";
+import { buildTrackBSite } from "./build.js";
+import type { SiteContent } from "./content.js";
 import { parseBrief } from "../brief.js";
 import type { FrontendBuildInput } from "../agent.js";
 import { FRONT_END_BUILDER_ROLE } from "../agent.js";
@@ -12,7 +14,19 @@ import type { FrontendLoopResult } from "../loop.js";
 import { TrackBLoop, TRACK_B_TEMPLATE, type TrackBLoopOptions } from "./loop.js";
 
 export function createTrackBBuilderAgent(opts: TrackBLoopOptions): Agent<FrontendBuildInput, FrontendLoopResult> {
-  const loop = new TrackBLoop(opts);
+  // Step 6: model calls and the isolated build go through the run's permission gate. The build is a named tool
+  // (build.trackBIsolated) in the front-end-builder's scope, so no other role can start one.
+  const models = guardModelPair(opts.builderModel, "builder", opts.evaluatorModel, "evaluator");
+  const build = opts.build ?? ((c: SiteContent) => buildTrackBSite(c));
+  const loop = new TrackBLoop({
+    ...opts,
+    builderModel: models.builder,
+    evaluatorModel: models.evaluator,
+    build: async (content) => {
+      await requirePermission({ kind: "tool", name: "build.trackBIsolated" });
+      return build(content);
+    },
+  });
   return {
     role: FRONT_END_BUILDER_ROLE,
     retry: { maxAttempts: 1, baseDelayMs: 2000 },

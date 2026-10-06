@@ -13,6 +13,7 @@ import { buildPalette, contrast } from "../src/trackA/palette.js";
 import { renderSite, STARTER_VERSION } from "../src/trackA/render.js";
 import { TrackALoop, trackASystemPrompt } from "../src/trackA/loop.js";
 import { createTrackABuilderAgent } from "../src/trackA/agent.js";
+import { createSeedRegistry, permissionGateFor, withPermissionGate } from "@wfact/agent-runtime";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..", "..");
 const brief = loadBrief(path.join(ROOT, "clients", "summit-line-roofing", "brief.json"));
@@ -168,7 +169,9 @@ test("agent: Track A revisions need the content JSON; summary lists the pages", 
   assert.equal(agent.role, "front-end-builder");
   assert.equal(agent.parseInput({ brief }).template.id, "track-a");
   assert.throws(() => agent.parseInput({ brief, revision: { html: "<html></html>", issues: ["x"] } }), /contentJson/);
-  const out = await agent.execute(agent.parseInput({ brief }), {} as never);
+  // Step 6: model calls need a permission gate (runAgent provides one); this direct execute() supplies the role's own.
+  const gate = permissionGateFor(createSeedRegistry(), "front-end-builder", { taskId: null, runId: null, entitySlug: brief.entitySlug, clientSlug: brief.clientSlug, audit: null });
+  const out = await withPermissionGate(gate, () => agent.execute(agent.parseInput({ brief }), {} as never));
   assert.deepEqual(agent.summarize!(out).pages, ["index.html", "services.html", "faq.html", "contact.html"]);
 });
 
