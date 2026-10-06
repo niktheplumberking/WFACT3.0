@@ -2,7 +2,8 @@
 
 Last synced: 2026-10-06 (+05), via `/step-close 4B M4` — `8dae180`…`4bbd4bc` (claims gate 1.1.0, single-page and no-invented-testimonial
 builder fixes from Cockpit job `f696ba43`, `packages/media` Seedance groundwork); local tests green, **not pushed, no CI run yet**.
-Step 6 is running in a separate worktree (Huraira approved the parallel lane 2026-10-06); not merged, not reflected here.
+Step 6 (parallel worktree, approved by Huraira 2026-10-06) merged locally: `58bf776`…`ee08f9d`; merged tree re-tested here.
+`8dae180`…`6cbde1d` were pushed to `huraira-work` 2026-10-06; CI runs only for `main`, so none has run yet.
 Previous sync: 2026-10-02 (20:05 +05), via `/progress-sync` — folds in the push of `a9f4dcf`…`2d96962` to both branches (Huraira's word),
 CI `37016971442` green on `2d96962` (all 13 jobs incl. the new isolated Track B build and the Cockpit deploy), the other session's
 `c857150`…`0f00cde` (artifact-store CDN fix; CI `37019326469` still running at sync), and the live `jobs`/`plan_approvals`/`audit_log`
@@ -24,7 +25,7 @@ steps; this file tracks the Continuation Stages.
 Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is IN PROGRESS** (M0 6 of 7 inputs, M1, M2, M3 done; **M4 PARTIAL**
 2026-10-02: built, verified locally and in CI `37016971442`; the live Track B build `f696ba43` failed on two factory contradictions,
 fixed 2026-10-06 in `c64bd0e` (not yet re-run live); M5–M6 not started), and
-**Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
+**Step 6 is DONE** 2026-10-06 (enforced default-deny permissions, live attack verified; CI pending until pushed). **Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
 signed-in use on 2026-10-01: plan `b5a45a8e` approved as Track A (audited) and two Track A builds started from the Cockpit; both halted
 on a CDN bug that is now fixed but not yet re-run live. A full room-by-room signed-in check is still Huraira's to confirm.
 **Biggest open items**: push today's fixes and re-run Track A (`b5a45a8e`) and Track B (`4acbde1f`) live, Higgsfield credits and a
@@ -37,7 +38,8 @@ spending cap (M5), a different-vendor screenshot reviewer, Nick's real brief, a 
    client, the Track B budgets stand, Motion/Radix stay out of the starter.
 2. **Huraira**: add Higgsfield credits (the live Seedance run returned "Not enough credits"), rotate the key (it was posted in chat), put
    it in the GitHub secrets, and set a per-build and per-month spending cap; then GO for M5.
-3. **Huraira**: the screenshot reviewer (deferred to after M6, 2026-10-06); Supabase Auth settings and one real sign-up for Step 3A; the
+3. **Huraira**: confirm the Step 6 per-run cost ceilings (builder $5, QA $2, Intake $0.50, Direction $1, Planner $1, Hermes $0.50); the
+   screenshot reviewer (deferred to after M6, 2026-10-06); Supabase Auth settings and one real sign-up for Step 3A; the
    old Doppler CLI token check.
 
 **Gaps noticed**:
@@ -45,6 +47,9 @@ spending cap (M5), a different-vendor screenshot reviewer, Nick's real brief, a 
   (the only dead path found in a link check of the 7 main docs this sync).
 - **Two ways in to QA still differ**: `packages/verification`'s old `npm run verify` CLI runs only the original six checks; the M1 gate is
   in `npm run qa` (rendered-qa), the jobs runner and the workflow CLI.
+- **QA link checker egress is open** (found in Step 6): it fetches any link on a built page, a possible SSRF on the job runner. Candidate
+  for Step 7 or 21.
+- **Hermes-lite reads `clients/<entitySlug>/memory.md`** (an entity slug used as a client folder name), found in Step 6.
 - **`packages/media` is not in CI yet**: its 8 tests run locally only; add it to the CI job list when M5 wires it into the pipeline.
 - **Track B "work" items can still be invented clients labelled SAMPLE**; quotes no longer can (2026-10-06). The design reviewer may
   read invented project panels as fake social proof too; watch the next live Track B build.
@@ -929,3 +934,43 @@ reason; the walkthrough passes; accessibility and responsiveness proven with evi
 — **PARTIALLY MET**. All parts are met with the evidence above (CI `36905237284`; no deploy button: Launch shows as a decision made outside
 the Cockpit and is blocked as a stage move), except that every room has only been checked with copied data, not with a live signed-in
 session. The phone layout shift on Projects (0.118, measured on the copied-data build) is also still open.
+
+## Step 6 — Enforce agent permissions (DONE 2026-10-06 — CI pending until pushed)
+
+Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 6 and Blueprint §3/§12/§16I. Built by a coding agent in a separate worktree
+(Huraira approved the parallel lane 2026-10-06), merged into `huraira-work` and re-verified in the main checkout. Full write-up, capability
+inventory and NOT COVERED list: `docs/AGENT-PERMISSIONS.md`.
+
+- [x] Capability inventory, role x capability — `docs/AGENT-PERMISSIONS.md`
+- [x] `permissionScope` is a typed, versioned (policy 1.0.0), default-deny allowlist (model slots, tables/ops, read/write paths, tools,
+      max cost per run); the registry refuses a malformed scope — `58bf776`, `packages/agent-runtime/src/permissions.ts`
+- [x] One enforcement point: `decide()` + the per-run `PermissionGate` from `runAgent`; model clients, artifact reads/writes, `plan_approvals`,
+      the Track B build, the QA browser and reviewer, Hermes-lite tools and the verify job all go through it — `b8dbe95`, `a319a59`, `89e80be`,
+      `a10c225`, `5c82f0b`
+- [x] Entity isolation in code: `clients/<slug>/` paths must be the run's client; a client owned by another entity is refused before start
+- [x] Every denial audited as `agent.deny` (role, capability, reason, task id), never retried by the runtime, never reported completed
+- [x] Injection: client text is data; instruction-like text is flagged `agent.injection_suspected`; tests for "ignore previous", "email the
+      API key", "write to another client's folder" — `planning/test/injection.test.ts`
+- [x] Live attack run 2026-10-06 13:02 UTC through the real runtime and live `audit_log` (`npm run attack:permissions -- --real-model`, `128cd0a`):
+      A1 `050c3329`, A2 `ed07cfaf`, A3 `cb7739a2`, A4 `7197fa12` all denied (1, 1, 1, 4 denials); A5 `9a692a2d` real models did not obey
+- [x] Registry header and docs updated ("descriptive only" removed) — `ee08f9d`
+- [ ] CI on the merged tree (runs only for `main`; pending Huraira's choice of PR or push)
+- [ ] Per-run cost ceilings confirmed by Huraira: builder $5, QA $2, Intake $0.50, Direction $1, Planner $1, Hermes $0.50
+
+**Verification** (independent of the building agent)
+- [x] Merged tree, main checkout: typecheck clean and tests pass in all packages — audit 14, agent-runtime 39, hermes 43, planning 32,
+      verification 44, workflow 24, jobs 17, frontend-loop 64, media 8, rendered-qa 40 (real Chromium)
+- [x] Supabase SQL, run separately from the attack script: 26 audit rows from the attack runs, 7 `agent.deny` all with a task id, all for
+      `dreamsign`, no row forged for `bennett-co`
+- [x] Code read of `decide()`: no scope, wrong policy version or unknown capability kind all deny; paths normalised before matching
+
+**NOT COVERED** (stated plainly): network egress outside the Track B build sandbox (the QA link checker can fetch any URL: possible SSRF on
+the runner); one service-role key per runner (the gate is an in-process boundary, not a credential boundary); local CLIs (workflow CLI's
+correction-log append, rendered-QA CLI, Hermes-lite CLI) are not gated; the screenshot reviewer's and unpriced Agent 37 calls don't count
+toward the cost ceiling (it can be exceeded by one call); Hermes-lite retries a denied model call up to 3 times (up to 3 `agent.deny` rows).
+
+**Exit check**: *"Default-deny works; each role can do exactly its scope, proven by tests and a live attack run. Cross-entity access and the
+injection cases are denied and audited. Existing suites pass unchanged (or minimal, justified changes listed)."* — **MET**. Justified
+changes: `runAgent.test.ts` echo role uses a typed scope; one `trackA.test.ts` test supplies the role's gate; `verification.decision` rows
+inside an agent run now carry the run's entity in `entity_slug` (client slug moved to the payload). CI on the merged tree is still to run.
+
