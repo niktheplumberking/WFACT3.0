@@ -13,7 +13,7 @@
  *     every role registered in the agent registry — a plan the pipeline can't execute is rejected.
  */
 import { z } from "zod";
-import { AgentInputError, type Agent, type AgentDefinition, type AgentRegistry } from "@wfact/agent-runtime";
+import { AgentInputError, defineScope, guardModelClient, type Agent, type AgentDefinition, type AgentRegistry } from "@wfact/agent-runtime";
 import { parseBrief, type PilotBrief } from "@wfact/frontend-loop/brief";
 import { HAND_PICKED_TEMPLATES } from "@wfact/frontend-loop/templates";
 import { IntakeResultSchema, type IntakeResult } from "./intake.js";
@@ -26,7 +26,14 @@ export const PLANNER_DEFINITION: AgentDefinition = {
   role: PLANNER_ROLE,
   description: "Turns intake facts into an owner-approvable plan: template, brief, stage tasks for build-and-verify (Blueprint §5 Planning).",
   skillset: ["stage-breakdown", "template-selection", "brief-writing"],
-  permissionScope: ["model:planner", "db:insert:plan_approvals"],
+  // Step 6: the plan_approvals insert (and superseding its own pending predecessor) is done by the planning
+  // pipeline on this role's behalf, through this scope (pipeline.ts). Intake facts came from client text: screened.
+  permissionScope: defineScope({
+    models: ["planner"],
+    db: [{ table: "plan_approvals", ops: ["insert", "update"] }],
+    maxCostUsdPerRun: 1,
+    scanInputForInjection: true,
+  }),
   modelSlots: ["planner"],
 };
 
@@ -139,6 +146,7 @@ export class PlanValidationError extends Error {
 }
 
 export function createPlannerAgent(opts: { model: JsonModelClient; registry: AgentRegistry }): Agent<PlannerInput, Plan> {
+  const model = guardModelClient(opts.model, "planner");
   return {
     role: PLANNER_ROLE,
     // One retry if the model returns an unexecutable plan (bad stages, dropped sections) or a
@@ -159,7 +167,7 @@ export function createPlannerAgent(opts: { model: JsonModelClient; registry: Age
     },
     async execute(input): Promise<Plan> {
       const out = ModelPlanSchema.parse(
-        await opts.model.completeJson({ system: systemPrompt(), user: userPrompt(input), schema: MODEL_PLAN_JSON_SCHEMA, maxTokens: 4096 }),
+        await model.completeJson({ system: systemPrompt(), user: userPrompt(input), schema: MODEL_PLAN_JSON_SCHEMA, maxTokens: 4096 }),
       );
       return assemblePlan(input.intake, out, opts.registry);
     },

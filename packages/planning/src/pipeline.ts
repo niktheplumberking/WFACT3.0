@@ -14,7 +14,7 @@
  */
 import { randomUUID } from "node:crypto";
 import type { AuditSink } from "@wfact/audit";
-import { createSeedRegistry, runAgent, type AgentRegistry, type AgentRun } from "@wfact/agent-runtime";
+import { createSeedRegistry, permissionGateFor, PermissionDeniedError, runAgent, type AgentRegistry, type AgentRun } from "@wfact/agent-runtime";
 import { createIntakeAgent, INTAKE_DEFINITION, INTAKE_ROLE, type IntakeResult } from "./intake.js";
 import { createPlannerAgent, PLANNER_DEFINITION, PLANNER_ROLE, type Plan } from "./planner.js";
 import { createDirectionAgent, DIRECTION_DEFINITION, DIRECTION_ROLE, type DirectionResult } from "./direction.js";
@@ -82,7 +82,7 @@ async function directionFor(
   if (!deps.directionModel) return { direction: null, note: "no direction model configured for this run", run: null };
   const run = await runAgent(
     createDirectionAgent({ model: deps.directionModel }),
-    { taskId: randomUUID(), role: DIRECTION_ROLE, input: { intake, rawText }, entitySlug: intake.entitySlug ?? undefined },
+    { taskId: randomUUID(), role: DIRECTION_ROLE, input: { intake, rawText }, entitySlug: intake.entitySlug ?? undefined, clientSlug: intake.clientSlug },
     { registry, audit: deps.audit ? { sink: deps.audit } : null, runId },
   );
   if (run.status !== "completed" || !run.output) {
@@ -100,13 +100,16 @@ async function planFrom(
   replanOf: { id: string; note: string } | null,
   dir: { direction: DirectionResult | null; note: string | null; run: AgentRun<DirectionResult> | null },
 ): Promise<PlanningResult> {
+  const plannerTaskId = randomUUID();
   const plannerRun = await runAgent(
     createPlannerAgent({ model: deps.plannerModel, registry }),
     {
-      taskId: randomUUID(),
+      taskId: plannerTaskId,
       role: PLANNER_ROLE,
       input: { intake, ownerFeedback: replanOf?.note },
       entitySlug: intake.entitySlug,
+      // Step 6: the plan is for this client folder only; a client of another entity is refused before the run.
+      clientSlug: intake.clientSlug,
     },
     { registry, audit: deps.audit ? { sink: deps.audit } : null, runId },
   );
@@ -114,6 +117,22 @@ async function planFrom(
   const d = { direction: dir.direction, directionNote: dir.note };
   if (plannerRun.status !== "completed" || !plannerRun.output) {
     return { status: "plan_failed", runId, planId: null, plan: null, intake, ...d, reason: `planner ${plannerRun.status}: ${plannerRun.reason}`, runs };
+  }
+  // Step 6: the pipeline writes plan_approvals on the Planner's behalf, so the Planner's scope decides: insert
+  // (and update, to supersede a pending predecessor) on plan_approvals, for the run's own entity only.
+  const gate = permissionGateFor(registry, PLANNER_ROLE, {
+    taskId: plannerTaskId,
+    runId,
+    entitySlug: intake.entitySlug,
+    clientSlug: intake.clientSlug,
+    audit: deps.audit,
+  });
+  try {
+    await gate.authorize({ kind: "db", table: "plan_approvals", op: "insert", entitySlug: plannerRun.output.brief.entitySlug });
+    if (replanOf) await gate.authorize({ kind: "db", table: "plan_approvals", op: "update", entitySlug: plannerRun.output.brief.entitySlug });
+  } catch (err) {
+    if (!(err instanceof PermissionDeniedError)) throw err;
+    return { status: "plan_failed", runId, planId: null, plan: null, intake, ...d, reason: err.message, runs };
   }
   const planId = await deps.store.insertPending({
     plan: plannerRun.output,

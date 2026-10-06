@@ -18,7 +18,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
-import { AgentInputError, type Agent, type AgentDefinition } from "@wfact/agent-runtime";
+import { AgentInputError, defineScope, guardModelClient, type Agent, type AgentDefinition } from "@wfact/agent-runtime";
 import type { IntakeResult } from "./intake.js";
 import { toApiSchema, type JsonModelClient } from "./modelClient.js";
 
@@ -29,7 +29,8 @@ export const DIRECTION_DEFINITION: AgentDefinition = {
   description:
     "Reads the raw request and states niche, audience, conversion goal, requirements and brand direction (each quoted), and recommends a build track for the owner to confirm (Step 4B).",
   skillset: ["niche-classification", "brand-direction", "track-recommendation"],
-  permissionScope: ["model:direction"],
+  // Step 6: one model slot. It reads the raw request text, so its input is screened for injection (audit-only).
+  permissionScope: defineScope({ models: ["direction"], maxCostUsdPerRun: 1, scanInputForInjection: true }),
   modelSlots: ["direction"],
 };
 
@@ -195,6 +196,7 @@ function systemPrompt(): string {
 }
 
 export function createDirectionAgent(opts: { model: JsonModelClient }): Agent<DirectionInput, DirectionResult> {
+  const model = guardModelClient(opts.model, "direction");
   return {
     role: DIRECTION_ROLE,
     retry: { maxAttempts: 2, baseDelayMs: 1000 },
@@ -207,7 +209,7 @@ export function createDirectionAgent(opts: { model: JsonModelClient }): Agent<Di
     },
     async execute({ intake, rawText }): Promise<DirectionResult> {
       const out = ModelDirectionSchema.parse(
-        await opts.model.completeJson({
+        await model.completeJson({
           system: systemPrompt(),
           user: [
             `Intake already found: client "${intake.clientName}", lead type ${intake.leadType}, goal: ${intake.goal}`,
