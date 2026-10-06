@@ -69,8 +69,12 @@ export class VerificationLoop {
         action: "verification.decision",
         // Only an approval is a success; blocked_no_evaluator is not "verified" (CLAUDE.md §1).
         outcome: result.status === "approved" ? "success" : "failure",
-        entitySlug: ctx.clientSlug,
+        // Step 6: inside an agent run the row is attributed to the run's ENTITY (its audit context says which),
+        // because the QA agent's audit sink only accepts rows for its own entity. Standalone use (no entity in
+        // the context) keeps the previous attribution to the client slug. The client is always in the payload.
+        entitySlug: this.audit.entitySlug === undefined ? ctx.clientSlug : this.audit.entitySlug,
         payload: {
+          clientSlug: ctx.clientSlug,
           status: result.status,
           goal,
           checks: result.checkResults.map(({ checkId, passed, details }) => ({ checkId, passed, details })),

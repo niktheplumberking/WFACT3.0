@@ -8,7 +8,7 @@
  * A failed verification is a *completed* QA run with a failing verdict, not an escalation: the
  * agent did its job. The workflow (Stage 3) routes on `output.status`.
  */
-import { AgentInputError, type Agent } from "@wfact/agent-runtime";
+import { AgentInputError, currentPermissionGate, guardModelClient, requirePermission, type Agent } from "@wfact/agent-runtime";
 import { SITE_FILE_RE, type AsyncCheckSuite, type Check, type VerificationContext } from "./checks/types.js";
 import type { ModelClient } from "./modelClient.js";
 import { VerificationLoop, type VerificationResult } from "./verificationLoop.js";
@@ -59,7 +59,32 @@ function parseSite(value: unknown): NonNullable<VerificationContext["site"]> {
   return { files: files as Record<string, string>, pages, ...(binary.length ? { binary } : {}) };
 }
 
+/**
+ * Step 6: the suites run inside the QA run's permission gate. A browser suite is the QA browser tool
+ * (tool:qa.renderedBrowser); a review suite calls the screenshot reviewer model (model:reviewer, then budget).
+ * The reviewer makes its own HTTP call, so its cost is traced by the reviewer, not metered against the run's spend.
+ */
+function gatedSuite(suite: AsyncCheckSuite, kind: "browser" | "review"): AsyncCheckSuite {
+  return {
+    id: suite.id,
+    description: suite.description,
+    async run(ctx) {
+      if (kind === "browser") await requirePermission({ kind: "tool", name: "qa.renderedBrowser" });
+      else {
+        await requirePermission({ kind: "model", slot: "reviewer" });
+        const gate = currentPermissionGate();
+        if (gate) await gate.authorize({ kind: "spend", usd: gate.spentUsd });
+      }
+      return suite.run(ctx);
+    },
+  };
+}
+
 export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaInput, VerificationResult> {
+  // Guarded here, not at composition: every QA agent's evaluator calls ask the run's gate first.
+  const evaluatorModel = opts.evaluatorModel ? guardModelClient(opts.evaluatorModel, "evaluator") : null;
+  const asyncChecks = opts.asyncChecks?.map((s) => gatedSuite(s, "browser"));
+  const reviewSuites = opts.reviewSuites?.map((s) => gatedSuite(s, "review"));
   return {
     role: QA_EVALUATOR_ROLE,
     retry: { maxAttempts: 1, baseDelayMs: 2000 },
@@ -85,9 +110,9 @@ export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaI
     execute: ({ ctx, goal }, runCtx) =>
       new VerificationLoop({
         checks: opts.checks,
-        asyncChecks: opts.asyncChecks,
-        reviewSuites: opts.reviewSuites,
-        evaluatorModel: opts.evaluatorModel,
+        asyncChecks,
+        reviewSuites,
+        evaluatorModel,
         audit: runCtx.audit ?? undefined,
       }).run(ctx, goal),
     summarize: (result) => ({
