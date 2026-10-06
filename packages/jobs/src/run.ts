@@ -14,12 +14,10 @@
  * a runner's disk is gone when the job ends.
  */
 import path from "node:path";
-import { auditReaderFromEnv, auditSinkFromEnv, traceSinkFromEnv, type AuditContext } from "@wfact/audit";
+import { auditReaderFromEnv, auditSinkFromEnv, traceSinkFromEnv } from "@wfact/audit";
 import { createSeedRegistry } from "@wfact/agent-runtime";
 import { resolveModelRoute } from "@wfact/hermes-lite/routing";
 import { traceModelClient } from "@wfact/hermes-lite/tracing";
-import { HermesLite } from "@wfact/hermes-lite/controller";
-import { buildToolRegistry } from "@wfact/hermes-lite/tools/registry";
 import { stateReaderFromEnv } from "@wfact/hermes-lite/state";
 import { modelClientFromEnv as hermesModelFromEnv } from "@wfact/hermes-lite/modelClient";
 import { createFrontendBuilderAgent } from "@wfact/frontend-loop/agent";
@@ -36,6 +34,7 @@ import { productionQaOptions } from "@wfact/rendered-qa/production";
 import { TRACK_B_BUDGET } from "@wfact/rendered-qa/rendered";
 import { SupabaseJobStore } from "./jobStore.js";
 import { handleJob, type HandlerDeps } from "./handlers.js";
+import { askHermesGated } from "./hermesAsk.js";
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..", "..");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -123,9 +122,8 @@ function buildDeps(): HandlerDeps {
       const { client } = hermesModelFromEnv();
       if (!client) throw new Error("ANTHROPIC_API_KEY missing for Hermes-lite");
       const { reader: stateReader } = stateReaderFromEnv();
-      const ctx: AuditContext = { sink: audit, actor: "hermes-lite", runId: crypto.randomUUID() };
-      const hermes = new HermesLite({ toolRegistry: buildToolRegistry(stateReader, ctx), modelClient: traceModelClient(client, traces, "hermes-lite") });
-      return hermes.answerStatusQuestion(question);
+      // Step 6: tool and model calls go through the controller's PermissionGate (hermesAsk.ts).
+      return askHermesGated(question, { audit, stateReader, modelClient: traceModelClient(client, traces, "hermes-lite") });
     },
   };
 }

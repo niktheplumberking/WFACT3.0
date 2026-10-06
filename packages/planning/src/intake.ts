@@ -14,7 +14,7 @@
  * text, and any disagreement between it and the model counts as ambiguity.
  */
 import { z } from "zod";
-import { AgentInputError, type Agent, type AgentDefinition } from "@wfact/agent-runtime";
+import { AgentInputError, defineScope, guardModelClient, type Agent, type AgentDefinition } from "@wfact/agent-runtime";
 import { KNOWN_ENTITIES, detectEntitySlug } from "@wfact/hermes-lite/entities";
 import { toApiSchema, type JsonModelClient } from "./modelClient.js";
 
@@ -24,7 +24,8 @@ export const INTAKE_DEFINITION: AgentDefinition = {
   role: INTAKE_ROLE,
   description: "Turns a raw lead/request into structured intake facts: entity, lead type, client, goal (Blueprint §5 Task intake).",
   skillset: ["lead-classification", "entity-assignment", "fact-extraction"],
-  permissionScope: ["model:intake"],
+  // Step 6: one model slot, nothing else. Its input is raw client text, so it is screened for injection (audit-only).
+  permissionScope: defineScope({ models: ["intake"], maxCostUsdPerRun: 0.5, scanInputForInjection: true }),
   modelSlots: ["intake"],
 };
 
@@ -105,6 +106,8 @@ export function entityAmbiguity(rawText: string, modelEntity: string | null): st
 }
 
 export function createIntakeAgent(opts: { model: JsonModelClient }): Agent<RawRequest, IntakeResult> {
+  // Step 6: every call asks the run's gate for model:intake and budget first.
+  const model = guardModelClient(opts.model, "intake");
   return {
     role: INTAKE_ROLE,
     // Transient API/parse failures get one retry from the runtime; ambiguity gets its own single
@@ -122,7 +125,7 @@ export function createIntakeAgent(opts: { model: JsonModelClient }): Agent<RawRe
       let ambiguity: string | null = null;
       for (let attempt = 1; ; attempt += 1) {
         const out = ModelIntakeSchema.parse(
-          await opts.model.completeJson({
+          await model.completeJson({
             system: systemPrompt(),
             user: userPrompt(raw, ambiguity),
             schema: MODEL_INTAKE_JSON_SCHEMA,

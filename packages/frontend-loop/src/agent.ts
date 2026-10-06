@@ -5,7 +5,7 @@
  * typed input, one bounded execution, and "hit the round cap" surfaced as an escalation instead of
  * a flag the caller has to remember to check.
  */
-import { AgentInputError, type Agent } from "@wfact/agent-runtime";
+import { AgentInputError, guardModelPair, type Agent } from "@wfact/agent-runtime";
 import { parseBrief, type PilotBrief } from "./brief.js";
 import { selectTemplate, type PageTemplate } from "./templates.js";
 import { FrontendLoop, type FrontendLoopResult } from "./loop.js";
@@ -34,8 +34,11 @@ export function createFrontendBuilderAgent(
   opts: FrontendBuilderAgentOptions,
 ): Agent<FrontendBuildInput, FrontendLoopResult> {
   // Constructed once, up front: the builder ≠ evaluator instance check fires at composition time,
-  // exactly as it did when the CLI built the loop directly.
-  const loop = new FrontendLoop(opts);
+  // exactly as it did when the CLI built the loop directly. Step 6: both clients are guarded here, so every
+  // call asks the run's gate for model:builder / model:evaluator and budget (guardModelPair keeps the
+  // same-instance check meaningful).
+  const models = guardModelPair(opts.builderModel, "builder", opts.evaluatorModel, "evaluator");
+  const loop = new FrontendLoop({ ...opts, builderModel: models.builder, evaluatorModel: models.evaluator });
   return {
     role: FRONT_END_BUILDER_ROLE,
     // One attempt by default: a full multi-round build is expensive to repeat, and FrontendLoop

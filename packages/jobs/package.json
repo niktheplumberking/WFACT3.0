@@ -9,6 +9,7 @@
   },
   "scripts": {
     "run-job": "tsx src/run.ts",
+    "attack:permissions": "tsx src/permissionsAttack.ts",
     "test": "tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit"
   },

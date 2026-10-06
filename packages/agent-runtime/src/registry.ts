@@ -8,10 +8,14 @@
  * own code and `register()` it on the registry instance at composition time (see
  * test/runAgent.test.ts's "new agent" case). The seed list is only the roles that exist right now.
  *
- * `permissionScope` is DESCRIPTIVE ONLY at this stage — it documents what each role may touch, but
- * nothing enforces it yet (Blueprint §14's policy engine is explicitly "do not build yet" for this
- * stage). Stated here so it can't be mistaken for an enforced boundary.
+ * `permissionScope` is ENFORCED (Factory Completion Plan Step 6). It is a typed, versioned, default-deny
+ * allowlist (`AgentScope`, see permissions.ts): model slots, tables and operations, readable and writable
+ * path patterns, tools, and a per-run spend ceiling. `register()` validates it (a malformed scope, a scope
+ * written for another policy version, or a clients/ pattern that does not name the bound client is
+ * refused), and `runAgent` builds a PermissionGate from it for every run. Anything a role's scope does not
+ * list is denied and audited as `agent.deny`. The role x capability inventory is docs/AGENT-PERMISSIONS.md.
  */
+import { defineScope, validateScope, type AgentScope } from "./permissions.js";
 
 export interface AgentDefinition {
   /** Stable role id — the only string a task may use to address this agent. */
@@ -19,8 +23,8 @@ export interface AgentDefinition {
   description: string;
   /** What the agent knows how to do (Blueprint §3: an agent is a role plus a skillset). */
   skillset: string[];
-  /** Descriptive, not enforced (see header). Format: "<kind>:<scope>". */
-  permissionScope: string[];
+  /** Enforced and default-deny (see header and permissions.ts). Build it with `defineScope`. */
+  permissionScope: AgentScope;
   /** Routing slots this role draws from (Blueprint §7) — which model fills each is config, not code. */
   modelSlots: string[];
 }
@@ -43,10 +47,17 @@ export class AgentRegistry {
     if (!/^[a-z][a-z0-9-]*$/.test(def.role)) {
       throw new Error(`Agent role "${def.role}" must be lowercase-hyphenated.`);
     }
+    // Throws ScopeValidationError: a role with a malformed scope is never registered, so it can never run.
+    validateScope(def.role, def.permissionScope);
+    for (const slot of def.permissionScope.models) {
+      if (!def.modelSlots.includes(slot)) {
+        throw new Error(`Agent role "${def.role}": scope grants model slot "${slot}" that is not in its modelSlots.`);
+      }
+    }
     if (this.definitions.has(def.role)) {
       throw new Error(`Agent role "${def.role}" is already registered — refusing a silent overwrite.`);
     }
-    this.definitions.set(def.role, structuredClone(def));
+    this.definitions.set(def.role, Object.freeze(structuredClone(def)));
   }
 
   get(role: string): AgentDefinition {
@@ -72,7 +83,14 @@ export const SEED_AGENT_DEFINITIONS: AgentDefinition[] = [
       "Builds one client page from a brief + template, self-correcting against an independent " +
       "reviewer until approved or the round cap escalates (packages/frontend-loop).",
     skillset: ["html-page-generation", "template-reskin", "correction-rounds"],
-    permissionScope: ["model:builder", "model:evaluator", "fs:read:clients/*/brief.json"],
+    // The page/site files are written by the workflow on this role's behalf, through this scope
+    // (packages/workflow/src/buildAndVerify.ts). The brief arrives as task input: the builder reads no client file.
+    permissionScope: defineScope({
+      models: ["builder", "evaluator"],
+      fsWrite: ["clients/{client}/pages/*", "clients/{client}/sites/**"],
+      tools: ["build.trackBIsolated"],
+      maxCostUsdPerRun: 5,
+    }),
     modelSlots: ["builder", "evaluator"],
   },
   {
@@ -81,8 +99,16 @@ export const SEED_AGENT_DEFINITIONS: AgentDefinition[] = [
       "Verifies a built page: 6 deterministic registry checks, then an independent evaluator model " +
       "(packages/verification). Never the same instance as the builder.",
     skillset: ["registry-checks", "independent-evaluation"],
-    permissionScope: ["model:evaluator", "fs:read:clients/*/pages/*", "audit:write"],
-    modelSlots: ["evaluator"],
+    // Reads the checkpointed page/site (via the workflow) and the client's brief as its fact source (verify job),
+    // writes its own verification.decision row, renders the page in the QA browser, asks the screenshot reviewer.
+    permissionScope: defineScope({
+      models: ["evaluator", "reviewer"],
+      db: [{ table: "audit_log", ops: ["insert"] }],
+      fsRead: ["clients/{client}/pages/*", "clients/{client}/sites/**", "clients/{client}/brief.json"],
+      tools: ["qa.renderedBrowser"],
+      maxCostUsdPerRun: 2,
+    }),
+    modelSlots: ["evaluator", "reviewer"],
   },
 ];
 

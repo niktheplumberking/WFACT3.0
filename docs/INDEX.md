@@ -28,6 +28,7 @@ Live status: `../PROGRESS.md`. Waiting on Nick: `../BLOCKED-ON-NICK.md`.
 | `WFACT-3.0-Ecosystem-Blueprint.md` | Markdown version of the Blueprint (text-friendly) |
 | `COCKPIT-JOBS.md` | Cockpit job queue design and runbook |
 | `SECRETS.md` | Doppler secrets runbook |
+| `AGENT-PERMISSIONS.md` | Step 6: enforced agent scopes, role x capability inventory, injection defence, live attack evidence, NOT COVERED |
 | `WFACT SOPS/` | The 3 SOPs, Factory Book and Factory Audit (PDFs, with markdown copies) |
 
 ## Planned outputs (created by later steps, not yet present)

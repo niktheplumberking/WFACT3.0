@@ -4,7 +4,7 @@
  * is the output: a multi-page site (`result.site`) built from content-as-data, and revisions edit that
  * content (`revision.contentJson`), not HTML.
  */
-import { AgentInputError, type Agent } from "@wfact/agent-runtime";
+import { AgentInputError, guardModelPair, type Agent } from "@wfact/agent-runtime";
 import { parseBrief } from "../brief.js";
 import type { FrontendBuildInput } from "../agent.js";
 import { FRONT_END_BUILDER_ROLE } from "../agent.js";
@@ -20,7 +20,9 @@ export interface TrackABuilderAgentOptions {
 }
 
 export function createTrackABuilderAgent(opts: TrackABuilderAgentOptions): Agent<FrontendBuildInput, FrontendLoopResult> {
-  const loop = new TrackALoop(opts);
+  // Step 6: model calls go through the run's permission gate (see src/agent.ts).
+  const models = guardModelPair(opts.builderModel, "builder", opts.evaluatorModel, "evaluator");
+  const loop = new TrackALoop({ ...opts, builderModel: models.builder, evaluatorModel: models.evaluator });
   return {
     role: FRONT_END_BUILDER_ROLE,
     retry: { maxAttempts: 1, baseDelayMs: 2000 },

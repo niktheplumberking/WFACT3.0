@@ -72,14 +72,30 @@ export interface ToolRegistryOptions {
    * throws too, so no tool result is ever handed back without its audit row.
    */
   audit?: AuditContext;
+  /**
+   * Step 6: asked before every allowlisted tool runs (after the allowlist lookup, before input validation). The
+   * composition root passes the controller's PermissionGate (`gate.authorize({ kind: "tool", name })` from
+   * @wfact/agent-runtime, which writes `agent.deny` on refusal). Injected rather than imported because
+   * agent-runtime already depends on this package. A throw is recorded as a refused (`rejected`) tool.invoke.
+   */
+  authorize?: (toolName: string) => Promise<void>;
+}
+
+export class ToolNotPermittedError extends Error {
+  constructor(public readonly toolName: string, public readonly denial: unknown) {
+    super(`Tool "${toolName}" is allowlisted but not permitted for this caller: ${denial instanceof Error ? denial.message : String(denial)}`);
+    this.name = "ToolNotPermittedError";
+  }
 }
 
 export class ToolRegistry {
   private readonly tools = new Map<string, ToolDefinition<z.ZodTypeAny, z.ZodTypeAny>>();
   private readonly audit: AuditContext | null;
+  private readonly authorize: ((toolName: string) => Promise<void>) | null;
 
   constructor(opts: ToolRegistryOptions = {}) {
     this.audit = opts.audit ?? null;
+    this.authorize = opts.authorize ?? null;
   }
 
   /** Register a tool. Call sites are the only allowlist — there is no dynamic registration path. */
@@ -105,7 +121,9 @@ export class ToolRegistry {
       // Refusals (not allowlisted, bad input) are "rejected" — the boundary did its job. Anything
       // else (handler threw, output broke contract) is a "failure". Both get a row, then rethrow.
       const outcome =
-        err instanceof ToolNotAllowlistedError || err instanceof ToolInputValidationError ? "rejected" : "failure";
+        err instanceof ToolNotAllowlistedError || err instanceof ToolNotPermittedError || err instanceof ToolInputValidationError
+          ? "rejected"
+          : "failure";
       await this.recordInvoke(toolName, rawInput, outcome, startedAt, err);
       throw err;
     }
@@ -117,6 +135,16 @@ export class ToolRegistry {
     const tool = this.tools.get(toolName);
     if (!tool) {
       throw new ToolNotAllowlistedError(toolName);
+    }
+
+    if (this.authorize) {
+      try {
+        await this.authorize(toolName);
+      } catch (err) {
+        // An audit-write failure inside the gate is not a refusal: fail closed and let it surface as itself.
+        if (err instanceof Error && err.name === "AuditWriteError") throw err;
+        throw new ToolNotPermittedError(toolName, err);
+      }
     }
 
     const parsedInput = tool.inputSchema.safeParse(rawInput);

@@ -12,6 +12,7 @@
  * escalation, and the audit trail — so no agent re-implements any of it.
  */
 import type { AuditContext } from "@wfact/audit";
+import type { PermissionGate } from "./permissions.js";
 
 /** Blueprint §3's typed task. `role` is the owner; it must match a registered agent role. */
 export interface AgentTask<I = unknown> {
@@ -21,6 +22,11 @@ export interface AgentTask<I = unknown> {
   /** Raw input — the agent's own `parseInput` decides whether it meets the schema. */
   input: I;
   entitySlug?: string | null;
+  /**
+   * Step 6: the one client folder this run may touch (clients/<clientSlug>/). Scope patterns written as
+   * `{client}` match only this slug; a client that belongs to another entity is refused before the run starts.
+   */
+  clientSlug?: string | null;
   /** ISO-8601. A task already past its deadline is rejected, not started. */
   deadline?: string | null;
   /** Total attempts allowed (1 = no retry). Overrides the agent's own default. */
@@ -38,6 +44,11 @@ export interface AgentRunContext {
    * verification loop's `verification.decision` — land on the same task as the lifecycle rows.
    */
   audit: AuditContext | null;
+  /**
+   * Step 6: this run's permission gate (also the current gate for any guarded model client called during the
+   * attempt). An agent asks it before any I/O its scope must cover; a denial is audited and throws.
+   */
+  permissions: PermissionGate;
 }
 
 export interface Agent<I, O> {
@@ -72,6 +83,8 @@ export interface AgentRun<O> {
   reason: string | null;
   startedAt: string;
   finishedAt: string;
+  /** Step 6: injection pattern ids found in the task input (scanning roles only; audited as agent.injection_suspected). */
+  injectionSuspected?: string[];
 }
 
 export class AgentInputError extends Error {

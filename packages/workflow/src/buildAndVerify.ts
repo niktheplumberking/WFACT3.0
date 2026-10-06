@@ -27,7 +27,15 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { recordAudit, type AuditContext, type AuditReader, type AuditRecord, type AuditSink } from "@wfact/audit";
-import { runAgent, type Agent, type AgentRegistry, type AgentRun } from "@wfact/agent-runtime";
+import {
+  permissionGateFor,
+  PermissionDeniedError,
+  runAgent,
+  type Agent,
+  type AgentRegistry,
+  type AgentRun,
+  type PermissionGate,
+} from "@wfact/agent-runtime";
 import type { FrontendBuildInput } from "@wfact/frontend-loop/agent";
 import type { FrontendLoopResult } from "@wfact/frontend-loop/loop";
 import type { PilotBrief } from "@wfact/frontend-loop/brief";
@@ -156,6 +164,42 @@ export async function readSiteVerified(
     if (files[p] === undefined) throw new CheckpointIntegrityError(`site manifest lists page ${p} but has no file for it`);
   }
   return { files, pages: manifest.pages, contentJson, ...(binary.size ? { binary: [...binary] } : {}) };
+}
+
+/**
+ * Step 6: a view of an ArtifactStore whose every write and read is first authorized against an agent role's
+ * permission gate (fs:write / fs:read of the exact path). The workflow writes the builder's output through the
+ * builder's gate and reads the checkpoint back through the QA agent's gate, so each role's scope (its own client
+ * folder only) decides, not this file. The path allow-list in the stores below still applies on top.
+ */
+export function gatedArtifactStore(store: ArtifactStore, gate: PermissionGate): ArtifactStore {
+  const fs = (op: "read" | "write", p: string) => gate.authorize({ kind: "fs", op, path: p });
+  return {
+    write: async (relPath, content) => {
+      await fs("write", relPath);
+      return store.write(relPath, content);
+    },
+    readVerified: async (artifact) => {
+      await fs("read", artifact.path);
+      return store.readVerified(artifact);
+    },
+    ...(store.writeBytes
+      ? {
+          writeBytes: async (relPath: string, bytes: Buffer) => {
+            await fs("write", relPath);
+            return store.writeBytes!(relPath, bytes);
+          },
+        }
+      : {}),
+    ...(store.readVerifiedBytes
+      ? {
+          readVerifiedBytes: async (artifact: StoredArtifact) => {
+            await fs("read", artifact.path);
+            return store.readVerifiedBytes!(artifact);
+          },
+        }
+      : {}),
+  };
 }
 
 /** Files under the repo root — the same location the front-end CLI has always written pages to. */
@@ -385,6 +429,17 @@ class Workflow {
     });
   }
 
+  /** Step 6: the gate for I/O this workflow does on behalf of `role` for one of its tasks. */
+  private gateFor(role: string, taskId: string): PermissionGate {
+    return permissionGateFor(this.deps.registry, role, {
+      taskId,
+      runId: this.runId,
+      entitySlug: this.brief.entitySlug,
+      clientSlug: this.brief.clientSlug,
+      audit: this.deps.audit,
+    });
+  }
+
   async start(): Promise<WorkflowResult> {
     await recordAudit(this.ctx, {
       action: "workflow.start",
@@ -413,16 +468,31 @@ class Workflow {
     const buildTaskId = randomUUID();
     const run: AgentRun<FrontendLoopResult> = await runAgent(
       this.deps.frontEndAgent,
-      { taskId: buildTaskId, role: this.deps.frontEndAgent.role, input: { brief: this.brief, revision }, entitySlug: this.brief.entitySlug },
+      {
+        taskId: buildTaskId,
+        role: this.deps.frontEndAgent.role,
+        input: { brief: this.brief, revision },
+        entitySlug: this.brief.entitySlug,
+        // Step 6: the build is bound to this client's folder; a client of another entity is refused before it runs.
+        clientSlug: this.brief.clientSlug,
+      },
       { registry: this.deps.registry, audit: { sink: this.deps.audit }, runId: this.runId },
     );
     if (run.output) this.builderRounds = [...this.builderRounds, ...run.output.rounds];
     if (run.status !== "completed" || !run.output?.finalHtml) {
       return { halted: await this.halt("build_failed", "build", cycle, null, `builder ${run.status}: ${run.reason ?? "no page produced"}`) };
     }
-    const artifact = run.output.site
-      ? await writeSite(this.deps.artifacts, `clients/${run.output.brief.clientSlug}/sites/${run.output.template.id}`, run.output.site)
-      : await this.deps.artifacts.write(`clients/${run.output.brief.clientSlug}/pages/${run.output.template.id}.html`, run.output.finalHtml);
+    // Written on the builder's behalf, through the builder's scope and binding (its own client folder only).
+    const writer = gatedArtifactStore(this.deps.artifacts, this.gateFor(this.deps.frontEndAgent.role, buildTaskId));
+    let artifact: StoredArtifact;
+    try {
+      artifact = run.output.site
+        ? await writeSite(writer, `clients/${run.output.brief.clientSlug}/sites/${run.output.template.id}`, run.output.site)
+        : await writer.write(`clients/${run.output.brief.clientSlug}/pages/${run.output.template.id}.html`, run.output.finalHtml);
+    } catch (err) {
+      if (err instanceof PermissionDeniedError) return { halted: await this.halt("build_failed", "build", cycle, null, err.message) };
+      throw err;
+    }
     const cp: CheckpointState = { stage: "build", cycle, buildTaskId, artifact };
     await this.checkpoint(cp);
     this.templateSections = run.output.template.requiredSections;
@@ -435,23 +505,28 @@ class Workflow {
     for (;;) {
       let html: string;
       let site: { files: Record<string, string>; pages: string[]; contentJson: string; binary?: string[] } | null = null;
+      const qaTaskId = randomUUID();
+      // Read back on the QA agent's behalf, through its scope and binding.
+      const reader = gatedArtifactStore(this.deps.artifacts, this.gateFor(this.deps.qaAgent.role, qaTaskId));
       try {
         if (isSiteManifest(cp.artifact)) {
-          site = await readSiteVerified(this.deps.artifacts, cp.artifact);
+          site = await readSiteVerified(reader, cp.artifact);
           html = site.files[site.pages[0]!]!;
         } else {
-          html = await this.deps.artifacts.readVerified(cp.artifact);
+          html = await reader.readVerified(cp.artifact);
         }
       } catch (err) {
+        if (err instanceof PermissionDeniedError) return this.halt("qa_failed", "qa", cp.cycle + 1, cp, err.message);
         return this.halt("checkpoint_corrupt", "qa", cp.cycle + 1, cp, err instanceof Error ? err.message : String(err));
       }
 
       const qaRun = await runAgent(
         this.deps.qaAgent,
         {
-          taskId: randomUUID(),
+          taskId: qaTaskId,
           role: this.deps.qaAgent.role,
           entitySlug: this.brief.entitySlug,
+          clientSlug: this.brief.clientSlug,
           input: {
             html,
             clientSlug: this.brief.clientSlug,

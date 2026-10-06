@@ -9,8 +9,13 @@ import { readContextTool, readClientMemoryTool } from "./memoryTools.js";
 import { createProjectStatusTool } from "./stateTools.js";
 import type { StateReader } from "../state.js";
 
-export function buildToolRegistry(stateReader: StateReader | null, audit?: AuditContext): ToolRegistry {
-  const registry = new ToolRegistry({ audit });
+export function buildToolRegistry(
+  stateReader: StateReader | null,
+  audit?: AuditContext,
+  /** Step 6: the controller's permission check (see ToolRegistryOptions.authorize). */
+  authorize?: (toolName: string) => Promise<void>,
+): ToolRegistry {
+  const registry = new ToolRegistry({ audit, authorize });
   registry.register(readContextTool);
   registry.register(readClientMemoryTool);
   if (stateReader) {
