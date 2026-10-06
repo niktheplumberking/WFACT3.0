@@ -1,0 +1,23 @@
+{
+  "name": "@wfact/media",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Generated media for client sites (Step 4B M5) through the Higgsfield API. Server-side only: HF_CREDENTIALS comes from Doppler at runtime, never a file in the repo.",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "example:seedance": "doppler run -- tsx src/index.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@higgsfield/client": "^0.2.6"
+  }
+}
