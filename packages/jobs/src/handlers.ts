@@ -9,7 +9,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { AuditSink } from "@wfact/audit";
-import { createSeedRegistry, runAgent, type Agent } from "@wfact/agent-runtime";
+import { createSeedRegistry, fileClientEntityResolver, permissionGateFor, PermissionDeniedError, runAgent, type Agent } from "@wfact/agent-runtime";
 import type { QaInput } from "@wfact/verification/agent";
 import { QA_EVALUATOR_ROLE } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
@@ -159,6 +159,20 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       const relPath = str(p, "path", 200);
       if (!PAGE_PATH.test(relPath)) throw new Error("params.path must be clients/<slug>/pages/<name>.html");
       const clientSlug = relPath.split("/")[1]!;
+      // Step 6: this job reads on the QA agent's behalf, so the QA scope decides, bound to the page's client and
+      // to the entity that owns that client folder (clients/<slug>/brief.json; null for a client with no brief).
+      const taskId = crypto.randomUUID();
+      const entitySlug = fileClientEntityResolver(deps.repoRoot)(clientSlug);
+      const registry = createSeedRegistry();
+      const gate = permissionGateFor(registry, QA_EVALUATOR_ROLE, { taskId, runId: null, entitySlug, clientSlug, audit: deps.audit });
+      const briefPath = `clients/${clientSlug}/brief.json`;
+      try {
+        await gate.authorize({ kind: "fs", op: "read", path: relPath });
+        await gate.authorize({ kind: "fs", op: "read", path: briefPath });
+      } catch (err) {
+        if (err instanceof PermissionDeniedError) return { ok: false, reason: err.message, result: { path: relPath } };
+        throw err;
+      }
       let html = await deps.readArtifact(relPath);
       let source = "artifact-store";
       if (html === null) {
@@ -169,14 +183,16 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       const sections = Array.isArray(p.sections) ? (p.sections as unknown[]).filter((s): s is string => typeof s === "string") : [];
       // Step 4B M1 claims gate: the client's brief on file is the only fact source; without one every
       // factual claim on the page fails as unsourced (fails closed).
-      const briefOnFile = await readFile(path.join(deps.repoRoot, "clients", clientSlug, "brief.json"), "utf-8")
+      const briefOnFile = await readFile(path.join(deps.repoRoot, briefPath), "utf-8")
         .then((t) => JSON.parse(t) as { goal?: unknown; brandNotes?: unknown })
         .catch(() => null);
       const factSources = briefOnFile ? [briefOnFile.goal, briefOnFile.brandNotes].filter((s): s is string => typeof s === "string") : [];
       const run = await runAgent(
         deps.qaAgent,
         {
-          taskId: crypto.randomUUID(),
+          taskId,
+          entitySlug,
+          clientSlug,
           role: QA_EVALUATOR_ROLE,
           input: {
             html,
@@ -187,7 +203,7 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
             factSources,
           },
         },
-        { registry: createSeedRegistry(), audit: deps.audit ? { sink: deps.audit } : null },
+        { registry, audit: deps.audit ? { sink: deps.audit } : null, clientEntityOf: fileClientEntityResolver(deps.repoRoot) },
       );
       const v = run.output;
       return {
