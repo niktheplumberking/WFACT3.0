@@ -5,6 +5,7 @@ import {
   AgentInputError,
   AgentRegistry,
   createSeedRegistry,
+  defineScope,
   runAgent,
   SEED_AGENT_DEFINITIONS,
   type Agent,
@@ -20,7 +21,8 @@ const ECHO_DEF: AgentDefinition = {
   role: "echo-test",
   description: "Test-only agent: uppercases a string.",
   skillset: ["echo"],
-  permissionScope: [],
+  // Step 6: scopes are typed and enforced. The echo agent writes one audit row of its own in the fail-closed test.
+  permissionScope: defineScope({ db: [{ table: "audit_log", ops: ["insert"] }] }),
   modelSlots: [],
 };
 
