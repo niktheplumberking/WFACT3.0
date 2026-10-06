@@ -1,11 +1,11 @@
 {
   "_doc": "Claims gate rules (Step 4B M1). Versioned data, read by src/checks/claims.ts. bannedClaims distil memory/context.md R-10 (banned claims and content); each rule fails the page when its pattern matches visible text, aria-label, alt or title. factPatterns are the kinds of factual claim that must appear in the run's fact sources (the approved brief) or be visibly labelled SAMPLE. Patterns are JavaScript regular expressions, matched case-insensitively. Change a rule = bump version.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "sampleLabel": "\\bSAMPLE\\b",
   "bannedClaims": [
     { "id": "BC-LICENCE", "pattern": "\\blicen[cs]ed\\b|\\binsured\\b|\\bbonded\\b|\\blicen[cs]e\\s*(no\\.?|number|#)|\\bcertified\\b", "why": "Licence, insurance or certification statements need the client's documents and Nick's check (R-10)." },
     { "id": "BC-WARRANTY", "pattern": "\\bwarrant(y|ies)\\b|\\blifetime\\b|\\bguarantee(d|s)?\\b|\\b100%\\s+satisf", "why": "Warranty terms and guarantees need written client terms (R-10)." },
-    { "id": "BC-SUPERLATIVE", "pattern": "\\bbest\\b|#\\s?1\\b|\\bnumber one\\b|\\bno\\.\\s?1\\b|\\bleading\\b|\\btop[- ]rated\\b|\\baward[- ]winning\\b|\\bworld[- ]class\\b", "why": "Superlatives need a cited source (R-10)." },
+    { "id": "BC-SUPERLATIVE", "pattern": "(?<!\\b(works?|suits?|fits?|at|do (your|our)|try (your|our))\\s+)\\bbest\\b(?!\\s+(time|times|day|days|way to (reach|contact|call)|ways to (reach|contact|call))\\b)|#\\s?1\\b|\\bnumber one\\b|\\bno\\.\\s?1\\b|\\bleading\\b|\\btop[- ]rated\\b|\\baward[- ]winning\\b|\\bworld[- ]class\\b", "why": "Superlatives need a cited source (R-10). Not a claim (1.1.0, Cockpit jobs 21350a42 and 5ed238ac): 'the best time to reach you', 'what works best for you'." },
     { "id": "BC-YEARS", "pattern": "\\b(\\d+|one|two|three|four|five|ten|fifteen|twenty|thirty)\\+?\\s+years?\\s+(of\\s+)?(experience|in business|serving|in the trade)|\\bsince\\s+(19|20)\\d\\d\\b|\\best(\\.|ablished)\\s+(in\\s+)?(19|20)\\d\\d\\b", "why": "Years in business are never invented (R-10)." },
     { "id": "BC-COUNTS", "pattern": "\\b\\d[\\d,.]*\\s*k?\\+?\\s+(happy\\s+|satisfied\\s+)?(customers|clients|homeowners|homes|jobs|projects|roofs|reviews|families|businesses)\\b", "why": "Customer, job or review counts are never invented (R-10)." },
     { "id": "BC-RATING", "pattern": "★{2,}|⭐|\\b[1-5](\\.\\d)?\\s*(/\\s*5|out of 5|stars?)\\b|\\b5[- ]star\\b", "why": "Star ratings are never invented (R-10)." },

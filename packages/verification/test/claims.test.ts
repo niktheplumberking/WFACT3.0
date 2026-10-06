@@ -76,6 +76,18 @@ test("clean fixture passes all 10 production QA checks (the six plus the claims 
   for (const r of results) assert.deepEqual(r.details, [], `${r.checkId}: ${r.details.join("; ")}`);
 });
 
+test("BC-SUPERLATIVE: 'best time to reach you' and 'works best' are questions, not claims; a real superlative still fails (rules 1.1.0)", () => {
+  const clean = read("packages/frontend-loop/design/fixtures/clean.html");
+  const withText = (t: string) => clean.replace("</main>", `<p>${t}</p></main>`);
+  const banned = (t: string) => runChecks(ctx(withText(t)), QA_GATE_CHECKS).find((r) => r.checkId === "claims.banned")!;
+  for (const ok of ["When is the best time to reach you?", "Tell us what time of day works best.", "Pick the day that suits best.", "The best way to reach us is the form.", "At best it takes a morning."]) {
+    assert.deepEqual(banned(ok).details, [], ok);
+  }
+  for (const claim of ["The best roofer in town.", "Our best work, every time.", "We are the best."]) {
+    assert.match(banned(claim).details.join(" "), /BC-SUPERLATIVE/, claim);
+  }
+});
+
 const PLANTED: [fixture: string, checkId: string, expect: RegExp][] = [
   ["leaked-text", "claims.after-html", /File-mutation verifier/],
   ["missing-sample", "claims.sample-label", /Testimonial without a visible SAMPLE label/],
