@@ -15,6 +15,8 @@ import { QA_EVALUATOR_ROLE } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
 import { intakeAndPlan, replan, type PlanningDeps, type PlanningResult } from "@wfact/planning/pipeline";
 import type { PlanStore } from "@wfact/planning/planStore";
+import type { Plan } from "@wfact/planning/planner";
+import type { PilotBrief } from "@wfact/frontend-loop/brief";
 import { buildAndVerify, recordedBuilderTemplate, resumeBuildAndVerify, qaFailureToIssues, type WorkflowDeps, type WorkflowResult } from "@wfact/workflow";
 import type { Job } from "./jobStore.js";
 
@@ -142,7 +144,7 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
         return { ok: false, reason: `plan ${planId} is Track B, but this runner has no Track B builder configured; it is not built as Track A`, result: { planId, buildTrack: "B" } };
       }
       const wf = stored.buildTrack === "B" ? deps.trackBWorkflow! : deps.trackAWorkflow ?? deps.workflow;
-      const outcome = workflowOutcome(await buildAndVerify(stored.plan.brief, wf));
+      const outcome = workflowOutcome(await buildAndVerify(briefForBuild(stored.plan), wf));
       return { ...outcome, result: { planId, buildTrack: stored.buildTrack, ...outcome.result } };
     }
 
@@ -212,4 +214,10 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       };
     }
   }
+}
+
+/** The brief a plan is built from. Plans approved before 2026-10-06 carry no page scope; their lead type says it. */
+export function briefForBuild(plan: Pick<Plan, "brief" | "intake">): PilotBrief {
+  if (plan.brief.pageScope) return plan.brief;
+  return { ...plan.brief, pageScope: plan.intake.leadType === "landing_page" ? "single" : "multi" };
 }

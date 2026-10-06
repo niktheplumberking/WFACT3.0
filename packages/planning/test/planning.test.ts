@@ -115,6 +115,12 @@ test("planner: plan brief keeps every client-requested section even if the model
   assert.deepEqual(plan.tasks.map((t) => [t.order, t.role]), [[1, "front-end-builder"], [2, "qa-evaluator"]]);
 });
 
+test("planner: a landing-page lead becomes a single-page brief; any other lead stays multi-page (Cockpit job f696ba43)", () => {
+  const landing = assemblePlan({ ...certainIntake, leadType: "landing_page" } as IntakeResult, modelPlan(), registryWithPlanning());
+  assert.equal(landing.brief.pageScope, "single");
+  assert.equal(assemblePlan(certainIntake, modelPlan(), registryWithPlanning()).brief.pageScope, "multi");
+});
+
 test("planner: an unexecutable task list is rejected, retried once, then the run escalates", async () => {
   const reversed = modelPlan({ tasks: [...modelPlan().tasks].reverse() });
   const model = new MockJsonClient(() => reversed);

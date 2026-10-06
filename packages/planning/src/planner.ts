@@ -202,6 +202,8 @@ export function assemblePlan(intake: IntakeResult, out: ModelPlan, registry: Age
     brandNotes: out.brandNotes,
     requiredSections: sections,
     templatePreference: out.templateId,
+    // A landing-page lead is built as one page, never split into a multi-page site (Cockpit job f696ba43).
+    pageScope: intake.leadType === "landing_page" ? "single" : "multi",
     source: "intake-planner",
   });
 

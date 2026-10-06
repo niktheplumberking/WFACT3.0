@@ -11,7 +11,7 @@ import { MockModelClient as EvalMock } from "@wfact/verification/modelClient";
 import { MockJsonClient } from "@wfact/planning/modelClient";
 import { MemoryPlanStore } from "@wfact/planning/planStore";
 import { MemoryArtifactStore } from "@wfact/workflow";
-import { handleJob, type HandlerDeps } from "../src/handlers.js";
+import { briefForBuild, handleJob, type HandlerDeps } from "../src/handlers.js";
 import type { Job } from "../src/jobStore.js";
 
 const FIXTURES = path.join(import.meta.dirname, "..", "..", "verification", "test", "fixtures");
@@ -205,4 +205,12 @@ test("Step 4B M3: a Track A plan is built by the Track A builder into a multi-pa
     assert.ok(artifacts.files.has(`clients/northlight-signs/sites/track-a/${f}`), f);
   }
   assert.ok(![...artifacts.files.keys()].some((k) => k.includes("/pages/")), "the single-page builder was not used");
+});
+
+test("briefForBuild: a plan approved before page scope existed takes it from the lead type; an explicit scope wins", () => {
+  const brief = { clientSlug: "harbor-street-bakery", entitySlug: "bennett-co", projectName: "x", goal: "x", requiredSections: [], brandNotes: "x", source: "intake-planner" as const };
+  const intake = (leadType: string) => ({ entitySlug: "bennett-co", leadType, requestSource: "cockpit", clientName: "Harbor Street Bakery" });
+  assert.equal(briefForBuild({ brief, intake: intake("landing_page") }).pageScope, "single");
+  assert.equal(briefForBuild({ brief, intake: intake("new_website") }).pageScope, "multi");
+  assert.equal(briefForBuild({ brief: { ...brief, pageScope: "multi" }, intake: intake("landing_page") }).pageScope, "multi");
 });

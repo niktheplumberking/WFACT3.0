@@ -26,7 +26,7 @@ export function rulebookPromptText(): string {
     ...DESIGN_RULEBOOK.rules.filter((r) => r.kind === "banned").map(line),
     "Always do:",
     ...DESIGN_RULEBOOK.rules.filter((r) => r.kind === "required").map(line),
-    "Facts: use only facts in the brief. Anything else (phone, hours, areas, ratings, testimonials) must be visibly labelled SAMPLE.",
+    "Facts: use only facts in the brief. Anything else (phone, hours, areas) must be visibly labelled SAMPLE. Never invent ratings or testimonials, labelled or not.",
     "Output ends at </html>; nothing may follow it.",
   ].join("\n");
 }

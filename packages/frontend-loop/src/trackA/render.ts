@@ -275,9 +275,12 @@ function footer(ctx: Ctx): string {
     b.email ? `<li><a href="mailto:${esc(b.email.value)}">${esc(b.email.value)}</a>${b.email.source === "sample" ? sampleTag() : ""}</li>` : "",
     b.address ? `<li>${fact(b.address)}</li>` : "",
   ].join("");
-  return `<footer class="site-footer on-deep"><div class="wrap"><div class="footer-grid"><div><p class="brand-name">${esc(b.name)}</p>${b.tagline ? `<p>${esc(b.tagline)}</p>` : ""}</div><nav aria-label="Footer"><h2>Pages</h2><ul>${content.pages
-    .map((p) => `<li><a href="${pageFile(p.slug)}">${esc(p.navLabel)}</a></li>`)
-    .join("")}</ul></nav><div><h2>Contact</h2>${contact ? `<ul>${contact}</ul>` : ""}</div></div>${
+  return `<footer class="site-footer on-deep"><div class="wrap"><div class="footer-grid"><div><p class="brand-name">${esc(b.name)}</p>${b.tagline ? `<p>${esc(b.tagline)}</p>` : ""}</div>${
+    // A single landing page has no other pages to list.
+    content.pages.length > 1
+      ? `<nav aria-label="Footer"><h2>Pages</h2><ul>${content.pages.map((p) => `<li><a href="${pageFile(p.slug)}">${esc(p.navLabel)}</a></li>`).join("")}</ul></nav>`
+      : ""
+  }<div><h2>Contact</h2>${contact ? `<ul>${contact}</ul>` : ""}</div></div>${
     anySample ? `<p class="fine">Details marked SAMPLE are placeholders until ${esc(b.name)} confirms them.</p>` : ""
   }</div></footer>`;
 }

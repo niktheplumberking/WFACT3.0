@@ -61,18 +61,6 @@
           ]
         },
         {
-          "type": "quote",
-          "id": "kind-words",
-          "heading": "From a client",
-          "quotes": [
-            {
-              "text": "They asked better questions about our timetable than we had ever asked ourselves.",
-              "attribution": "Operations lead, ferry operator",
-              "source": "sample"
-            }
-          ]
-        },
-        {
           "type": "cta",
           "id": "next-step",
           "heading": "Have a brand that should move?",

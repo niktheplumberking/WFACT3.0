@@ -6,7 +6,10 @@
  *
  *   - Business facts are `Fact`s: `source: "brief"` only when the value is in the approved brief (checked),
  *     otherwise `source: "sample"` and the starter prints a SAMPLE label next to it.
- *   - Work items and quotes carry a source too; SAMPLE ones are labelled where they appear.
+ *   - Work items carry a source too; SAMPLE ones are labelled where they appear. Quotes only ever come
+ *     from the brief: an invented quote, even labelled SAMPLE, is fake social proof (DR-FAKE-SOCIAL-PROOF,
+ *     Cockpit job f696ba43), so a brief without quotes gets no quote section.
+ *   - Page count follows the brief: one page for a landing-page brief (pageScope "single"), 3-7 otherwise.
  *   - Colours are validated hex; contrast is computed (buildTrackBPalette), never assumed.
  *   - Page structure keeps one h1 per page, one hero, no repeated layout back to back, and the brief's
  *     required section ids somewhere on the site.
@@ -14,7 +17,7 @@
  * Versioned: change the schema = bump CONTENT_SCHEMA_VERSION (and the starter's lib/content.ts types).
  */
 import { z } from "zod";
-import type { PilotBrief } from "../brief.js";
+import { pageScopeOf, type PilotBrief } from "../brief.js";
 import { briefFactText, extractJson, inBrief } from "../trackA/content.js";
 import { buildTrackBPalette } from "./palette.js";
 
@@ -116,7 +119,8 @@ export const SiteContentSchema = z.object({
   }),
   /** The one primary action, labelled the same everywhere. */
   primaryAction: z.object({ label: Text(28), page: Slug }),
-  pages: z.array(PageSchema).min(3).max(7),
+  /** 1 page for a single landing page (brief.pageScope "single"), otherwise 3-7; checked in validateSiteContent. */
+  pages: z.array(PageSchema).min(1).max(7),
   /** Questions the brief left open. Kept in content.json for a human, never shown as copy. */
   openQuestions: z.array(Text(300)).max(10).default([]),
 });
@@ -127,6 +131,10 @@ export const SITE_CONTENT_JSON_SCHEMA = z.toJSONSchema(SiteContentSchema);
 
 /** The home page leads; detail lives on the other pages. */
 export const MAX_HOME_SECTIONS = 6;
+/** A single landing page carries the whole story, so it may hold more (PageSchema's cap). */
+export const MAX_SINGLE_PAGE_SECTIONS = 8;
+/** Pages in a multi-page site. */
+export const MIN_SITE_PAGES = 3;
 /** Section types that open a page with its h1. Any other first section would leave the page without one. */
 const H1_TYPES = new Set(["hero", "prose", "contact"]);
 /** Layouts that read as a list; three in a row is one repeated rhythm. */
@@ -160,6 +168,11 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
   errors.push(...buildTrackBPalette(c.brand.colors).problems);
 
   const slugs = c.pages.map((p) => p.slug);
+  const single = pageScopeOf(brief) === "single";
+  if (single && c.pages.length !== 1) {
+    errors.push(`pages: the brief asks for a single landing page, but there are ${c.pages.length} pages; put every section on the one "index" page.`);
+  }
+  if (!single && c.pages.length < MIN_SITE_PAGES) errors.push(`pages: ${c.pages.length} page(s); a multi-page site has ${MIN_SITE_PAGES} to 7.`);
   if (slugs[0] !== "index") errors.push(`pages[0].slug must be "index" (the home page); got "${slugs[0]}".`);
   for (const dup of slugs.filter((s, i) => slugs.indexOf(s) !== i)) errors.push(`pages: slug "${dup}" is used twice.`);
   for (const s of slugs) if (RESERVED_SLUGS.has(s)) errors.push(`pages: slug "${s}" is reserved by the starter; choose another.`);
@@ -176,7 +189,7 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
     for (const once of ["statement", "work", "cta", "contact"] as const) {
       if (types.filter((t) => t === once).length > 1) errors.push(`${where}: more than one "${once}" section; one per page.`);
     }
-    if (pi === 0 && types.length > MAX_HOME_SECTIONS) errors.push(`${where}: ${types.length} sections; keep the home page to ${MAX_HOME_SECTIONS} and move the rest to their own pages.`);
+    if (pi === 0 && !single && types.length > MAX_HOME_SECTIONS) errors.push(`${where}: ${types.length} sections; keep the home page to ${MAX_HOME_SECTIONS} and move the rest to their own pages.`);
     if (pi > 0 && types.length < 2) errors.push(`${where}: one section; give every page at least two, or fold it into another page.`);
     for (let i = 1; i < types.length; i += 1) {
       if (types[i] === types[i - 1]) errors.push(`${where}: sections ${i - 1} and ${i} are both "${types[i]}" (DR-REPEATED-RHYTHM); put a different section between them.`);
@@ -189,7 +202,11 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
       if (s.type === "contact") contactForms += 1;
       if (s.type === "quote") {
         s.quotes.forEach((q, qi) => {
-          if (q.source === "brief" && !inBrief(q.text, briefText)) errors.push(`${where}.sections[${si}].quotes[${qi}]: marked source "brief" but the quote is not in the brief. Use source "sample".`);
+          if (q.source === "sample") {
+            errors.push(`${where}.sections[${si}].quotes[${qi}]: an invented quote, even labelled SAMPLE, is fake social proof (DR-FAKE-SOCIAL-PROOF). Use only quotes the brief supplies; without any, remove the quote section.`);
+          } else if (!inBrief(q.text, briefText)) {
+            errors.push(`${where}.sections[${si}].quotes[${qi}]: marked source "brief" but the quote is not in the brief. Use only quotes the brief supplies; without any, remove the quote section.`);
+          }
         });
       }
       if (s.type === "work") {

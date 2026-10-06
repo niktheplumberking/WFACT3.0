@@ -8,6 +8,8 @@
  */
 import { readFileSync } from "node:fs";
 
+export type PageScope = "single" | "multi";
+
 export interface PilotBrief {
   clientSlug: string;
   entitySlug: string;
@@ -16,6 +18,11 @@ export interface PilotBrief {
   requiredSections: string[];
   brandNotes: string;
   templatePreference?: string;
+  /**
+   * "single" = the client asked for one landing page; "multi" (the default) = a 3+ page site. Set by the
+   * Planner from the intake lead type, so a landing-page brief is never built as a multi-page site.
+   */
+  pageScope?: PageScope;
   /** Provenance — never silently treat a placeholder brief as Nick's real one. */
   source: "nick" | "placeholder-2.0-case" | "intake-planner" | "synthetic-provisional-2026-09-30";
 }
@@ -34,6 +41,11 @@ const REQUIRED_STRING_FIELDS: (keyof PilotBrief)[] = [
   "brandNotes",
   "source",
 ];
+
+/** The brief's page scope; a brief without one (every brief before 2026-10-06) is a multi-page site. */
+export function pageScopeOf(brief: PilotBrief): PageScope {
+  return brief.pageScope ?? "multi";
+}
 
 export class InvalidBriefError extends Error {
   constructor(reason: string) {
@@ -65,6 +77,9 @@ export function parseBrief(raw: unknown): PilotBrief {
   if (record.templatePreference !== undefined && typeof record.templatePreference !== "string") {
     throw new InvalidBriefError('Brief "templatePreference", if present, must be a string.');
   }
+  if (record.pageScope !== undefined && record.pageScope !== "single" && record.pageScope !== "multi") {
+    throw new InvalidBriefError('Brief "pageScope", if present, must be "single" or "multi".');
+  }
 
   return {
     clientSlug: record.clientSlug as string,
@@ -74,6 +89,7 @@ export function parseBrief(raw: unknown): PilotBrief {
     requiredSections: record.requiredSections as string[],
     brandNotes: record.brandNotes as string,
     templatePreference: record.templatePreference as string | undefined,
+    ...(record.pageScope !== undefined ? { pageScope: record.pageScope as PageScope } : {}),
     source: record.source as PilotBrief["source"],
   };
 }

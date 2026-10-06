@@ -47,7 +47,6 @@ test("SAMPLE facts are labelled where they appear and never published as structu
   const site = renderSite(validateSiteContent(fixture(), brief).content!);
   const home = site.files["index.html"]!;
   assert.match(home, /555-0142<\/span><\/a> <span class="sample">SAMPLE<\/span>/);
-  assert.match(home, /SAMPLE - replace with real customer feedback/);
   const ld = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)![1]!);
   assert.equal(ld.name, "Summit Line Roofing");
   assert.equal(ld.telephone, undefined, "a SAMPLE phone is never published as a fact");
@@ -79,7 +78,7 @@ test("validation sends back exact problems: invented facts, missing required sec
   const c = fixture();
   c.business.phone = { value: "(555) 014-7732", source: "brief" };
   c.business.serviceAreas = { values: ["Springfield"], source: "brief" };
-  c.pages[0]!.sections = c.pages[0]!.sections.filter((s) => s.id !== "proof");
+  c.pages[0]!.sections = c.pages[0]!.sections.filter((s) => s.id !== "process");
   c.pages[3]!.sections[1]!.id = "request";
   c.primaryAction.page = "faq";
   const { content, errors } = validateSiteContent(c, brief);
@@ -87,7 +86,7 @@ test("validation sends back exact problems: invented facts, missing required sec
   const all = errors.join("\n");
   assert.match(all, /business\.phone: "\(555\) 014-7732" is marked source "brief" but is not in the brief/);
   assert.match(all, /serviceAreas: "Springfield" is not in the brief/);
-  assert.match(all, /requires a section with id "proof"/);
+  assert.match(all, /requires a section with id "process"/);
   assert.match(all, /id "request" is reserved/);
   assert.match(all, /primaryAction\.page "faq" has no "contact" section/);
 
@@ -177,7 +176,7 @@ test("validation enforces page structure: home page size, thin pages, one cta, n
   const home = c.pages[0]!;
   const services = c.pages[1]!;
   services.sections = [services.sections[0]!, services.sections[1]!, { type: "steps", id: "how", heading: "How", steps: [{ title: "a", text: "a" }, { title: "b", text: "b" }, { title: "c", text: "c" }] }, services.sections[2]!];
-  home.sections = [...home.sections, { type: "cta", id: "again", heading: "Again", text: "Again." }, { type: "prose", id: "more", heading: "More", paragraphs: ["More."] }];
+  home.sections = [...home.sections, { type: "cta", id: "again", heading: "Again", text: "Again." }, { type: "prose", id: "more", heading: "More", paragraphs: ["More."] }, { type: "prose", id: "even-more", heading: "Even more", paragraphs: ["More."] }];
   c.pages[2]!.sections = [c.pages[2]!.sections[0]!];
   const all = validateSiteContent(c, brief).errors.join("\n");
   assert.match(all, /pages\[0\] \(index\) has 7 sections; keep the home page to 6/);
@@ -190,4 +189,40 @@ test("palette: the tinted section background really differs from the paper (regr
   const { palette } = buildPalette({ ink: "#1F3D36", paper: "#F6F1E7", accent: "#B5642A", deep: "#1F3D36" });
   assert.notEqual(palette!.surface, palette!.paper);
   assert.ok(contrast(palette!.accentInk, palette!.surface) >= 4.5 && contrast(palette!.ink, palette!.surface) >= 4.5);
+});
+
+test("testimonials only quote the brief: an invented one, even labelled SAMPLE, is fake social proof (job f696ba43)", () => {
+  const c = fixture();
+  const quote = (text: string, source: "brief" | "sample") => ({ text, attribution: "Maren, homeowner", source });
+  c.pages[2]!.sections.splice(1, 0, { type: "testimonials", id: "proof", heading: "What homeowners say", quotes: [quote("Clear about what could wait.", "sample")] } as never);
+  let all = validateSiteContent(c, brief).errors.join("\n");
+  assert.match(all, /quotes\[0\]: an invented testimonial, even labelled SAMPLE, is fake social proof \(DR-FAKE-SOCIAL-PROOF\)/);
+  (c.pages[2]!.sections[1] as { quotes: unknown[] }).quotes = [quote("Clear about what could wait.", "brief")];
+  all = validateSiteContent(c, brief).errors.join("\n");
+  assert.match(all, /quotes\[0\]: marked source "brief" but the quote is not in the brief/);
+  const sourced = { ...brief, brandNotes: `${brief.brandNotes} Real customer quote: "Clear about what could wait."` };
+  assert.deepEqual(validateSiteContent(c, sourced).errors, [], "a quote the brief supplies is allowed");
+  assert.match(trackASystemPrompt(), /Never invent a testimonial, not even one labelled/);
+});
+
+test("a single landing page brief gets exactly one page; a multi-page brief still needs 3+", () => {
+  const single = { ...brief, pageScope: "single" as const };
+  const multiPage = validateSiteContent(fixture(), single).errors.join("\n");
+  assert.match(multiPage, /the brief asks for a single landing page, but there are 4 pages/);
+
+  const c = fixture();
+  const [home, services, faq, contact] = c.pages;
+  home!.sections = [home!.sections[0]!, home!.sections[1]!, services!.sections[1]!, contact!.sections[1]!, home!.sections[2]!, faq!.sections[0]!, contact!.sections[0]!, home!.sections[3]!];
+  c.pages = [home!];
+  c.primaryAction.page = "index";
+  for (const it of (home!.sections[1] as { items: { page?: string }[] }).items) delete it.page; // no other pages to link to
+  assert.deepEqual(validateSiteContent(c, single).errors, [], "one page with every required section and the form passes");
+  assert.match(validateSiteContent(c, brief).errors.join("\n"), /1 page\(s\); a multi-page site has 3 to 8/);
+
+  const site = renderSite(validateSiteContent(c, single).content!);
+  assert.deepEqual(site.pages, ["index.html"]);
+  assert.doesNotMatch(site.files["index.html"]!, /<nav aria-label="Footer">/, "no footer page list with one page");
+  assert.match(site.files["index.html"]!, /<a class="btn" href="#request">/, "the primary action stays on the page");
+  assert.match(trackASystemPrompt("single"), /SINGLE landing page/);
+  assert.doesNotMatch(trackASystemPrompt("multi"), /SINGLE landing page/);
 });

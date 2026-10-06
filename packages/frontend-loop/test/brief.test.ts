@@ -50,5 +50,5 @@ test("loadBrief reads and parses the synthetic provisional Summit Line Roofing b
   assert.equal(brief.clientSlug, "summit-line-roofing");
   assert.equal(brief.entitySlug, "bennett-co");
   assert.equal(brief.source, "synthetic-provisional-2026-09-30");
-  assert.deepEqual(brief.requiredSections, ["hero", "services", "packages", "process", "proof", "faq", "contact"]);
+  assert.deepEqual(brief.requiredSections, ["hero", "services", "packages", "process", "faq", "contact"]);
 });

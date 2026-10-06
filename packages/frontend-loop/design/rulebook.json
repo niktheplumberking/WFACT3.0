@@ -1,6 +1,6 @@
 {
   "_doc": "WFACT design rulebook (anti AI-slop), Step 4B. Versioned data. Distilled in our own words from Huraira's design-quality rule (Factory Completion Plan Part C, 2026-10-01) and the installed design skills (impeccable, design-taste-frontend, high-end-visual-design, ecc:frontend-design-direction, ecc:frontend-a11y); no third-party prompt text is copied. Given to the builder in its system prompt (packages/frontend-loop/src/rulebook.ts) and checked on the rendered page: `dom` names a deterministic detector in packages/rendered-qa/src/design.ts, `review` is the question the cross-vendor screenshot reviewer answers. Every rule has a failing fixture under design/fixtures/. A brief may explicitly ask for a pattern (e.g. a brand that is purple); `briefCanAllow` says whether that override exists. Change a rule = bump version.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "rules": [
     {
       "id": "DR-GRADIENT-HERO",
@@ -50,9 +50,9 @@
     {
       "id": "DR-FAKE-SOCIAL-PROOF",
       "kind": "banned",
-      "title": "Fake 'trusted by' logos or initials avatars",
-      "rule": "No 'trusted by / as seen in / featured in' strips without supplied, real logos, and no circles of initials posing as customers.",
-      "detect": { "dom": "fakeSocialProof", "review": "Is there a logo wall, 'trusted by' strip or row of initials avatars that looks invented?" },
+      "title": "Fake 'trusted by' logos, initials avatars or invented testimonials",
+      "rule": "No 'trusted by / as seen in / featured in' strips without supplied, real logos, no circles of initials posing as customers, and no invented testimonials or customer quotes, even labelled SAMPLE (1.1.0): quotes appear only when the brief supplies them.",
+      "detect": { "dom": "fakeSocialProof", "review": "Is there a logo wall, 'trusted by' strip, row of initials avatars or testimonial that looks invented or is labelled as a sample?" },
       "briefCanAllow": false,
       "fixture": "fixtures/DR-FAKE-SOCIAL-PROOF.html"
     },

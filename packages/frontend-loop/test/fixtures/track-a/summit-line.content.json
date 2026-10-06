@@ -75,16 +75,6 @@
           ]
         },
         {
-          "type": "testimonials",
-          "id": "proof",
-          "heading": "What homeowners say",
-          "quotes": [
-            { "text": "They showed me photos of the actual problem before suggesting anything. The repair was small and that is what they did.", "attribution": "Maren, homeowner", "source": "sample" },
-            { "text": "Clear about what could wait and what could not.", "attribution": "Tobias, homeowner", "source": "sample" },
-            { "text": "The gutters drain properly now and the yard was left clean.", "attribution": "Ines, homeowner", "source": "sample" }
-          ]
-        },
-        {
           "type": "cta",
           "id": "next",
           "heading": "Not sure what your roof needs?",

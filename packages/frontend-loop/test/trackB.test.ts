@@ -187,3 +187,24 @@ test("every type pairing stays inside the font weight that keeps mobile LCP in b
   }
   assert.deepEqual(Object.keys(pairings).sort(), ["editorial", "studio", "technical"]);
 });
+
+test("quotes only come from the brief: an invented one, even labelled SAMPLE, is fake social proof (job f696ba43)", () => {
+  const c = fixture();
+  c.pages[0]!.sections.splice(3, 0, { type: "quote", id: "kind-words", heading: "From a client", quotes: [{ text: "Better questions than we had asked.", attribution: "Operations lead", source: "sample" }] } as never);
+  assert.match(validateSiteContent(c, brief).errors.join("\n"), /quotes\[0\]: an invented quote, even labelled SAMPLE, is fake social proof \(DR-FAKE-SOCIAL-PROOF\)/);
+  assert.match(trackBSystemPrompt(), /Never invent a quote, not even one labelled/);
+});
+
+test("a single landing page brief gets exactly one page (job f696ba43 spent two rounds on four pages)", () => {
+  const single = { ...brief, pageScope: "single" as const };
+  assert.match(validateSiteContent(fixture(), single).errors.join("\n"), /the brief asks for a single landing page, but there are 3 pages/);
+
+  const c = fixture();
+  const [home, services, contact] = c.pages;
+  home!.sections = [home!.sections[0]!, home!.sections[1]!, home!.sections[2]!, services!.sections[1]!, services!.sections[2]!, contact!.sections[0]!, home!.sections[3]!];
+  c.pages = [home!];
+  c.primaryAction.page = "index";
+  assert.deepEqual(validateSiteContent(c, single).errors, [], "one page with every required section and the form passes");
+  assert.match(validateSiteContent(c, brief).errors.join("\n"), /1 page\(s\); a multi-page site has 3 to 7/);
+  assert.match(trackBSystemPrompt("single"), /SINGLE landing page/);
+});

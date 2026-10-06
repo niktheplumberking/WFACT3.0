@@ -7,13 +7,15 @@
  *   - Every business fact (phone, email, address, hours, service areas) is a `Fact` that either quotes
  *     the approved brief (`source: "brief"`, checked here against the brief text) or is a visibly
  *     labelled SAMPLE placeholder (`source: "sample"`, the renderer prints the label).
- *   - Testimonials are always rendered with the SAMPLE label unless they quote the brief.
+ *   - Testimonials only ever quote the brief: an invented quote, even labelled SAMPLE, is fake social proof
+ *     (DR-FAKE-SOCIAL-PROOF, Cockpit job f696ba43), so a brief without quotes gets no testimonials section.
+ *   - Page count follows the brief: one page for a landing-page brief (pageScope "single"), 3-8 otherwise.
  *   - Colours are validated hex; contrast is computed, never assumed (`palette()` in render.ts).
  *
  * Versioned: change the schema = bump CONTENT_SCHEMA_VERSION.
  */
 import { z } from "zod";
-import type { PilotBrief } from "../brief.js";
+import { pageScopeOf, type PilotBrief } from "../brief.js";
 import { buildPalette } from "./palette.js";
 
 export const CONTENT_SCHEMA_VERSION = "track-a/1";
@@ -137,7 +139,8 @@ export const SiteContentSchema = z.object({
   }),
   /** The one primary action, labelled the same everywhere (DQ-CONTENT-HIERARCHY). */
   primaryAction: z.object({ label: Text(40), page: Slug }),
-  pages: z.array(PageSchema).min(3).max(8),
+  /** 1 page for a single landing page (brief.pageScope "single"), otherwise 3-8; checked in validateSiteContent. */
+  pages: z.array(PageSchema).min(1).max(8),
   /** Questions the brief left open. Rendered as HTML comments for a human, never as visible copy. */
   openQuestions: z.array(Text(300)).max(10).default([]),
 });
@@ -196,6 +199,11 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
   errors.push(...buildPalette(c.brand.colors).problems);
 
   const slugs = c.pages.map((p) => p.slug);
+  const single = pageScopeOf(brief) === "single";
+  if (single && c.pages.length !== 1) {
+    errors.push(`pages: the brief asks for a single landing page, but there are ${c.pages.length} pages; put every section on the one "index" page.`);
+  }
+  if (!single && c.pages.length < MIN_SITE_PAGES) errors.push(`pages: ${c.pages.length} page(s); a multi-page site has ${MIN_SITE_PAGES} to 8.`);
   if (slugs[0] !== "index") errors.push(`pages[0].slug must be "index" (the home page); got "${slugs[0]}".`);
   for (const dup of slugs.filter((s, i) => slugs.indexOf(s) !== i)) errors.push(`pages: slug "${dup}" is used twice.`);
   if (!slugs.includes(c.primaryAction.page)) errors.push(`primaryAction.page "${c.primaryAction.page}" is not one of the pages (${slugs.join(", ")}).`);
@@ -219,8 +227,10 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
       if (s.type === "areas" && !c.business.serviceAreas) errors.push(`pages[${pi}].sections[${si}]: an "areas" section needs business.serviceAreas.`);
       if (s.type === "testimonials") {
         s.quotes.forEach((q, qi) => {
-          if (q.source === "brief" && !inBrief(q.text, briefText)) {
-            errors.push(`pages[${pi}].sections[${si}].quotes[${qi}]: marked source "brief" but the quote is not in the brief. Use source "sample".`);
+          if (q.source === "sample") {
+            errors.push(`pages[${pi}].sections[${si}].quotes[${qi}]: an invented testimonial, even labelled SAMPLE, is fake social proof (DR-FAKE-SOCIAL-PROOF). Use only quotes the brief supplies; without any, remove the testimonials section.`);
+          } else if (!inBrief(q.text, briefText)) {
+            errors.push(`pages[${pi}].sections[${si}].quotes[${qi}]: marked source "brief" but the quote is not in the brief. Use only quotes the brief supplies; without any, remove the testimonials section.`);
           }
         });
       }
@@ -231,14 +241,14 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
   const LISTLIKE = new Set(["services", "packages", "steps", "faq"]);
   c.pages.forEach((page, pi) => {
     const types = page.sections.map((s) => s.type);
-    if (pi === 0 && types.length > MAX_HOME_SECTIONS) {
+    if (pi === 0 && !single && types.length > MAX_HOME_SECTIONS) {
       errors.push(`pages[0] (index) has ${types.length} sections; keep the home page to ${MAX_HOME_SECTIONS} and move the rest to their own pages.`);
     }
     if (pi > 0 && types.length < 2) errors.push(`pages[${pi}] (${page.slug}) has one section; give every page at least two, or fold it into another page.`);
     if (types.filter((t) => t === "cta").length > 1) errors.push(`pages[${pi}] (${page.slug}) has more than one "cta" section; one per page.`);
     for (let i = 2; i < types.length; i += 1) {
       if (LISTLIKE.has(types[i]!) && LISTLIKE.has(types[i - 1]!) && LISTLIKE.has(types[i - 2]!)) {
-        errors.push(`pages[${pi}] (${page.slug}): sections ${i - 2}-${i} (${types.slice(i - 2, i + 1).join(", ")}) are three list-like layouts in a row (DR-REPEATED-RHYTHM); put testimonials, prose or a cta between them.`);
+        errors.push(`pages[${pi}] (${page.slug}): sections ${i - 2}-${i} (${types.slice(i - 2, i + 1).join(", ")}) are three list-like layouts in a row (DR-REPEATED-RHYTHM); put prose, a cta or brief-supplied testimonials between them.`);
       }
     }
   });
@@ -257,6 +267,8 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
 
 /** The home page leads; detail lives on the other pages. */
 export const MAX_HOME_SECTIONS = 6;
+/** Pages in a multi-page site. A single landing page holds up to PageSchema's 10 sections. */
+export const MIN_SITE_PAGES = 3;
 
 /** Element ids the starter itself uses (skip link target, menu, request form). */
 const RESERVED_IDS = new Set(["main", "site-nav", "request"]);
