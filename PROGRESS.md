@@ -1,6 +1,9 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-02 (20:05 +05), via `/progress-sync` — folds in the push of `a9f4dcf`…`2d96962` to both branches (Huraira's word),
+Last synced: 2026-10-06 (+05), via `/step-close 4B M4` — `8dae180`…`4bbd4bc` (claims gate 1.1.0, single-page and no-invented-testimonial
+builder fixes from Cockpit job `f696ba43`, `packages/media` Seedance groundwork); local tests green, **not pushed, no CI run yet**.
+Step 6 is running in a separate worktree (Huraira approved the parallel lane 2026-10-06); not merged, not reflected here.
+Previous sync: 2026-10-02 (20:05 +05), via `/progress-sync` — folds in the push of `a9f4dcf`…`2d96962` to both branches (Huraira's word),
 CI `37016971442` green on `2d96962` (all 13 jobs incl. the new isolated Track B build and the Cockpit deploy), the other session's
 `c857150`…`0f00cde` (artifact-store CDN fix; CI `37019326469` still running at sync), and the live `jobs`/`plan_approvals`/`audit_log`
 rows. `main`, `origin/huraira-work` and local `huraira-work` are all at `0f00cde`.
@@ -19,31 +22,32 @@ steps; this file tracks the Continuation Stages.
 
 **Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
 Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is IN PROGRESS** (M0 6 of 7 inputs, M1, M2, M3 done; **M4 PARTIAL**
-2026-10-02: built, verified locally and in CI `37016971442`; screenshot review and a live pipeline build pending; M5–M6 not started), and
+2026-10-02: built, verified locally and in CI `37016971442`; the live Track B build `f696ba43` failed on two factory contradictions,
+fixed 2026-10-06 in `c64bd0e` (not yet re-run live); M5–M6 not started), and
 **Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
 signed-in use on 2026-10-01: plan `b5a45a8e` approved as Track A (audited) and two Track A builds started from the Cockpit; both halted
 on a CDN bug that is now fixed but not yet re-run live. A full room-by-room signed-in check is still Huraira's to confirm.
-**Biggest open items**: a fresh live Track A build after the CDN fix, the claims-gate "best time" false positive (it now costs live
-correction rounds), a different-vendor screenshot reviewer, the image tool (before M5), Nick's real brief, a real Step 3A sign-up.
+**Biggest open items**: push today's fixes and re-run Track A (`b5a45a8e`) and Track B (`4acbde1f`) live, Higgsfield credits and a
+spending cap (M5), a different-vendor screenshot reviewer, Nick's real brief, a real Step 3A sign-up.
 
 **Next up**:
-1. **Huraira**: once CI `37019326469` (the CDN fix) is green and deployed, start a **fresh** Track A build of plan `b5a45a8e` from the
-   Cockpit (do not resume the halted runs). While there, close the two stuck jobs `a2a41d2d`, `cbf8bf7b` (still `queued` today) and
-   confirm you clicked through Home, a plan, a run and Settings, which closes Step 4C's live check.
-2. **Huraira**: decide on the Step 4B M4 open items: the entity for a synthetic Track B client (entity law blocks a third client; needed
-   for the live Track B build), the Track B budgets, and leaving Motion/Radix out of the starter (`docs/FRONTEND-UPGRADE-DESIGN.md` §11).
-   Then GO to finish M4 (live build) or for M5.
-3. **Huraira**: the screenshot reviewer (still Agent 37, same vendor as the builder; false positives in M3); image tool before M5;
-   Supabase Auth settings and one real sign-up for Step 3A; the old Doppler CLI token check.
+1. **Huraira**: say "push" for `8dae180`…`4bbd4bc`; once CI is green and the runner has the fixes, start a fresh Track B build of plan
+   `4acbde1f` (Harbor Street Bakery, now single-page) and a fresh Track A build of `b5a45a8e` from the Cockpit, and click through Home, a
+   plan, a run and Settings (closes Step 4C's live check). M4 decisions were given 2026-10-06: Harbor Street is the synthetic Track B
+   client, the Track B budgets stand, Motion/Radix stay out of the starter.
+2. **Huraira**: add Higgsfield credits (the live Seedance run returned "Not enough credits"), rotate the key (it was posted in chat), put
+   it in the GitHub secrets, and set a per-build and per-month spending cap; then GO for M5.
+3. **Huraira**: the screenshot reviewer (deferred to after M6, 2026-10-06); Supabase Auth settings and one real sign-up for Step 3A; the
+   old Doppler CLI token check.
 
 **Gaps noticed**:
 - **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`
   (the only dead path found in a link check of the 7 main docs this sync).
 - **Two ways in to QA still differ**: `packages/verification`'s old `npm run verify` CLI runs only the original six checks; the M1 gate is
   in `npm run qa` (rendered-qa), the jobs runner and the workflow CLI.
-- **The claims gate's BC-SUPERLATIVE rule flags "the best time to reach you"** (noted in M3) and has now cost live correction rounds:
-  both Cockpit Track A jobs (`21350a42`, `5ed238ac`) failed QA cycle 0 on exactly this ("best time", "what time of day works best"). The
-  rule (`packages/verification/config/claims-rules.json` v1.0.0) needs a narrower pattern; not changed in this sync.
+- **`packages/media` is not in CI yet**: its 8 tests run locally only; add it to the CI job list when M5 wires it into the pipeline.
+- **Track B "work" items can still be invented clients labelled SAMPLE**; quotes no longer can (2026-10-06). The design reviewer may
+  read invented project panels as fake social proof too; watch the next live Track B build.
 - **Track B output is reproducible per platform, not across platforms**: the same content gives output hash `a19eed34…` on macOS (two
   runs) and `0209e11b…` on the Linux CI runner. A checkpoint is always re-hashed against its own build, so nothing breaks, but "same
   content = same bytes" holds per platform only.
@@ -862,7 +866,26 @@ answered `GET /models` with HTTP 200 at 2026-10-03 (gateway up; a full review ca
 - [ ] Re-run the Track B build of that plan from the Cockpit (Huraira; after this fix is deployed, or as is: the outcome is the same, only
       the message changes).
 
-**M5–M6**: not started. M5 needs the image tool (`BLOCKED-ON-NICK.md`).
+**Fix 2026-10-06 — Cockpit job `f696ba43` (Track B, Harbor Street Bakery) failed on two factory contradictions** (`c64bd0e`, `8dae180`;
+local only, not pushed). The 2026-10-03 re-run of plan `4acbde1f` ended `failed_verification` after 5 correction rounds: the builder's
+reviewer rejected twice that a "single landing page" brief was built as 4 and then 3 pages (both content schemas forced 3+ pages), and the
+design review failed DR-FAKE-SOCIAL-PROOF on testimonials labelled "SAMPLE - replace with real client feedback" (the builder prompts asked
+for exactly those). Fixes: the brief carries `pageScope` (single|multi), set by the Planner from the `landing_page` lead type and, for plans
+approved earlier, by `briefForBuild()` from the stored lead type; both tracks validate, prompt and review by it (a one-page site keeps the
+primary action on the page; Track A drops the footer page list). Quotes now come only from the brief; an invented one is refused before the
+build; rulebook 1.1.0 says so in DR-FAKE-SOCIAL-PROOF. The synthetic Summit Line brief no longer asks for SAMPLE testimonials (its `proof`
+section is removed; real feedback is open question 3), flagged to Huraira. Claims rules 1.1.0: BC-SUPERLATIVE no longer flags "the best
+time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`); "the best roofer in town" still fails. Tests: frontend-loop
+59/59 (incl. both real isolated Track B builds), verification 39/39, planning 26/26, workflow 19/19, jobs 13/13, rendered-qa 40/40.
+- [ ] Push and re-run Track B `4acbde1f` and Track A `b5a45a8e` live from the Cockpit (Huraira).
+- [ ] Screenshot review of the passing live builds at desktop and phone, then `/step-close 4B M4` as DONE.
+
+**M5 groundwork 2026-10-06** (`4bbd4bc`): Huraira chose Higgsfield. `packages/media` wraps Seedance 2.5 text-to-video with the official
+SDK (`@higgsfield/client` 0.2.6); `HF_CREDENTIALS` is in Doppler `wfact-3-0-codebase/dev` (never in a file); success only on `completed`
+with a video URL, every other status an error naming the request id; polling capped at 15 min; 8 tests with a fake client. **Live run
+NOT verified**: the API accepted the key and refused the request with "Not enough credits" (no video, nothing billed).
+
+**M5–M6**: M5 not started beyond the groundwork above: it needs Higgsfield credits and a spending cap (`BLOCKED-ON-NICK.md`). M6 not started.
 
 ## Step 4C — Cockpit UI/UX redesign: the control room (BUILT AND DEPLOYED 2026-10-01 — live signed-in check pending)
 
