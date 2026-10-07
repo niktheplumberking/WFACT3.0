@@ -28,13 +28,12 @@ M5 blocked on Higgsfield API credit; M6 not started. Step 4C BUILT AND DEPLOYED 
 Continuation Stages 1–5 MET; Stage 6 = Step 5 (MET except the Cognee write-up, Step 15); Stage 7 waits on Nick. **Biggest blocker**:
 none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-07).
 
-**Next up**:
-0. **Huraira**: now that the Cockpit is deployed, open a stopped build in the Cockpit and press the new button once, so the agent can verify a live continue.
-1. **Huraira**: re-run Track B `4acbde1f` and Track A `b5a45a8e` from the Cockpit once CI on the `render.perf` change is green (the agent
-   reports it). M4 closes when one live build per track passes and the agent has reviewed the screenshots.
-2. **Agent**: then Step 8 (task/event queue and durable execution).
-3. **Huraira**: launch files in both starters and removing open questions from the Track A page source (yes/no); OpenAI and Higgsfield
-   API credit when convenient; rotate the Higgsfield key.
+**Next up** (order re-set and approved by Huraira 2026-10-07; see "Execution order" in the Factory Completion Plan):
+1. **Huraira**: re-run Track B `4acbde1f` and Track A `b5a45a8e` (closes 4B M4); press "continue" on a real stopped build (4D live proof); OpenAI and Higgsfield credits; rotate the Higgsfield key.
+2. **Agent**: Step 26 quality calibration (different-vendor evaluator, human calibration, reference set).
+3. **Agent**: Step 25 real-client proof run (Nick's real brief, or the real 2.0 DreamSign case); 4B M5/M6 when Higgsfield credits land.
+4. **Agent**: Steps 8, 12, 20 as one reliability bundle (with Step 21 sub-item H); then Steps 9-10 as one thin Health room.
+5. Not in scope now: e-commerce site type. Deferred: Steps 15, 16, 24.
 
 **Gaps noticed**:
 - **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`

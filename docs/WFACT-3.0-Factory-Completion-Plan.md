@@ -10,12 +10,12 @@ to a Continuation Stage, that is noted.
 **Revised 2026-10-01**: added **Step 4B** (front-end upgrade: two build tracks, chosen per client) and **Step 4C** (Cockpit UI/UX
 redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
-**Realigned 2026-10-07**: product-and-solution alignment pass (`docs/HANDOFF.md` is the orientation; `docs/archive/MANIFEST.md` lists what moved). Changes to this plan: closed steps (1, 2, 3, 3A, 4, 4C, 5, 6, 7) keep their heading, status and evidence but their long agent prompts moved to the archived pre-realignment copy; open steps keep full prompts; Steps 12, 20 and 21 gained the verified gaps found in the audit; Part F lists proposed, UNAPPROVED additions (agency scope) and the decisions that gate them. The approved step order below is unchanged. The step table, headings and Part E remain machine-checked by `scripts/check-trackers.mjs`.
+**Realigned 2026-10-07**: product-and-solution alignment pass (`docs/HANDOFF.md` is the orientation; `docs/archive/MANIFEST.md` lists what moved). Changes to this plan: closed steps (1, 2, 3, 3A, 4, 4C, 5, 6, 7) keep their heading, status and evidence but their long agent prompts moved to the archived pre-realignment copy; open steps keep full prompts; Steps 12, 20 and 21 gained the verified gaps found in the audit; Part F lists proposed, UNAPPROVED additions (agency scope) and the decisions that gate them. The execution order was re-set on 2026-10-07 (see "Execution order" after Part B); Steps 25 and 26 were added. The step table, headings and Part E remain machine-checked by `scripts/check-trackers.mjs`.
 **Status as of 2026-10-07**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
 Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done, M4 PARTIAL: built and verified in CI `37016971442`; live Track B
 build `f696ba43` failed on page count and invented testimonials, fixed in `c64bd0e`, not yet re-run; M5 groundwork `4bbd4bc`, live run
 blocked on Higgsfield credits; M6 not started); Step 4C is **BUILT AND DEPLOYED** (`main` `fb08be3`, live signed-in check pending); Step 4D (build recovery) is **PARTIAL** (`a3198d8`…`a643d2d`; migration 0018 applied live, 26/26 attack checks; CI `37644039022` green and deployed; live continue not yet run);
-Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **DONE** (proven on live Cockpit builds 2026-10-07); Step 7 is **DONE** (CI `37617845669` green); Steps 8–24 are not started. Each step heading below carries its
+Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **DONE** (proven on live Cockpit builds 2026-10-07); Step 7 is **DONE** (CI `37617845669` green); Steps 8–26 are not started. Each step heading below carries its
 status; Part E is the checklist.
 
 ## How to use this file
@@ -24,7 +24,7 @@ status; Part E is the checklist.
    `docs/WFACT-3.0-Factory-Completion-Plan.md`").
 2. The agent does **only that step**, verifies it independently, and sends the **Report** (format below).
 3. Huraira reads the report and says **GO** for the next step. The agent never starts a step on its own.
-4. Steps are ordered by priority. Do them in order unless Huraira says otherwise. Each step lists its
+4. Follow the **Execution order** table after Part B (re-set 2026-10-07), not the numeric order, unless Huraira says otherwise. Each step lists its
    `Depends on`; do not start a step whose dependencies are not reported done and approved.
 
 ---
@@ -93,6 +93,27 @@ the goals · **P3** later or depends on Nick.
 | 22 | Nick's items (Huraira acts, agent prepares) | Disclosures, Cockpit review, real brief and rules, budget and scope sign-off | Only Nick can close these; goal 1 needs his real brief | Logged decisions; real inputs replace provisional ones | P3 |
 | 23 | Product features (Owner's Key port) | Rebuilds Owner's Key, closing reports, care plans on the new stack | Blueprint Phase 10; Business/Product category | Migrated features; re-run attack tests | P3 |
 | 24 | Advanced autonomy and optimization | Earns auto-pass gates from measured runs; local-model migration decision | Blueprint Phases 11–12 need real data first | Evidence-backed autonomy upgrades | P3 |
+| 25 | Real-client proof run (added 2026-10-07) | Runs one real client (Nick's brief, or the real 2.0 DreamSign case if his brief is not ready) through intake, build, verify and human launch; measures corrections, cost, time | Goal 1; the loop has only run on synthetic clients | Measured result against the 40+ baseline, with a failure analysis | P0 |
+| 26 | Quality calibration (added 2026-10-07) | Gets a different-vendor evaluator working live; calibrates the automated reviewer against Nick's blind ratings; builds per-niche reference outputs with visual regression | A passing check must mean a good site; reviewer and builder share a vendor today | Calibration report; reference set in CI | P0 |
+
+### Execution order (approved by Huraira 2026-10-07; supersedes "do them in order of number")
+
+Step numbers are identifiers, not the sequence. Do them in this order; each still needs Huraira's GO.
+
+| Order | Step(s) | Why here |
+|---|---|---|
+| 1 | Huraira actions: close Step 4B M4 (re-run Track A `b5a45a8e`, Track B `4acbde1f`), press "continue" on a real stopped build (4D live proof), buy OpenAI and Higgsfield credits, rotate the Higgsfield key | Unblocks everything; nothing else is trustworthy until M4 closes |
+| 2 | **26** Quality calibration | A passing check must mean a good site before we measure a real client |
+| 3 | **25** Real-client proof run (with 4B M5/M6 when credits land) | Goal 1: the core loop has never run on a real client; one client needs no queue |
+| 4 | **8, 12, 20** as one reliability bundle, plus Step 21 sub-item H (CI coverage) | Queue, cost governance (price or cap Agent 37) and the Vercel ceiling belong together; attack tests move into CI |
+| 5 | **9 then 10** as one thin Health room (what is running, what failed, which check failed) | Founders' stated need; defer the rest of the rooms |
+| 6 | **11, 13, 14, 17** as needed | Second model, remaining agents, Memory and Human Control rooms, alerts |
+| 7 | **18, 19**, plus defining the 50-point audit list (goal 3) | Scale and recovery proof |
+| 8 | **21** (rest), **22** | Housekeeping and Nick's items |
+| 9 | After the first paid delivery: **23** and the Part F proposals | Product features follow revenue |
+| Deferred | **15, 16, 24** | Need real data first; revisit after step 7 |
+
+Not in scope now: an e-commerce site type (Huraira 2026-10-07).
 
 ---
 
@@ -1122,6 +1143,61 @@ REPORT in the Part C format after each sub-part, then STOP.
 
 ---
 
+### STEP 25 — Real-client proof run (P0, added 2026-10-07) — NOT STARTED
+
+**Depends on**: Step 4B M4 closed; Step 26 done (or Huraira's explicit waiver); a real brief from Nick, or Huraira's choice of the real 2.0 DreamSign case.
+**Maps to**: Blueprint §16K goal 1; Continuation Stage 7.
+
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules in
+docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 25.
+
+TASK
+1. Confirm with Huraira which real brief is used and that the client agreed to it being a pilot. Never use a synthetic brief here.
+2. Run the brief through the Cockpit exactly as an owner would (intake, plan approval, track choice, build, verify). Do not hand-edit
+   intermediates. Record every correction round with who asked and why.
+3. Measure: correction batches (baseline DreamSign 40+), builder and evaluator cost per model (flag unpriced calls), wall-clock time,
+   failed checks by name, and every manual intervention you had to make.
+4. Write a failure analysis: where quality was lost (brief, direction, build, QA) and which defects a human found that the checks missed.
+5. Launch stays human: stop at "awaiting launch approval". Do not deploy.
+
+ACCEPTANCE
+- A measured, honest result in docs and PROGRESS.md with evidence; defects the checks missed are listed.
+- No synthetic input used or counted. Every stand-in labelled.
+
+REPORT in the Part C format, then STOP.
+```
+
+---
+
+### STEP 26 — Quality calibration (P0, added 2026-10-07) — NOT STARTED
+
+**Depends on**: OpenAI (or another different-vendor) credits; Step 4B M4 closed.
+**Maps to**: Blueprint §1 "never trust done"; goal 3.
+
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules in
+docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 26.
+
+TASK
+1. Different-vendor evaluator: make one successful live call from the evaluator and from the screenshot reviewer on a vendor other than
+   the builder's (Agent 37). If credits are missing, stop and tell Huraira. Record the vendor in packages/rendered-qa/config/reviewer.json.
+2. Human calibration: prepare a blind rating sheet of 10-15 real outputs (Track A and B builds, mixed good and bad, labels hidden) for
+   Nick or Huraira to score 1-5 on a short rubric. Compare to the automated reviewer's scores; report agreement and the biggest
+   disagreements. Adjust thresholds or rubric only with Huraira's approval.
+3. Reference set: per niche in the taxonomy, keep one approved output with screenshots as a visual-regression baseline run in CI;
+   a regression beyond a stated threshold fails the check. No fake or invented clients presented as real.
+4. Report the cost per review and per run for the new vendor.
+
+ACCEPTANCE
+- Live different-vendor call proven with a trace row; calibration table in docs; regression test fails on a seeded visual regression.
+- Existing suites pass unchanged.
+
+REPORT in the Part C format, then STOP.
+```
+
+---
+
 ## Part E — Progress checklist (update as steps close)
 
 | # | Step | Status | Reported | Approved by Huraira |
@@ -1154,14 +1230,16 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 22 | Nick's items | not started | | |
 | 23 | Product features (A–E) | not started | | |
 | 24 | Advanced autonomy and optimization (A–C) | not started | | |
+| 25 | Real-client proof run | not started | | |
+| 26 | Quality calibration | not started | | |
 
 **Goal tracker (Blueprint §16K)**
 
 | # | Goal | Status | Closed by |
 |---|---|---|---|
-| 1 | One real client, fewer than 40 corrections | open (synthetic run done in Step 4: 2 change rounds, not comparable; comparable output needs Step 4B; real brief after Step 22) | 4B, 22 |
+| 1 | One real client, fewer than 40 corrections | open (synthetic run done in Step 4: 2 change rounds, not comparable; comparable output needs Step 4B; real brief after Step 22) | 4B, 25, 22 |
 | 2 | Three concurrent clients | open | 18 |
-| 3 | 50-point audit and registry re-run | partial (Step 7: 48-check registry re-run on the Step 4 page with a per-check table; the 78-check and 50-point source lists are not in this repo) | 7 |
+| 3 | 50-point audit and registry re-run | partial (Step 7: 48-check registry re-run on the Step 4 page with a per-check table; the 78-check and 50-point source lists are not in this repo) | 7, 26, 19 |
 | 4 | Real cost per client | partial | 12 |
 | 5 | Every agent action audited | largely met | 16, 21 |
 | 6 | Disaster-recovery drill | not verified | 19 |
@@ -1178,12 +1256,12 @@ steps to Part B, Part D and Part E in the same commit and run `node scripts/chec
 
 | ID | Proposed step | Gated by |
 |---|---|---|
-| N1 | Revised front-end direction note: motion-rich conversion-first default for all sites, e-commerce site type, lead forms unchanged (replaces the Addendum's dynamic tiers D0–D4) | D1 |
+| N1 | Revised front-end direction note: motion-rich, conversion-first default for local-business sites, lead forms unchanged (replaces the Addendum's dynamic tiers D0–D4). **E-commerce site type deferred, Huraira 2026-10-07** | D1 (remaining: Nick confirms motion-rich default) |
 | N2 | Niche research and offer agents (cost-capped external data) | D1, Steps 12 and 13 |
 | N3 | Per-niche template capture and lessons write-back to starters | N2, Step 7 |
 | N4 | Lead-gen content engine, agency-side only, after delivery and client consent | D1; Steps 12 and 13 |
 | N5 | Dynamic features, only if D3 shows they are needed (captured leads, client-editable content via Owner's Key, live data) | D3 |
 
-Decisions (owners in `docs/HANDOFF.md` §6): **D1** confirm the revised direction; **D2** approve or reject pulling Steps 12 and 20 ahead of Step 8;
+Decisions (owners in `docs/HANDOFF.md` §6): **D1** confirm the revised direction (e-commerce deferred by Huraira 2026-10-07; motion-rich default awaits Nick's confirmation); **D2** APPROVED by Huraira 2026-10-07: Steps 12 and 20 are pulled forward with Step 8 as one reliability bundle, after the real-client proof run (see Execution order);
 **D3** dynamic runtime shape within the Hostinger/Vercel law; **D4** obtain the AIW2.0STACK website-factory shell to compare real output;
 **D5** spend caps for Higgsfield and Agent 37.

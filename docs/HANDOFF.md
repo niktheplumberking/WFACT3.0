@@ -158,8 +158,8 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 
 | # | Question | Owner | Why it matters |
 |---|---|---|---|
-| D1 | Confirm the revised direction after Nick's reply: all sites motion-rich with 21st.dev + conversion-focused; e-commerce (e.g. Shopify) as a distinct site type; do lead forms stay as-is | Huraira → Nick | Changes Step 4B design, adds steps |
-| D2 | Approve or reject the Addendum's N-steps and reorder (pull Step 20 and Step 12 ahead of Step 8?) | Huraira | Decides the next 6 steps |
+| D1 | Confirm with Nick the motion-rich, conversion-focused default with 21st.dev and unchanged lead forms. **E-commerce deferred by Huraira 2026-10-07** | Huraira → Nick | Changes Step 4B design, adds steps |
+| D2 | **DECIDED 2026-10-07 (Huraira): approved.** Steps 12 and 20 join Step 8 as one bundle, after the real-client proof run | Huraira | — |
 | D3 | Runtime shape for any dynamic features within the Hostinger/Vercel law | Huraira | Only if D1 needs dynamic |
 | D4 | Obtain AIW2.0STACK "website-factory shell" to compare real output | Huraira | Comparison currently rests on Nick's description |
 | D5 | Spend caps: Higgsfield per build/month; Agent 37 auto top-up | Nick | M5 |
@@ -168,20 +168,24 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 
 ## 7. Ordered implementation backlog
 
-Order follows the approved Factory Completion Plan (the Addendum's reorder is **not** approved). Each step: read its Part D prompt, follow Part C, report, wait for GO.
+Order approved by Huraira 2026-10-07 (it replaces the numeric order; the full table is "Execution order" in the Factory Completion Plan). Each step: read its Part D prompt, follow Part C, report, wait for GO.
 
 | Order | Item | Depends on | Acceptance / verification (summary) |
 |---|---|---|---|
-| 0 | **Huraira actions**: press "continue" on a stopped build; re-run Track B `4acbde1f` and Track A `b5a45a8e` after CI green | CI green | 4D live proof; M4 closes when one live build per track passes and screenshots are reviewed |
-| 1 | **Step 8** task/event queue, durable execution | 4, 6 | Crash-resume, capped retries + escalation, per-client serialisation, cross-client parallelism each proven; RLS attack tests; design approved first |
-| 2 | Step 4B M5 (images) and M6 (Summit Line rebuild, supersedes Step 4 preview) | Higgsfield credits | Rendered QA passes on rebuilt site |
-| 3 | Step 9 System room / "is everything OK"; Step 10 Agents room + Workflows drill-down | 8 | Real data, failed check named |
-| 4 | Step 11 second model + routing; Step 12 cost governance (price Agent 37 or token ceiling) | 8 | Same task on 2 models; per-client budget guard |
-| 5 | Step 13 remaining agents; 14 Memory + Human Control rooms; 15 Cognee write-up; 16 tool tracing; 17 alerts + roles | 8–12 | Bounded scopes under Step 6 model |
-| 6 | Step 20 Vercel ceiling (earlier if more endpoints are added); Step 18 three-client test; Step 19 DR drill; Step 21 housekeeping | 8 | per plan |
-| 7 | Step 22 Nick's items; 23 Owner's Key etc.; 24 autonomy | real inputs | per plan |
+| 1 | **Huraira actions**: re-run Track B `4acbde1f` and Track A `b5a45a8e` (closes 4B M4); press "continue" on a stopped build (4D live proof); buy OpenAI and Higgsfield credits; rotate the Higgsfield key | CI green | M4 closes when one live build per track passes and screenshots are reviewed |
+| 2 | **Step 26** quality calibration | OpenAI credits | Live different-vendor call with trace row; human-vs-automated calibration table; visual-regression baseline that fails on a seeded regression |
+| 3 | **Step 25** real-client proof run (with 4B M5/M6 when Higgsfield credits land) | Nick's real brief or the real 2.0 DreamSign case; Step 26 | Measured corrections, cost, time vs the 40+ baseline; defects the checks missed listed; stops at the launch gate |
+| 4 | **Steps 8, 12, 20** as one reliability bundle, plus Step 21 sub-item H (CI coverage) | 4, 6 | Crash-resume, capped retries + escalation, per-client serialisation; Agent 37 priced or token-capped; no 12-function risk; attack tests in CI |
+| 5 | **Steps 9 then 10**: one thin Health room | 8 | Real data; failed check named |
+| 6 | Steps 11, 13, 14, 17 as needed | 8–12 | Bounded scopes under the Step 6 model |
+| 7 | Steps 18, 19, plus define the 50-point audit list | 8 | Three-client test, DR drill, goal 3 closable |
+| 8 | Step 21 (rest), 22 | real inputs | per plan |
+| 9 | After the first paid delivery: Step 23 and Part F proposals | revenue | per plan |
+| Deferred | Steps 15, 16, 24 | real data | revisit after item 7 |
 
-Housekeeping to fold into Step 21: add `media`, `dispatch-job`, `check-trackers` and RLS attack runs to CI; launch files for both starters; stop writing open questions into Track A HTML; dedupe model clients; set the real entity list.
+Not in scope now: an e-commerce site type (Huraira 2026-10-07).
+
+Housekeeping folded into Step 21: launch files for both starters; stop writing open questions into Track A HTML; dedupe model clients; real entity list instead of `KNOWN_ENTITIES`.
 
 ---
 
@@ -214,10 +218,9 @@ Supabase project `mcaxxhgjptwowwrluhra` is canonical (BLOCKED-ON-NICK.md). There
 
 ## 10. Exact next task
 
-**Task: Step 8, part 1 only — the one-page design for the task/event queue. No code, no migration.**
+**Task: Step 26, part 1 — prove one live call on a different vendor from the builder.** (Steps before it are Huraira's actions in §7 item 1.)
 
-*Precondition*: ask Huraira (one message) whether to start Step 8 now or wait for the M4 live re-runs, and whether D2 (reordering Step 20/12 ahead) is decided. If undecided, proceed with the approved order.
-*Do*: follow Step 8's prompt in the Factory Completion Plan (Part D), first bullet: options considered (Postgres queue with `SKIP LOCKED` + leases on the existing `jobs` table, GitHub Actions concurrency groups, n8n, Temporal), recommendation, cost, failure modes, and how crash-resume reuses `workflow` checkpoints. Keep it to one page at `docs/STEP-8-QUEUE-DESIGN.md`.
-*Expected outcome*: a design Huraira can approve or reject in five minutes.
-*Done when*: the file exists, names the option chosen and why, lists failure modes, states how each acceptance item (crash-resume, capped retries + escalation, per-client serialisation, cross-client parallelism) will be proven, and the report is sent in the Part C format. **Then STOP and wait for GO**; building starts only after approval.
-*Before finishing*: `node scripts/check-trackers.mjs` prints OK; run `/step-close 8` only when the step (not just the design) has evidence.
+*Precondition*: ask Huraira whether M4 is closed and whether OpenAI credits are in place. If not, report BLOCKED and stop; do not substitute the builder's vendor.
+*Do*: follow Step 26 in the Factory Completion Plan Part D, item 1 only: one successful live call from the evaluator and one from the screenshot reviewer on a non-Agent-37 vendor, with trace rows; record the vendor in `packages/rendered-qa/config/reviewer.json`; report cost per review.
+*Expected outcome*: independent review is real, not same-vendor.
+*Done when*: two `model_traces` rows (checked with SQL) show the second vendor, existing suites pass unchanged, `node scripts/check-trackers.mjs` prints OK, and the report is in the Part C format. Then STOP and wait for GO before items 2–4 of the step.
