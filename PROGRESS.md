@@ -900,6 +900,10 @@ time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`)
       with the scripts removed, unchanged with GSAP removed (the floor is the React + Next runtime, ~140 KB gzipped); real Chrome records LCP
       at 48 ms (one entry, no re-render); Lighthouse with applied (devtools) throttling: 0.72 s with or without the scripts. The simulated
       (lantern) model charges parallel framework scripts to LCP. Not a content defect: revisions could not fix it.
+- [ ] Third re-run 2026-10-07 on `8cb26e9`: Track A job `9c853a49` failed in 3 min, "content still invalid after 3 attempts: the brief requires a
+      section with id testimonials": the plan requires a testimonials section, the brief has no quotes and the builder may not invent them.
+      Fixed: a required customer-words section (testimonials, reviews, social proof) may be left out only with an open question asking the
+      client for real feedback; any other required section still must exist; both tracks, builder prompts updated; frontend-loop 72/72.
 - [x] `render.perf` measurement changed (Huraira chose option 1, 2026-10-07): the gate uses Lighthouse with applied (devtools) throttling,
       same budgets (Track A 2.0 s, Track B 2.5 s); the simulated LCP is recorded on the home page as advisory only; eval registry 1.1.0.
       The over-budget fixture (60 KB script, heavy hero) still fails LCP under the new method; rendered-qa 52/52, verification 98/98.
