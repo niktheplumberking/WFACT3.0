@@ -4,8 +4,8 @@ Last synced: 2026-10-06 (+05), via `/step-close 4B M4` — `8dae180`…`4bbd4bc`
 builder fixes from Cockpit job `f696ba43`, `packages/media` Seedance groundwork); local tests green, **not pushed, no CI run yet**.
 Step 6 (parallel worktree, approved by Huraira 2026-10-06) merged locally: `58bf776`…`ee08f9d`; merged tree re-tested here.
 Both branches pushed and synced at `8b05a46` 2026-10-07 (Huraira: "push to both branches, keep both synced"); CI `37609559746` green, all
-13 jobs incl. the Cockpit deploy. Step 6 cost ceilings re-set from live `model_traces` 2026-10-07. Steps 5 and 7 running in parallel
-worktrees (GO 2026-10-07), not merged.
+13 jobs incl. the Cockpit deploy. Step 6 cost ceilings re-set from live `model_traces` 2026-10-07. Step 5 merged 2026-10-07 (PARTIAL);
+Step 7 still running in its worktree.
 Previous sync: 2026-10-02 (20:05 +05), via `/progress-sync` — folds in the push of `a9f4dcf`…`2d96962` to both branches (Huraira's word),
 CI `37016971442` green on `2d96962` (all 13 jobs incl. the new isolated Track B build and the Cockpit deploy), the other session's
 `c857150`…`0f00cde` (artifact-store CDN fix; CI `37019326469` still running at sync), and the live `jobs`/`plan_approvals`/`audit_log`
@@ -27,7 +27,7 @@ steps; this file tracks the Continuation Stages.
 Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is IN PROGRESS** (M0 6 of 7 inputs, M1, M2, M3 done; **M4 PARTIAL**
 2026-10-02: built, verified locally and in CI `37016971442`; the live Track B build `f696ba43` failed on two factory contradictions,
 fixed 2026-10-06 in `c64bd0e` (not yet re-run live); M5–M6 not started), and
-**Step 6 is DONE** 2026-10-06 (enforced default-deny permissions, live attack verified; CI `37609559746` green). **Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
+**Step 5 is PARTIAL** 2026-10-07 (Documentation agent built and merged; live Cockpit run with it pending). **Step 6 is DONE** 2026-10-06 (enforced default-deny permissions, live attack verified; CI `37609559746` green). **Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
 signed-in use on 2026-10-01: plan `b5a45a8e` approved as Track A (audited) and two Track A builds started from the Cockpit; both halted
 on a CDN bug that is now fixed but not yet re-run live. A full room-by-room signed-in check is still Huraira's to confirm.
 **Biggest open items**: push today's fixes and re-run Track A (`b5a45a8e`) and Track B (`4acbde1f`) live, Higgsfield credits and a
@@ -886,6 +886,10 @@ section is removed; real feedback is open question 3), flagged to Huraira. Claim
 time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`); "the best roofer in town" still fails. Tests: frontend-loop
 59/59 (incl. both real isolated Track B builds), verification 39/39, planning 26/26, workflow 19/19, jobs 13/13, rendered-qa 40/40.
 - [x] Pushed (both branches, `4e30947`, CI green) and re-run live from the Cockpit 2026-10-07: Track B job `6f68adbd`, Track A job `4d6e1abb`.
+- [ ] Track B job `6f68adbd` (single page, 14 min, 3 cycles): both 2026-10-06 fixes held (builder review approved first time every round;
+      no fake social proof). Failed only on the evaluator: the starter's contact form is a fixed studio-enquiry form (organisation, "what
+      are you planning", start date), wrong for an email signup, and the builder cannot change form fields, so revisions could not fix it.
+      Needs a configurable form in the Track B starter.
 - [ ] Track A job `4d6e1abb` failed before building: "content still invalid after 3 attempts: openQuestions.0 over 300 chars". The plan
       carries 11 open questions, the content schema allowed 10 x 300, the builder merged two. Caps raised to 25 x 800 in both tracks (never
       shown as copy; Track A keeps them as escaped HTML comments), test added, frontend-loop 66/66. Re-run of Track A needed (Huraira).
@@ -981,4 +985,34 @@ toward the cost ceiling (it can be exceeded by one call); Hermes-lite retries a 
 injection cases are denied and audited. Existing suites pass unchanged (or minimal, justified changes listed)."* — **MET**. Justified
 changes: `runAgent.test.ts` echo role uses a typed scope; one `trackA.test.ts` test supplies the role's gate; `verification.decision` rows
 inside an agent run now carry the run's entity in `entity_slug` (client slug moved to the payload). CI green: `37609559746`.
+
+## Step 5 — Stage 6: Documentation agent and episodic memory (PARTIAL 2026-10-07 — live workflow run with the agent pending)
+
+Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 5 (Continuation Stage 6). Built by a coding agent in a parallel worktree (GO
+2026-10-07), merged into `huraira-work` and re-verified in the main checkout.
+
+- [x] Versioned episodic entry format (v1: heading, one JSON record line, rendered bullets; parser re-renders, hand-edited = "tampered";
+      secrets/emails/phones redacted; brief stored as a hash) — `08fc069`, `packages/hermes/src/tools/episodes.ts`
+- [x] Workflow announces the end of every build and QA stage to an optional `StageObserver`; a documentation failure writes
+      `workflow.documentation_escalated` and never undoes the stage — `bba3093`
+- [x] `packages/documentation`: Documentation agent on a minimal default-deny scope (reads own-entity `audit_log`/`model_traces`, appends
+      only the bound client's `memory.md`, no model, $0 ceiling); deterministic extraction, append-only with an unchanged-prefix check,
+      refuses another entity's run — `791d67a`, `bd62314`
+- [x] Wired into the build-and-verify CLI and the Cockpit jobs runner; each entry also stored as a `documentation.entry` row (runner disks
+      are lost), `npm run document` writes them into the file and backfills; CI job `documentation` — `e2c7a12`
+- [x] Live backfill: 26 entries in `clients/summit-line-roofing/memory.md` over 8 runs — `530f4cb`
+- [ ] A live Cockpit build with the agent attached (the next Cockpit build after this merge is deployed exercises it)
+- [ ] CI `documentation` job green on `main`
+
+**Verification** (independent of the building agent)
+- [x] Merged tree: every package typechecks and passes — documentation 18, hermes 48, workflow 27, jobs 17 and the rest unchanged
+- [x] SQL: 26 `documentation.entry` rows, 8 runs, 0 without a task id = 26 entry headings in the memory file
+- [x] Agent's evidence (not re-run here): live `npm run ask` on Summit Line answered from the entries, every fact matched SQL, $0.0278
+
+**NOT COVERED**: redaction misses personal names and street addresses in free text (excerpts capped at 240-300 chars); on a runner the
+file is lost with the disk until `npm run document` is run and committed; client detection in a question is a whole-word folder-name match.
+
+**Exit check**: *"one correct entry per stage after a workflow run, written by the agent and joined to the audit task ids; `npm run ask`
+answers correctly, checked against SQL; existing suites pass unchanged."* — **PARTIALLY MET**: met in process and through the live backfill
+path (same extraction code); not yet on a live workflow run with the agent attached.
 
