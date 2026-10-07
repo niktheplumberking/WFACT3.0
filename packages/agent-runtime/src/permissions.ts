@@ -387,7 +387,8 @@ type AnyClient = { name?: string; totalUsage?: Record<string, number>; modelIdUs
  */
 function meterFor(client: AnyClient): { usage: () => { inputTokens: number; outputTokens: number }; model: string } | null {
   const u = () => client.totalUsage ?? {};
-  if (client.name === "claude" && client.modelIdUsed) {
+  // Step 7: "openai" is the second-vendor QA evaluator; metered against the run's ceiling like Claude.
+  if ((client.name === "claude" || client.name === "openai") && client.modelIdUsed) {
     return { model: client.modelIdUsed, usage: () => ({ inputTokens: u().inputTokens ?? 0, outputTokens: u().outputTokens ?? 0 }) };
   }
   if (client.name === "agent37") {
