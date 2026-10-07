@@ -12,6 +12,21 @@ import { CHECK_REGISTRY, runChecks } from "./registry.js";
 import type { ModelClient } from "./modelClient.js";
 import { runEvaluator, type EvaluatorVerdict } from "./evaluator.js";
 import { recordAudit, type AuditContext } from "@wfact/audit";
+import { costForModel } from "@wfact/hermes-lite/routing";
+
+/**
+ * Step 7: what each check cost in this run. Deterministic checks cost $0 (time only); a model suite's cost
+ * comes from its recorded calls, the evaluator's from its token usage priced by the one routing price table.
+ * usd null = UNPRICED (a model with no price on file, e.g. Agent 37), never a guess.
+ */
+export interface CheckCost {
+  /** A check id, a suite id (one suite yields several results) or "evaluator". */
+  id: string;
+  kind: "deterministic" | "model";
+  ms: number;
+  usd: number | null;
+  model?: string;
+}
 
 export type VerificationStatus =
   | "failed_checks"
@@ -23,6 +38,8 @@ export interface VerificationResult {
   status: VerificationStatus;
   checkResults: CheckResult[];
   evaluator: EvaluatorVerdict | null;
+  /** Step 7: per-check time and cost, in run order. */
+  costs?: CheckCost[];
 }
 
 export interface VerificationLoopOptions {
@@ -80,6 +97,7 @@ export class VerificationLoop {
           checks: result.checkResults.map(({ checkId, passed, details }) => ({ checkId, passed, details })),
           evaluator: result.evaluator,
           evaluatorModel: this.evaluatorModel?.name ?? null,
+          costs: result.costs ?? [],
         },
       });
     }
@@ -87,48 +105,91 @@ export class VerificationLoop {
   }
 
   private async decide(ctx: VerificationContext, goal: string): Promise<VerificationResult> {
-    const checkResults = runChecks(ctx, this.checks);
-    for (const suite of this.asyncChecks) checkResults.push(...(await suite.run(ctx)));
-    const checksPassed = checkResults.every((r) => r.passed);
+    const costs: CheckCost[] = [];
+    const checkResults: CheckResult[] = [];
+    for (const check of this.checks) {
+      const started = Date.now();
+      checkResults.push(...runChecks(ctx, [check]));
+      costs.push({ id: check.id, kind: "deterministic", ms: Date.now() - started, usd: 0 });
+    }
+    for (const suite of this.asyncChecks) {
+      const started = Date.now();
+      checkResults.push(...(await suite.run(ctx)));
+      costs.push({ id: suite.id, kind: "deterministic", ms: Date.now() - started, usd: 0 });
+    }
+    // Step 7: a minor (advisory) failure is reported but never fails the gate; N/A results are passes with a reason.
+    const checksPassed = checkResults.every((r) => r.passed || r.advisory);
 
     if (!checksPassed) {
       // Never even spend a model call on a build the cheap deterministic layer already caught —
       // this IS the Manual's Phase 5 exit check: "a deliberately broken test build gets caught
       // and returned before being marked done."
-      return { status: "failed_checks", checkResults, evaluator: null };
+      return { status: "failed_checks", checkResults, evaluator: null, costs };
     }
 
     if (this.reviewSuites.length > 0) {
       const reviewResults: CheckResult[] = [];
-      for (const suite of this.reviewSuites) reviewResults.push(...(await suite.run(ctx)));
+      for (const suite of this.reviewSuites) {
+        const started = Date.now();
+        const callsBefore = suiteCalls(suite).length;
+        reviewResults.push(...(await suite.run(ctx)));
+        const calls = suiteCalls(suite).slice(callsBefore);
+        costs.push({ id: suite.id, kind: "model", ms: Date.now() - started, usd: sumUsd(calls.map((c) => c.costUsd)), ...(calls[0]?.model ? { model: calls[0].model } : {}) });
+      }
       checkResults.push(...reviewResults);
       if (reviewResults.some((r) => r.notRun)) {
-        return { status: "blocked_no_evaluator", checkResults, evaluator: null };
+        return { status: "blocked_no_evaluator", checkResults, evaluator: null, costs };
       }
       if (reviewResults.some((r) => !r.passed)) {
         // The reviewer's rule ids go back to the builder like any failed check; no evaluator call.
-        return { status: "changes_requested", checkResults, evaluator: null };
+        return { status: "changes_requested", checkResults, evaluator: null, costs };
       }
     }
 
     if (!this.evaluatorModel) {
-      return { status: "blocked_no_evaluator", checkResults, evaluator: null };
+      return { status: "blocked_no_evaluator", checkResults, evaluator: null, costs };
     }
 
+    const started = Date.now();
+    const usageBefore = modelUsage(this.evaluatorModel);
     const evaluator = await runEvaluator(this.evaluatorModel, ctx, goal);
+    costs.push(evaluatorCost(this.evaluatorModel, usageBefore, Date.now() - started));
     return {
       status: evaluator.verdict === "approved" ? "approved" : "changes_requested",
       checkResults,
       evaluator,
+      costs,
     };
   }
+}
+
+/** A suite that records its model calls (the screenshot reviewer's `calls`). */
+const suiteCalls = (suite: AsyncCheckSuite): { costUsd: number | null; model?: string }[] => {
+  const calls = (suite as { calls?: unknown }).calls;
+  return Array.isArray(calls) ? (calls as { costUsd: number | null; model?: string }[]) : [];
+};
+const sumUsd = (xs: (number | null)[]): number | null => (xs.some((x) => x === null) ? null : xs.reduce<number>((a, x) => a + (x ?? 0), 0));
+
+/** Token usage of a model client that exposes it (ClaudeModelClient, OpenAIModelClient); null otherwise. */
+function modelUsage(model: ModelClient): { inputTokens: number; outputTokens: number } | null {
+  const u = (model as { totalUsage?: { inputTokens?: number; outputTokens?: number } }).totalUsage;
+  return u && typeof u.inputTokens === "number" ? { inputTokens: u.inputTokens, outputTokens: u.outputTokens ?? 0 } : null;
+}
+
+function evaluatorCost(model: ModelClient, before: { inputTokens: number; outputTokens: number } | null, ms: number): CheckCost {
+  const id = (model as { modelIdUsed?: string }).modelIdUsed;
+  const after = modelUsage(model);
+  if (!id || !before || !after) return { id: "evaluator", kind: "model", ms, usd: null, model: id ?? model.name };
+  const { costUsd } = costForModel(id, { inputTokens: after.inputTokens - before.inputTokens, outputTokens: after.outputTokens - before.outputTokens });
+  return { id: "evaluator", kind: "model", ms, usd: costUsd, model: id };
 }
 
 /** Human-readable summary, same spirit as frontend-loop's `formatCorrectionSummary`. */
 export function formatVerificationSummary(result: VerificationResult): string {
   const lines: string[] = [];
   for (const check of result.checkResults) {
-    lines.push(`[${check.notRun ? "NOT RUN" : check.passed ? "PASS" : "FAIL"}] ${check.checkId}`);
+    const status = check.notRun ? "NOT RUN" : check.notApplicable ? "N/A" : check.passed ? "PASS" : check.advisory ? "WARN" : "FAIL";
+    lines.push(`[${status}] ${check.checkId}${check.notApplicable ? ` (${check.notApplicable})` : ""}`);
     for (const detail of check.details) {
       lines.push(`    - ${detail}`);
     }
