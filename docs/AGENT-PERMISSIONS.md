@@ -46,7 +46,7 @@ Not agent capabilities (runtime/orchestrator, listed so nothing is hidden):
 | Artifact storage bucket / repo files | `SupabaseArtifactStore` / `FileArtifactStore` | Yes, through the role's gate (above), plus the stores' own path allow-list |
 | `clients/<slug>/memory.md` correction-log append | workflow CLI (`cli.ts`) after a run | No: local CLI only, not an agent (NOT COVERED, see 6) |
 | Network: Anthropic API, Agent 37 gateway, OpenAI (reviewer) | model clients | Indirectly: the model call is gated by slot; egress itself is not filtered |
-| Network: link checker HEAD/GET to links on the built page | rendered-QA browser suite | Only as part of `qa.renderedBrowser`; destinations not filtered (NOT COVERED) |
+| Network: link checker HEAD/GET to links on the built page | rendered-QA browser suite | Only as part of `qa.renderedBrowser`. Since Step 7 (2026-10-07): same-site links are checked against the built files (no fetch); the browser and Lighthouse's Chrome are confined to the site's own server (every other request refused and reported); external links, only with `--external-links`, go to public addresses only, checked after DNS with the connection pinned, every redirect re-checked (`rendered-qa/src/egress.ts`, attack tests in `rendered-qa/test/egress.test.ts`) |
 | Network: Track B build | sandbox (`isolate.ts`) | No network at all (sandbox-exec / unshare), proven per build |
 | Job dispatch (Cockpit → GitHub Actions) | Cockpit + DB trigger | No agent can dispatch a job: no role has `jobs` insert or a dispatch tool |
 
@@ -88,8 +88,8 @@ Not agent capabilities (runtime/orchestrator, listed so nothing is hidden):
 ## 6. NOT COVERED (stated plainly)
 
 - **Network egress is not filtered** for agent processes, except the Track B build sandbox. A model call is gated by
-  slot, but nothing stops code in the runner from opening another socket. The rendered-QA link checker fetches
-  whatever links a built page contains.
+  slot, but nothing stops code in the runner from opening another socket. (The rendered-QA browser and link checker
+  were confined in Step 7, see the table above; WebRTC from the QA browser is not separately filtered.)
 - **The screenshot reviewer's cost is not metered** against the run's spend ceiling (it makes its own HTTP call);
   its slot is gated and its cost is traced. Agent 37 calls are unpriced, so they add nothing to spend either: the
   ceiling bites on metered Claude calls only. The ceiling is checked before each call, so a run can exceed it by at

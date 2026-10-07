@@ -96,7 +96,7 @@ export const SEED_AGENT_DEFINITIONS: AgentDefinition[] = [
   {
     role: "qa-evaluator",
     description:
-      "Verifies a built page: 6 deterministic registry checks, then an independent evaluator model " +
+      "Verifies a built page: the evaluation registry's deterministic checks (Step 7), then an independent evaluator model " +
       "(packages/verification). Never the same instance as the builder.",
     skillset: ["registry-checks", "independent-evaluation"],
     // Reads the checkpointed page/site (via the workflow) and the client's brief as its fact source (verify job),
