@@ -252,7 +252,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Fixtures are up to date (regenerate and diff)
-        run: npm run fixtures && git diff --exit-code -- ../frontend-loop/design/fixtures ../verification/test/fixtures/claims test/fixtures
+        run: npm run fixtures && git diff --exit-code -- ../frontend-loop/design/fixtures ../verification/test/fixtures/claims ../verification/test/fixtures/registry test/fixtures && test -z "$(git status --porcelain -- ../verification/test/fixtures/registry)"
       - name: Typecheck
         run: npm run typecheck
       - name: Tests (real Chromium)

@@ -13,6 +13,8 @@ import { imageOptimizationCheck } from "./checks/imageOptimization.js";
 import { isolationCheck } from "./checks/isolation.js";
 import { requiredSectionsCheck } from "./checks/requiredSections.js";
 import { CLAIMS_CHECKS as CLAIMS } from "./checks/claims.js";
+import { runOneCheck } from "./runCheck.js";
+import { gateTextChecks } from "./evalRegistry.js";
 
 export const CHECK_REGISTRY: Check[] = [
   secretsScanCheck,
@@ -25,8 +27,9 @@ export const CHECK_REGISTRY: Check[] = [
 
 /**
  * Step 4B M1: the claims gate (content after </html>, SAMPLE labels, banned claims, unsourced
- * facts). Kept as its own list so `CHECK_REGISTRY` stays exactly the Phase 5 six; production QA
- * (the jobs runner, the workflow and verify CLIs) uses `QA_GATE_CHECKS`, which is both.
+ * facts). Kept as its own list so `CHECK_REGISTRY` stays exactly the Phase 5 six. `QA_GATE_CHECKS` is both:
+ * the Step 4B M1 gate, kept unchanged for the tests that pin it. Since Step 7 production QA runs
+ * `registryGateChecks()` (a superset, from config/eval-registry.json) instead.
  */
 export const CLAIMS_CHECKS: Check[] = CLAIMS;
 export const QA_GATE_CHECKS: Check[] = [...CHECK_REGISTRY, ...CLAIMS];
@@ -37,25 +40,19 @@ export const QA_GATE_CHECKS: Check[] = [...CHECK_REGISTRY, ...CLAIMS];
  * the one site-wide property (a section may live on any page), so that check sees all pages at once.
  */
 export function runChecks(ctx: VerificationContext, checks: Check[] = CHECK_REGISTRY): CheckResult[] {
-  const site = ctx.site;
-  if (!site) return checks.map((check) => check.run(ctx));
-  const pageCtx = (html: string, page?: string): VerificationContext => ({ ...ctx, html, site: undefined, ...(page ? { pageOf: { page, site } } : {}) });
-  return checks.map((check) => {
-    if (check.id === requiredSectionsCheck.id) {
-      const r = check.run(pageCtx(site.pages.map((p) => site.files[p] ?? "").join("\n")));
-      return { ...r, details: r.details.map((d) => `site: ${d}`) };
-    }
-    const details: string[] = [];
-    for (const page of site.pages) {
-      const html = site.files[page];
-      if (html === undefined) {
-        details.push(`${page}: the page is missing from the site files`);
-        continue;
-      }
-      details.push(...check.run(pageCtx(html, page)).details.map((d) => `${page}: ${d}`));
-    }
-    return { checkId: check.id, passed: details.length === 0, details };
-  });
+  return checks.map((check) => runOneCheck(ctx, check));
 }
+
+/**
+ * Step 7: the gate every production entry point runs (the jobs runner, the workflow CLI, `npm run qa`,
+ * `npm run verify`), derived from the versioned evaluation registry (config/eval-registry.json): every
+ * deterministic text check in registry order, each wrapped with its severity and stage. A superset of
+ * QA_GATE_CHECKS; QA_GATE_CHECKS stays exactly the Step 4B M1 ten for the tests that pin that set.
+ */
+export function registryGateChecks(): Check[] {
+  return gateTextChecks();
+}
+
+export { gates } from "./evalRegistry.js";
 
 export type { Check, CheckResult, VerificationContext };

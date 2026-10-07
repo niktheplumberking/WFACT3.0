@@ -17,7 +17,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { QA_GATE_CHECKS, runChecks } from "@wfact/verification/registry";
+import { QA_GATE_CHECKS, gates, registryGateChecks, runChecks } from "@wfact/verification/registry";
 import { loadBrief } from "../../frontend-loop/src/brief.js";
 import { validateSiteContent } from "../../frontend-loop/src/trackB/content.js";
 import { buildTrackBSite, type TrackBBuild } from "../../frontend-loop/src/trackB/build.js";
@@ -164,4 +164,23 @@ test("the rendered suite serves a Track B site from the verification context (ne
     () => suite.run({ html: "x", clientSlug: "a", requiredSections: [], otherClientSlugs: [], site: { files: { "a/../../evil.html": "x" }, pages: ["a/../../evil.html"] } }),
     /refusing site file name/,
   );
+});
+
+// --- Step 7: the evaluation registry's full text gate on the real Track B build -----------------------------
+
+test("Step 7: the Track B build passes the registry gate at preview; every launch-stage failure is a launch tell (reported gap)", () => {
+  const ctx = {
+    html: site.files["index.html"]!,
+    clientSlug: brief.clientSlug,
+    requiredSections: brief.requiredSections,
+    otherClientSlugs: ["dreamsign-pilot", "northlight-signs", "summit-line-roofing"],
+    factSources: [brief.goal, brief.brandNotes],
+    site: { files: site.files, pages: site.pages, binary: site.binary },
+  };
+  const preview = runChecks({ ...ctx, stage: "preview" }, registryGateChecks());
+  assert.deepEqual(preview.filter(gates).map((r) => r.checkId), [], preview.filter(gates).flatMap((r) => r.details).join("\n"));
+  const launch = runChecks({ ...ctx, stage: "launch" }, registryGateChecks());
+  const failing = launch.filter(gates).map((r) => r.checkId);
+  console.log(`Track B @ preview advisory ${JSON.stringify(preview.filter((r) => r.advisory).map((r) => r.checkId))}; @ launch failing ${JSON.stringify(failing)}, advisory ${JSON.stringify(launch.filter((r) => r.advisory).map((r) => r.checkId))}`);
+  for (const id of failing) assert.match(id, /^tells\./, `${id} failed at launch but is not a launch-stage tell`);
 });

@@ -288,7 +288,7 @@ export interface TraceEvent {
   runId: string | null;
   taskId: string | null;
   actor: string;
-  provider: "anthropic" | "agent37";
+  provider: "anthropic" | "agent37" | "openai";
   model: string;
   inputTokens: number;
   outputTokens: number;

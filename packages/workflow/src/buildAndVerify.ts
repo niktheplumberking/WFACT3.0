@@ -668,7 +668,8 @@ class Workflow {
       }
 
       const failure: QaFailure = {
-        failedChecks: verdict.checkResults.filter((c) => !c.passed).map(({ checkId, details }) => ({ checkId, details })),
+        // Step 7: advisory (minor) failures are reported in the audit row, not sent back to the builder on their own.
+        failedChecks: verdict.checkResults.filter((c) => !c.passed && !c.advisory).map(({ checkId, details }) => ({ checkId, details })),
         evaluatorIssues: verdict.evaluator?.issues ?? [],
       };
       if (cp.cycle >= this.maxRevisions) {

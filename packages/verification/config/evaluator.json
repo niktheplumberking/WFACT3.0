@@ -1,0 +1,15 @@
+{
+  "_doc": "Which model runs the independent QA evaluator, and the model-family table the cross-model rule uses (Factory Completion Plan Step 7; CLAUDE.md §6: the evaluator is never the builder's instance, and ideally not its model or vendor). Read by src/crossModel.ts and src/modelClient.ts. 'candidates' is tried in order: the first whose family differs from the builder's AND whose key is in the environment wins; none = the evaluator does not run and the run ends 'not verified' (never approved). A builder and evaluator that resolve to the same family are refused loudly at composition (productionQaOptions, npm run verify). A model that matches no family is refused too (fail closed). Prices come from packages/hermes/config/model-routing.json (the one price table). Change = bump version.",
+  "version": "1.0.0",
+  "separation": "model-family",
+  "candidates": [
+    { "provider": "anthropic", "model": "claude-sonnet-5", "keyEnv": "ANTHROPIC_API_KEY", "modelEnv": "ANTHROPIC_MODEL", "why": "Default since Phase 5: mid tier for a whole-site judgment; a different family from today's Agent 37 builder." },
+    { "provider": "openai", "model": "gpt-5.4", "keyEnv": "OPENAI_API_KEY", "why": "Second vendor, used when the builder is Claude (Agent 37 not configured: the builder falls back to Claude) so the evaluator is still another family. Status 2026-10-01: the OpenAI account had no credits (HTTP 429); re-checked in the Step 7 report." }
+  ],
+  "families": [
+    { "family": "anthropic-claude", "vendor": "anthropic", "match": "^claude-" },
+    { "family": "openai-gpt", "vendor": "openai", "match": "^(gpt-|o[0-9])" },
+    { "family": "agent37-hermes", "vendor": "agent37", "match": "^hermes-agent$", "caveat": "Agent 37 is a self-hosted Nous Research 'Hermes Agent' gateway; it does not disclose which upstream model answers. Treated as its own family on the gateway's self-description (routing decision 2026-09-22). NOT independently verified." },
+    { "family": "mock", "vendor": "mock", "match": ".*", "caveat": "Test doubles only. Two mocks are the same family unless a test gives them distinct families." }
+  ]
+}

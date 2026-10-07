@@ -12,7 +12,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium } from "playwright";
-import { QA_GATE_CHECKS, runChecks } from "@wfact/verification/registry";
+import { QA_GATE_CHECKS, gates, registryGateChecks, runChecks } from "@wfact/verification/registry";
 import { loadBrief } from "../../frontend-loop/src/brief.js";
 import { validateSiteContent } from "../../frontend-loop/src/trackA/content.js";
 import { renderSite } from "../../frontend-loop/src/trackA/render.js";
@@ -119,4 +119,23 @@ test("the rendered suite serves a whole site from the verification context", asy
     () => suite.run({ html: "x", clientSlug: "a", requiredSections: [], otherClientSlugs: [], site: { files: { "../evil.html": "x" }, pages: ["../evil.html"] } }),
     /refusing site file name/,
   );
+});
+
+// --- Step 7: the evaluation registry's full text gate on the real Track A starter output ---------------------
+
+test("Step 7: the Track A starter passes the registry gate at preview (advisories only); at launch it fails exactly the launch tells it lacks", () => {
+  const ctx = {
+    html: site.files["index.html"]!,
+    clientSlug: brief.clientSlug,
+    requiredSections: brief.requiredSections,
+    otherClientSlugs: ["dreamsign-pilot", "northlight-signs"],
+    factSources: [brief.goal, brief.brandNotes],
+    site: { files: site.files, pages: site.pages },
+  };
+  const preview = runChecks({ ...ctx, stage: "preview" }, registryGateChecks());
+  assert.deepEqual(preview.filter(gates).map((r) => r.checkId), [], preview.filter(gates).flatMap((r) => r.details).join("\n"));
+  assert.deepEqual(preview.filter((r) => r.advisory).map((r) => r.checkId), ["seo.open-graph", "tells.favicon"]);
+  // A known, reported gap (Step 7 report): the starter ships no 404 page, sitemap, robots.txt, canonical or og:image.
+  const launch = runChecks({ ...ctx, stage: "launch" }, registryGateChecks());
+  assert.deepEqual(launch.filter(gates).map((r) => r.checkId), ["tells.404-page", "tells.sitemap", "tells.robots", "tells.canonical", "tells.og-image"]);
 });

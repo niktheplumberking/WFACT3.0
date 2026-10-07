@@ -59,6 +59,12 @@ function parseSite(value: unknown): NonNullable<VerificationContext["site"]> {
   return { files: files as Record<string, string>, pages, ...(binary.length ? { binary } : {}) };
 }
 
+/** Step 7: which registry gate this run is (launch adds the launch-candidate checks). */
+function parseStage(value: unknown): "preview" | "launch" {
+  if (value !== "preview" && value !== "launch") throw new AgentInputError('stage must be "preview" or "launch"');
+  return value;
+}
+
 /**
  * Step 6: the suites run inside the QA run's permission gate. A browser suite is the QA browser tool
  * (tool:qa.renderedBrowser); a review suite calls the screenshot reviewer model (model:reviewer, then budget).
@@ -103,6 +109,7 @@ export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaI
           otherClientSlugs: stringArray(r.otherClientSlugs ?? [], "otherClientSlugs"),
           ...(r.factSources !== undefined ? { factSources: stringArray(r.factSources, "factSources") } : {}),
           ...(r.site !== undefined ? { site: parseSite(r.site) } : {}),
+          ...(r.stage !== undefined ? { stage: parseStage(r.stage) } : {}),
         },
         goal: r.goal,
       };
@@ -117,7 +124,8 @@ export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaI
       }).run(ctx, goal),
     summarize: (result) => ({
       status: result.status,
-      failedChecks: result.checkResults.filter((c) => !c.passed).map((c) => c.checkId),
+      failedChecks: result.checkResults.filter((c) => !c.passed && !c.advisory).map((c) => c.checkId),
+      advisories: result.checkResults.filter((c) => c.advisory).map((c) => c.checkId),
       evaluatorVerdict: result.evaluator?.verdict ?? null,
     }),
   };
