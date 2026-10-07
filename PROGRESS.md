@@ -22,18 +22,19 @@ steps; this file tracks the Continuation Stages.
 **Status summary**: On the Factory Completion Plan, Steps 1, 2, 3, 3A and **6 are DONE**; Step 4 is PARTIAL (preview superseded by 4B M6);
 **Step 4B is IN PROGRESS** (M1–M3 done, M4 PARTIAL, about 80% through M4: both live re-runs on 2026-10-07 failed on factory defects that
 are now fixed, Track A `4d6e1abb` on the open-question cap, Track B `6f68adbd` only on its fixed enquiry form; M5 blocked on Higgsfield API
-credit; M6 not started); **Step 5 is PARTIAL** (built, merged, CI green, live backfill SQL-checked; no live build with it yet); Step 4C is
-BUILT AND DEPLOYED (signed-in check pending); **Step 7 is DONE** (merged `c1e511a`, CI pending until pushed); Steps 8–24 not
+credit; M6 not started); **Step 5 is DONE** (live Cockpit builds 2026-10-07: one entry per stage); Step 4C is
+BUILT AND DEPLOYED (signed-in check pending); **Step 7 is DONE** (CI `37617845669` green); Steps 8–24 not
 started. Continuation Stages 1–5 MET; Stage 6 = Step 5 (PARTIAL); Stage 7 waits on Nick. **Biggest blocker**: none hard; M4 needs one
 passing live build per track.
 
 **Next up**:
-1. **Huraira**: when CI `37615794583` (`c1b386a`) is green, re-run Track B `4acbde1f` and Track A `b5a45a8e` from the Cockpit; this is also
-   Step 5's first live run. Then the agent reviews screenshots and closes M4.
-2. **Agent**: after both runs are dispatched, push the Step 7 merge (`c1e511a`, verified locally) and confirm CI; then Step 8 (queue and
-   durable execution).
-3. **Huraira**: decide on adding launch files (sitemap, robots.txt, canonical, og:image, 404) to both starters, and on removing open
-   questions from the Track A page source; OpenAI and Higgsfield API credit when convenient; rotate the Higgsfield key.
+1. **Huraira**: decide how `render.perf` measures LCP. Lighthouse's simulated model puts the Track B starter at ~2.46-2.58 s against a 2.5 s
+   budget purely for the framework scripts, while applied (devtools) throttling and real Chrome show 0.72 s / 0.05 s. Recommended: gate on
+   applied throttling (same 2.5 s budget), keep the simulated figure as an advisory number. Then re-run Track B `4acbde1f`.
+2. **Huraira**: re-run Track A `b5a45a8e` from the Cockpit (the Agent 37 retry fix `734ded5` is on `main`). M4 closes when one live build
+   per track passes; then Step 8 (queue and durable execution).
+3. **Huraira**: launch files in both starters and removing open questions from the Track A page source (yes/no); OpenAI and Higgsfield
+   API credit when convenient; rotate the Higgsfield key.
 
 **Gaps noticed**:
 - **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`
@@ -894,7 +895,14 @@ time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`)
       attempt: fetch failed": one dropped connection to Agent 37 (25 ms, `model_traces` 12:02:03Z) ended the build because the builder client
       had no retry. Fixed: `Agent37ModelClient` retries no-response / HTTP 5xx / 429 after 5, 15, 45 s (4 attempts), then escalates; 4xx and
       unusable answers are not retried; 3 tests, frontend-loop 70/70. Step 5 proven live on the same run: the Documentation agent wrote entry
-      `ep-7fc49965fcf0d73c` for the halted build stage (`documentation.entry`, 12:02:04Z). Track B job `c775c396` still running at this note.
+      `ep-7fc49965fcf0d73c` for the halted build stage (`documentation.entry`, 12:02:04Z).
+- [ ] Track B job `c775c396` (single page, signup form chosen, 3 cycles, 7.5 min): every check passed in every cycle (claims gate, rendered
+      checks, a11y, layout, design rules; builder review approved first time) except `render.perf`: mobile LCP 2.58 / 2.58 / 2.52 s vs the
+      2.5 s budget. Diagnosed 2026-10-07 on the exact built site with the factory's own gzip server: Lighthouse simulated LCP 2.46 s, 1.20 s
+      with the scripts removed, unchanged with GSAP removed (the floor is the React + Next runtime, ~140 KB gzipped); real Chrome records LCP
+      at 48 ms (one entry, no re-render); Lighthouse with applied (devtools) throttling: 0.72 s with or without the scripts. The simulated
+      (lantern) model charges parallel framework scripts to LCP. Not a content defect: revisions could not fix it. Decision for Huraira:
+      the `render.perf` measurement method (see Next up).
 - [ ] Track A job `4d6e1abb` failed before building: "content still invalid after 3 attempts: openQuestions.0 over 300 chars". The plan
       carries 11 open questions, the content schema allowed 10 x 300, the builder merged two. Caps raised to 25 x 800 in both tracks (never
       shown as copy; Track A keeps them as escaped HTML comments), test added, frontend-loop 66/66. Re-run of Track A needed (Huraira).
@@ -991,7 +999,7 @@ injection cases are denied and audited. Existing suites pass unchanged (or minim
 changes: `runAgent.test.ts` echo role uses a typed scope; one `trackA.test.ts` test supplies the role's gate; `verification.decision` rows
 inside an agent run now carry the run's entity in `entity_slug` (client slug moved to the payload). CI green: `37609559746`.
 
-## Step 5 — Stage 6: Documentation agent and episodic memory (PARTIAL 2026-10-07 — live workflow run with the agent pending)
+## Step 5 — Stage 6: Documentation agent and episodic memory (DONE 2026-10-07)
 
 Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 5 (Continuation Stage 6). Built by a coding agent in a parallel worktree (GO
 2026-10-07), merged into `huraira-work` and re-verified in the main checkout.
@@ -1018,10 +1026,11 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 5 (Continuation Sta
 file is lost with the disk until `npm run document` is run and committed; client detection in a question is a whole-word folder-name match.
 
 **Exit check**: *"one correct entry per stage after a workflow run, written by the agent and joined to the audit task ids; `npm run ask`
-answers correctly, checked against SQL; existing suites pass unchanged."* — **PARTIALLY MET**: met in process and through the live backfill
-path (same extraction code); not yet on a live workflow run with the agent attached.
+answers correctly, checked against SQL; existing suites pass unchanged."* — met in process and through the live backfill
+path, and since on live Cockpit builds: job `c775c396` (3 cycles) got exactly one entry per build and QA stage (6 rows), job `ad49df57` one
+for its halted build stage. **MET**.
 
-## Step 7 — Expand the evaluation registry (DONE 2026-10-07 — CI pending until pushed)
+## Step 7 — Expand the evaluation registry (DONE 2026-10-07 — CI green)
 
 Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 7. Built by a coding agent in a parallel worktree (GO 2026-10-07), merged
 (`c1e511a`) and re-verified in the main checkout. Docs: the registry's own `_doc`/`notCovered`, the egress write-up and `docs/AGENT-PERMISSIONS.md`.
@@ -1039,7 +1048,7 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 7. Built by a codin
       revise — `7988390`; docs and CI fixture-drift check — `0e13e30`
 - [x] Step 4 pilot page through the full gate with a per-check table: 33 text checks 20 PASS / 4 FAIL / 2 WARN / 7 N/A; browser 6 PASS /
       3 FAIL (agent's evidence)
-- [ ] CI on the merged tree (pushed after the 2026-10-07 M4 re-runs are dispatched)
+- [x] CI on the merged tree: `7180260` pushed after the M4 re-runs were dispatched; CI `37617845669` all jobs success
 - [ ] Live screenshot-review / evaluator run through the registry (mocks only so far); OpenAI evaluator live (HTTP 429, no credits — Huraira)
 
 **Verification** (independent of the building agent)
@@ -1054,5 +1063,5 @@ upstream model is undisclosed, so its "family" rests on the gateway's self-descr
 
 **Exit check**: *"registry versioned with fixtures that behave; pilot page re-run with a per-check table; cross-model separation enforced by
 config; existing verification tests pass unchanged."* — **MET** (44 -> 98 tests, additions only), with the source-list and live-model
-gaps above. CI on the merged tree still to run.
+gaps above. CI `37617845669` green.
 

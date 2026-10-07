@@ -14,7 +14,7 @@ parallel with Steps 5-8 because it only touches `apps/cockpit`.
 Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done, M4 PARTIAL: built and verified in CI `37016971442`; live Track B
 build `f696ba43` failed on page count and invented testimonials, fixed in `c64bd0e`, not yet re-run; M5 groundwork `4bbd4bc`, live run
 blocked on Higgsfield credits; M6 not started); Step 4C is **BUILT AND DEPLOYED** (`main` `fb08be3`, live signed-in check pending);
-Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **PARTIAL** (merged 2026-10-07; live run with the agent pending); Step 7 is **DONE** (merged 2026-10-07, CI pending until pushed); Steps 8–24 are not started. Each step heading below carries its
+Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **DONE** (proven on live Cockpit builds 2026-10-07); Step 7 is **DONE** (CI `37617845669` green); Steps 8–24 are not started. Each step heading below carries its
 status; Part E is the checklist.
 
 ## How to use this file
@@ -599,9 +599,9 @@ REPORT in the Part C format (Phase 1 report first, then the build report), then 
 
 ---
 
-### STEP 5 — Stage 6: Documentation agent and episodic memory (P1) — PARTIAL 2026-10-07, live workflow run with the agent pending
+### STEP 5 — Stage 6: Documentation agent and episodic memory (P1) — DONE 2026-10-07
 
-**Status: PARTIAL** (parallel worktree, GO 2026-10-07; `08fc069`…`530f4cb`, merged). `packages/documentation` writes one versioned, append-only episodic entry per stage from the run's audit rows (no model, $0 ceiling, scope-gated to the bound client); Hermes-lite answers "what happened" from those entries. Proven: in-process full workflow test, live backfill of 26 entries (SQL-matched), live `npm run ask` answer checked against SQL. Not yet: a live Cockpit build with the agent attached, CI's new `documentation` job.
+**Status: DONE** (parallel worktree, GO 2026-10-07; `08fc069`…`530f4cb`, merged; proven on live Cockpit builds `ad49df57` and `c775c396`). `packages/documentation` writes one versioned, append-only episodic entry per stage from the run's audit rows (no model, $0 ceiling, scope-gated to the bound client); Hermes-lite answers "what happened" from those entries. Proven: in-process full workflow test, live backfill of 26 entries (SQL-matched), live `npm run ask` answer checked against SQL. Live: Cockpit job `c775c396` (3 cycles) got one entry per build and QA stage (6 `documentation.entry` rows), job `ad49df57` one for its halted build stage; CI `documentation` job green since `37614606732`.
 
 **Depends on**: Step 4.
 **Maps to**: Continuation Stage 6; Blueprint §8, §16D (Documentation agent).
@@ -689,7 +689,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 7 — Expand the evaluation registry (P1) — DONE 2026-10-07, CI pending until pushed
+### STEP 7 — Expand the evaluation registry (P1) — DONE 2026-10-07, CI green
 
 **Status: DONE** (parallel worktree, GO 2026-10-07; `64222b1`…`0e13e30`, merged `c1e511a`). Registry v1.0.0 as data + code: 48 checks, each with a passing and a failing fixture, severity/stage gate, cost per check; one gate for every QA entry point; builder/evaluator model-family separation enforced by `config/evaluator.json` (+ OpenAI adapter, migration 0017 applied); QA-runner SSRF closed. Gaps stated, not hidden: the full 78-check list and 50-point audit are not in this repo (only summaries survive; recorded in the registry's `sourceInventory`/`notCovered`), model-judged checks proven on mocks, the OpenAI evaluator has no live success (no credits).
 
@@ -1450,9 +1450,9 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
 | 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done; M4 partial (`a9f4dcf`…`13ec854`, migration 0014, CI `37016971442` green; live Track B `f696ba43` failures fixed in `c64bd0e`/`8dae180`, not pushed or re-run; screenshot review pending); M5 groundwork `4bbd4bc` (live run blocked: no Higgsfield credits) | 2026-10-06 | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`; redeploy `fb08be3`, CI `36907274448`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
-| 5 | Documentation agent | **PARTIAL** (`08fc069`…`530f4cb`; 26 live backfilled entries = 26 `documentation.entry` rows over 8 runs; live ask answer SQL-checked; pending: a live Cockpit build with the agent attached and CI) | 2026-10-07 | |
+| 5 | Documentation agent | **DONE** (`08fc069`…`530f4cb`; live Cockpit builds `c775c396` 6 entries / 6 stages and `ad49df57` 1 / 1; backfill 26 = 26 rows; live ask SQL-checked; CI `37614606732`) | 2026-10-07 | |
 | 6 | Enforce agent permissions | **DONE** (`58bf776`…`ee08f9d`; 285 package tests + rendered-qa pass on the merged tree; live attack runs `050c3329`, `ed07cfaf`, `cb7739a2`, `7197fa12`, `9a692a2d`, 7 `agent.deny` rows verified by SQL; CI `37609559746` green; cost ceilings set from live traces 2026-10-07: builder $1, QA $0.50, Planner $0.25, Direction $0.15, Hermes $0.10, Intake $0.05) | 2026-10-06 | |
-| 7 | Evaluation registry | **DONE** (`64222b1`…`0e13e30`, merged `c1e511a`; merged tree verification 98, rendered-qa 52 and all packages pass; migration 0017 applied live; CI pending until pushed; 78-check and 50-point sources missing from the repo, OpenAI evaluator unproven live) | 2026-10-07 | |
+| 7 | Evaluation registry | **DONE** (`64222b1`…`0e13e30`, merged `c1e511a`; merged tree verification 98, rendered-qa 52 and all packages pass; migration 0017 applied live; CI `37617845669` green; 78-check and 50-point sources missing from the repo, OpenAI evaluator unproven live) | 2026-10-07 | |
 | 8 | Queue and durable execution | not started | | |
 | 9 | Cockpit: status and System room | not started | | |
 | 10 | Cockpit: Agents and Workflows | not started | | |
