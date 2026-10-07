@@ -30,6 +30,7 @@ import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
 import { traceModelClient } from "@wfact/hermes-lite/tracing";
 import { knownClientSlugs } from "@wfact/verification/paths";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
+import { createDocumentationAgent, createDocumentationObserver, FileMemoryStore, registerDocumentationAgent, runRecordReaderFromEnv } from "@wfact/documentation";
 import {
   buildAndVerify,
   resumeBuildAndVerify,
@@ -115,6 +116,15 @@ async function main() {
   }
   if (track === "A") console.error("(builder: Track A starter, multi-page; the builder model writes the content only)");
   if (track === "B") console.error("(builder: Track B starter, Next.js static export built with no network and no secrets; the builder model writes the content only)");
+  // Step 5: the Documentation agent appends one episodic entry per finished stage to clients/<slug>/memory.md.
+  const registry = registerDocumentationAgent(createSeedRegistry());
+  const { reader: runRecords, reason: recordsReason } = runRecordReaderFromEnv();
+  if (!runRecords) blocked(`run records unavailable for the Documentation agent — ${recordsReason}`);
+  const stageObserver = createDocumentationObserver({
+    agent: createDocumentationAgent({ records: runRecords, memory: new FileMemoryStore(REPO_ROOT) }),
+    registry,
+    audit: sink,
+  });
   const deps: WorkflowDeps = {
     frontEndAgent:
       track === "A"
@@ -127,11 +137,12 @@ async function main() {
     qaAgent: createQaEvaluatorAgent(
       productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, ...(track === "B" ? { budget: TRACK_B_BUDGET } : {}) }),
     ),
-    registry: createSeedRegistry(),
+    registry,
     audit: sink,
     reader,
     artifacts: new FileArtifactStore(REPO_ROOT),
     knownClientSlugs: knownClientSlugs(),
+    stageObserver,
   };
 
   const result = resumeRunId
@@ -150,6 +161,9 @@ async function main() {
   }
   if (result.status === "awaiting_launch_approval") {
     console.log("NEXT: launch is a human hard-gate (CLAUDE.md §3). This workflow did not deploy anything.");
+  }
+  for (const esc of result.documentationEscalations ?? []) {
+    console.log(`ESCALATED (memory): ${esc.stage} cycle ${esc.cycle} was not documented — ${esc.reason}`);
   }
 
   if (result.builderRounds.length > 0) {
