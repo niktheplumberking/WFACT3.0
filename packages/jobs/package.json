@@ -21,6 +21,7 @@
   "dependencies": {
     "@wfact/agent-runtime": "file:../agent-runtime",
     "@wfact/audit": "file:../audit",
+    "@wfact/documentation": "file:../documentation",
     "@wfact/frontend-loop": "file:../frontend-loop",
     "@wfact/hermes-lite": "file:../hermes",
     "@wfact/planning": "file:../planning",

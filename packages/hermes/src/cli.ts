@@ -5,6 +5,7 @@
  * client. Exits with a clear, honest message rather than a fake answer if either is unconfigured.
  */
 import { buildToolRegistry } from "./tools/registry.js";
+import { listClientSlugs } from "./tools/memoryTools.js";
 import { stateReaderFromEnv } from "./state.js";
 import { modelClientFromEnv, ClaudeModelClient } from "./modelClient.js";
 import { HermesLite } from "./controller.js";
@@ -51,7 +52,8 @@ async function main() {
   }
 
   const registry = buildToolRegistry(stateReader, audit);
-  const hermes = new HermesLite({ toolRegistry: registry, modelClient });
+  // Step 5: known client folders, so "What happened on <client>'s build?" reads that client's episodic entries.
+  const hermes = new HermesLite({ toolRegistry: registry, modelClient, clientSlugs: listClientSlugs() });
 
   const result = await hermes.answerStatusQuestion(question);
 
@@ -65,6 +67,8 @@ async function main() {
       payload: {
         question,
         sourcesUsed: result.sourcesUsed,
+        clientSlug: result.clientSlug ?? null,
+        episodesUsed: result.episodesUsed ?? 0,
         needsHuman: result.needsHuman,
         escalationReason: result.escalationReason,
         model: modelClient instanceof ClaudeModelClient ? modelClient.modelIdUsed : modelClient.name,
@@ -83,6 +87,7 @@ async function main() {
 
   console.log(result.answer);
   console.error(`\n(sources: ${result.sourcesUsed.join(", ")})`);
+  if (result.episodesUsed) console.error(`(answered from ${result.episodesUsed} episodic entries for client ${result.clientSlug})`);
   if (result.toneFilter.remainingAcronyms.length > 0) {
     console.error(`(tone filter flagged for review: ${result.toneFilter.remainingAcronyms.join(", ")})`);
   }

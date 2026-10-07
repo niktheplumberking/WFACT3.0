@@ -26,7 +26,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { recordAudit, type AuditContext, type AuditReader, type AuditRecord, type AuditSink } from "@wfact/audit";
+import { AuditWriteError, recordAudit, type AuditContext, type AuditReader, type AuditRecord, type AuditSink } from "@wfact/audit";
 import {
   permissionGateFor,
   PermissionDeniedError,
@@ -285,6 +285,39 @@ export class MemoryArtifactStore implements ArtifactStore {
 // Workflow
 // ---------------------------------------------------------------------------------------------
 
+/**
+ * Step 5 (Continuation Plan Stage 6): the end of every workflow stage is announced to an observer, which the
+ * composition root fills with the Documentation agent (packages/documentation). A schema-validated handoff, not
+ * prose: ids, the stage, its cycle and the stage's own agent task. The observer reads the rest from the run's
+ * audit trail itself.
+ */
+export interface StageEndEvent {
+  workflow: string;
+  workflowVersion: string;
+  workflowRunId: string;
+  workflowTaskId: string;
+  stage: "build" | "qa";
+  cycle: number;
+  /** The builder's or QA agent's task id for this stage; null when no agent ran (e.g. the checkpoint was corrupt). */
+  stageTaskId: string | null;
+  /** The stage's result as the workflow saw it, e.g. "checkpointed", "build_failed", "returned_to_builder", "awaiting_launch_approval". */
+  status: string;
+  entitySlug: string;
+  clientSlug: string;
+}
+
+export interface StageObserverResult {
+  /** False when the stage could not be documented: the workflow records an escalation, it never skips silently. */
+  ok: boolean;
+  reason: string | null;
+  /** The observer's own agent task (for the escalation row), when it ran one. */
+  taskId?: string | null;
+}
+
+export interface StageObserver {
+  stageEnded(event: StageEndEvent): Promise<StageObserverResult>;
+}
+
 export interface WorkflowDeps {
   frontEndAgent: Agent<FrontendBuildInput, FrontendLoopResult>;
   qaAgent: Agent<QaInput, VerificationResult>;
@@ -296,6 +329,8 @@ export interface WorkflowDeps {
   /** Every client slug the isolation check should treat as "someone else". */
   knownClientSlugs: string[];
   maxQaRevisions?: number;
+  /** Step 5: told about the end of every stage (the Documentation agent). Optional so older callers are unchanged. */
+  stageObserver?: StageObserver;
 }
 
 export type WorkflowStatus =
@@ -324,6 +359,8 @@ export interface WorkflowResult {
   qaFailure: QaFailure | null;
   /** Builder correction rounds from every build cycle, in order — for the correction-round log. */
   builderRounds: FrontendLoopResult["rounds"];
+  /** Step 5: stages the observer could not document (each also a `workflow.documentation_escalated` row). */
+  documentationEscalations?: { stage: "build" | "qa"; cycle: number; reason: string }[];
 }
 
 interface CheckpointState {
@@ -366,6 +403,7 @@ class Workflow {
   private readonly ctx: AuditContext;
   private readonly maxRevisions: number;
   private builderRounds: FrontendLoopResult["rounds"] = [];
+  private readonly documentationEscalations: NonNullable<WorkflowResult["documentationEscalations"]> = [];
   templateSections: string[] = [];
 
   constructor(
@@ -394,7 +432,55 @@ class Workflow {
       reason,
       qaFailure,
       builderRounds: this.builderRounds,
+      ...(this.deps.stageObserver ? { documentationEscalations: [...this.documentationEscalations] } : {}),
     };
+  }
+
+  /**
+   * Step 5: tell the observer a stage ended. A failure to document is an escalation (an audit row the Cockpit can
+   * show and a field on the result), never a silent skip, and never a reason to undo the stage itself. An audit write
+   * failure is not swallowed: audit is fail-closed.
+   */
+  private async stageEnded(stage: "build" | "qa", cycle: number, stageTaskId: string | null, status: string): Promise<void> {
+    const observer = this.deps.stageObserver;
+    if (!observer) return;
+    let res: StageObserverResult;
+    try {
+      res = await observer.stageEnded({
+        workflow: WORKFLOW_ID,
+        workflowVersion: WORKFLOW_VERSION,
+        workflowRunId: this.runId,
+        workflowTaskId: this.taskId,
+        stage,
+        cycle,
+        stageTaskId,
+        status,
+        entitySlug: this.brief.entitySlug,
+        clientSlug: this.brief.clientSlug,
+      });
+    } catch (err) {
+      if (err instanceof AuditWriteError) throw err;
+      res = { ok: false, reason: `the stage observer threw: ${err instanceof Error ? err.message : String(err)}` };
+    }
+    if (res.ok) return;
+    const reason = res.reason ?? "the stage could not be documented (no reason given)";
+    this.documentationEscalations.push({ stage, cycle, reason });
+    await recordAudit(this.ctx, {
+      action: "workflow.documentation_escalated",
+      outcome: "failure",
+      payload: {
+        workflow: WORKFLOW_ID,
+        version: WORKFLOW_VERSION,
+        stage,
+        cycle,
+        stageTaskId,
+        status,
+        documentationTaskId: res.taskId ?? null,
+        reason,
+        tier: "notify-and-wait",
+        note: "Memory entry missing for this stage: fix the cause, then backfill it from the audit trail (packages/documentation).",
+      },
+    });
   }
 
   private async halt(
@@ -480,7 +566,9 @@ class Workflow {
     );
     if (run.output) this.builderRounds = [...this.builderRounds, ...run.output.rounds];
     if (run.status !== "completed" || !run.output?.finalHtml) {
-      return { halted: await this.halt("build_failed", "build", cycle, null, `builder ${run.status}: ${run.reason ?? "no page produced"}`) };
+      const halted = await this.halt("build_failed", "build", cycle, null, `builder ${run.status}: ${run.reason ?? "no page produced"}`);
+      await this.stageEnded("build", cycle, buildTaskId, "build_failed");
+      return { halted };
     }
     // Written on the builder's behalf, through the builder's scope and binding (its own client folder only).
     const writer = gatedArtifactStore(this.deps.artifacts, this.gateFor(this.deps.frontEndAgent.role, buildTaskId));
@@ -490,11 +578,16 @@ class Workflow {
         ? await writeSite(writer, `clients/${run.output.brief.clientSlug}/sites/${run.output.template.id}`, run.output.site)
         : await writer.write(`clients/${run.output.brief.clientSlug}/pages/${run.output.template.id}.html`, run.output.finalHtml);
     } catch (err) {
-      if (err instanceof PermissionDeniedError) return { halted: await this.halt("build_failed", "build", cycle, null, err.message) };
+      if (err instanceof PermissionDeniedError) {
+        const halted = await this.halt("build_failed", "build", cycle, null, err.message);
+        await this.stageEnded("build", cycle, buildTaskId, "build_failed");
+        return { halted };
+      }
       throw err;
     }
     const cp: CheckpointState = { stage: "build", cycle, buildTaskId, artifact };
     await this.checkpoint(cp);
+    await this.stageEnded("build", cycle, buildTaskId, "checkpointed");
     this.templateSections = run.output.template.requiredSections;
     return { cp };
   }
@@ -516,8 +609,10 @@ class Workflow {
           html = await reader.readVerified(cp.artifact);
         }
       } catch (err) {
-        if (err instanceof PermissionDeniedError) return this.halt("qa_failed", "qa", cp.cycle + 1, cp, err.message);
-        return this.halt("checkpoint_corrupt", "qa", cp.cycle + 1, cp, err instanceof Error ? err.message : String(err));
+        const status: WorkflowStatus = err instanceof PermissionDeniedError ? "qa_failed" : "checkpoint_corrupt";
+        const halted = await this.halt(status, "qa", cp.cycle + 1, cp, err instanceof Error ? err.message : String(err));
+        await this.stageEnded("qa", cp.cycle, null, status);
+        return halted;
       }
 
       const qaRun = await runAgent(
@@ -541,7 +636,9 @@ class Workflow {
         { registry: this.deps.registry, audit: { sink: this.deps.audit }, runId: this.runId },
       );
       if (qaRun.status !== "completed" || !qaRun.output) {
-        return this.halt("qa_failed", "qa", cp.cycle + 1, cp, `qa-evaluator ${qaRun.status}: ${qaRun.reason}`);
+        const halted = await this.halt("qa_failed", "qa", cp.cycle + 1, cp, `qa-evaluator ${qaRun.status}: ${qaRun.reason}`);
+        await this.stageEnded("qa", cp.cycle, qaTaskId, "qa_failed");
+        return halted;
       }
       const verdict = qaRun.output;
 
@@ -560,11 +657,14 @@ class Workflow {
             artifact: cp.artifact,
           },
         });
+        await this.stageEnded("qa", cp.cycle, qaTaskId, "awaiting_launch_approval");
         return this.result("awaiting_launch_approval", cp.cycle + 1, verified, null);
       }
 
       if (verdict.status === "blocked_no_evaluator") {
-        return this.halt("not_verified_no_evaluator", "qa", cp.cycle + 1, cp, notVerifiedReason(verdict.checkResults));
+        const halted = await this.halt("not_verified_no_evaluator", "qa", cp.cycle + 1, cp, notVerifiedReason(verdict.checkResults));
+        await this.stageEnded("qa", cp.cycle, qaTaskId, "not_verified_no_evaluator");
+        return halted;
       }
 
       const failure: QaFailure = {
@@ -572,7 +672,7 @@ class Workflow {
         evaluatorIssues: verdict.evaluator?.issues ?? [],
       };
       if (cp.cycle >= this.maxRevisions) {
-        return this.halt(
+        const halted = await this.halt(
           "failed_verification",
           "qa",
           cp.cycle + 1,
@@ -580,6 +680,8 @@ class Workflow {
           `QA still failing after ${this.maxRevisions} revision(s) — escalating to a human rather than retrying forever`,
           failure,
         );
+        await this.stageEnded("qa", cp.cycle, qaTaskId, "failed_verification");
+        return halted;
       }
 
       const issues = qaFailureToIssues(failure);
@@ -588,6 +690,7 @@ class Workflow {
         outcome: "info",
         payload: { workflow: WORKFLOW_ID, cycle: cp.cycle, issues, qaStatus: verdict.status },
       });
+      await this.stageEnded("qa", cp.cycle, qaTaskId, "returned_to_builder");
       const rebuilt = await this.build(cp.cycle + 1, site ? { html, issues, contentJson: site.contentJson } : { html, issues });
       if ("halted" in rebuilt) return rebuilt.halted;
       cp = rebuilt.cp;

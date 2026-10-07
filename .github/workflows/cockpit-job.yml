@@ -55,7 +55,7 @@ jobs:
       - uses: dopplerhq/cli-action@v3
 
       - name: "Install packages (dependency order; file: links don't install linked deps)"
-        run: for p in audit hermes agent-runtime frontend-loop verification planning rendered-qa workflow jobs; do (cd "packages/$p" && npm ci --no-audit --no-fund); done
+        run: for p in audit hermes agent-runtime documentation frontend-loop verification planning rendered-qa workflow jobs; do (cd "packages/$p" && npm ci --no-audit --no-fund); done
 
       # Step 4B M4: a Track B build installs the starter with `npm ci --offline` inside a network sandbox
       # with an allow-listed environment (DOPPLER_TOKEN and every Doppler secret stay outside it). This

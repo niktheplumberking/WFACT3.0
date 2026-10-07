@@ -188,8 +188,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Install linked packages (audit, hermes, agent-runtime, frontend-loop, verification, planning)
-        run: for p in audit hermes agent-runtime frontend-loop verification planning rendered-qa; do (cd ../$p && npm ci); done
+      - name: Install linked packages (audit, hermes, agent-runtime, documentation, frontend-loop, verification, planning)
+        run: for p in audit hermes agent-runtime documentation frontend-loop verification planning rendered-qa; do (cd ../$p && npm ci); done
       - name: Install
         run: npm ci
       - name: Typecheck
@@ -272,7 +272,30 @@ jobs:
         with:
           node-version: "22"
       - name: Install linked packages
-        run: for p in audit hermes agent-runtime frontend-loop verification planning rendered-qa workflow; do (cd ../$p && npm ci); done
+        run: for p in audit hermes agent-runtime documentation frontend-loop verification planning rendered-qa workflow; do (cd ../$p && npm ci); done
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
+  # Factory Completion Plan Step 5 (Continuation Plan Stage 6): the Documentation agent and episodic memory
+  # (entry format, append-only, escalation on write failure, redaction, permissions, no agent-runtime change).
+  documentation:
+    name: Documentation agent — typecheck + unit tests
+    runs-on: ubuntu-latest
+    needs: guardrails
+    defaults:
+      run:
+        working-directory: packages/documentation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install linked packages
+        run: for p in audit hermes agent-runtime; do (cd ../$p && npm ci); done
       - name: Install
         run: npm ci
       - name: Typecheck
@@ -359,7 +382,7 @@ jobs:
     name: Deploy Cockpit to Vercel (trunk only)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [guardrails, audit, hermes, agent-runtime, frontend-loop, track-b-build, verification, rendered-qa, workflow, planning, jobs-runner, build]
+    needs: [guardrails, audit, hermes, agent-runtime, documentation, frontend-loop, track-b-build, verification, rendered-qa, workflow, planning, jobs-runner, build]
     concurrency:
       group: deploy-cockpit
       cancel-in-progress: false

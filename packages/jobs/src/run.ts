@@ -30,6 +30,7 @@ import { knownClientSlugs } from "@wfact/verification/paths";
 import { ClaudeJsonClient } from "@wfact/planning/modelClient";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
 import { SupabaseArtifactStore } from "@wfact/workflow/supabaseArtifacts";
+import { createDocumentationAgent, createDocumentationObserver, FileMemoryStore, registerDocumentationAgent, SupabaseRunRecordReader } from "@wfact/documentation";
 import { productionQaOptions } from "@wfact/rendered-qa/production";
 import { TRACK_B_BUDGET } from "@wfact/rendered-qa/rendered";
 import { SupabaseJobStore } from "./jobStore.js";
@@ -77,6 +78,15 @@ function buildDeps(): HandlerDeps {
   const slugs = knownClientSlugs();
 
   const qaAgent = createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name }));
+  // Step 5: the Documentation agent records every finished stage. On a runner the memory file is written to the
+  // checkout (gone when the job ends); the durable copy is the agent's documentation.entry row in audit_log, which
+  // `npm run document` (packages/documentation) later writes into clients/<slug>/memory.md exactly as recorded.
+  const registry = registerDocumentationAgent(createSeedRegistry());
+  const stageObserver = createDocumentationObserver({
+    agent: createDocumentationAgent({ records: new SupabaseRunRecordReader(url, serviceKey), memory: new FileMemoryStore(REPO_ROOT) }),
+    registry,
+    audit,
+  });
   const workflow: HandlerDeps["workflow"] = {
     frontEndAgent: createFrontendBuilderAgent({
       builderModel: traceModelClient(builder.client, traces, actor),
@@ -84,11 +94,12 @@ function buildDeps(): HandlerDeps {
     }),
     // Step 4B M1: claims gate + rendered QA + screenshot review, then the evaluator.
     qaAgent,
-    registry: createSeedRegistry(),
+    registry,
     audit,
     reader,
     artifacts,
     knownClientSlugs: slugs,
+    stageObserver,
   };
 
   return {

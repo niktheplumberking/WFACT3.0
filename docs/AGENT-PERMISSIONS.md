@@ -35,6 +35,13 @@ depend on the thing it records).
 | Tools | `build.trackBIsolated` (Track B sandboxed build) | `qa.renderedBrowser` (Chromium, Lighthouse, link crawl) | none | none | none | `memory.readContext`, `memory.readClient`, `state.projectStatus` |
 | Injection screen on input | no | no | yes | yes | yes | n/a |
 
+**`documentation`** (added by Step 5, registered at composition time through `registerDocumentationAgent`, not a seed role;
+`packages/documentation/src/agent.ts`): model slots none; spend ceiling $0 (it makes no model call); DB reads `audit_log` and
+`model_traces` select, own entity only; DB writes `audit_log` insert (its `documentation.entry` / `documentation.skip` rows), own
+entity only; file reads and writes `clients/{client}/memory.md` only (append-only store, the bound client's file); tools none;
+injection screen no (its input is ids from the workflow, never client text; the free text it copies from the trail is redacted
+and neutralised by `safeText`).
+
 Not agent capabilities (runtime/orchestrator, listed so nothing is hidden):
 
 | I/O | Who | Gated? |
@@ -45,6 +52,7 @@ Not agent capabilities (runtime/orchestrator, listed so nothing is hidden):
 | `plan_approvals` select (re-plan) | planning pipeline | No: orchestrator reading its own record |
 | Artifact storage bucket / repo files | `SupabaseArtifactStore` / `FileArtifactStore` | Yes, through the role's gate (above), plus the stores' own path allow-list |
 | `clients/<slug>/memory.md` correction-log append | workflow CLI (`cli.ts`) after a run | No: local CLI only, not an agent (NOT COVERED, see 6) |
+| `clients/<slug>/memory.md` episodic-log append (Step 5) | `documentation` agent | Yes: `gatedMemoryStore` with the agent's own gate (fs:read / fs:write of the bound client's file) |
 | Network: Anthropic API, Agent 37 gateway, OpenAI (reviewer) | model clients | Indirectly: the model call is gated by slot; egress itself is not filtered |
 | Network: link checker HEAD/GET to links on the built page | rendered-QA browser suite | Only as part of `qa.renderedBrowser`; destinations not filtered (NOT COVERED) |
 | Network: Track B build | sandbox (`isolate.ts`) | No network at all (sandbox-exec / unshare), proven per build |
@@ -63,6 +71,7 @@ Not agent capabilities (runtime/orchestrator, listed so nothing is hidden):
 | Track B isolated build | `requirePermission(tool:build.trackBIsolated)` in `trackB/agent.ts` |
 | Rendered-QA browser / screenshot reviewer | wrapped suites in `verification/src/agent.ts` |
 | Hermes-lite tools and model | `ToolRegistry` `authorize` hook + guarded model, `jobs/src/hermesAsk.ts` |
+| Documentation agent's run-record reads and memory appends | `ctx.permissions.authorize` (db:select on `audit_log` / `model_traces` for the bound entity, `client` binding check) and `gatedMemoryStore` in `documentation/src/agent.ts` |
 
 ## 4. Entity isolation in code (as well as RLS)
 

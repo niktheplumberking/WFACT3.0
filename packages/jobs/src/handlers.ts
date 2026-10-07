@@ -110,9 +110,11 @@ function workflowOutcome(r: WorkflowResult): JobOutcome {
       lastCheckpoint: r.lastCheckpoint,
       qaIssues: r.qaFailure ? qaFailureToIssues(r.qaFailure) : [],
       correctionRounds: r.builderRounds.length,
-      // Stage 6 (Documentation agent) is the proper home for the per-client correction log; CI runs
-      // can't write clients/<slug>/memory.md into the repo, so the rounds are kept here for now.
+      // The per-stage record now lives in the client's episodic memory (Step 5, Documentation agent; durable as
+      // documentation.entry rows). The rounds stay here too: the Cockpit's job view reads them.
       builderRounds: r.builderRounds.map((x) => ({ round: x.round, verdict: x.verdict, issues: x.issues })),
+      // Step 5: stages the Documentation agent could not record (each also a workflow.documentation_escalated row).
+      documentationEscalations: r.documentationEscalations ?? [],
     },
   };
 }
