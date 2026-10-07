@@ -1,7 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-07 (19:55 +05), via `/step-close 4D` (`a3198d8`; migration 0018 applied live, 26/26 attack checks; pushed).
-Previous sync: 2026-10-07 (17:05 +05), via `/progress-sync` — re-synced `1032b23`…`c1b386a` (claims gate 1.1.0, Track B single-page /
+Last synced: 2026-10-07 (20:45 +05), via `/progress-sync` — folded in `a3198d8`…`a643d2d` (Step 4D). Both branches at `a643d2d`; CI green `37644039022` (all jobs incl. Rendered QA 14 min, Deploy Cockpit to Vercel success); the first Step 4D CI `37638990031` FAILED on one test of mine (event loop ended before the Agent 37 timeout fired on the runner), fixed in `a643d2d`. Live: Cockpit HTTP 200 and the deployed bundle contains the new recovery copy ("Save the details and continue"); database latest migration `0018_build_recovery` (20261007144150), 0 queued/running jobs, 0 plan_inputs rows, 23 jobs total.
+Previous sync: 2026-10-07 (19:55 +05) via `/step-close 4D`; before that 2026-10-07 (17:05 +05), via `/progress-sync` — re-synced `1032b23`…`c1b386a` (claims gate 1.1.0, Track B single-page /
 no-invented-testimonial / signup-form fixes, open-question cap, Steps 5 and 6 merged, cost ceilings, `packages/media`). Both branches
 synced at `c1b386a`; CI green on `8b05a46` `37609559746`, `171d57a` `37610747531`, `4e30947` `37611008861`, `c532d5a` `37614145447`, `ed84610`
 `37614606732`; `c1b386a` CI `37615794583` still running at sync. Live: Cockpit HTTP 200 (`/`, `/activity`); no queued or running jobs;
@@ -29,7 +29,7 @@ Continuation Stages 1–5 MET; Stage 6 = Step 5 (MET except the Cognee write-up,
 none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-07).
 
 **Next up**:
-0. **Huraira**: after the Cockpit deploys, open a stopped build in the Cockpit and press the new button once, so the agent can verify a live continue.
+0. **Huraira**: now that the Cockpit is deployed, open a stopped build in the Cockpit and press the new button once, so the agent can verify a live continue.
 1. **Huraira**: re-run Track B `4acbde1f` and Track A `b5a45a8e` from the Cockpit once CI on the `render.perf` change is green (the agent
    reports it). M4 closes when one live build per track passes and the agent has reviewed the screenshots.
 2. **Agent**: then Step 8 (task/event queue and durable execution).
@@ -122,6 +122,7 @@ none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
+- **Step 4D's first CI run failed and skipped the Cockpit deploy (2026-10-07).** `9730d99` (CI `37638990031`): the Frontend loop job failed on my new test of the Agent 37 request timeout ("Promise resolution is still pending but the event loop has already resolved"): `AbortSignal.timeout`'s timer does not keep Node alive, so on the runner the test process ended first; locally other handles hid it. Product code was fine. Fixed in `a643d2d` (test holds the loop open); CI `37644039022` green and the Cockpit deployed. Nothing live was affected: migration 0018 was already applied and the old Cockpit simply did not use it.
 - **A push made a live QA crash possible (2026-10-07).** `8cb26e9` (render.perf on applied throttling) added a second Lighthouse Chrome per
   page; `5c3ae67`'s CI (`37627375120`) then failed Rendered QA with an uncaught `ECONNRESET` from the QA server's error-less CONNECT sockets.
   `main` (which the Cockpit runner builds from) carried the risk from `8cb26e9` until the fix; live jobs on it: Track B `c7fba41a` and
@@ -1089,7 +1090,7 @@ config; existing verification tests pass unchanged."* — **MET** (44 -> 98 test
 gaps above. CI `37617845669` green.
 
 
-## Step 4D — Build recovery (PARTIAL 2026-10-07 — migration 0018 applied and attack-tested live; pushed; live continue not yet run)
+## Step 4D — Build recovery (PARTIAL 2026-10-07 — migration 0018 applied and attack-tested live; deployed; live continue not yet run)
 
 Governed by `docs/BUILD-RECOVERY-DESIGN.md`. Huraira's request: stop Tracks failing again and again; when a build fails say why, offer a button
 that fixes it and continues from where it left off; when something is missing, ask for it in the Cockpit and continue.
@@ -1108,7 +1109,8 @@ that fixes it and continues from where it left off; when something is missing, a
 - [x] Independent review (separate agent): no critical or high findings; the 5 real findings fixed (stale revision base on a crashed run, unrecorded
       newer brief, full rebuild offered for a verified run, "skip" not reaching the builder, panel flash).
 - [x] Migration 0018 applied live 2026-10-07 (version 20261007144150, Huraira's GO) and `scripts/rls_attack_test_recovery.sql` run in a rolled-back transaction: 26/26 as intended (anon/PM/other-user inserts refused, unapproved plan refused, bad key/empty/oversize/unknown kind refused, no edit or delete for anyone, audit row carries no text, duplicate build and continue refused, different run not blocked); afterwards 0 synthetic users, plans, inputs or audit rows remain.
-- [ ] Cockpit deployed (push of `main` deploys it), worker updated, one live stopped build continued end to end: push done, live continue NOT yet run.
+- [x] Pushed and deployed: `a643d2d`, CI `37644039022` green, Deploy Cockpit to Vercel success; live bundle `/assets/index-DyE0Yzn2.js` contains the new copy; the worker (GitHub Actions) runs the pushed `main` code on its next job.
+- [ ] One live stopped build continued end to end: NOT yet run (needs a stopped build and Huraira pressing the button, or a new build that stops).
 - [ ] Not covered: file uploads (photos, logos: Step 4B M5), closing a stale `running` row from the Cockpit, a per-build total spend cap, saving the
       approved content before the site build.
 
