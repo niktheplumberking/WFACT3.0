@@ -2,10 +2,10 @@
 /**
  * Independent re-check of a built page (Step 4B M1), as its own process:
  *   npm run qa -- <page.html> --brief <brief.json> [--out <dir>] [--expect-sha256 <hex>]
- *                 [--no-lighthouse] [--review-always] [--external-links]
+ *                 [--no-lighthouse] [--review-always] [--external-links] [--stage preview|launch]
  *
- * Runs, in order: the production QA gate (the Phase 5 six + the claims gate) with the brief as the
- * only fact source; the rendered suite (headless Chromium at 1440/768/375, axe, Lighthouse, links,
+ * Runs, in order: the evaluation registry's deterministic text gate (Step 7, the same list the jobs runner,
+ * the workflow CLI and `npm run verify` use) with the brief as the only fact source; the rendered suite (headless Chromium at 1440/768/375, axe, Lighthouse, links,
  * console, layout, JS budget, reduced motion, design rules); then the cross-vendor screenshot review.
  * Like VerificationLoop, the review is skipped (no model spend) when a deterministic check failed,
  * unless --review-always is given (used to gather evidence on a page already known to fail).
@@ -18,7 +18,8 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { QA_GATE_CHECKS, runChecks } from "@wfact/verification/registry";
+import { gates, registryGateChecks, runChecks } from "@wfact/verification/registry";
+import { registry, registryTable } from "@wfact/verification/evalRegistry";
 import { knownClientSlugs } from "@wfact/verification/paths";
 import type { CheckResult, VerificationContext } from "@wfact/verification/checks/types";
 import { createRenderedQa, reviewerFromEnv } from "./index.js";
@@ -33,7 +34,7 @@ async function main() {
   const file = process.argv[2];
   const briefPath = arg("--brief");
   if (!file || file.startsWith("--") || !briefPath) {
-    console.error("Usage: npm run qa -- <page.html> --brief <brief.json> [--out <dir>] [--expect-sha256 <hex>] [--no-lighthouse] [--review-always] [--external-links]");
+    console.error("Usage: npm run qa -- <page.html> --brief <brief.json> [--out <dir>] [--expect-sha256 <hex>] [--no-lighthouse] [--review-always] [--external-links] [--stage preview|launch]");
     process.exitCode = 2;
     return;
   }
@@ -56,6 +57,7 @@ async function main() {
     requiredSections: brief.requiredSections ?? [],
     otherClientSlugs: knownClientSlugs().filter((s) => s !== brief.clientSlug),
     factSources: [brief.goal, brief.brandNotes],
+    stage: arg("--stage") === "launch" ? "launch" : "preview",
   };
   const builderVendor = process.env.WFACT_BUILDER_VENDOR || "agent37";
   const qa = createRenderedQa({
@@ -67,9 +69,10 @@ async function main() {
   });
 
   console.log(`reviewer: ${qa.review.provider} ${qa.review.model}${qa.review.sameVendorAsBuilder ? ` (SAME VENDOR AS BUILDER ${builderVendor}; approved in config/reviewer.json)` : ""}`);
-  const results: CheckResult[] = runChecks(ctx, QA_GATE_CHECKS);
+  const results: CheckResult[] = runChecks(ctx, registryGateChecks());
   results.push(...(await qa.rendered.run(ctx)));
-  const deterministicPassed = results.every((r) => r.passed);
+  // Step 7: advisory (minor) failures are reported as WARN and do not stop the review.
+  const deterministicPassed = !results.some(gates);
   let reviewRan = false;
   if (deterministicPassed || flag("--review-always")) {
     results.push(...(await qa.review.run(ctx)));
@@ -77,7 +80,7 @@ async function main() {
   }
 
   for (const r of results) {
-    console.log(`[${r.notRun ? "NOT RUN" : r.passed ? "PASS" : "FAIL"}] ${r.checkId}`);
+    console.log(`[${r.notRun ? "NOT RUN" : r.notApplicable ? "N/A" : r.passed ? "PASS" : r.advisory ? "WARN" : "FAIL"}] ${r.checkId}${r.notApplicable ? ` (${r.notApplicable})` : ""}`);
     for (const d of r.details) console.log(`    - ${d}`);
   }
   const metrics = qa.rendered.lastRun?.metrics ?? {};
@@ -89,14 +92,17 @@ async function main() {
   }
   if (!reviewRan) console.log("screenshot review: not run because a deterministic check failed (no model spend on a page already failing)");
 
-  const failed = results.filter((r) => !r.passed).map((r) => r.checkId);
+  console.log(`\nEvaluation registry v${registry().version}, stage ${ctx.stage} (${registry().checks.length} checks; the evaluator and attack checks are not part of this CLI):`);
+  for (const line of registryTable(results)) console.log(`  ${line}`);
+  const failed = results.filter(gates).map((r) => r.checkId);
+  const warned = results.filter((r) => r.advisory).map((r) => r.checkId);
   const verdict = failed.length === 0 && reviewRan ? "PASS" : "FAIL";
   writeFileSync(
     path.join(outDir, "report.json"),
     JSON.stringify(
       {
         page: file, sha256, brief: briefPath, builderVendor, startedAt: started.toISOString(), finishedAt: new Date().toISOString(),
-        verdict, failed, results, metrics,
+        verdict, failed, warned, results, metrics, registryVersion: registry().version, stage: ctx.stage,
         reviewer: { provider: qa.review.provider, model: qa.review.model, sameVendorAsBuilder: qa.review.sameVendorAsBuilder },
         reviewCalls: qa.review.calls, reviewFindings: qa.review.lastFindings,
         screenshots: qa.rendered.lastRun?.shots.map((s) => ({ page: s.page, viewport: s.viewport, width: s.width, file: s.file })) ?? [],
@@ -105,7 +111,7 @@ async function main() {
       2,
     ),
   );
-  console.log(`\nQA: ${verdict}${failed.length ? ` (failed: ${failed.join(", ")})` : ""}\nreport + screenshots: ${outDir}`);
+  console.log(`\nQA: ${verdict}${failed.length ? ` (failed: ${failed.join(", ")})` : ""}${warned.length ? ` (advisory: ${warned.join(", ")})` : ""}\nreport + screenshots: ${outDir}`);
   process.exitCode = verdict === "PASS" ? 0 : 1;
 }
 

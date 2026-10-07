@@ -26,6 +26,7 @@ import { createTrackBBuilderAgent } from "@wfact/frontend-loop/trackB/agent";
 import { modelClientFromEnv } from "@wfact/frontend-loop/modelClient";
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
 import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
+import { modelIdentity } from "@wfact/verification/crossModel";
 import { knownClientSlugs } from "@wfact/verification/paths";
 import { ClaudeJsonClient } from "@wfact/planning/modelClient";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
@@ -70,13 +71,14 @@ function buildDeps(): HandlerDeps {
 
   const builder = modelClientFromEnv("builder");
   const reviewer = modelClientFromEnv("evaluator");
-  const qa = evaluatorModelClientFromEnv();
+  // Step 7: the QA evaluator is chosen from config/evaluator.json in a different model family from the builder.
+  const qa = evaluatorModelClientFromEnv(process.env, builder.client ? { avoid: modelIdentity(builder.client) } : {});
   if (!builder.client || !reviewer.client) throw new Error(`builder models unavailable: ${builder.reason ?? reviewer.reason}`);
   const qaModel = qa.client ? traceModelClient(qa.client, traces, actor) : null;
   const artifacts = new SupabaseArtifactStore(url, serviceKey);
   const slugs = knownClientSlugs();
 
-  const qaAgent = createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name }));
+  const qaAgent = createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client }));
   const workflow: HandlerDeps["workflow"] = {
     frontEndAgent: createFrontendBuilderAgent({
       builderModel: traceModelClient(builder.client, traces, actor),
@@ -110,7 +112,7 @@ function buildDeps(): HandlerDeps {
         builderModel: traceModelClient(builder.client, traces, actor),
         evaluatorModel: traceModelClient(reviewer.client, traces, actor),
       }),
-      qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, budget: TRACK_B_BUDGET })),
+      qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client, budget: TRACK_B_BUDGET })),
     },
     workflow,
     readArtifact: (p) => artifacts.read(p),

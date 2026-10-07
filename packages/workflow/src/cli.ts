@@ -27,6 +27,7 @@ import { createQaEvaluatorAgent } from "@wfact/verification/agent";
 import { productionQaOptions } from "@wfact/rendered-qa/production";
 import { TRACK_B_BUDGET } from "@wfact/rendered-qa/rendered";
 import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
+import { modelIdentity } from "@wfact/verification/crossModel";
 import { traceModelClient } from "@wfact/hermes-lite/tracing";
 import { knownClientSlugs } from "@wfact/verification/paths";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
@@ -95,7 +96,8 @@ async function main() {
   const builderReviewer = modelClientFromEnv("evaluator");
   if (!builderReviewer.client) blocked(`builder's reviewer model: ${builderReviewer.reason}`);
   // A fresh evaluator instance for QA — never the builder's reviewer instance (CLAUDE.md §6).
-  const qa = evaluatorModelClientFromEnv();
+  // Step 7: the QA evaluator is chosen from config/evaluator.json in a different model family from the builder.
+  const qa = evaluatorModelClientFromEnv(process.env, builder.client ? { avoid: modelIdentity(builder.client) } : {});
   if (!qa.client) console.error(`NOTE (QA evaluator): ${qa.reason}\n`);
   console.error(`(builder: ${builder.chose}; builder's reviewer: ${builderReviewer.chose}; QA evaluator: ${qa.client?.name ?? "none"})`);
 
@@ -125,7 +127,7 @@ async function main() {
     // Step 4B M1: claims gate + rendered QA + cross-vendor screenshot review, then the evaluator. Track B is
     // held to its own budget (LCP 2.5 s, its JS ceiling, the motion budget).
     qaAgent: createQaEvaluatorAgent(
-      productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, ...(track === "B" ? { budget: TRACK_B_BUDGET } : {}) }),
+      productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client, ...(track === "B" ? { budget: TRACK_B_BUDGET } : {}) }),
     ),
     registry: createSeedRegistry(),
     audit: sink,
