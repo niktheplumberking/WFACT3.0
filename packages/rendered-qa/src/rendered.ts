@@ -5,7 +5,9 @@
  *
  *   render.load            page served and loaded (HTTP 2xx)
  *   render.console         console errors, uncaught exceptions, failed network requests
- *   render.links           in-page anchors, relative pages, assets (HTTP >= 400), tel:/mailto:, optional external
+ *   render.links           in-page anchors, same-site pages and assets (against the built files), tel:/mailto:,
+ *                          any request that tried to leave the site (blocked, Step 7), optional external links
+ *                          (public addresses only, egress.ts)
  *   render.a11y            axe-core, WCAG 2.0/2.1/2.2 A + AA tags, at 1440 and 375
  *   render.layout          horizontal scroll at every viewport; tiny text and small tap targets at 375
  *   render.js-budget       total JavaScript bytes (inline + loaded) against the track budget
@@ -23,13 +25,14 @@
  * Screenshots are written to `outDir` (full page per viewport) and kept as viewport-sized JPEG slices
  * for the cross-vendor screenshot reviewer (`reviewer.ts`).
  */
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
 import { AxeBuilder } from "@axe-core/playwright";
 import { SITE_FILE_RE, type AsyncCheckSuite, type CheckResult, type VerificationContext } from "@wfact/verification/checks/types";
-import { serveDirectory } from "./server.js";
+import { serveDirectory, siteFileFor } from "./server.js";
+import { checkExternalLink, confinedBrowserArgs, type EgressOptions } from "./egress.js";
 import { DESIGN_DETECTORS, INLINE_JS_BYTES, SCRIPT_RESOURCE_BYTES, LAYOUT_PROBE, LINK_PROBE, MOTION_MARK, MOTION_PROBE, MOTION_REPORT, MOTION_WATCH, SCROLL_SAMPLE, SCROLL_THROUGH } from "./browserScripts.js";
 import { loadRulebook, type Rulebook } from "./rulebook.js";
 
@@ -142,8 +145,10 @@ export interface RenderedQaOptions {
   budget?: Budget;
   /** Run Lighthouse (render.perf). Default true; tests turn it off for speed. */
   lighthouse?: boolean;
-  /** HEAD-check external http(s) links. Default false (CI may have no outbound network). */
+  /** HEAD-check external http(s) links. Default false (CI may have no outbound network). Public addresses only (egress.ts). */
   checkExternalLinks?: boolean;
+  /** Step 7: egress policy overrides for the external link check (tests inject a resolver). */
+  egress?: EgressOptions;
   minFontPx?: number;
   minTargetPx?: number;
   rulebook?: Rulebook;
@@ -160,12 +165,28 @@ async function evaluate<T>(page: Page, fn: string, arg?: unknown): Promise<T> {
   return page.evaluate(`(${fn})(${arg === undefined ? "" : JSON.stringify(arg)})`) as Promise<T>;
 }
 
+/** Same origin as the site server (exact origin match, not a string prefix: :1234 is not :12345). */
+const sameOrigin = (url: string, origin: string): boolean => {
+  try {
+    return new URL(url).origin === origin;
+  } catch {
+    return false;
+  }
+};
+/** A request the confined browser could not make leaves the site; the server's blocked list reports it once. */
+const leavesSite = (url: string, origin: string) => /^(https?|wss?):/i.test(url) && !sameOrigin(url, origin);
+
 function watch(page: Page, origin: string, sink: { console: string[]; assets: string[]; scriptBytes: number }) {
   page.on("console", (m) => {
-    if (m.type() === "error") sink.console.push(`console error: ${m.text().slice(0, 200)}`);
+    if (m.type() !== "error") return;
+    // The browser's own "Failed to load resource" line for a request the egress policy refused is reported
+    // under render.links (as a blocked request), not twice.
+    if (/^Failed to load resource/.test(m.text()) && leavesSite(m.location()?.url ?? "", origin)) return;
+    sink.console.push(`console error: ${m.text().slice(0, 200)}`);
   });
   page.on("pageerror", (e) => sink.console.push(`uncaught exception: ${String(e.message ?? e).slice(0, 200)}`));
   page.on("requestfailed", (r) => {
+    if (leavesSite(r.url(), origin)) return;
     const reason = r.failure()?.errorText ?? "unknown";
     // A request the page or the test cancelled (a framework's background prefetch when the page closes) is
     // not a failure of the site; a missing file shows as an HTTP status below, a dead host as another error.
@@ -174,6 +195,7 @@ function watch(page: Page, origin: string, sink: { console: string[]; assets: st
   });
   page.on("response", async (r) => {
     const url = r.url();
+    if (leavesSite(url, origin)) return;
     if (r.status() >= 400) sink.assets.push(`${r.request().resourceType()} ${url.replace(origin, "")} returned HTTP ${r.status()}`);
     if (r.request().resourceType() === "script" && r.ok()) {
       try {
@@ -185,7 +207,13 @@ function watch(page: Page, origin: string, sink: { console: string[]; assets: st
   });
 }
 
-async function checkLink(link: { href: string; abs: string; text: string; anchorOk: boolean | null }, origin: string, external: boolean): Promise<string | null> {
+async function checkLink(
+  link: { href: string; abs: string; text: string; anchorOk: boolean | null },
+  origin: string,
+  siteDir: string,
+  external: boolean,
+  egress: EgressOptions | undefined,
+): Promise<string | null> {
   const label = `"${link.text || link.href}" (${link.href})`;
   const href = link.href.trim();
   if (href === "" || href === "#") return `link ${label} goes nowhere`;
@@ -195,15 +223,17 @@ async function checkLink(link: { href: string; abs: string; text: string; anchor
   if (/^mailto:/i.test(href)) return /^mailto:[^@\s]+@[^@\s]+\.[a-z]{2,}/i.test(href) ? null : `email link ${label} is malformed`;
   if (/^tel:/i.test(href)) return /^tel:\+?[\d\s().-]{7,}$/i.test(href) ? null : `phone link ${label} is malformed`;
   if (!/^https?:/i.test(link.abs)) return null;
-  const sameOrigin = link.abs.startsWith(origin);
-  if (!sameOrigin && !external) return null;
-  try {
-    let res = await fetch(link.abs, { method: "HEAD", redirect: "follow", signal: AbortSignal.timeout(8000) });
-    if (res.status === 405 || res.status === 403) res = await fetch(link.abs, { redirect: "follow", signal: AbortSignal.timeout(8000) });
-    return res.status >= 400 ? `link ${label} returns HTTP ${res.status}` : null;
-  } catch (err) {
-    return `link ${label} is unreachable (${err instanceof Error ? err.message : String(err)})`;
+  // Step 7: a same-site link is checked against the built files (the way the server would serve it), never fetched.
+  if (sameOrigin(link.abs, origin)) {
+    const file = siteFileFor(siteDir, new URL(link.abs).pathname);
+    return file && existsSync(file) && statSync(file).isFile() ? null : `link ${label} returns HTTP 404 (no such file in the build)`;
   }
+  if (!external) return null;
+  const r = await checkExternalLink(link.abs, egress);
+  if (r.outcome === "ok") return null;
+  if (r.outcome === "http-error") return `link ${label} returns HTTP ${r.status}`;
+  if (r.outcome === "refused") return `link ${label} was not checked: ${r.reason} (rendered QA only contacts public addresses)`;
+  return `link ${label} is unreachable (${r.reason})`;
 }
 
 const LIGHTHOUSE_TIMEOUT_MS = 120_000;
@@ -212,7 +242,8 @@ async function lighthouseRun(url: string): Promise<{ lcpMs: number; cls: number;
   const [{ default: lighthouse }, chromeLauncher] = await Promise.all([import("lighthouse"), import("chrome-launcher")]);
   const chrome = await chromeLauncher.launch({
     chromePath: chromium.executablePath(),
-    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage"],
+    // Step 7: confined to the site's own server (egress.ts); nothing Lighthouse's Chrome loads can leave it.
+    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage", ...confinedBrowserArgs(new URL(url).origin)],
     maxConnectionRetries: 100,
   });
   let timer: NodeJS.Timeout | undefined;
@@ -254,13 +285,15 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
   let browser: Browser | null = null;
   try {
     // Native smooth scrolling off, so any smoothing the reduced-motion probe sees comes from page script.
-    browser = await chromium.launch({ args: ["--disable-smooth-scrolling"] });
+    // Step 7: every request goes to the site's own server, which serves only the built files (egress.ts).
+    browser = await chromium.launch({ args: ["--disable-smooth-scrolling", ...confinedBrowserArgs(server.origin)] });
     for (const pageName of pages) {
       const url = pageUrl(server.origin, pageName);
       const sink = { console: [] as string[], assets: [] as string[], scriptBytes: 0 };
       const m: RenderedMetrics = { jsBytes: 0, lcpMs: null, cls: null, performanceScore: null };
       metrics[pageName] = m;
       const where = pages.length > 1 ? `${pageName}: ` : "";
+      const blockedBefore = server.blocked.length;
 
       for (const vp of VIEWPORTS) {
         const context: BrowserContext = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 1, isMobile: vp.mobile, hasTouch: vp.mobile });
@@ -318,7 +351,7 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
           for (const rule of domRules) for (const d of found[rule.detect.dom!] ?? []) details["render.design-rules"]!.push(`${where}${rule.id}: ${d}. ${rule.rule}`);
           const links = await evaluate<{ href: string; abs: string; text: string; anchorOk: boolean | null }[]>(page, LINK_PROBE);
           const unique = [...new Map(links.map((l) => [l.href, l])).values()];
-          for (const issue of await Promise.all(unique.map((l) => checkLink(l, server.origin, opts.checkExternalLinks ?? false)))) {
+          for (const issue of await Promise.all(unique.map((l) => checkLink(l, server.origin, siteDir, opts.checkExternalLinks ?? false, opts.egress)))) {
             if (issue) details["render.links"]!.push(`${where}${issue}`);
           }
           // External scripts: the larger of what the response hook read and what the browser's own resource
@@ -387,6 +420,10 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
 
       details["render.console"]!.push(...sink.console.map((c) => `${where}${c}`));
       details["render.links"]!.push(...sink.assets.map((a) => `${where}${a}`));
+      // Step 7: anything the page tried to load from outside the site was refused by the server; say so.
+      for (const b of server.blocked.slice(blockedBefore)) {
+        details["render.links"]!.push(`${where}request to outside the site blocked: ${b} (rendered QA serves only the built files; a page must be self-contained)`);
+      }
       const kb = m.jsBytes / 1024;
       if (kb > budget.jsKb) details["render.js-budget"]!.push(`${where}${kb.toFixed(1)} KB of JavaScript; the budget is ${budget.jsKb} KB`);
 
