@@ -249,8 +249,10 @@ const LIGHTHOUSE_TIMEOUT_MS = 120_000;
  */
 export type ThrottlingMethod = "devtools" | "simulate";
 
-async function lighthouseRun(url: string, throttlingMethod: ThrottlingMethod): Promise<{ lcpMs: number; cls: number; score: number | null }> {
+async function lighthouseRun(url: string, methods: ThrottlingMethod[]): Promise<{ lcpMs: number; cls: number; score: number | null }[]> {
   const [{ default: lighthouse }, chromeLauncher] = await Promise.all([import("lighthouse"), import("chrome-launcher")]);
+  // One Chrome for every measurement of the page: launching and killing a second one per page reset open
+  // sockets mid-run (CI 37627375120).
   const chrome = await chromeLauncher.launch({
     chromePath: chromium.executablePath(),
     // Step 7: confined to the site's own server (egress.ts); nothing Lighthouse's Chrome loads can leave it.
@@ -259,25 +261,30 @@ async function lighthouseRun(url: string, throttlingMethod: ThrottlingMethod): P
   });
   let timer: NodeJS.Timeout | undefined;
   try {
-    // A hung Lighthouse run must fail the check by name, not hang the job (first CI run, 2026-10-01).
-    const timeout = new Promise<never>((_, reject) => {
-      timer = setTimeout(() => reject(new Error(`Lighthouse did not finish within ${LIGHTHOUSE_TIMEOUT_MS / 1000} s`)), LIGHTHOUSE_TIMEOUT_MS);
-    });
-    const run = await Promise.race([
-      lighthouse(
-        url,
-        { port: chrome.port, output: "json", logLevel: "error", onlyCategories: ["performance"] },
-        { extends: "lighthouse:default", settings: { throttlingMethod } },
-      ),
-      timeout,
-    ]);
-    if (!run) throw new Error("Lighthouse returned no result");
-    const audits = run.lhr.audits;
-    return {
-      lcpMs: audits["largest-contentful-paint"]?.numericValue ?? Number.NaN,
-      cls: audits["cumulative-layout-shift"]?.numericValue ?? Number.NaN,
-      score: run.lhr.categories.performance?.score ?? null,
-    };
+    const results: { lcpMs: number; cls: number; score: number | null }[] = [];
+    for (const throttlingMethod of methods) {
+      // A hung Lighthouse run must fail the check by name, not hang the job (first CI run, 2026-10-01).
+      const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Lighthouse did not finish within ${LIGHTHOUSE_TIMEOUT_MS / 1000} s`)), LIGHTHOUSE_TIMEOUT_MS);
+      });
+      const run = await Promise.race([
+        lighthouse(
+          url,
+          { port: chrome.port, output: "json", logLevel: "error", onlyCategories: ["performance"] },
+          { extends: "lighthouse:default", settings: { throttlingMethod } },
+        ),
+        timeout,
+      ]);
+      clearTimeout(timer);
+      if (!run) throw new Error("Lighthouse returned no result");
+      const audits = run.lhr.audits;
+      results.push({
+        lcpMs: audits["largest-contentful-paint"]?.numericValue ?? Number.NaN,
+        cls: audits["cumulative-layout-shift"]?.numericValue ?? Number.NaN,
+        score: run.lhr.categories.performance?.score ?? null,
+      });
+    }
+    return results;
   } finally {
     clearTimeout(timer);
     chrome.kill();
@@ -447,14 +454,19 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
 
       if (opts.lighthouse !== false) {
         try {
-          const lh = await lighthouseRun(url, "devtools");
+          // Applied throttling gates; the simulated run (home page only) is advisory and may fail without consequence.
+          const isHome = pageName === pages[0];
+          const [lh, sim] = await lighthouseRun(url, isHome ? ["devtools", "simulate"] : ["devtools"]).then(
+            (r) => r,
+            async (err) => (isHome ? [...(await lighthouseRun(url, ["devtools"])), undefined] : Promise.reject(err)),
+          );
+          if (!lh) throw new Error("Lighthouse returned no applied-throttling result");
           m.lcpMs = lh.lcpMs;
           m.cls = lh.cls;
           m.performanceScore = lh.score;
           if (!(lh.lcpMs < budget.lcpMs)) details["render.perf"]!.push(`${where}LCP ${(lh.lcpMs / 1000).toFixed(2)} s on mobile (Lighthouse, applied throttling); the budget is ${(budget.lcpMs / 1000).toFixed(1)} s`);
-          // Advisory only: never fails the check; a failure to measure it is null, not a defect. Home page only, so a
-          // multi-page site's QA cycles stay inside the 30-minute Cockpit job limit.
-          if (pageName === pages[0]) m.lcpSimulatedMs = await lighthouseRun(url, "simulate").then((r) => r.lcpMs, () => null);
+          // Advisory only: never fails the check; home page only, so multi-page QA stays inside the 30-minute job limit.
+          if (isHome) m.lcpSimulatedMs = sim?.lcpMs ?? null;
           if (!(lh.cls < budget.cls)) details["render.perf"]!.push(`${where}CLS ${lh.cls.toFixed(3)}; the budget is ${budget.cls}`);
         } catch (err) {
           details["render.perf"]!.push(`${where}Lighthouse could not measure the page (${err instanceof Error ? err.message : String(err)}); performance is unverified`);

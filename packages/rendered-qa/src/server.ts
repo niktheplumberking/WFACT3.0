@@ -107,9 +107,15 @@ export async function serveDirectory(root: string): Promise<StaticServer> {
   });
   // An https:// or ws(s):// request through the proxy arrives as a CONNECT tunnel: never opened.
   server.on("connect", (req, socket) => {
+    // A browser killed mid-refusal resets this socket; without a listener that reset was an uncaught
+    // ECONNRESET that crashed the whole QA process (CI 37627375120, 2026-10-07).
+    socket.on("error", () => socket.destroy());
     block(`CONNECT ${req.url ?? "?"}`);
     socket.end("HTTP/1.1 403 Forbidden\r\n\r\n");
   });
+  // Same for any client socket the browser drops: a reset connection is not a QA failure.
+  server.on("clientError", (_err, socket) => socket.destroy());
+  server.on("connection", (socket) => socket.on("error", () => socket.destroy()));
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
   const address = server.address();
   if (!address || typeof address === "string") throw new Error("static server did not bind");
