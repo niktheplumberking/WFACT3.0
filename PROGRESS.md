@@ -19,13 +19,13 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: On the Factory Completion Plan, Steps 1, 2, 3, 3A and **6 are DONE**; Step 4 is PARTIAL (preview superseded by 4B M6);
-**Step 4B is IN PROGRESS** (M1–M3 done, M4 PARTIAL, about 80% through M4: both live re-runs on 2026-10-07 failed on factory defects that
-are now fixed, Track A `4d6e1abb` on the open-question cap, Track B `6f68adbd` only on its fixed enquiry form; M5 blocked on Higgsfield API
-credit; M6 not started); **Step 5 is DONE** (live Cockpit builds 2026-10-07: one entry per stage); Step 4C is
-BUILT AND DEPLOYED (signed-in check pending); **Step 7 is DONE** (CI `37617845669` green); Steps 8–24 not
-started. Continuation Stages 1–5 MET; Stage 6 = Step 5 (PARTIAL); Stage 7 waits on Nick. **Biggest blocker**: none hard; M4 needs one
-passing live build per track.
+**Status summary**: On the Factory Completion Plan, Steps 1, 2, 3, 3A, **5, 6 and 7 are DONE** (5 and 7 on 2026-10-07: 5 proven on live
+Cockpit builds, 7 CI `37617845669` green); Step 4 is PARTIAL (preview superseded by 4B M6); **Step 4B is IN PROGRESS**, about 90% through M4:
+Track B's live build `c775c396` passed every check except a simulated-LCP measurement that misses 2.5 s by 0.02-0.08 s for framework
+scripts alone (real LCP 0.05-0.72 s), and Track A's last re-run `ad49df57` died on one dropped Agent 37 connection, now retried (`734ded5`);
+M5 blocked on Higgsfield API credit; M6 not started. Step 4C BUILT AND DEPLOYED (signed-in check pending). Steps 8–24 not started.
+Continuation Stages 1–5 MET; Stage 6 = Step 5 (MET except the Cognee write-up, Step 15); Stage 7 waits on Nick. **Biggest blocker**:
+Huraira's decision on the `render.perf` measurement method.
 
 **Next up**:
 1. **Huraira**: decide how `render.perf` measures LCP. Lighthouse's simulated model puts the Track B starter at ~2.46-2.58 s against a 2.5 s
