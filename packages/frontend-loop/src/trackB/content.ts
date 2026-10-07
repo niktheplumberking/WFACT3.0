@@ -77,6 +77,8 @@ const Contact = z.object({
   /** Shown above the submit button; must say honestly what happens next. */
   formNote: Text(240),
   showDetails: z.boolean(),
+  /** enquiry = project enquiry (name, email, organisation, plans, timing); signup = email updates only (email, optional first name). */
+  form: z.enum(["enquiry", "signup"]).default("enquiry"),
 });
 const Prose = z.object({
   type: z.literal("prose"),

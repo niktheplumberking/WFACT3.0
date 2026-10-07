@@ -67,6 +67,8 @@ export interface Contact {
   intro: string;
   formNote: string;
   showDetails: boolean;
+  /** enquiry = a project enquiry (default); signup = email updates only (launches, openings, waitlists). */
+  form?: "enquiry" | "signup";
 }
 export interface Prose {
   type: "prose";

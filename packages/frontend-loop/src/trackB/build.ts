@@ -22,7 +22,7 @@ import { buildTrackBPalette } from "./palette.js";
 import { probeIsolation, runIsolated, type IsolationMethod, type IsolationProbe } from "./isolate.js";
 import type { SiteContent } from "./content.js";
 
-export const STARTER_VERSION = "track-b-starter/1.0.0";
+export const STARTER_VERSION = "track-b-starter/1.1.0"; // 1.1.0: contact form variants (enquiry | signup), "Location" label
 
 /** Extensions read back as text; everything else in the export is binary (base64). */
 const TEXT_EXT = new Set([".html", ".txt", ".js", ".css", ".json", ".svg", ".xml", ".webmanifest", ".map"]);

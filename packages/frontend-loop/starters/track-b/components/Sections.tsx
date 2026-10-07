@@ -265,7 +265,7 @@ export function SectionView({ section, first }: { section: Section; first: boole
                   )}
                   {b.location && (
                     <div>
-                      <dt>Studio</dt>
+                      <dt>Location</dt>
                       <dd>
                         <FactLine fact={b.location} kind="text" />
                       </dd>
@@ -274,7 +274,7 @@ export function SectionView({ section, first }: { section: Section; first: boole
                 </dl>
               )}
             </div>
-            <ContactForm actionLabel={content.primaryAction.label} note={s.formNote} fallback={fallback} />
+            <ContactForm variant={s.form ?? "enquiry"} actionLabel={content.primaryAction.label} note={s.formNote} fallback={fallback} />
           </div>
         </section>
       );

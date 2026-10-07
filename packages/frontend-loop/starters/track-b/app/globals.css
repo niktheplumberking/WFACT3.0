@@ -780,6 +780,10 @@ html:has(.menu-panel[open]) {
   font-weight: 600;
   font-size: 0.9375rem;
 }
+/* Same ink as the label (contrast stays at the label's), set apart by weight only. */
+.field-optional {
+  font-weight: 400;
+}
 .field input,
 .field textarea,
 .field select {

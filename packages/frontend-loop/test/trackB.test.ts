@@ -216,3 +216,21 @@ test("open questions: 11 of them, one long, are still valid content (Cockpit job
   assert.deepEqual(validateSiteContent(c, brief).errors, []);
 });
 
+
+test("contact form: 'signup' asks only for an email (first name optional); the default stays the enquiry form (Cockpit job 6f68adbd)", { timeout: 300_000 }, async () => {
+  const enquiry = (await realBuild()).files["contact/index.html"]!;
+  assert.match(enquiry, /data-form="enquiry"/);
+  assert.match(enquiry, /name="organisation"/);
+  assert.match(enquiry, /What are you planning\?/);
+
+  const c = fixture();
+  const contact = c.pages[2]!.sections.find((s) => s.type === "contact") as { form?: string };
+  contact.form = "signup";
+  const { content, errors } = validateSiteContent(c, brief);
+  assert.deepEqual(errors, []);
+  const signup = (await buildTrackBSite(content!)).files["contact/index.html"]!;
+  assert.match(signup, /data-form="signup"/);
+  assert.match(signup, /<input[^>]*type="email"[^>]*required=""|<input[^>]*required=""[^>]*type="email"/, "email is required");
+  assert.match(signup, /First name<!-- -->?<span class="field-optional"> \(optional\)<\/span>|First name<span class="field-optional"> \(optional\)<\/span>/);
+  assert.doesNotMatch(signup, /name="organisation"|What are you planning\?|name="timing"|<textarea/, "no project-brief fields on a signup");
+});
