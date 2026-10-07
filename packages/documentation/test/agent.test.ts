@@ -209,7 +209,7 @@ test("permissions: a run bound to one client cannot be pointed at another client
   const s3 = setup(foreign);
   const r3 = await s3.run({ mode: "backfill", workflowRunId: RUN, clientSlug: CLIENT, entitySlug: ENTITY });
   assert.equal(r3.status, "escalated");
-  assert.match(r3.reason ?? "", /not a workflow run|belongs to/);
+  assert.match(r3.reason ?? "", /was started for entity "dreamsign", not "bennett-co"/);
   assert.equal(s3.memory.files.get(MEM), HUMAN);
   assert.equal(memory.files.get(MEM), HUMAN);
 });

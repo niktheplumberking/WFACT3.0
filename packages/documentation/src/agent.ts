@@ -191,6 +191,12 @@ export function createDocumentationAgent(opts: DocumentationAgentOptions): Agent
       const rows = allRows.filter((r) => ownEntity(r.entitySlug));
       const traces = allTraces.filter((t) => ownEntity(t.entitySlug));
       const excludedRows = allRows.length - rows.length + (allTraces.length - traces.length);
+      const foreignStart = allRows.find((r) => r.action === "workflow.start" && !ownEntity(r.entitySlug));
+      if (foreignStart) {
+        throw new DocumentationRefusedError(
+          `run ${input.workflowRunId} was started for entity "${foreignStart.entitySlug}", not "${bound.entitySlug}" this run is bound to — refusing to write it into ${bound.clientSlug}'s memory`,
+        );
+      }
 
       const extracted = extractStageDrafts(rows, traces, { roles: opts.roles });
       if (extracted.entitySlug !== bound.entitySlug || extracted.clientSlug !== bound.clientSlug) {
