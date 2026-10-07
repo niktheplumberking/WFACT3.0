@@ -1,0 +1,26 @@
+{
+  "name": "@wfact/documentation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Step 5 (Continuation Plan Stage 6): the Documentation agent. Appends one structured, versioned episodic entry per finished workflow stage to clients/<slug>/memory.md, from the run's audit_log and model_traces rows. Registered through the agent registry; no change to agent-runtime.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "document": "tsx src/cli.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@wfact/agent-runtime": "file:../agent-runtime",
+    "@wfact/audit": "file:../audit",
+    "@wfact/hermes-lite": "file:../hermes"
+  }
+}
