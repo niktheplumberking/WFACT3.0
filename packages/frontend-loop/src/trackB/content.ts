@@ -18,7 +18,7 @@
  */
 import { z } from "zod";
 import { pageScopeOf, type PilotBrief } from "../brief.js";
-import { briefFactText, extractJson, inBrief } from "../trackA/content.js";
+import { briefFactText, extractJson, inBrief, missingRequiredMessage, waivedSocialProof } from "../trackA/content.js";
 import { buildTrackBPalette } from "./palette.js";
 
 export { extractJson };
@@ -223,7 +223,7 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
 
   const allIds = new Set(c.pages.flatMap((p) => p.sections.map((s) => s.id)));
   for (const required of brief.requiredSections) {
-    if (!allIds.has(required)) errors.push(`The brief requires a section with id "${required}" on some page; none has it.`);
+    if (!allIds.has(required) && !waivedSocialProof(required, c.openQuestions)) errors.push(missingRequiredMessage(required));
   }
   if (contactForms === 0) errors.push(`No page has a "contact" section; the primary action needs a form to land on.`);
   const target = c.pages.find((p) => p.slug === c.primaryAction.page);

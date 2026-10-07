@@ -237,3 +237,14 @@ test("open questions: 11 of them, one long, are still valid content (Cockpit job
   assert.deepEqual(validateSiteContent(c, brief).errors, []);
 });
 
+
+test("a required testimonials section without brief quotes: left out with an open question, never invented (Cockpit job 9c853a49)", () => {
+  const needs = { ...brief, requiredSections: [...brief.requiredSections, "testimonials"] };
+  const missing = validateSiteContent(fixture(), needs).errors.join("\n");
+  assert.match(missing, /requires a section with id "testimonials" \(customer words\)[\s\S]*add an openQuestions entry asking the client for real customer feedback/);
+  const c = fixture();
+  c.openQuestions = [...c.openQuestions, "Can the client share real customer reviews for the testimonials section?"];
+  assert.deepEqual(validateSiteContent(c, needs).errors, [], "waived honestly, with the gap recorded");
+  const other = { ...brief, requiredSections: [...brief.requiredSections, "pricing"] };
+  assert.match(validateSiteContent(c, other).errors.join("\n"), /requires a section with id "pricing" on some page; none has it/, "only customer-words sections can be waived");
+});

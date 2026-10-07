@@ -234,3 +234,11 @@ test("contact form: 'signup' asks only for an email (first name optional); the d
   assert.match(signup, /First name<!-- -->?<span class="field-optional"> \(optional\)<\/span>|First name<span class="field-optional"> \(optional\)<\/span>/);
   assert.doesNotMatch(signup, /name="organisation"|What are you planning\?|name="timing"|<textarea/, "no project-brief fields on a signup");
 });
+
+test("a required social-proof section without brief quotes: left out with an open question, never invented (Cockpit job 9c853a49)", () => {
+  const needs = { ...brief, requiredSections: [...brief.requiredSections, "social-proof"] };
+  assert.match(validateSiteContent(fixture(), needs).errors.join("\n"), /requires a section with id "social-proof" \(customer words\)/);
+  const c = fixture();
+  c.openQuestions = [...c.openQuestions, "Real customer feedback for social-proof: can the studio share quotes?"];
+  assert.deepEqual(validateSiteContent(c, needs).errors, []);
+});

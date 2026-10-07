@@ -161,6 +161,25 @@ export function inBrief(value: string, briefText: string): boolean {
   return norm(briefText).includes(norm(value));
 }
 
+/**
+ * A required section that can only be honest with real customer words (testimonials, reviews, social proof).
+ * Plans ask for one even when the brief has no quotes; the builder may not invent them (DR-FAKE-SOCIAL-PROOF), so
+ * such a section may be left out IF an open question asks the client for that feedback (Cockpit job 9c853a49).
+ */
+export const SOCIAL_PROOF_ID = /testimonial|review|social-proof|^proof$|feedback|^quotes?$|kind-words/;
+const ASKS_FOR_FEEDBACK = /testimonial|review|feedback|quote|social proof/i;
+
+/** The brief's required section ids this content does not need to have, with the honest reason recorded. */
+export function waivedSocialProof(required: string, openQuestions: string[]): boolean {
+  return SOCIAL_PROOF_ID.test(required) && openQuestions.some((q) => ASKS_FOR_FEEDBACK.test(q) || q.includes(required));
+}
+
+export function missingRequiredMessage(required: string): string {
+  return SOCIAL_PROOF_ID.test(required)
+    ? `The brief requires a section with id "${required}" (customer words). Use it only with quotes the brief supplies; without any, leave it out and add an openQuestions entry asking the client for real customer feedback for "${required}".`
+    : `The brief requires a section with id "${required}" on some page; none has it.`;
+}
+
 export function briefFactText(brief: PilotBrief): string {
   return [brief.goal, brief.brandNotes].join("\n");
 }
@@ -257,7 +276,7 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
 
   const allIds = new Set(c.pages.flatMap((p) => p.sections.map((s) => s.id)));
   for (const required of brief.requiredSections) {
-    if (!allIds.has(required)) errors.push(`The brief requires a section with id "${required}" on some page; none has it.`);
+    if (!allIds.has(required) && !waivedSocialProof(required, c.openQuestions)) errors.push(missingRequiredMessage(required));
   }
   if (contactForms === 0) errors.push(`No page has a "contact" section; the primary action needs a form to land on.`);
   const target = c.pages.find((p) => p.slug === c.primaryAction.page);
