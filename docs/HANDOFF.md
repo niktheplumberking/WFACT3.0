@@ -150,8 +150,7 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 | 7 | CI does not cover `media`, `dispatch-job`, `db` attack SQL, `check-trackers` | Medium |
 | 8 | Hosting law (Hostinger) never exercised; Vercel stood in | Medium |
 | 9 | Track B simulated-LCP miss; launch files missing | Low–medium |
-| 10 | Stale worktrees `.claude/worktrees/agent-*`; local `main` lags `origin/main` | Low |
-| 11 | 11 of 13 `.claude/hooks` scripts unregistered; unknown if wanted | Low |
+| 10 | 11 of 13 `.claude/hooks` scripts unregistered; unknown if wanted | Low |
 
 ---
 

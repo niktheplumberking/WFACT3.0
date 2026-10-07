@@ -24,3 +24,6 @@ build/
 .idea/
 .vercel
 .env*
+
+# Claude Code agent worktrees
+.claude/worktrees/

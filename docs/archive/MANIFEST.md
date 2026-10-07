@@ -34,6 +34,9 @@ Restore with `git mv <archive path> <original path>`. Rounds are in date order.
 | `docs/WFACT SOPS/` | Cited by `verification/config/eval-registry.json` |
 | `docs/WFACT-3.0-Agency-Scope-Addendum-DRAFT.md` | Unresolved scope proposal; section 2 is known-superseded but the rest is live input |
 | `.claude/hooks/*` (11 unregistered scripts) | Relevance not established; only 2 hooks are registered in `.claude/settings.json` |
-| `.claude/worktrees/agent-*` | Two leftover git worktrees whose commits are already in `huraira-work`; removal is a `git worktree remove`, left for the owner |
 | `packages/media` | Orphaned (no importer, no CI job) but is Step 4B M5 groundwork |
 | `clients/dreamsign-pilot`, `clients/summit-line-roofing` | Read by code and tests; synthetic/provisional, labelled as such |
+
+## Removed (not archived) 2026-10-07
+
+Two leftover git worktrees `.claude/worktrees/agent-ac3844b…` and `agent-ad14ed1…` and their branches `worktree-agent-*`: every commit was already in `huraira-work` (checked with `merge-base --is-ancestor`), so nothing was lost. `.claude/worktrees/` is now in `.gitignore`. Stray `.DS_Store` files were deleted (already git-ignored).
