@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-07 (20:45 +05), via `/progress-sync` — folded in `a3198d8`…`a643d2d` (Step 4D). Both branches at `a643d2d`; CI green `37644039022` (all jobs incl. Rendered QA 14 min, Deploy Cockpit to Vercel success); the first Step 4D CI `37638990031` FAILED on one test of mine (event loop ended before the Agent 37 timeout fired on the runner), fixed in `a643d2d`. Live: Cockpit HTTP 200 and the deployed bundle contains the new recovery copy ("Save the details and continue"); database latest migration `0018_build_recovery` (20261007144150), 0 queued/running jobs, 0 plan_inputs rows, 23 jobs total.
+Last synced: 2026-10-07 (21:40 +05), via `/progress-sync` — folded in the alignment pass `ec71c89`…`113276a` (docs, plan order, decisions D1/D2; no application code changed). Both branches at `113276a`. Evidence this sync: local re-run typecheck clean for all 10 packages and the Cockpit; tests agent-runtime 39, audit 14, documentation 18, hermes 48, jobs 24, media 8, planning 32, verification 100, workflow 33, frontend-loop 75, Cockpit 67 all pass (rendered-qa not re-run locally). CI: `37651786532` (`fa12bbe`) success and `37651306672` (`122c071`) success; `37652704145`, `37653665566` and `37653814793` (the last three doc commits) were still running at sync, so they are NOT confirmed green. Live: Cockpit HTTP 200; Supabase `mcaxxhgjptwowwrluhra` migrations list ends `0017_model_traces_openai` then `build_recovery` (20261007144150, which is repo file `0018_build_recovery.sql` under a different name; 0016 is absent live too). Not checked: signed-in Cockpit, Doppler, GitHub secrets.
+Previous sync: 2026-10-07 (20:45 +05), via `/progress-sync` — folded in `a3198d8`…`a643d2d` (Step 4D). Both branches at `a643d2d`; CI green `37644039022` (all jobs incl. Rendered QA 14 min, Deploy Cockpit to Vercel success); the first Step 4D CI `37638990031` FAILED on one test of mine (event loop ended before the Agent 37 timeout fired on the runner), fixed in `a643d2d`. Live: Cockpit HTTP 200 and the deployed bundle contains the new recovery copy ("Save the details and continue"); database latest migration `0018_build_recovery` (20261007144150), 0 queued/running jobs, 0 plan_inputs rows, 23 jobs total.
 Previous sync: 2026-10-07 (19:55 +05) via `/step-close 4D`; before that 2026-10-07 (17:05 +05), via `/progress-sync` — re-synced `1032b23`…`c1b386a` (claims gate 1.1.0, Track B single-page /
 no-invented-testimonial / signup-form fixes, open-question cap, Steps 5 and 6 merged, cost ceilings, `packages/media`). Both branches
 synced at `c1b386a`; CI green on `8b05a46` `37609559746`, `171d57a` `37610747531`, `4e30947` `37611008861`, `c532d5a` `37614145447`, `ed84610`
@@ -26,7 +27,7 @@ Track B's live build `c775c396` passed every check except a simulated-LCP measur
 scripts alone (real LCP 0.05-0.72 s), and Track A's last re-run `ad49df57` died on one dropped Agent 37 connection, now retried (`734ded5`);
 M5 blocked on Higgsfield API credit; M6 not started. Step 4C BUILT AND DEPLOYED (signed-in check pending). Steps 8–27 not started (new: 25 real-client run, 26 quality calibration, 27 Track A motion budget).
 Continuation Stages 1–5 MET; Stage 6 = Step 5 (MET except the Cognee write-up, Step 15); Stage 7 waits on Nick. **Biggest blocker**:
-none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-07).
+Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfield credits, rotating the Higgsfield key) gate Steps 26, 27 and 25; Nick's real brief gates Step 25 (fallback: the real 2.0 DreamSign case). `render.perf` gates on applied throttling (Huraira, option 1, 2026-10-07).
 
 **Next up** (order re-set and approved by Huraira 2026-10-07; see "Execution order" in the Factory Completion Plan):
 1. **Huraira**: re-run Track B `4acbde1f` and Track A `b5a45a8e` (closes 4B M4); press "continue" on a real stopped build (4D live proof); OpenAI and Higgsfield credits; rotate the Higgsfield key.
@@ -37,6 +38,9 @@ none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-
 6. Not in scope now: e-commerce site type. Deferred: Steps 15, 16, 24.
 
 **Gaps noticed**:
+- **Live migration name differs from the repo file**: applied as `build_recovery` (20261007144150), repo file is `0018_build_recovery.sql`; `0016` is absent in both. Cause not recorded.
+- **Doc-only commits trigger the full CI and a production deploy of the Cockpit** (three runs queued for three doc commits). Consider a paths filter (Step 21 H).
+- **Nick has not confirmed decision D1**; he confirms by blind-rating sample builds in Step 27.
 - **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`
   (the only dead path found in a link check of the 7 main docs this sync).
 - **Track A writes the brief's open questions into the home page as HTML comments**: readable by anyone viewing the page source (Step 7 report).
@@ -90,6 +94,7 @@ none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-
   off in Supabase Auth. Both predate Step 4C and are not fixed by it.
 
 **Unplanned work done**:
+- **Alignment pass 2026-10-07** (`ec71c89`…`113276a`, docs only): `docs/HANDOFF.md`, `docs/archive/MANIFEST.md`, sprint Phases 1–7 checklist archived to `docs/archive/2026-10-07-alignment/`, Factory Completion Plan recreated (closed-step prompts archived, Steps 25–27 added, Execution order table, Part F proposals), decisions D1 and D2 recorded, `.env.example` and `.claude/*` rewritten, two stale agent worktrees removed. `check-trackers` OK (31 steps).
 - **Cockpit-driven actions** (`4653c67`): a `jobs` queue (migration `0009`), the `dispatch-job` Edge
   Function, `.github/workflows/cockpit-job.yml`, a `packages/jobs` runner, and a Cockpit Actions room.
   This is Huraira's direction (every pipeline action runs from the Cockpit, with GitHub Actions as the
