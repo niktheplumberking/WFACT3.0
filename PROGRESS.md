@@ -1,6 +1,6 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-07 (19:55 +05), via `/step-close 4D` (`a3198d8`; local only, not pushed; migration 0018 not applied).
+Last synced: 2026-10-07 (19:55 +05), via `/step-close 4D` (`a3198d8`; migration 0018 applied live, 26/26 attack checks; pushed).
 Previous sync: 2026-10-07 (17:05 +05), via `/progress-sync` — re-synced `1032b23`…`c1b386a` (claims gate 1.1.0, Track B single-page /
 no-invented-testimonial / signup-form fixes, open-question cap, Steps 5 and 6 merged, cost ceilings, `packages/media`). Both branches
 synced at `c1b386a`; CI green on `8b05a46` `37609559746`, `171d57a` `37610747531`, `4e30947` `37611008861`, `c532d5a` `37614145447`, `ed84610`
@@ -29,7 +29,7 @@ Continuation Stages 1–5 MET; Stage 6 = Step 5 (MET except the Cognee write-up,
 none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-07).
 
 **Next up**:
-0. **Huraira**: review Step 4D (`docs/BUILD-RECOVERY-DESIGN.md`), then GO to apply migration 0018 and run `scripts/rls_attack_test_recovery.sql` (rolled back), and to push so the Cockpit and worker carry it.
+0. **Huraira**: after the Cockpit deploys, open a stopped build in the Cockpit and press the new button once, so the agent can verify a live continue.
 1. **Huraira**: re-run Track B `4acbde1f` and Track A `b5a45a8e` from the Cockpit once CI on the `render.perf` change is green (the agent
    reports it). M4 closes when one live build per track passes and the agent has reviewed the screenshots.
 2. **Agent**: then Step 8 (task/event queue and durable execution).
@@ -1089,7 +1089,7 @@ config; existing verification tests pass unchanged."* — **MET** (44 -> 98 test
 gaps above. CI `37617845669` green.
 
 
-## Step 4D — Build recovery (PARTIAL 2026-10-07 — built locally; migration 0018 not applied, not pushed)
+## Step 4D — Build recovery (PARTIAL 2026-10-07 — migration 0018 applied and attack-tested live; pushed; live continue not yet run)
 
 Governed by `docs/BUILD-RECOVERY-DESIGN.md`. Huraira's request: stop Tracks failing again and again; when a build fails say why, offer a button
 that fixes it and continues from where it left off; when something is missing, ask for it in the Cockpit and continue.
@@ -1107,8 +1107,8 @@ that fixes it and continues from where it left off; when something is missing, a
       instead of blaming the site, Run step limited to 26 minutes so the safety net can fire, job linked to run (`job.run`), thrown errors keep the run.
 - [x] Independent review (separate agent): no critical or high findings; the 5 real findings fixed (stale revision base on a crashed run, unrecorded
       newer brief, full rebuild offered for a verified run, "skip" not reaching the builder, panel flash).
-- [ ] Migration 0018 applied live and `scripts/rls_attack_test_recovery.sql` run (rolled back): NOT DONE (needs Huraira's GO).
-- [ ] Pushed, Cockpit deployed, worker updated, one live stopped build continued end to end: NOT DONE.
+- [x] Migration 0018 applied live 2026-10-07 (version 20261007144150, Huraira's GO) and `scripts/rls_attack_test_recovery.sql` run in a rolled-back transaction: 26/26 as intended (anon/PM/other-user inserts refused, unapproved plan refused, bad key/empty/oversize/unknown kind refused, no edit or delete for anyone, audit row carries no text, duplicate build and continue refused, different run not blocked); afterwards 0 synthetic users, plans, inputs or audit rows remain.
+- [ ] Cockpit deployed (push of `main` deploys it), worker updated, one live stopped build continued end to end: push done, live continue NOT yet run.
 - [ ] Not covered: file uploads (photos, logos: Step 4B M5), closing a stale `running` row from the Cockpit, a per-build total spend cap, saving the
       approved content before the site build.
 
