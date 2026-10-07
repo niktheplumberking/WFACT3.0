@@ -8,6 +8,7 @@
  *   - "claude"          text clients in hermes / frontend-loop / verification   → complete(), totalUsage.{inputTokens,outputTokens}, modelIdUsed
  *   - "agent37"         frontend-loop's Agent 37 builder                        → complete(), totalUsage.{promptTokens,completionTokens}, model "hermes-agent"
  *   - "claude:<model>"  planning's structured-output client                     → completeJson(), totalUsage.{inputTokens,outputTokens}
+ *   - "openai"          verification's second-vendor QA evaluator (Step 7)        → complete(), totalUsage.{inputTokens,outputTokens}, modelIdUsed
  * Anything else is refused loudly — an unknown client would otherwise go untraced.
  */
 import { traceModelCalls, type TraceSink } from "@wfact/audit";
@@ -21,6 +22,13 @@ export function traceModelClient<T extends object>(client: T, sink: TraceSink, f
   if (c.name === "claude" && c.modelIdUsed) {
     return traceModelCalls(client, {
       sink, method: "complete", provider: "anthropic", model: c.modelIdUsed, cost, fallbackActor,
+      usage: () => ({ inputTokens: c.totalUsage!.inputTokens ?? 0, outputTokens: c.totalUsage!.outputTokens ?? 0 }),
+    });
+  }
+  // Step 7: the second-vendor QA evaluator (packages/verification OpenAIModelClient).
+  if (c.name === "openai" && c.modelIdUsed) {
+    return traceModelCalls(client, {
+      sink, method: "complete", provider: "openai", model: c.modelIdUsed, cost, fallbackActor,
       usage: () => ({ inputTokens: c.totalUsage!.inputTokens ?? 0, outputTokens: c.totalUsage!.outputTokens ?? 0 }),
     });
   }

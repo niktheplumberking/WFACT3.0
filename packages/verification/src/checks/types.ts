@@ -37,6 +37,12 @@ export interface VerificationContext {
    * external dependency.
    */
   pageOf?: { page: string; site: SiteFiles };
+  /**
+   * Step 7 evaluation registry: which gate this run is. "preview" (default) is every build; "launch" adds the
+   * launch-candidate checks (canonical URL, og:image, sitemap, robots.txt, llms.txt, 404 page), which need the
+   * production domain and run before a human launch decision. A launch-only check at preview reports N/A.
+   */
+  stage?: "preview" | "launch";
 }
 
 /**
@@ -65,6 +71,19 @@ export interface CheckResult {
    * VerificationLoop reports the run as not verified instead of sending it back to the builder.
    */
   notRun?: boolean;
+  /**
+   * Step 7: a registry check of severity "minor" fails as advisory: reported (WARN) and audited, but it does not
+   * fail the gate and is not sent back to the builder on its own. Blocker and major failures always gate.
+   */
+  advisory?: boolean;
+  /**
+   * Step 7: the check does not apply to this run, with the reason (e.g. a launch-only check at preview, or a
+   * site-level check on a single-file page). Always `passed: true` with empty details; never a silent pass:
+   * the reason is printed and audited, and a reasonless N/A is refused by the registry (2.0's audit law).
+   */
+  notApplicable?: string;
+  /** Step 7: the registry severity of the check that produced this result (absent outside the registry gate). */
+  severity?: "blocker" | "major" | "minor";
 }
 
 export interface Check {

@@ -34,7 +34,11 @@ Run it under `doppler run --` for the reviewer key (`AGENT37_API_KEY` + `AGENT37
 
 - The design detectors are heuristics (see `packages/frontend-loop/design/README.md`).
 - Lighthouse uses simulated mobile throttling; numbers vary run to run by roughly ±10%.
-- External links are not checked by default (`--external-links` turns it on).
+- External links are not checked by default (`--external-links` turns it on). Since Step 7 only public addresses are contacted
+  (`src/egress.ts`: DNS checked, connection pinned, every redirect re-checked, 8 s per request), and the browser and Lighthouse are
+  confined to the site's own server: anything a page tries to load from elsewhere is refused and reported under `render.links`.
+- Since Step 7 the text gate is the evaluation registry's (`packages/verification/config/eval-registry.json`), shared with the jobs
+  runner, the workflow CLI and `npm run verify`; `--stage launch` adds the launch-candidate checks.
 - **Measured reviewer results (2026-10-01, live, Agent 37)**: the clean fixture passes; the Step 4 artifact fails on 6 rules; the
   review-only fixtures for DR-REPEATED-RHYTHM, DQ-ART-DIRECTION, DQ-TYPE-HIERARCHY and DQ-CONTENT-HIERARCHY each fail their rule.
   **Missed**: DQ-MOBILE-READABLE (10-11px text at 375px), even with phone shots at full detail; that fixture is caught by `render.layout`

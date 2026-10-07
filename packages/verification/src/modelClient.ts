@@ -14,6 +14,7 @@
  * genuinely closed, not just structurally distinct instances.
  */
 import Anthropic from "@anthropic-ai/sdk";
+import { familyOf, loadEvaluatorConfig, type EvaluatorConfig, type ModelIdentity } from "./crossModel.js";
 
 export interface ModelRequest {
   system: string;
@@ -74,27 +75,101 @@ export class ClaudeModelClient implements ModelClient {
 }
 
 /**
- * Builds a fresh `ClaudeModelClient` from env, or returns null with a clear reason — same pattern
- * as `packages/frontend-loop/src/modelClient.ts#modelClientFromEnv`. Called separately from
- * whatever instance Phase 4 used, so this is always a distinct object even when both ultimately
- * wrap the same Claude account (the "ideally different vendor" half stays an open, tracked gap
- * until Kimi K3/GPT-5.6 access lands — see BLOCKED-ON-NICK.md).
+ * Step 7: the second-vendor evaluator. OpenAI Chat Completions over fetch (no SDK dependency), same contract
+ * as ClaudeModelClient: token usage is accumulated for cost, a truncated or empty answer throws (a verdict is
+ * never parsed from a cut-off reply), an HTTP error throws with the status (the key is never echoed).
  */
-export function evaluatorModelClientFromEnv(env: NodeJS.ProcessEnv = process.env): {
+export class OpenAIModelClient implements ModelClient {
+  readonly name = "openai";
+  public readonly modelIdUsed: string;
+  public totalUsage = { inputTokens: 0, outputTokens: 0 };
+
+  constructor(
+    private readonly apiKey: string,
+    modelId: string = "gpt-5.4",
+    private readonly baseUrl: string = "https://api.openai.com/v1",
+    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly timeoutMs: number = 180_000,
+  ) {
+    this.modelIdUsed = modelId;
+  }
+
+  async complete({ system, user }: ModelRequest): Promise<string> {
+    const res = await this.fetchImpl(`${this.baseUrl.replace(/\/+$/, "")}/chat/completions`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${this.apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: this.modelIdUsed,
+        max_completion_tokens: MAX_OUTPUT_TOKENS,
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
+      }),
+      signal: AbortSignal.timeout(this.timeoutMs),
+    });
+    if (!res.ok) {
+      const body = (await res.text()).replace(/sk-[A-Za-z0-9_-]{8,}/g, "sk-…").slice(0, 300);
+      throw new Error(`OpenAI evaluator request failed: HTTP ${res.status} ${body}`);
+    }
+    const data = (await res.json()) as {
+      choices?: { message?: { content?: string | null }; finish_reason?: string }[];
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
+    };
+    if (data.usage) {
+      this.totalUsage.inputTokens += data.usage.prompt_tokens ?? 0;
+      this.totalUsage.outputTokens += data.usage.completion_tokens ?? 0;
+    }
+    const choice = data.choices?.[0];
+    if (choice?.finish_reason === "length") {
+      throw new Error(`OpenAI output truncated at max_completion_tokens=${MAX_OUTPUT_TOKENS} — cannot verify a page from a cut-off answer.`);
+    }
+    const text = choice?.message?.content;
+    if (!text) throw new Error(`OpenAI response contained no text (finish_reason: ${choice?.finish_reason ?? "none"}) — cannot verify a page from this.`);
+    return text;
+  }
+}
+
+/**
+ * Builds a fresh evaluator client from env, or returns null with a clear reason — same pattern as
+ * `packages/frontend-loop/src/modelClient.ts#modelClientFromEnv`. Always a new instance, never the builder's.
+ *
+ * Step 7: the candidates and their order come from config/evaluator.json. With `avoid` (the builder's identity)
+ * a candidate in the builder's model family is skipped, so a Claude builder (Agent 37 not configured) gets the
+ * second vendor instead of a same-family evaluator. Without `avoid` the first candidate with a key wins
+ * (Claude, as before Step 7). Composition roots still call assertCrossModelSeparation on the result.
+ */
+export function evaluatorModelClientFromEnv(
+  env: NodeJS.ProcessEnv = process.env,
+  opts: { avoid?: ModelIdentity; config?: EvaluatorConfig; fetchImpl?: typeof fetch } = {},
+): {
   client: ModelClient | null;
   reason: string | null;
 } {
-  const apiKey = env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return {
-      client: null,
-      reason:
-        "ANTHROPIC_API_KEY is not set. Per BLOCKED-ON-NICK.md this is the same open, blocking item " +
-        "that stops Phase 3's and Phase 4's live runs — the deterministic checks in this package " +
-        "still run and are still meaningful without it; only the evaluator step is blocked.",
-    };
+  const config = opts.config ?? loadEvaluatorConfig();
+  const avoidFamily = opts.avoid ? familyOf(opts.avoid, config) : null;
+  const skipped: string[] = [];
+  for (const c of config.candidates) {
+    const model = (c.modelEnv && env[c.modelEnv]) || c.model;
+    const family = familyOf({ vendor: c.provider, model }, config);
+    if (avoidFamily && family === avoidFamily) {
+      skipped.push(`${c.provider}:${model} (same family as the builder, ${family})`);
+      continue;
+    }
+    const key = env[c.keyEnv];
+    if (!key) {
+      skipped.push(`${c.provider}:${model} (${c.keyEnv} is not set)`);
+      continue;
+    }
+    if (c.provider === "anthropic") return { client: new ClaudeModelClient(key, model), reason: null };
+    return { client: new OpenAIModelClient(key, model, undefined, opts.fetchImpl), reason: null };
   }
-  return { client: new ClaudeModelClient(apiKey, env.ANTHROPIC_MODEL), reason: null };
+  return {
+    client: null,
+    reason:
+      `no evaluator model available (config/evaluator.json v${config.version}): ${skipped.join("; ")}. ` +
+      "The deterministic checks still run and still mean something; only the evaluator step is blocked, so the run cannot be approved.",
+  };
 }
 
 /** Deterministic stand-in for tests — no network, no key, fully inspectable. */
@@ -102,7 +177,11 @@ export class MockModelClient implements ModelClient {
   readonly name = "mock";
   public readonly calls: ModelRequest[] = [];
 
-  constructor(private readonly respond: (request: ModelRequest, callIndex: number) => string) {}
+  /** `family` (optional, Step 7): lets a test give two mocks distinct model families for the cross-model rule. */
+  constructor(
+    private readonly respond: (request: ModelRequest, callIndex: number) => string,
+    public readonly family?: string,
+  ) {}
 
   async complete(request: ModelRequest): Promise<string> {
     const result = this.respond(request, this.calls.length);

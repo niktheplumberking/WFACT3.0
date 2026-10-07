@@ -1,0 +1,3 @@
+# SYNTHETIC TEST FIXTURE (Step 7 registry), planted: blocks every crawler
+User-agent: *
+Disallow: /
