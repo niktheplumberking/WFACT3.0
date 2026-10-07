@@ -13,7 +13,7 @@ parallel with Steps 5-8 because it only touches `apps/cockpit`.
 **Status as of 2026-10-07**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
 Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done, M4 PARTIAL: built and verified in CI `37016971442`; live Track B
 build `f696ba43` failed on page count and invented testimonials, fixed in `c64bd0e`, not yet re-run; M5 groundwork `4bbd4bc`, live run
-blocked on Higgsfield credits; M6 not started); Step 4C is **BUILT AND DEPLOYED** (`main` `fb08be3`, live signed-in check pending);
+blocked on Higgsfield credits; M6 not started); Step 4C is **BUILT AND DEPLOYED** (`main` `fb08be3`, live signed-in check pending); Step 4D (build recovery) is **PARTIAL** (built and tested locally `a3198d8`; migration 0018 not applied, not pushed);
 Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **DONE** (proven on live Cockpit builds 2026-10-07); Step 7 is **DONE** (CI `37617845669` green); Steps 8–24 are not started. Each step heading below carries its
 status; Part E is the checklist.
 
@@ -596,6 +596,19 @@ ACCEPTANCE
 
 REPORT in the Part C format (Phase 1 report first, then the build report), then STOP.
 ```
+
+---
+
+### STEP 4D — Build recovery: why a build stopped, and carry on from where it left off (P0, added 2026-10-07) — PARTIAL 2026-10-07, built locally; migration 0018 not applied, not pushed
+
+**Added at Huraira's request 2026-10-07** after Track A and B builds kept stopping and every stop meant a new paid build. Design, failure
+catalogue, owner flow and edge cases: `docs/BUILD-RECOVERY-DESIGN.md`. A stopped run can now be reopened by a person (`workflow.reopen`,
+fresh revision budget, newest brief); the Cockpit explains each stop in seven plain buckets, shows what is saved, takes the missing details in a
+form (append-only `plan_inputs`, migration 0018) and carries the build on with one button; bounded automatic retry for a reviewer outage; a job
+killed by a timeout is linked to its run (`job.run`) and can still be continued; one active build per plan (database guard).
+**Acceptance**: a build that stopped (failed checks, outage, missing facts) continues from its saved site in one press; missing facts are asked in
+plain words and reach the builder as sourced facts; nothing is invented; nothing publishes. **Open**: apply 0018 and run
+`scripts/rls_attack_test_recovery.sql` live; push and deploy; one live stop continued end to end.
 
 ---
 
@@ -1450,6 +1463,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
 | 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done; M4 partial (`a9f4dcf`…`13ec854`, migration 0014, CI `37016971442` green; live Track B `f696ba43` failures fixed in `c64bd0e`/`8dae180`, not pushed or re-run; screenshot review pending); M5 groundwork `4bbd4bc` (live run blocked: no Higgsfield credits) | 2026-10-06 | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`; redeploy `fb08be3`, CI `36907274448`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
+| 4D | Build recovery | **PARTIAL** (`a3198d8`: engine, Cockpit and tests green locally: workflow 33, jobs 24, frontend-loop 75, verification 100, Cockpit 67; independent review done and its findings fixed; migration 0018 and its attack script written but NOT applied or run live; not pushed or deployed) | 2026-10-07 | |
 | 5 | Documentation agent | **DONE** (`08fc069`…`530f4cb`; live Cockpit builds `c775c396` 6 entries / 6 stages and `ad49df57` 1 / 1; backfill 26 = 26 rows; live ask SQL-checked; CI `37614606732`) | 2026-10-07 | |
 | 6 | Enforce agent permissions | **DONE** (`58bf776`…`ee08f9d`; 285 package tests + rendered-qa pass on the merged tree; live attack runs `050c3329`, `ed07cfaf`, `cb7739a2`, `7197fa12`, `9a692a2d`, 7 `agent.deny` rows verified by SQL; CI `37609559746` green; cost ceilings set from live traces 2026-10-07: builder $1, QA $0.50, Planner $0.25, Direction $0.15, Hermes $0.10, Intake $0.05) | 2026-10-06 | |
 | 7 | Evaluation registry | **DONE** (`64222b1`…`0e13e30`, merged `c1e511a`; merged tree verification 98, rendered-qa 52 and all packages pass; migration 0017 applied live; CI `37617845669` green; 78-check and 50-point sources missing from the repo, OpenAI evaluator unproven live) | 2026-10-07 | |
