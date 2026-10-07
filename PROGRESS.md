@@ -25,14 +25,12 @@ Track B's live build `c775c396` passed every check except a simulated-LCP measur
 scripts alone (real LCP 0.05-0.72 s), and Track A's last re-run `ad49df57` died on one dropped Agent 37 connection, now retried (`734ded5`);
 M5 blocked on Higgsfield API credit; M6 not started. Step 4C BUILT AND DEPLOYED (signed-in check pending). Steps 8–24 not started.
 Continuation Stages 1–5 MET; Stage 6 = Step 5 (MET except the Cognee write-up, Step 15); Stage 7 waits on Nick. **Biggest blocker**:
-Huraira's decision on the `render.perf` measurement method.
+none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-07).
 
 **Next up**:
-1. **Huraira**: decide how `render.perf` measures LCP. Lighthouse's simulated model puts the Track B starter at ~2.46-2.58 s against a 2.5 s
-   budget purely for the framework scripts, while applied (devtools) throttling and real Chrome show 0.72 s / 0.05 s. Recommended: gate on
-   applied throttling (same 2.5 s budget), keep the simulated figure as an advisory number. Then re-run Track B `4acbde1f`.
-2. **Huraira**: re-run Track A `b5a45a8e` from the Cockpit (the Agent 37 retry fix `734ded5` is on `main`). M4 closes when one live build
-   per track passes; then Step 8 (queue and durable execution).
+1. **Huraira**: re-run Track B `4acbde1f` and Track A `b5a45a8e` from the Cockpit once CI on the `render.perf` change is green (the agent
+   reports it). M4 closes when one live build per track passes and the agent has reviewed the screenshots.
+2. **Agent**: then Step 8 (task/event queue and durable execution).
 3. **Huraira**: launch files in both starters and removing open questions from the Track A page source (yes/no); OpenAI and Higgsfield
    API credit when convenient; rotate the Higgsfield key.
 
@@ -901,8 +899,10 @@ time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`)
       2.5 s budget. Diagnosed 2026-10-07 on the exact built site with the factory's own gzip server: Lighthouse simulated LCP 2.46 s, 1.20 s
       with the scripts removed, unchanged with GSAP removed (the floor is the React + Next runtime, ~140 KB gzipped); real Chrome records LCP
       at 48 ms (one entry, no re-render); Lighthouse with applied (devtools) throttling: 0.72 s with or without the scripts. The simulated
-      (lantern) model charges parallel framework scripts to LCP. Not a content defect: revisions could not fix it. Decision for Huraira:
-      the `render.perf` measurement method (see Next up).
+      (lantern) model charges parallel framework scripts to LCP. Not a content defect: revisions could not fix it.
+- [x] `render.perf` measurement changed (Huraira chose option 1, 2026-10-07): the gate uses Lighthouse with applied (devtools) throttling,
+      same budgets (Track A 2.0 s, Track B 2.5 s); the simulated LCP is recorded on the home page as advisory only; eval registry 1.1.0.
+      The over-budget fixture (60 KB script, heavy hero) still fails LCP under the new method; rendered-qa 52/52, verification 98/98.
 - [ ] Track A job `4d6e1abb` failed before building: "content still invalid after 3 attempts: openQuestions.0 over 300 chars". The plan
       carries 11 open questions, the content schema allowed 10 x 300, the builder merged two. Caps raised to 25 x 800 in both tracks (never
       shown as copy; Track A keeps them as escaped HTML comments), test added, frontend-loop 66/66. Re-run of Track A needed (Huraira).
