@@ -889,7 +889,9 @@ time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`)
 - [ ] Track B job `6f68adbd` (single page, 14 min, 3 cycles): both 2026-10-06 fixes held (builder review approved first time every round;
       no fake social proof). Failed only on the evaluator: the starter's contact form is a fixed studio-enquiry form (organisation, "what
       are you planning", start date), wrong for an email signup, and the builder cannot change form fields, so revisions could not fix it.
-      Needs a configurable form in the Track B starter.
+      Fixed 2026-10-07: the contact section takes `form: "enquiry" | "signup"` (default enquiry; signup = email required, first name
+      optional, no project-brief fields); the builder prompt says when to use which; starter 1.1.0 (also "Studio" -> "Location"). Real
+      isolated build test of both variants; frontend-loop 67/67, workflow 27/27, rendered-qa 40/40. Re-run of Track B needed (Huraira).
 - [ ] Track A job `4d6e1abb` failed before building: "content still invalid after 3 attempts: openQuestions.0 over 300 chars". The plan
       carries 11 open questions, the content schema allowed 10 x 300, the builder merged two. Caps raised to 25 x 800 in both tracks (never
       shown as copy; Track A keeps them as escaped HTML comments), test added, frontend-loop 66/66. Re-run of Track A needed (Huraira).
