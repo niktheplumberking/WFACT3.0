@@ -885,7 +885,10 @@ build; rulebook 1.1.0 says so in DR-FAKE-SOCIAL-PROOF. The synthetic Summit Line
 section is removed; real feedback is open question 3), flagged to Huraira. Claims rules 1.1.0: BC-SUPERLATIVE no longer flags "the best
 time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`); "the best roofer in town" still fails. Tests: frontend-loop
 59/59 (incl. both real isolated Track B builds), verification 39/39, planning 26/26, workflow 19/19, jobs 13/13, rendered-qa 40/40.
-- [ ] Push and re-run Track B `4acbde1f` and Track A `b5a45a8e` live from the Cockpit (Huraira).
+- [x] Pushed (both branches, `4e30947`, CI green) and re-run live from the Cockpit 2026-10-07: Track B job `6f68adbd`, Track A job `4d6e1abb`.
+- [ ] Track A job `4d6e1abb` failed before building: "content still invalid after 3 attempts: openQuestions.0 over 300 chars". The plan
+      carries 11 open questions, the content schema allowed 10 x 300, the builder merged two. Caps raised to 25 x 800 in both tracks (never
+      shown as copy; Track A keeps them as escaped HTML comments), test added, frontend-loop 66/66. Re-run of Track A needed (Huraira).
 - [ ] Screenshot review of the passing live builds at desktop and phone, then `/step-close 4B M4` as DONE.
 
 **M5 groundwork 2026-10-06** (`4bbd4bc`): Huraira chose Higgsfield. `packages/media` wraps Seedance 2.5 text-to-video with the official
