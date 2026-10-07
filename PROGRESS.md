@@ -1,15 +1,11 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-06 (+05), via `/step-close 4B M4` — `8dae180`…`4bbd4bc` (claims gate 1.1.0, single-page and no-invented-testimonial
-builder fixes from Cockpit job `f696ba43`, `packages/media` Seedance groundwork); local tests green, **not pushed, no CI run yet**.
-Step 6 (parallel worktree, approved by Huraira 2026-10-06) merged locally: `58bf776`…`ee08f9d`; merged tree re-tested here.
-Both branches pushed and synced at `8b05a46` 2026-10-07 (Huraira: "push to both branches, keep both synced"); CI `37609559746` green, all
-13 jobs incl. the Cockpit deploy. Step 6 cost ceilings re-set from live `model_traces` 2026-10-07. Step 5 merged 2026-10-07 (PARTIAL);
-Step 7 still running in its worktree.
-Previous sync: 2026-10-02 (20:05 +05), via `/progress-sync` — folds in the push of `a9f4dcf`…`2d96962` to both branches (Huraira's word),
-CI `37016971442` green on `2d96962` (all 13 jobs incl. the new isolated Track B build and the Cockpit deploy), the other session's
-`c857150`…`0f00cde` (artifact-store CDN fix; CI `37019326469` still running at sync), and the live `jobs`/`plan_approvals`/`audit_log`
-rows. `main`, `origin/huraira-work` and local `huraira-work` are all at `0f00cde`.
+Last synced: 2026-10-07 (17:05 +05), via `/progress-sync` — re-synced `1032b23`…`c1b386a` (claims gate 1.1.0, Track B single-page /
+no-invented-testimonial / signup-form fixes, open-question cap, Steps 5 and 6 merged, cost ceilings, `packages/media`). Both branches
+synced at `c1b386a`; CI green on `8b05a46` `37609559746`, `171d57a` `37610747531`, `4e30947` `37611008861`, `c532d5a` `37614145447`, `ed84610`
+`37614606732`; `c1b386a` CI `37615794583` still running at sync. Live: Cockpit HTTP 200 (`/`, `/activity`); no queued or running jobs;
+latest migration applied `0017_model_traces_openai` (20261007114354). Step 7 is merged on a local branch only (`step7-merge`), not here.
+Previous sync: 2026-10-06 via `/step-close 4B M4` (`8dae180`…`4bbd4bc`); 2026-10-02 (20:05 +05) via `/progress-sync` (`a9f4dcf`…`0f00cde`, CI `37016971442`).
 Previous syncs: 2026-10-02 (18:55 +05) via `/step-close 4B M4` (`a9f4dcf`…`7267575`); 2026-10-01 (23:30 +05) via `/progress-sync` (`70cd7d1`…`e76cff2`, Step 4C, CI `36905237284`); 2026-10-01 (19:20 +05)
 after Step 4B M2 (CI `36871379578`); earlier `289ec00`…`c0f3d29`.
 
@@ -23,33 +19,35 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: Continuation Stages 1–5 are built and green in CI. On the Factory Completion Plan, Steps **1, 2, 3 and 3A are done**,
-Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is IN PROGRESS** (M0 6 of 7 inputs, M1, M2, M3 done; **M4 PARTIAL**
-2026-10-02: built, verified locally and in CI `37016971442`; the live Track B build `f696ba43` failed on two factory contradictions,
-fixed 2026-10-06 in `c64bd0e` (not yet re-run live); M5–M6 not started), and
-**Step 5 is PARTIAL** 2026-10-07 (Documentation agent built and merged; live Cockpit run with it pending). **Step 6 is DONE** 2026-10-06 (enforced default-deny permissions, live attack verified; CI `37609559746` green). **Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
-signed-in use on 2026-10-01: plan `b5a45a8e` approved as Track A (audited) and two Track A builds started from the Cockpit; both halted
-on a CDN bug that is now fixed but not yet re-run live. A full room-by-room signed-in check is still Huraira's to confirm.
-**Biggest open items**: push today's fixes and re-run Track A (`b5a45a8e`) and Track B (`4acbde1f`) live, Higgsfield credits and a
-spending cap (M5), a different-vendor screenshot reviewer, Nick's real brief, a real Step 3A sign-up.
+**Status summary**: On the Factory Completion Plan, Steps 1, 2, 3, 3A and **6 are DONE**; Step 4 is PARTIAL (preview superseded by 4B M6);
+**Step 4B is IN PROGRESS** (M1–M3 done, M4 PARTIAL, about 80% through M4: both live re-runs on 2026-10-07 failed on factory defects that
+are now fixed, Track A `4d6e1abb` on the open-question cap, Track B `6f68adbd` only on its fixed enquiry form; M5 blocked on Higgsfield API
+credit; M6 not started); **Step 5 is PARTIAL** (built, merged, CI green, live backfill SQL-checked; no live build with it yet); Step 4C is
+BUILT AND DEPLOYED (signed-in check pending); **Step 7 is built and verified locally, not merged to `huraira-work` yet**; Steps 8–24 not
+started. Continuation Stages 1–5 MET; Stage 6 = Step 5 (PARTIAL); Stage 7 waits on Nick. **Biggest blocker**: none hard; M4 needs one
+passing live build per track.
 
 **Next up**:
-1. **Huraira**: say "push" for `8dae180`…`4bbd4bc`; once CI is green and the runner has the fixes, start a fresh Track B build of plan
-   `4acbde1f` (Harbor Street Bakery, now single-page) and a fresh Track A build of `b5a45a8e` from the Cockpit, and click through Home, a
-   plan, a run and Settings (closes Step 4C's live check). M4 decisions were given 2026-10-06: Harbor Street is the synthetic Track B
-   client, the Track B budgets stand, Motion/Radix stay out of the starter.
-2. **Huraira**: add Higgsfield credits (the live Seedance run returned "Not enough credits"), rotate the key (it was posted in chat), put
-   it in the GitHub secrets, and set a per-build and per-month spending cap; then GO for M5.
-3. **Huraira**: the screenshot reviewer (deferred to after M6, 2026-10-06); Supabase Auth settings and one real sign-up for Step 3A; the
-   old Doppler CLI token check.
+1. **Huraira**: when CI `37615794583` (`c1b386a`) is green, re-run Track B `4acbde1f` and Track A `b5a45a8e` from the Cockpit; this is also
+   Step 5's first live run. Then the agent reviews screenshots and closes M4.
+2. **Agent**: after both runs are dispatched, push the Step 7 merge (`step7-merge`: rendered-qa re-run in progress; the other 10 packages
+   pass, verification 98/98) and close Step 7 in the trackers.
+3. **Huraira**: decide on adding launch files (sitemap, robots.txt, canonical, og:image, 404) to both starters, and on removing open
+   questions from the Track A page source; OpenAI and Higgsfield API credit when convenient; rotate the Higgsfield key.
 
 **Gaps noticed**:
 - **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`
   (the only dead path found in a link check of the 7 main docs this sync).
-- **Two ways in to QA still differ**: `packages/verification`'s old `npm run verify` CLI runs only the original six checks; the M1 gate is
-  in `npm run qa` (rendered-qa), the jobs runner and the workflow CLI.
-- **QA link checker egress is open** (found in Step 6): it fetches any link on a built page, a possible SSRF on the job runner. Candidate
-  for Step 7 or 21.
+- **Two ways in to QA still differ, and the QA link checker egress is open (possible SSRF)**: both fixed in Step 7 (one registry gate for every
+  entry point; confined QA browser, public-only external checks), which is not merged to `huraira-work` yet. Remove this line on merge.
+- **Track A writes the brief's open questions into the home page as HTML comments**: readable by anyone viewing the page source (Step 7 report).
+  Should live in `content.json` only. Awaiting Huraira's yes.
+- **Both starters lack launch files**: no sitemap, robots.txt, canonical, og:image (Track A also no 404 page); Step 7's launch-stage checks
+  fail on them. Needed before any launch; awaiting Huraira's decision on doing it in 4B.
+- **Migration `0017_model_traces_openai` is applied live (20261007114354) but its file is only on `step7-merge`**: trunk and the live schema
+  disagree until Step 7 is merged.
+- **Second-vendor evaluator has never made a successful live call**: OpenAI returns HTTP 429 "no credits remaining" (checked 2026-10-07). Only
+  matters when the builder falls back to Claude; with Agent 37 as builder, Claude stays the evaluator.
 - **Hermes-lite reads `clients/<entitySlug>/memory.md`** (an entity slug used as a client folder name), found in Step 6.
 - **Agent 37 builder calls are unpriced** (`model_traces.cost_usd` null; ~168k input + 25k output tokens per builder run, the biggest
   token user), so no USD ceiling sees them. Needs a price basis or a token ceiling for unpriced providers (Step 12, cost governance).
@@ -127,6 +125,9 @@ spending cap (M5), a different-vendor screenshot reviewer, Nick's real brief, a 
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
+- **A live Higgsfield API key was pasted into the chat (2026-10-06).** Huraira posted `HIGGSFIELD_API_KEY` in the session so it could be stored;
+  the agent stored it in Doppler (`HF_CREDENTIALS`, value never printed, logged or committed; staged diffs scanned before each commit, 0
+  matches). The key is still exposed in the chat transcript: **rotation pending (Huraira)**. No use beyond two refused calls ("Not enough credits").
 - **Step 4B M1 reached `main` and redeployed the Cockpit without a planned push (2026-10-01).** This checkout pushed `huraira-work`
   (17:02:01 +05) and `main` (17:02:03 +05) right after another session's commit `03138d9`; the coding agent's docs commit `eaea97b` landed in
   the gap and went to `main` with it, so `c1345de`, `47cef2c`, `eaea97b` deployed through CI run `36859122425` (all jobs green,
@@ -618,16 +619,17 @@ Huraira's direction; see "Unplanned work done". Design and runbook are in `docs/
       edges: it offers "Resume from last checkpoint" on a failed build that has no checkpoint, and reports
       "0 builder correction rounds" though the evaluator had requested one.
 
-## Stage 6 — Real second brain v1.5: episodic memory tied to task IDs (NOT STARTED)
+## Stage 6 — Real second brain v1.5: episodic memory tied to task IDs (PARTIALLY MET 2026-10-07 — delivered as Factory Completion Plan Step 5)
 
-- [ ] Documentation agent writes a structured entry to `clients/<name>/memory.md` at the end of every
-      workflow stage, tied to the `audit_log` task ID. No `documentation` agent exists in any
-      registry.
-- [ ] Cognee trial: at most one session, then a write-up that states adopt or don't adopt.
+- [x] Documentation agent writes a structured entry to `clients/<name>/memory.md` at the end of every workflow stage, tied to the
+      `audit_log` task ID — `791d67a`, `bba3093`, `e2c7a12`; live backfill 26 entries = 26 `documentation.entry` rows over 8 runs, 0 without a
+      task id (SQL, 2026-10-07); CI `documentation` job green in `37614606732`. Not yet seen on a live Cockpit build (see Step 5 below).
+- [ ] Cognee trial: at most one session, then a write-up that states adopt or don't adopt. Not done; it is Factory Completion Plan Step 15.
 
-**Acceptance** (not met): *"A test query ('what happened on client X's build') returns a correct
-answer sourced from the structured memory file, written by the Documentation agent, not by a human"*,
-plus the Cognee write-up exists.
+**Acceptance**: *"A test query ('what happened on client X's build') returns a correct answer sourced from the structured memory file,
+written by the Documentation agent, not by a human"*, plus the Cognee write-up exists. — **PARTIALLY MET**: the Step 5 agent's live
+`npm run ask` on Summit Line answered from the agent-written entries and every fact matched SQL ($0.0278; the agent's evidence, not re-run at
+this sync); the Cognee write-up does not exist.
 
 ## Stage 7 — A real pilot, not a placeholder one (NOT STARTED — waiting on Nick; provisional stand-ins in use since 2026-09-30)
 

@@ -10,11 +10,11 @@ to a Continuation Stage, that is noted.
 **Revised 2026-10-01**: added **Step 4B** (front-end upgrade: two build tracks, chosen per client) and **Step 4C** (Cockpit UI/UX
 redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
-**Status as of 2026-10-06**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
+**Status as of 2026-10-07**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
 Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done, M4 PARTIAL: built and verified in CI `37016971442`; live Track B
 build `f696ba43` failed on page count and invented testimonials, fixed in `c64bd0e`, not yet re-run; M5 groundwork `4bbd4bc`, live run
 blocked on Higgsfield credits; M6 not started); Step 4C is **BUILT AND DEPLOYED** (`main` `fb08be3`, live signed-in check pending);
-Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **PARTIAL** (merged 2026-10-07; live run with the agent pending); Step 7 is running in a parallel worktree (GO 2026-10-07); Steps 8–24 are not started. Each step heading below carries its
+Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **PARTIAL** (merged 2026-10-07; live run with the agent pending); Step 7 is built and verified locally (parallel worktree, GO 2026-10-07), not yet merged to `huraira-work`; Steps 8–24 are not started. Each step heading below carries its
 status; Part E is the checklist.
 
 ## How to use this file
