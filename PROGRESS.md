@@ -904,6 +904,12 @@ time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`)
       section with id testimonials": the plan requires a testimonials section, the brief has no quotes and the builder may not invent them.
       Fixed: a required customer-words section (testimonials, reviews, social proof) may be left out only with an open question asking the
       client for real feedback; any other required section still must exist; both tracks, builder prompts updated; frontend-loop 72/72.
+- [ ] Third re-run, Track B job `c7fba41a` (15 min, 3 cycles): all 44 registry checks passed in the final cycle, the new `render.perf`
+      included (only advisory warnings `seo.open-graph`, `tells.favicon`); failed only at the evaluator on three points that contradict the
+      factory's own rules: the honestly disclosed unconnected form, and the missing opening date and address, which the brief never gave.
+      Fixed: the evaluator rubric states the honesty rules (no invented facts, forms unconnected before launch, no quotes without the brief)
+      and now sees the brief's facts; a goal that needs facts the brief lacks is approved with a recorded "NEEDS CLIENT INPUT" note;
+      verification 99/99.
 - [x] `render.perf` measurement changed (Huraira chose option 1, 2026-10-07): the gate uses Lighthouse with applied (devtools) throttling,
       same budgets (Track A 2.0 s, Track B 2.5 s); the simulated LCP is recorded on the home page as advisory only; eval registry 1.1.0.
       The over-budget fixture (60 KB script, heavy hero) still fails LCP under the new method; rendered-qa 52/52, verification 98/98.
