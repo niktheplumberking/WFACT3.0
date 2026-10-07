@@ -890,6 +890,11 @@ time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`)
       Fixed 2026-10-07: the contact section takes `form: "enquiry" | "signup"` (default enquiry; signup = email required, first name
       optional, no project-brief fields); the builder prompt says when to use which; starter 1.1.0 (also "Studio" -> "Location"). Real
       isolated build test of both variants; frontend-loop 67/67, workflow 27/27, rendered-qa 40/40. Re-run of Track B needed (Huraira).
+- [ ] Second re-run 2026-10-07 (both on `026fd29`, CI `37616985541` green): Track A job `ad49df57` failed in 3.5 min, "builder escalated after 1
+      attempt: fetch failed": one dropped connection to Agent 37 (25 ms, `model_traces` 12:02:03Z) ended the build because the builder client
+      had no retry. Fixed: `Agent37ModelClient` retries no-response / HTTP 5xx / 429 after 5, 15, 45 s (4 attempts), then escalates; 4xx and
+      unusable answers are not retried; 3 tests, frontend-loop 70/70. Step 5 proven live on the same run: the Documentation agent wrote entry
+      `ep-7fc49965fcf0d73c` for the halted build stage (`documentation.entry`, 12:02:04Z). Track B job `c775c396` still running at this note.
 - [ ] Track A job `4d6e1abb` failed before building: "content still invalid after 3 attempts: openQuestions.0 over 300 chars". The plan
       carries 11 open questions, the content schema allowed 10 x 300, the builder merged two. Caps raised to 25 x 800 in both tracks (never
       shown as copy; Track A keeps them as escaped HTML comments), test added, frontend-loop 66/66. Re-run of Track A needed (Huraira).
@@ -1001,8 +1006,8 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 5 (Continuation Sta
 - [x] Wired into the build-and-verify CLI and the Cockpit jobs runner; each entry also stored as a `documentation.entry` row (runner disks
       are lost), `npm run document` writes them into the file and backfills; CI job `documentation` — `e2c7a12`
 - [x] Live backfill: 26 entries in `clients/summit-line-roofing/memory.md` over 8 runs — `530f4cb`
-- [ ] A live Cockpit build with the agent attached (the next Cockpit build after this merge is deployed exercises it)
-- [ ] CI `documentation` job green on `main`
+- [x] A live Cockpit build with the agent attached: Cockpit job `ad49df57` (2026-10-07) — entry `ep-7fc49965fcf0d73c` appended for its halted build stage, `documentation.entry` row 12:02:04Z, `agent.complete` (allowed 7, denied 0)
+- [x] CI `documentation` job green on `main` — CI `37614606732` (`ed84610`) and every push since
 
 **Verification** (independent of the building agent)
 - [x] Merged tree: every package typechecks and passes — documentation 18, hermes 48, workflow 27, jobs 17 and the rest unchanged
