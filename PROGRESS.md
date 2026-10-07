@@ -910,6 +910,9 @@ time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`)
       Fixed: the evaluator rubric states the honesty rules (no invented facts, forms unconnected before launch, no quotes without the brief)
       and now sees the brief's facts; a goal that needs facts the brief lacks is approved with a recorded "NEEDS CLIENT INPUT" note;
       verification 99/99.
+- [x] Offline dry run of the Track A content stage with the real models on plan `b5a45a8e`'s exact brief (before spending another live
+      build): the builder's own content reviewer still demanded the waived testimonials section (3 rejections, would have failed live).
+      Fixed in the brief summary both models read and in both reviewer prompts; re-run: approved first round, 5 pages, 125 s.
 - [x] `render.perf` measurement changed (Huraira chose option 1, 2026-10-07): the gate uses Lighthouse with applied (devtools) throttling,
       same budgets (Track A 2.0 s, Track B 2.5 s); the simulated LCP is recorded on the home page as advisory only; eval registry 1.1.0.
       The over-budget fixture (60 KB script, heavy hero) still fails LCP under the new method; rendered-qa 52/52, verification 98/98.
