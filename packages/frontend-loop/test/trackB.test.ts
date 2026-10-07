@@ -208,3 +208,11 @@ test("a single landing page brief gets exactly one page (job f696ba43 spent two 
   assert.match(validateSiteContent(c, brief).errors.join("\n"), /1 page\(s\); a multi-page site has 3 to 7/);
   assert.match(trackBSystemPrompt("single"), /SINGLE landing page/);
 });
+
+test("open questions: 11 of them, one long, are still valid content (Cockpit job 4d6e1abb failed on a 10 x 300 cap)", () => {
+  const c = fixture();
+  c.openQuestions = Array.from({ length: 11 }, (_, i) => (i === 0 ? "Which booking method is real? ".repeat(15).trim() : `Open question ${i + 1}?`));
+  assert.ok(c.openQuestions[0]!.length > 300);
+  assert.deepEqual(validateSiteContent(c, brief).errors, []);
+});
+

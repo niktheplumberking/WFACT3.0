@@ -122,7 +122,9 @@ export const SiteContentSchema = z.object({
   /** 1 page for a single landing page (brief.pageScope "single"), otherwise 3-7; checked in validateSiteContent. */
   pages: z.array(PageSchema).min(1).max(7),
   /** Questions the brief left open. Kept in content.json for a human, never shown as copy. */
-  openQuestions: z.array(Text(300)).max(10).default([]),
+  // Never shown as copy, so the caps only stop runaway output. They were 10 x 300 chars until Cockpit job 4d6e1abb (2026-10-07):
+  // the Planner hands over 11+ open questions, the builder merged two to fit 10, and the merged one broke 300 chars three times.
+  openQuestions: z.array(Text(800)).max(25).default([]),
 });
 export type SiteContent = z.infer<typeof SiteContentSchema>;
 
