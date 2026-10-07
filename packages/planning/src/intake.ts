@@ -25,7 +25,7 @@ export const INTAKE_DEFINITION: AgentDefinition = {
   description: "Turns a raw lead/request into structured intake facts: entity, lead type, client, goal (Blueprint §5 Task intake).",
   skillset: ["lead-classification", "entity-assignment", "fact-extraction"],
   // Step 6: one model slot, nothing else. Its input is raw client text, so it is screened for injection (audit-only).
-  permissionScope: defineScope({ models: ["intake"], maxCostUsdPerRun: 0.5, scanInputForInjection: true }),
+  permissionScope: defineScope({ models: ["intake"], maxCostUsdPerRun: 0.05 /* Haiku; worst real run $0.003 incl. its one re-classification, model_traces 2026-10-06 */, scanInputForInjection: true }),
   modelSlots: ["intake"],
 };
 

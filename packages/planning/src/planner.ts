@@ -31,7 +31,8 @@ export const PLANNER_DEFINITION: AgentDefinition = {
   permissionScope: defineScope({
     models: ["planner"],
     db: [{ table: "plan_approvals", ops: ["insert", "update"] }],
-    maxCostUsdPerRun: 1,
+    // Worst real planner run $0.041 (model_traces 2026-10-06), and the planner retries once; ~6x headroom.
+    maxCostUsdPerRun: 0.25,
     scanInputForInjection: true,
   }),
   modelSlots: ["planner"],

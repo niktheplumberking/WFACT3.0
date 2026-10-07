@@ -30,7 +30,7 @@ export const DIRECTION_DEFINITION: AgentDefinition = {
     "Reads the raw request and states niche, audience, conversion goal, requirements and brand direction (each quoted), and recommends a build track for the owner to confirm (Step 4B).",
   skillset: ["niche-classification", "brand-direction", "track-recommendation"],
   // Step 6: one model slot. It reads the raw request text, so its input is screened for injection (audit-only).
-  permissionScope: defineScope({ models: ["direction"], maxCostUsdPerRun: 1, scanInputForInjection: true }),
+  permissionScope: defineScope({ models: ["direction"], maxCostUsdPerRun: 0.15 /* worst real run $0.025, model_traces 2026-10-06 */, scanInputForInjection: true }),
   modelSlots: ["direction"],
 };
 

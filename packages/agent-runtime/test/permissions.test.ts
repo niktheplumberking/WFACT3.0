@@ -210,7 +210,7 @@ test("a denial writes agent.deny (role, capability, task id, reason) and throws;
   assert.equal(row.payload?.capability, "fs:write:clients/summit-line-roofing/pages/x.html");
   assert.match(String(row.payload?.reason), /not the client this run is bound to/);
   assert.equal(row.payload?.policyVersion, PERMISSION_POLICY_VERSION);
-  assert.deepEqual(gate.summary(), { policyVersion: PERMISSION_POLICY_VERSION, allowed: 1, denied: 1, spentUsd: 0, maxCostUsdPerRun: 5 });
+  assert.deepEqual(gate.summary(), { policyVersion: PERMISSION_POLICY_VERSION, allowed: 1, denied: 1, spentUsd: 0, maxCostUsdPerRun: 1 });
 });
 
 test("fail closed: if the agent.deny row cannot be written, the audit failure is what surfaces", async () => {

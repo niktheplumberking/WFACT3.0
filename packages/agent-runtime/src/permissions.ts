@@ -488,6 +488,6 @@ export const HERMES_LITE_SCOPE: AgentScope = defineScope({
   db: [{ table: "projects", ops: ["select"] }],
   fsRead: ["memory/context.md", "clients/*/memory.md"],
   tools: ["memory.readContext", "memory.readClient", "state.projectStatus"],
-  maxCostUsdPerRun: 0.5,
+  maxCostUsdPerRun: 0.1, // worst real Hermes-lite answer $0.016 (model_traces 2026-10-06); covers its 3 retries
   crossEntity: true,
 });

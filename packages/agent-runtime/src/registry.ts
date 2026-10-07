@@ -89,7 +89,9 @@ export const SEED_AGENT_DEFINITIONS: AgentDefinition[] = [
       models: ["builder", "evaluator"],
       fsWrite: ["clients/{client}/pages/*", "clients/{client}/sites/**"],
       tools: ["build.trackBIsolated"],
-      maxCostUsdPerRun: 5,
+      // Worst real builder run (Claude, all rounds) $0.137 in model_traces 2026-10-06; ~7x headroom for every correction round.
+      // Agent 37 calls are unpriced (null cost) and are NOT counted here; see PROGRESS.md gaps.
+      maxCostUsdPerRun: 1,
     }),
     modelSlots: ["builder", "evaluator"],
   },
@@ -106,7 +108,8 @@ export const SEED_AGENT_DEFINITIONS: AgentDefinition[] = [
       db: [{ table: "audit_log", ops: ["insert"] }],
       fsRead: ["clients/{client}/pages/*", "clients/{client}/sites/**", "clients/{client}/brief.json"],
       tools: ["qa.renderedBrowser"],
-      maxCostUsdPerRun: 2,
+      // Worst real QA evaluator run $0.066 (model_traces 2026-10-06); ~7x headroom.
+      maxCostUsdPerRun: 0.5,
     }),
     modelSlots: ["evaluator", "reviewer"],
   },
