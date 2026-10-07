@@ -14,7 +14,7 @@
  */
 import type { ModelClient } from "./modelClient.js";
 import type { PageTemplate } from "./templates.js";
-import type { PilotBrief } from "./brief.js";
+import { ownerFactLines, type PilotBrief } from "./brief.js";
 import { rulebookPromptText } from "./rulebook.js";
 
 export interface CorrectionRound {
@@ -172,6 +172,7 @@ export class FrontendLoop {
       `Project: ${brief.projectName} (client: ${brief.clientSlug}, entity: ${brief.entitySlug})`,
       `Goal: ${brief.goal}`,
       `Brand notes: ${brief.brandNotes}`,
+      ...ownerFactLines(brief).map((l) => `Owner-confirmed fact: ${l}`),
       `Template: ${template.name} — ${template.description}`,
       `Style guidance: ${template.styleGuidance}`,
       `Required sections (must all be present, identifiable by id or heading): ${[
@@ -204,6 +205,7 @@ export class FrontendLoop {
     const user = [
       `Brief goal: ${brief.goal}`,
       `Brand notes: ${brief.brandNotes}`,
+      ...ownerFactLines(brief).map((l) => `Owner-confirmed fact: ${l}`),
       `Required sections: ${requiredSections.join(", ")}`,
       "",
       "--- HTML to review ---",

@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { createFake, fixtures, JOB_FAILED, JOB_STUCK, OWNER_ID, PLAN_APPROVED, PLAN_PENDING, RUN_FAILED } from "./test/fake";
+import { createFake, fixtures, JOB_FAILED, JOB_STUCK, JOB_VERIFIED, OWNER_ID, PLAN_APPROVED, PLAN_PENDING, RUN_FAILED } from "./test/fake";
 import type { Role } from "./lib/model";
 
 const h = vi.hoisted(() => ({ fake: null as unknown as ReturnType<typeof import("./test/fake").createFake> }));
@@ -152,13 +152,89 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(screen.queryByRole("button", { name: "Archive" })).not.toBeInTheDocument();
   });
 
-  it("open a run and see why it failed, then resume", async () => {
-    const t = start(`/activity/${JOB_FAILED}`);
+  it("a failed run that a later build already fixed explains itself and offers no button to carry on", async () => {
+    start(`/activity/${JOB_FAILED}`);
     expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: the site builder is out of credits" }, T)).toBeInTheDocument();
-    expect(screen.getByText(/Topping up Agent 37 is a money decision/)).toBeInTheDocument();
     expect(screen.getByText(/A later build of the same plan passed every check/)).toBeInTheDocument();
-    await t.click(screen.getByRole("button", { name: "Resume build" }));
-    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "resume", params: { workflowRunId: RUN_FAILED } }) }));
+    expect(screen.queryByRole("button", { name: /continue/i })).toBeNull();
+  });
+
+  it("a stopped build: plain reason, what is saved, ONE button that carries on from the saved step (reopens the run)", async () => {
+    const fx = fixtures();
+    fx.jobs = fx.jobs.filter((j) => j.id !== JOB_VERIFIED);
+    const t = start(`/activity/${JOB_FAILED}`, "owner", fx);
+    expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: the site builder is out of credits" }, T)).toBeInTheDocument();
+    expect(screen.getByText(/Adding credits to Agent 37 is a spending decision/)).toBeInTheDocument();
+    expect(screen.getByText(/Nothing was saved before it stopped/)).toBeInTheDocument();
+    await t.click(screen.getByRole("button", { name: "I've added credits, continue" }));
+    expect(t.calls()).toContainEqual(
+      expect.objectContaining({
+        op: "insert",
+        table: "jobs",
+        values: expect.objectContaining({ kind: "resume", params: expect.objectContaining({ workflowRunId: RUN_FAILED, planId: PLAN_APPROVED, reopen: true }) }),
+      }),
+    );
+  });
+
+  it("a build that needs details: asks in plain fields, saves them to the plan, then continues the build", async () => {
+    const fx = fixtures();
+    fx.jobs = fx.jobs.filter((j) => j.id !== JOB_VERIFIED).map((j) =>
+      j.id === JOB_FAILED
+        ? {
+            ...j,
+            error: "QA still failing after 2 revision(s) — escalating to a human rather than retrying forever",
+            result: { status: "failed_verification", planId: PLAN_APPROVED, workflowRunId: RUN_FAILED, cycles: 3, builderRounds: [], qaIssues: ["[claims.unsourced-fact] The phone number 0400 111 222 on contact.html has no source in the brief."], lastCheckpoint: { path: "clients/x/sites/track-a/site.manifest.json", stage: "build", cycle: 2 } },
+          }
+        : j,
+    );
+    const t = start(`/activity/${JOB_FAILED}`, "owner", fx);
+    expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: it needs a few details" }, T)).toBeInTheDocument();
+    expect(screen.getByText(/The site it had built is saved/)).toBeInTheDocument();
+    // Pressing with nothing filled in is refused, nothing is saved.
+    await t.click(await screen.findByRole("button", { name: "Save the details and continue" }, T));
+    expect(screen.getByText(/Fill in at least one detail/)).toBeInTheDocument();
+    expect(t.calls().some((c) => c.op === "insert")).toBe(false);
+    // A password or key is refused before storage.
+    await t.user.type(screen.getByLabelText("Business phone number"), "password: hunter2hunter2");
+    await t.click(screen.getByRole("button", { name: "Save the details and continue" }));
+    expect(await screen.findByText(/looks like a password or key/)).toBeInTheDocument();
+    expect(t.calls().some((c) => c.op === "insert")).toBe(false);
+    // The real value is saved, then the build continues.
+    await t.user.clear(screen.getByLabelText("Business phone number"));
+    await t.user.type(screen.getByLabelText("Business phone number"), "0400 111 222");
+    await t.click(screen.getByRole("button", { name: "Save the details and continue" }));
+    const inserts = t.calls().filter((c) => c.op === "insert");
+    expect(inserts[0]).toEqual(expect.objectContaining({ table: "plan_inputs", values: [expect.objectContaining({ plan_id: PLAN_APPROVED, key: "phone", value: "0400 111 222", waived: false })] }));
+    expect(inserts[1]).toEqual(expect.objectContaining({ table: "jobs", values: expect.objectContaining({ kind: "resume", params: expect.objectContaining({ workflowRunId: RUN_FAILED, reopen: true }) }) }));
+  });
+
+  it("a problem only Huraira can fix leads with a report, not a retry", async () => {
+    const fx = fixtures();
+    fx.jobs = fx.jobs.filter((j) => j.id !== JOB_VERIFIED).map((j) =>
+      j.id === JOB_FAILED
+        ? { ...j, error: 'builder escalated: permission denied for role "front-end-builder": fs:write:clients/x/y.html (not in scope)', result: { status: "build_failed", planId: PLAN_APPROVED, workflowRunId: RUN_FAILED, qaIssues: [] } }
+        : j,
+    );
+    start(`/activity/${JOB_FAILED}`, "owner", fx);
+    expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: the factory hit a problem of its own" }, T)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Copy a report for Huraira" })).toBeInTheDocument();
+    expect(screen.getByText(/Huraira does: it is a problem inside the factory/)).toBeInTheDocument();
+  });
+
+  it("two admins pressing continue: the database's 'already in progress' becomes a plain sentence, nothing is duplicated", async () => {
+    const fx = fixtures();
+    fx.jobs = fx.jobs.filter((j) => j.id !== JOB_VERIFIED);
+    const t = start(`/activity/${JOB_FAILED}`, "owner", fx);
+    const realFrom = h.fake.client.from;
+    h.fake.client.from = ((table: string) => {
+      const q = realFrom(table) as unknown as Record<string, unknown>;
+      if (table === "jobs") {
+        q.insert = () => ({ select: () => ({ single: () => Promise.resolve({ data: null, error: { message: "jobs: a build for this plan is already in progress" } }) }) });
+      }
+      return q;
+    }) as typeof realFrom;
+    await t.click(await screen.findByRole("button", { name: "I've added credits, continue" }, T));
+    expect(await screen.findByText(/This build is already running/)).toBeInTheDocument();
   });
 
   it("approve an account request with a role (2 clicks and a role choice)", async () => {

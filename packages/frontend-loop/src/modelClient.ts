@@ -94,6 +94,8 @@ export class ClaudeModelClient implements ModelClient {
  * Transient = no response (network error), HTTP 5xx or 429. Anything else (4xx, an unusable answer) is not retried here.
  */
 export const AGENT37_RETRY_DELAYS_MS = [5_000, 15_000, 45_000];
+/** One call that takes longer than this is treated as no answer (and retried like one). Without it a hung gateway ran to the 30-minute job limit. */
+export const AGENT37_REQUEST_TIMEOUT_MS = 6 * 60_000;
 
 class TransientGatewayError extends Error {}
 
@@ -102,6 +104,7 @@ export class Agent37ModelClient implements ModelClient {
   private readonly baseUrl: string;
   private readonly apiKey: string;
   private readonly retryDelaysMs: number[];
+  private readonly timeoutMs: number;
   private readonly fetchImpl: typeof fetch;
   private readonly sleep: (ms: number) => Promise<void>;
   public totalUsage = { promptTokens: 0, completionTokens: 0 };
@@ -111,8 +114,9 @@ export class Agent37ModelClient implements ModelClient {
   constructor(
     baseUrl: string,
     apiKey: string,
-    opts: { retryDelaysMs?: number[]; fetchImpl?: typeof fetch; sleep?: (ms: number) => Promise<void> } = {},
+    opts: { retryDelaysMs?: number[]; fetchImpl?: typeof fetch; sleep?: (ms: number) => Promise<void>; timeoutMs?: number } = {},
   ) {
+    this.timeoutMs = opts.timeoutMs ?? AGENT37_REQUEST_TIMEOUT_MS;
     this.baseUrl = baseUrl.replace(/\/+$/, "");
     this.apiKey = apiKey;
     this.retryDelaysMs = opts.retryDelaysMs ?? AGENT37_RETRY_DELAYS_MS;
@@ -146,6 +150,7 @@ export class Agent37ModelClient implements ModelClient {
           Authorization: `Bearer ${this.apiKey}`,
           "Content-Type": "application/json",
         },
+        signal: AbortSignal.timeout(this.timeoutMs),
         body: JSON.stringify({
           model: "hermes-agent",
           messages: [

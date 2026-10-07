@@ -38,7 +38,7 @@ import {
 } from "@wfact/agent-runtime";
 import type { FrontendBuildInput } from "@wfact/frontend-loop/agent";
 import type { FrontendLoopResult } from "@wfact/frontend-loop/loop";
-import type { PilotBrief } from "@wfact/frontend-loop/brief";
+import { briefFactSources, type PilotBrief } from "@wfact/frontend-loop/brief";
 import type { QaInput } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
 
@@ -331,6 +331,11 @@ export interface WorkflowDeps {
   maxQaRevisions?: number;
   /** Step 5: told about the end of every stage (the Documentation agent). Optional so older callers are unchanged. */
   stageObserver?: StageObserver;
+  /**
+   * Step 4D: told the run id the moment a new run starts, before any model is paid. The job runner uses it to link the
+   * Cockpit job to the run, so a job that the runner never got to finish (GitHub timeout, crash) can still be continued.
+   */
+  onRunStart?: (runId: string) => Promise<void>;
 }
 
 export type WorkflowStatus =
@@ -361,6 +366,8 @@ export interface WorkflowResult {
   builderRounds: FrontendLoopResult["rounds"];
   /** Step 5: stages the observer could not document (each also a `workflow.documentation_escalated` row). */
   documentationEscalations?: { stage: "build" | "qa"; cycle: number; reason: string }[];
+  /** Step 4D: what the evaluator says the client still has to supply ("NEEDS CLIENT INPUT" notes on an approval). */
+  needsFromClient?: string[];
 }
 
 interface CheckpointState {
@@ -405,6 +412,12 @@ class Workflow {
   private builderRounds: FrontendLoopResult["rounds"] = [];
   private readonly documentationEscalations: NonNullable<WorkflowResult["documentationEscalations"]> = [];
   templateSections: string[] = [];
+  /**
+   * Step 4D: the cycle a reopened run restarts counting revisions from. A run that was reopened by a person gets a fresh
+   * revision budget (maxRevisions more rounds), otherwise a run halted at its cap would halt again on the first failed check.
+   */
+  cycleBase = 0;
+  private clientNeeds: string[] = [];
 
   constructor(
     private readonly deps: WorkflowDeps,
@@ -433,6 +446,7 @@ class Workflow {
       qaFailure,
       builderRounds: this.builderRounds,
       ...(this.deps.stageObserver ? { documentationEscalations: [...this.documentationEscalations] } : {}),
+      ...(this.clientNeeds.length > 0 ? { needsFromClient: [...this.clientNeeds] } : {}),
     };
   }
 
@@ -541,7 +555,13 @@ class Workflow {
         template: this.deps.frontEndAgent.parseInput({ brief: this.brief }).template.id,
       },
     });
-    const built = await this.build(0, undefined);
+    await this.deps.onRunStart?.(this.runId);
+    return this.buildFrom(0, null);
+  }
+
+  /** Build (cycle `cycle`) and then verify. `prior` is the last checkpoint when a reopened run builds again, kept on a halt. */
+  async buildFrom(cycle: number, prior: CheckpointState | null): Promise<WorkflowResult> {
+    const built = await this.build(cycle, undefined, prior);
     if ("halted" in built) return built.halted;
     return this.verifyLoop(built.cp);
   }
@@ -550,6 +570,7 @@ class Workflow {
   private async build(
     cycle: number,
     revision: { html: string; issues: string[]; contentJson?: string } | undefined,
+    prior: CheckpointState | null = null,
   ): Promise<{ cp: CheckpointState } | { halted: WorkflowResult }> {
     const buildTaskId = randomUUID();
     const run: AgentRun<FrontendLoopResult> = await runAgent(
@@ -566,7 +587,7 @@ class Workflow {
     );
     if (run.output) this.builderRounds = [...this.builderRounds, ...run.output.rounds];
     if (run.status !== "completed" || !run.output?.finalHtml) {
-      const halted = await this.halt("build_failed", "build", cycle, null, `builder ${run.status}: ${run.reason ?? "no page produced"}`);
+      const halted = await this.halt("build_failed", "build", cycle, prior, `builder ${run.status}: ${run.reason ?? "no page produced"}`);
       await this.stageEnded("build", cycle, buildTaskId, "build_failed");
       return { halted };
     }
@@ -579,7 +600,7 @@ class Workflow {
         : await writer.write(`clients/${run.output.brief.clientSlug}/pages/${run.output.template.id}.html`, run.output.finalHtml);
     } catch (err) {
       if (err instanceof PermissionDeniedError) {
-        const halted = await this.halt("build_failed", "build", cycle, null, err.message);
+        const halted = await this.halt("build_failed", "build", cycle, prior, err.message);
         await this.stageEnded("build", cycle, buildTaskId, "build_failed");
         return { halted };
       }
@@ -629,7 +650,7 @@ class Workflow {
             otherClientSlugs: this.deps.knownClientSlugs.filter((s) => s !== this.brief.clientSlug),
             goal: this.brief.goal,
             // Step 4B M1 claims gate: the approved brief is the only place a page fact may come from.
-            factSources: [this.brief.goal, this.brief.brandNotes],
+            factSources: briefFactSources(this.brief),
             ...(site ? { site: { files: site.files, pages: site.pages, ...(site.binary ? { binary: site.binary } : {}) } } : {}),
           },
         },
@@ -643,6 +664,7 @@ class Workflow {
       const verdict = qaRun.output;
 
       if (verdict.status === "approved") {
+        this.clientNeeds = (verdict.evaluator?.notes ?? []).filter((n) => /NEEDS CLIENT INPUT/i.test(n)).map((n) => n.replace(/^.*?NEEDS CLIENT INPUT:?\s*/i, "").trim()).filter(Boolean);
         const verified: CheckpointState = { ...cp, stage: "verified" };
         await this.checkpoint(verified);
         await recordAudit(this.ctx, {
@@ -672,7 +694,7 @@ class Workflow {
         failedChecks: verdict.checkResults.filter((c) => !c.passed && !c.advisory).map(({ checkId, details }) => ({ checkId, details })),
         evaluatorIssues: verdict.evaluator?.issues ?? [],
       };
-      if (cp.cycle >= this.maxRevisions) {
+      if (cp.cycle - this.cycleBase >= this.maxRevisions) {
         const halted = await this.halt(
           "failed_verification",
           "qa",
@@ -692,11 +714,25 @@ class Workflow {
         payload: { workflow: WORKFLOW_ID, cycle: cp.cycle, issues, qaStatus: verdict.status },
       });
       await this.stageEnded("qa", cp.cycle, qaTaskId, "returned_to_builder");
-      const rebuilt = await this.build(cp.cycle + 1, site ? { html, issues, contentJson: site.contentJson } : { html, issues });
+      const rebuilt = await this.build(cp.cycle + 1, site ? { html, issues, contentJson: site.contentJson } : { html, issues }, cp);
       if ("halted" in rebuilt) return rebuilt.halted;
       cp = rebuilt.cp;
     }
   }
+}
+
+/**
+ * An exception that escaped a run that had already started keeps its own type; the run id is attached to it, so the
+ * job runner can record it and the Cockpit can offer to continue the run instead of losing it (Step 4D).
+ */
+const RUN_ID = Symbol.for("wfact.workflowRunId");
+function tagRunId(err: unknown, runId: string): unknown {
+  if (typeof err === "object" && err !== null) (err as Record<symbol, unknown>)[RUN_ID] = runId;
+  return err;
+}
+export function runIdOfError(err: unknown): string | null {
+  const v = typeof err === "object" && err !== null ? (err as Record<symbol, unknown>)[RUN_ID] : null;
+  return typeof v === "string" ? v : null;
 }
 
 /**
@@ -707,7 +743,11 @@ export async function buildAndVerify(rawBrief: unknown, deps: WorkflowDeps): Pro
   // Validate the brief exactly the way the builder will, before writing a single row.
   const brief = deps.frontEndAgent.parseInput({ brief: rawBrief }).brief;
   const wf = new Workflow(deps, randomUUID(), randomUUID(), brief);
-  return wf.start();
+  try {
+    return await wf.start();
+  } catch (err) {
+    throw tagRunId(err, wf.runId);
+  }
 }
 
 /** The builder template a run recorded at start ("track-a", "clean-agency", ...), or null for older runs. */
@@ -719,17 +759,63 @@ export async function recordedBuilderTemplate(runId: string, reader: AuditReader
 }
 
 /**
- * Crash recovery: continue a run from its last durable checkpoint. Never re-runs a build that has a
- * checkpoint; never trusts an artifact whose hash changed; never re-opens a run that already ended.
+ * Step 4D: a person asked to continue a run that had stopped. Only a person can do this (the job that carries it was
+ * requested by a signed-in owner/admin), and it is recorded as a `workflow.reopen` row so the run's history stays honest.
  */
-export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps): Promise<WorkflowResult> {
+export interface ReopenRequest {
+  /** Why, in the owner's terms ("fix and continue", "details added", "tried again after a top-up", "automatic retry: reviewer was unreachable"). */
+  reason: string;
+  /** The user id, or "auto" for the bounded automatic retry. */
+  by: string;
+  /** The brief to continue with, e.g. the approved brief plus the facts the owner added. Absent: the run keeps the brief it has. */
+  brief?: unknown;
+}
+
+/** Where a run stands, from its audit rows: what is saved, how many times it was reopened, whether it ended. */
+export interface RunProgress {
+  /** `none`: no checkpoint (nothing saved); `built`: a built site is saved; `verified`: it passed and awaits the launch decision. */
+  saved: "none" | "built" | "verified";
+  /** Cycle of the last saved checkpoint, or null. */
+  savedCycle: number | null;
+  reopens: number;
+  /** `running` = no ending row since the last start/reopen; `halted` = stopped (see haltStatus); `gate` = verified. */
+  state: "running" | "halted" | "gate";
+  haltStatus: WorkflowStatus | null;
+}
+
+export function runProgress(rows: AuditRecord[]): RunProgress {
+  const wf = rows.filter((r) => r.actor === `workflow:${WORKFLOW_ID}`);
+  const lastReopen = wf.map((r) => r.action).lastIndexOf("workflow.reopen");
+  const epoch = lastReopen >= 0 ? wf.slice(lastReopen + 1) : wf;
+  const end = epoch.find((r) => r.action === "workflow.halt" || r.action === "workflow.gate");
+  const cps = wf.filter((r) => r.action === "workflow.checkpoint");
+  const last = cps.at(-1);
+  return {
+    saved: !last ? "none" : last.payload?.stage === "verified" ? "verified" : "built",
+    savedCycle: last ? Number(last.payload?.cycle) : null,
+    reopens: wf.filter((r) => r.action === "workflow.reopen").length,
+    state: !end ? "running" : end.action === "workflow.gate" ? "gate" : "halted",
+    haltStatus: end?.action === "workflow.halt" ? ((end.payload?.status as WorkflowStatus | undefined) ?? null) : null,
+  };
+}
+
+/**
+ * Crash recovery: continue a run from its last durable checkpoint. Never re-runs a build that has a
+ * checkpoint; never trusts an artifact whose hash changed; never re-opens a run that already ended
+ * UNLESS a person asked for it (`opts.reopen`, Step 4D) and the run stopped for a reason a person can
+ * address. A run that reached the launch gate is never reopened, and one whose saved site no longer
+ * matches its hash (`checkpoint_corrupt`) cannot be: it needs a fresh build.
+ */
+export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps, opts: { reopen?: ReopenRequest } = {}): Promise<WorkflowResult> {
   const rows: AuditRecord[] = await deps.reader.listByRun(runId);
   const workflowRows = rows.filter((r) => r.actor === `workflow:${WORKFLOW_ID}`);
   const start = workflowRows.find((r) => r.action === "workflow.start");
   if (!start || !start.taskId) {
     throw new Error(`no ${WORKFLOW_ID} run found for run_id ${runId}`);
   }
-  const parsed = deps.frontEndAgent.parseInput({ brief: start.payload?.brief });
+  // The brief a reopened run continues with is the newest one a person supplied; otherwise the one it started with.
+  const lastBriefReopen = [...workflowRows].reverse().find((r) => r.action === "workflow.reopen" && r.payload?.brief !== undefined);
+  const parsed = deps.frontEndAgent.parseInput({ brief: opts.reopen?.brief ?? lastBriefReopen?.payload?.brief ?? start.payload?.brief });
   const brief = parsed.brief;
   const recordedTemplate = start.payload?.template;
   if (typeof recordedTemplate === "string" && recordedTemplate !== parsed.template.id) {
@@ -737,7 +823,7 @@ export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps): P
   }
   const wf = new Workflow(deps, runId, start.taskId, brief);
 
-  const terminal = workflowRows.find((r) => r.action === "workflow.halt" || r.action === "workflow.gate");
+  const progress = runProgress(rows);
   const checkpoints = workflowRows.filter((r) => r.action === "workflow.checkpoint");
   const last = checkpoints.at(-1);
   const lastCp: CheckpointState | null = last
@@ -748,26 +834,62 @@ export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps): P
         artifact: { path: String(last.payload?.path), sha256: String(last.payload?.sha256), bytes: Number(last.payload?.bytes) },
       }
     : null;
+  const finished = (reason: string, status: WorkflowStatus = "already_finished"): WorkflowResult => ({
+    workflowRunId: runId,
+    workflowTaskId: start.taskId!,
+    status,
+    cycles: lastCp ? lastCp.cycle + 1 : 0,
+    lastCheckpoint: lastCp ? { ...lastCp.artifact, stage: lastCp.stage, cycle: lastCp.cycle } : null,
+    reason,
+    qaFailure: null,
+    builderRounds: [],
+  });
 
-  if (terminal) {
-    return {
-      workflowRunId: runId,
-      workflowTaskId: start.taskId,
-      status: "already_finished",
-      cycles: lastCp ? lastCp.cycle + 1 : 0,
-      lastCheckpoint: lastCp ? { ...lastCp.artifact, stage: lastCp.stage, cycle: lastCp.cycle } : null,
-      reason: `run already ended with ${terminal.action} — not re-opened`,
-      qaFailure: null,
-      builderRounds: [],
-    };
+  if (progress.state === "gate") return finished("run already reached its launch gate — not re-opened");
+  if (progress.state === "halted") {
+    if (!opts.reopen) return finished("run already ended with workflow.halt — not re-opened");
+    if (progress.haltStatus === "checkpoint_corrupt") {
+      return finished("the saved site no longer matches its hash, so this run cannot continue: a fresh build is needed", "checkpoint_corrupt");
+    }
+    // Written before anything runs, so the run's history shows who continued it and why, and the revision budget restarts here.
+    await recordAudit(
+      { sink: deps.audit, actor: `workflow:${WORKFLOW_ID}`, runId, taskId: start.taskId, entitySlug: brief.entitySlug },
+      {
+        action: "workflow.reopen",
+        outcome: "info",
+        payload: {
+          workflow: WORKFLOW_ID,
+          version: WORKFLOW_VERSION,
+          reason: opts.reopen.reason,
+          by: opts.reopen.by,
+          fromStatus: progress.haltStatus,
+          baseCycle: lastCp ? lastCp.cycle : 0,
+          ...(opts.reopen.brief !== undefined ? { brief } : {}),
+        },
+      },
+    );
+    wf.cycleBase = lastCp ? lastCp.cycle : 0;
+  } else if (opts.reopen?.brief !== undefined) {
+    // A crashed (never halted) run continued with new facts: recorded, so the next resume keeps this brief and its revision budget.
+    await recordAudit(
+      { sink: deps.audit, actor: `workflow:${WORKFLOW_ID}`, runId, taskId: start.taskId, entitySlug: brief.entitySlug },
+      { action: "workflow.reopen", outcome: "info", payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, reason: opts.reopen.reason, by: opts.reopen.by, fromStatus: null, baseCycle: lastCp ? lastCp.cycle : 0, brief } },
+    );
+    wf.cycleBase = lastCp ? lastCp.cycle : 0;
+  } else {
+    const reopens = workflowRows.filter((r) => r.action === "workflow.reopen");
+    wf.cycleBase = reopens.length ? Number(reopens.at(-1)!.payload?.baseCycle ?? 0) : 0;
   }
-  if (!lastCp) {
-    // Crashed before the first checkpoint: there's nothing to resume from, so the build starts
-    // again under the same run id (Blueprint §3's rollback target is "the last checkpoint" — none).
-    return wf.start();
+  try {
+    if (!lastCp) {
+      // Nothing was saved: the build starts again under the same run id (Blueprint §3's rollback target is "the last checkpoint" — none).
+      return await wf.buildFrom(0, null);
+    }
+    // Template sections come from the brief's template choice, exactly as the builder derives them.
+    wf.templateSections = deps.frontEndAgent.parseInput({ brief }).template.requiredSections;
+    // A "verified" checkpoint without its gate row is re-verified rather than gated on trust.
+    return await wf.verifyLoop({ ...lastCp, stage: "build" });
+  } catch (err) {
+    throw tagRunId(err, runId);
   }
-  // Template sections come from the brief's template choice, exactly as the builder derives them.
-  wf.templateSections = deps.frontEndAgent.parseInput({ brief }).template.requiredSections;
-  // A "verified" checkpoint without its gate row is re-verified rather than gated on trust.
-  return wf.verifyLoop({ ...lastCp, stage: "build" });
 }

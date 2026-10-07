@@ -44,3 +44,14 @@ test("evaluator knows the honesty rules and sees the brief's facts; 'needs clien
   await runEvaluator(blind, { html: "<p/>", requiredSections: [] } as never, "g");
   assert.match(blind.calls[0]!.user, /brief's facts were not supplied to this review/);
 });
+
+test("Step 4D: a reply that ignores the format is asked for again once; a second one stops the run instead of blaming the site", async () => {
+  const { runEvaluator } = await import("../src/evaluator.js");
+  const ctx = { html: "<p>x</p>", requiredSections: ["hero"], clientSlug: "c", otherClientSlugs: [] } as never;
+  let calls = 0;
+  const flaky = { name: "m", complete: async () => (++calls === 1 ? "Sure! Here are my thoughts." : "VERDICT: APPROVED") };
+  assert.equal((await runEvaluator(flaky as never, ctx, "goal")).verdict, "approved");
+  assert.equal(calls, 2);
+  const broken = { name: "m", complete: async () => "no format at all" };
+  await assert.rejects(runEvaluator(broken as never, ctx, "goal"), /did not follow the VERDICT protocol after 2 tries/);
+});

@@ -69,13 +69,17 @@ jobs:
         working-directory: packages/rendered-qa
         run: npx playwright install --with-deps chromium
 
+      # Step 4D: the job as a whole stops at 30 minutes and nothing after it runs, so the safety net below could never fire on a
+      # timeout and the Cockpit showed "Running" forever. This step stops at 26 minutes instead; the net then marks the job failed
+      # while the run's saved site (linked to the job at start, `job.run`) can still be continued from the Cockpit.
       - name: Run job
+        timeout-minutes: 26
         working-directory: packages/jobs
         run: doppler run -- npx tsx src/run.ts "$JOB_ID"
 
       # Safety net: if anything above crashed before the runner recorded an outcome, the job must not
       # sit in "running" forever in the Cockpit.
       - name: Mark job failed if it never finished
-        if: failure()
+        if: failure() || cancelled()
         working-directory: packages/jobs
         run: doppler run -- npx tsx src/run.ts "$JOB_ID" --mark-failed

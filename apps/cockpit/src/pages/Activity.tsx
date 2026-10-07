@@ -4,10 +4,12 @@
  */
 import { useState } from "react";
 import { Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Archive, ArrowClockwise, ArrowCounterClockwise, ArrowSquareOut, Play, XCircle } from "@phosphor-icons/react";
+import { Archive, ArrowCounterClockwise, ArrowSquareOut, Play, XCircle } from "@phosphor-icons/react";
 import { supabase } from "../supabaseClient";
-import { archiveJob, cancelJob, dispatchJob, isActive, isFinished, isStaleQueued, requestJob, type JobRow } from "../jobsClient";
+import { archiveJob, cancelJob, dispatchJob, isActive, isFinished, isStaleQueued, isStaleRunning, type JobRow } from "../jobsClient";
 import { latestBuildByPlan, planIdOfJob } from "../lib/attention";
+import { asStopped, diagnoseJob } from "../lib/recovery";
+import { enrichFromRun } from "../lib/runInfo";
 import {
   KIND_LABEL, clock, dateTime, duration, explainJobError, jobState, planName, shortId,
   type PlanRow, type RoundRow,
@@ -15,6 +17,7 @@ import {
 import { fetchJob, useFactory, useLoad, useToast } from "../lib/state";
 import { stageLabel } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
+import { ClientNeedsPanel, RecoveryPanel } from "../components/Recovery";
 import { subjectOf } from "./Home";
 
 /* ---------------- list ---------------- */
@@ -72,7 +75,7 @@ export default function Activity() {
                       {KIND_LABEL[j.kind]}
                       {subject ? `: ${subject}` : ""}
                     </Link>
-                    {j.status === "failed" && <p className="why">{explainJobError(j).headline}</p>}
+                    {j.status === "failed" && <p className="why">{diagnoseJob(j).headline}</p>}
                   </div>
                   <span className="when fig">
                     {dateTime(j.created_at)}
@@ -147,9 +150,10 @@ const NOUN: Record<JobRow["kind"], string> = {
 function title(j: JobRow, plan: PlanRow | undefined): string {
   const name = plan ? planName(plan) : null;
   const build = j.kind === "build_plan" || j.kind === "resume";
+  if (isStaleRunning(j)) return `${NOUN[j.kind]} stopped without reporting`;
   switch (j.status) {
     case "failed":
-      return `${NOUN[j.kind]} stopped: ${explainJobError(j).headline}`;
+      return `${NOUN[j.kind]} stopped: ${diagnoseJob(j).headline}`;
     case "cancelled":
       return "This request was cancelled";
     case "queued":
@@ -192,7 +196,13 @@ function Steps({ j }: { j: JobRow }) {
             {j.started_at && <span className="fig quiet">{clock(j.started_at)}</span>}
             <span className="muted">Picked up by the factory worker.</span>
           </li>
-          {(j.status === "running" || j.status === "dispatched") && (
+          {(j.status === "running" || j.status === "dispatched") && isStaleRunning(j) && (
+            <li className="bad">
+              <b>Stopped without reporting</b>
+              <span className="muted">It has been going far longer than a build takes, so the worker most likely hit GitHub's time limit or crashed. What it saved is kept.</span>
+            </li>
+          )}
+          {(j.status === "running" || j.status === "dispatched") && !isStaleRunning(j) && (
             <li className="now">
               <b>Working</b>
               <span className="muted">This page refreshes every few seconds.</span>
@@ -320,6 +330,9 @@ export function RunPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
 
+  // A run that stopped is read together with the run's own record: which run it was, and what it had saved.
+  const stopped = job.data ? asStopped(job.data) : null;
+  const rich = useLoad(() => (stopped && stopped.status === "failed" ? enrichFromRun(stopped) : Promise.resolve(stopped)), [stopped?.id, stopped?.status, stopped?.finished_at]);
   const j = job.data;
   if (job.error) return <LoadError what="this run" error={job.error} onRetry={job.reload} />;
   if (job.loading && !j) return <Loading rows={4} label="Loading the run" />;
@@ -332,8 +345,10 @@ export function RunPage() {
   const build = j.kind === "build_plan" || j.kind === "resume";
   const latest = planId ? latestBuildByPlan(jobs).get(planId) : undefined;
   const superseded = build && j.status === "failed" && latest && latest.id !== j.id && latest.status === "succeeded" ? latest : null;
-  const canResume = build && j.status === "failed" && typeof j.result?.workflowRunId === "string";
-  const explanation = j.status === "failed" ? explainJobError(j) : null;
+  const siblings = planId ? jobs.filter((x) => planIdOfJob(x, jobs) === planId).sort((a, b) => b.created_at.localeCompare(a.created_at)) : [];
+  // A stop that a later build of the same plan already fixed needs no button; the pointer below says so.
+  const jv = rich.data && stopped && rich.data.id === stopped.id ? rich.data : stopped ?? j;
+  const showRecovery = jv.status === "failed" && !superseded && !j.archived_at && !rich.loading;
 
   async function act(fn: () => Promise<string | null>, ok: string) {
     setBusy(true);
@@ -361,24 +376,6 @@ export function RunPage() {
         lead={`${KIND_LABEL[j.kind]}${plan ? ` for ${planName(plan)}` : ""}${plan?.build_track ? `, Track ${plan.build_track}` : ""}.${j.kind === "ask" ? ` You asked: “${String(j.params?.question ?? "")}”` : ""}`}
         actions={
           <>
-            {canResume && (
-              <button
-                className="btn primary"
-                type="button"
-                disabled={busy}
-                onClick={() =>
-                  act(async () => {
-                    const { jobId: id, error } = await requestJob("resume", { workflowRunId: j.result!.workflowRunId });
-                    if (!id) return error;
-                    nav(`/activity/${id}`);
-                    return null;
-                  }, "Resuming from the last saved step.")
-                }
-              >
-                <ArrowClockwise aria-hidden="true" />
-                Resume build
-              </button>
-            )}
             {j.status === "queued" && (
               <button className="btn primary" type="button" disabled={busy} onClick={() => act(() => dispatchJob(j.id), "Started. The worker picks it up within seconds.")}>
                 <Play aria-hidden="true" />
@@ -412,11 +409,24 @@ export function RunPage() {
       />
       <div className="split narrow">
         <div className="stack">
-          {explanation && (
+          {showRecovery && (
+            <RecoveryPanel
+              job={jv}
+              siblings={siblings}
+              planId={planId}
+              planName={plan ? planName(plan) : null}
+              onChanged={async () => {
+                await Promise.all([job.reload(), f.reload()]);
+              }}
+              onStarted={(id) => nav(`/activity/${id}`)}
+            />
+          )}
+          {j.status === "failed" && superseded && (
             <Notice tone="stop" title="What happened.">
-              {explanation.happened} <b>What to do.</b> {explanation.todo}
+              {explainJobError(j).happened}
             </Notice>
           )}
+          {build && j.status === "succeeded" && <ClientNeedsPanel job={j} planId={planId} onStarted={(id) => nav(`/activity/${id}`)} />}
           {superseded && (
             <Notice tone="info">
               A later build of the same plan passed every check ({dateTime(superseded.finished_at ?? superseded.created_at)}). You probably don't need to resume this one.{" "}

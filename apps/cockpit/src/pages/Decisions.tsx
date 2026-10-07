@@ -18,6 +18,7 @@ import {
 import { canDecide, fetchPlan, useFactory, useLoad, useMe, useToast } from "../lib/state";
 import { nextStage, stageLabel, stageMoveBlock } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, Plate } from "../components/ui";
+import { BeforeBuild } from "../components/Recovery";
 import { fetchProjects } from "./Home";
 
 /* ---------------- tabs ---------------- */
@@ -428,6 +429,7 @@ function AfterDecision({ row }: { row: PlanRow }) {
                 </div>
               )
             )}
+            {decider && !active && <BeforeBuild planId={row.id} questions={[...row.plan.plan.openQuestions, ...(row.plan.direction?.openQuestions ?? [])]} />}
             <p className="quiet fine">Building and checking takes a few minutes. The result waits for your launch decision; nothing is published.</p>
           </>
         )}

@@ -15,7 +15,7 @@
  * Versioned: change the schema = bump CONTENT_SCHEMA_VERSION.
  */
 import { z } from "zod";
-import { pageScopeOf, type PilotBrief } from "../brief.js";
+import { briefFactSources, pageScopeOf, type PilotBrief } from "../brief.js";
 import { buildPalette } from "./palette.js";
 
 export const CONTENT_SCHEMA_VERSION = "track-a/1";
@@ -181,7 +181,7 @@ export function missingRequiredMessage(required: string): string {
 }
 
 export function briefFactText(brief: PilotBrief): string {
-  return [brief.goal, brief.brandNotes].join("\n");
+  return briefFactSources(brief).join("\n");
 }
 
 /**

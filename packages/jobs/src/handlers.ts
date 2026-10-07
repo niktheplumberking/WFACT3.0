@@ -17,8 +17,9 @@ import { intakeAndPlan, replan, type PlanningDeps, type PlanningResult } from "@
 import type { PlanStore } from "@wfact/planning/planStore";
 import type { Plan } from "@wfact/planning/planner";
 import type { PilotBrief } from "@wfact/frontend-loop/brief";
-import { buildAndVerify, recordedBuilderTemplate, resumeBuildAndVerify, qaFailureToIssues, type WorkflowDeps, type WorkflowResult } from "@wfact/workflow";
+import { buildAndVerify, recordedBuilderTemplate, resumeBuildAndVerify, qaFailureToIssues, runIdOfError, runProgress, type ReopenRequest, type WorkflowDeps, type WorkflowResult } from "@wfact/workflow";
 import type { Job } from "./jobStore.js";
+import { ownerFactsFrom, type PlanInput, type PlanInputStore } from "./inputStore.js";
 
 export interface HandlerDeps {
   planning: PlanningDeps;
@@ -41,6 +42,15 @@ export interface HandlerDeps {
   qaAgent: Agent<QaInput, VerificationResult>;
   audit: AuditSink | null;
   knownClientSlugs: string[];
+  /** Step 4D: details the owner added to an approved plan; absent in older tests (no inputs). */
+  inputs?: PlanInputStore;
+  /**
+   * Step 4D: when a finished build stopped only because the design reviewer was unreachable (everything else passed),
+   * the runner waits and continues it by itself, a bounded number of times, instead of asking a person. Defaults:
+   * 60 s then 180 s, and never after 18 minutes of the job's 30. Tests pass zero delays.
+   */
+  autoHeal?: { delaysMs: number[]; maxElapsedMs: number };
+  sleep?: (ms: number) => Promise<void>;
   /** Hermes-lite status answer — injected so tests don't need a model or Supabase. */
   ask: (question: string) => Promise<{ answer: string; sourcesUsed: string[]; needsHuman: boolean; escalationReason: string | null }>;
 }
@@ -99,13 +109,16 @@ function planningOutcome(r: PlanningResult): JobOutcome {
   };
 }
 
-function workflowOutcome(r: WorkflowResult): JobOutcome {
+function workflowOutcome(r: WorkflowResult, extra: Record<string, unknown> = {}): JobOutcome {
   return {
     ok: r.status === "awaiting_launch_approval",
     reason: r.reason,
     result: {
+      ...extra,
       status: r.status,
       workflowRunId: r.workflowRunId,
+      // Step 4D: what the run asked of the client, so the Cockpit can list it instead of burying it in an audit row.
+      needsFromClient: r.needsFromClient ?? [],
       cycles: r.cycles,
       lastCheckpoint: r.lastCheckpoint,
       qaIssues: r.qaFailure ? qaFailureToIssues(r.qaFailure) : [],
@@ -119,7 +132,82 @@ function workflowOutcome(r: WorkflowResult): JobOutcome {
   };
 }
 
+/**
+ * Step 4D: writes `job.run` (task = the Cockpit job, run = the workflow run) as soon as a run starts. Without it a job that
+ * died before reporting (GitHub's 30-minute limit, a crashed runner) has no way to say which run it was, and its saved
+ * site could not be continued.
+ */
+function linkRun(wf: WorkflowDeps, job: Job, deps: HandlerDeps): WorkflowDeps {
+  const sink = deps.audit;
+  if (!sink) return wf;
+  return {
+    ...wf,
+    onRunStart: async (runId) => {
+      await wf.onRunStart?.(runId);
+      await sink.write({ actor: "job-runner", action: "job.run", outcome: "info", taskId: job.id, runId, payload: { jobId: job.id, kind: job.kind } });
+    },
+  };
+}
+
+/** The run's own record decides what is saved, never this process's memory (a resumed run reports no rounds). */
+async function finishWorkflow(r: WorkflowResult, wf: WorkflowDeps, extra: Record<string, unknown>): Promise<JobOutcome> {
+  const progress = runProgress(await wf.reader.listByRun(r.workflowRunId));
+  return workflowOutcome(r, { ...extra, progress });
+}
+
+/**
+ * An exception inside a started run no longer loses the run: the job still fails (with the error), but it names the run
+ * and what was saved, so the Cockpit can offer to continue it. Exceptions before any run exists (a malformed brief) are rethrown.
+ */
+async function crashed(err: unknown, knownRunId: string | null, wf: WorkflowDeps, extra: Record<string, unknown>): Promise<JobOutcome> {
+  const runId = runIdOfError(err) ?? knownRunId;
+  if (!runId) throw err;
+  const message = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+  let progress: ReturnType<typeof runProgress> | null = null;
+  try {
+    progress = runProgress(await wf.reader.listByRun(runId));
+  } catch {
+    /* the audit store may be the thing that is down; the run id alone still lets the Cockpit offer to continue */
+  }
+  return { ok: false, reason: message.slice(0, 2000), result: { ...extra, status: "crashed", workflowRunId: runId, progress, cycles: null, qaIssues: [], builderRounds: [], needsFromClient: [] } };
+}
+
+const REVIEWER_OUTAGE = /a required review could not run/i;
+const NOT_AN_OUTAGE = /HTTP (400|401|402|403|404)\b|credits|api key|not set|not configured/i;
+
+/** True only for "everything passed but the reviewer did not answer": waiting and asking again is safe and cheap. */
+export function isTransientReviewerOutage(o: JobOutcome): boolean {
+  return !o.ok && o.result.status === "not_verified_no_evaluator" && REVIEWER_OUTAGE.test(o.reason ?? "") && !NOT_AN_OUTAGE.test(o.reason ?? "");
+}
+
+/**
+ * Bounded automatic retry (CLAUDE.md §6: bounded, backed off, then a human). Only the reviewer outage qualifies; the site is
+ * already saved, so each retry re-runs the checks and the review and nothing else. Each retry is recorded on the run.
+ */
+async function autoHeal(first: JobOutcome, wf: WorkflowDeps, extra: Record<string, unknown>, deps: HandlerDeps, startedAt: number): Promise<JobOutcome> {
+  const cfg = deps.autoHeal ?? { delaysMs: [60_000, 180_000], maxElapsedMs: 18 * 60_000 };
+  const sleep = deps.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
+  let outcome = first;
+  let attempts = 0;
+  for (const delay of cfg.delaysMs) {
+    if (!isTransientReviewerOutage(outcome) || Date.now() - startedAt + delay > cfg.maxElapsedMs) break;
+    const runId = outcome.result.workflowRunId as string;
+    await sleep(delay);
+    attempts += 1;
+    try {
+      const r = await resumeBuildAndVerify(runId, wf, { reopen: { reason: `automatic retry ${attempts}: the design reviewer did not answer`, by: "auto" } });
+      outcome = await finishWorkflow(r, wf, extra);
+    } catch (err) {
+      outcome = await crashed(err, runId, wf, extra);
+      break;
+    }
+  }
+  if (attempts > 0) outcome = { ...outcome, result: { ...outcome.result, autoRetries: attempts } };
+  return outcome;
+}
+
 export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome> {
+  const startedAt = Date.now();
   const p = job.params ?? {};
   switch (job.kind) {
     case "intake":
@@ -145,9 +233,17 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       if (stored.buildTrack === "B" && !deps.trackBWorkflow) {
         return { ok: false, reason: `plan ${planId} is Track B, but this runner has no Track B builder configured; it is not built as Track A`, result: { planId, buildTrack: "B" } };
       }
-      const wf = stored.buildTrack === "B" ? deps.trackBWorkflow! : deps.trackAWorkflow ?? deps.workflow;
-      const outcome = workflowOutcome(await buildAndVerify(briefForBuild(stored.plan), wf));
-      return { ...outcome, result: { planId, buildTrack: stored.buildTrack, ...outcome.result } };
+      const wf = linkRun(stored.buildTrack === "B" ? deps.trackBWorkflow! : deps.trackAWorkflow ?? deps.workflow, job, deps);
+      const inputs = (await deps.inputs?.current(planId)) ?? [];
+      const extra = { planId, buildTrack: stored.buildTrack, inputsUsed: inputs.filter((i) => !i.waived).length, inputsWaived: inputs.filter((i) => i.waived).length };
+      let runId: string | null = null;
+      try {
+        const first = await buildAndVerify(briefForBuild(stored.plan, inputs), wf);
+        runId = first.workflowRunId;
+        return await autoHeal(await finishWorkflow(first, wf, extra), wf, extra, deps, startedAt);
+      } catch (err) {
+        return crashed(err, runId, wf, extra);
+      }
     }
 
     case "resume": {
@@ -156,7 +252,28 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       const template = await recordedBuilderTemplate(runId, deps.workflow.reader);
       const wf =
         template === "track-a" && deps.trackAWorkflow ? deps.trackAWorkflow : template === "track-b" && deps.trackBWorkflow ? deps.trackBWorkflow : deps.workflow;
-      return workflowOutcome(await resumeBuildAndVerify(runId, wf));
+      // Step 4D: "reopen" is a person asking to continue a run that stopped. Only a signed-in owner/admin can create this job
+      // (the jobs trigger), and the run records who. The brief is the approved plan plus the details the owner has added since.
+      const planId = typeof p.planId === "string" && UUID.test(p.planId) ? p.planId : null;
+      const extra: Record<string, unknown> = planId ? { planId } : {};
+      let reopen: ReopenRequest | undefined;
+      if (p.reopen === true) {
+        let brief: unknown;
+        if (planId) {
+          const stored = await deps.planStore.get(planId);
+          const inputs = (await deps.inputs?.current(planId)) ?? [];
+          if (stored && inputs.length > 0) brief = briefForBuild(stored.plan, inputs);
+          extra.inputsUsed = inputs.filter((i) => !i.waived).length;
+          extra.inputsWaived = inputs.filter((i) => i.waived).length;
+        }
+        const reason = typeof p.reason === "string" && p.reason.trim() ? p.reason.trim().slice(0, 200) : "continued from the Cockpit";
+        reopen = { reason, by: job.createdBy, ...(brief !== undefined ? { brief } : {}) };
+      }
+      try {
+        return await autoHeal(await finishWorkflow(await resumeBuildAndVerify(runId, wf, reopen ? { reopen } : {}), wf, extra), wf, extra, deps, startedAt);
+      } catch (err) {
+        return crashed(err, runId, wf, extra);
+      }
     }
 
     case "verify": {
@@ -235,7 +352,9 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
 }
 
 /** The brief a plan is built from. Plans approved before 2026-10-06 carry no page scope; their lead type says it. */
-export function briefForBuild(plan: Pick<Plan, "brief" | "intake">): PilotBrief {
-  if (plan.brief.pageScope) return plan.brief;
-  return { ...plan.brief, pageScope: plan.intake.leadType === "landing_page" ? "single" : "multi" };
+export function briefForBuild(plan: Pick<Plan, "brief" | "intake">, inputs: PlanInput[] = []): PilotBrief {
+  const base: PilotBrief = plan.brief.pageScope ? plan.brief : { ...plan.brief, pageScope: plan.intake.leadType === "landing_page" ? "single" : "multi" };
+  const ownerFacts = ownerFactsFrom(inputs);
+  const ownerSkipped = inputs.filter((i) => i.waived).map((i) => i.label);
+  return { ...base, ...(ownerFacts.length > 0 ? { ownerFacts } : {}), ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}) };
 }

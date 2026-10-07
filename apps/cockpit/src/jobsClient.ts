@@ -38,8 +38,19 @@ export function isStaleQueued(j: Pick<JobRow, "status" | "created_at">, now = Da
   return j.status === "queued" && now - new Date(j.created_at).getTime() > STALE_QUEUED_MS;
 }
 
+/**
+ * A job still `dispatched` or `running` after this long was killed without reporting (GitHub stops a run at 30 minutes; a
+ * crash with no Doppler leaves no safety-net write). Same 45 minutes the jobs trigger (0018) uses to stop such a row from
+ * blocking a new attempt. It is shown as "stopped without reporting", never as still running.
+ */
+export const STALE_RUNNING_MS = 45 * 60 * 1000;
+
+export function isStaleRunning(j: Pick<JobRow, "status" | "created_at">, now = Date.now()): boolean {
+  return (j.status === "dispatched" || j.status === "running") && now - new Date(j.created_at).getTime() > STALE_RUNNING_MS;
+}
+
 export function isActive(j: Pick<JobRow, "status" | "created_at">, now = Date.now()): boolean {
-  return (j.status === "queued" && !isStaleQueued(j, now)) || j.status === "dispatched" || j.status === "running";
+  return (j.status === "queued" && !isStaleQueued(j, now)) || ((j.status === "dispatched" || j.status === "running") && !isStaleRunning(j, now));
 }
 
 export async function requestJob(kind: JobKind, params: Record<string, unknown>): Promise<{ jobId: string | null; error: string | null }> {

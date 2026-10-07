@@ -45,3 +45,20 @@ test("a 4xx and an unusable 200 are not retried", async () => {
   assert.equal(empty.calls(), 1);
   assert.deepEqual([...bad.slept, ...empty.slept], []);
 });
+
+test("Step 4D: a call that hangs is cut off by the timeout and retried like a dropped connection", async () => {
+  const slept: number[] = [];
+  let calls = 0;
+  const c = new Agent37ModelClient("https://gw.example/v1/", "k", {
+    timeoutMs: 20,
+    fetchImpl: ((_url: string, init: RequestInit) => {
+      calls += 1;
+      if (calls === 1) return new Promise((_res, rej) => init.signal!.addEventListener("abort", () => rej(init.signal!.reason)));
+      return Promise.resolve(ok("page"));
+    }) as unknown as typeof fetch,
+    sleep: async (ms) => void slept.push(ms),
+  });
+  assert.equal(await c.complete(REQ), "page");
+  assert.equal(calls, 2);
+  assert.deepEqual(slept, [AGENT37_RETRY_DELAYS_MS[0]]);
+});

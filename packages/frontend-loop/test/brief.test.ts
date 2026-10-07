@@ -52,3 +52,15 @@ test("loadBrief reads and parses the synthetic provisional Summit Line Roofing b
   assert.equal(brief.source, "synthetic-provisional-2026-09-30");
   assert.deepEqual(brief.requiredSections, ["hero", "services", "packages", "process", "faq", "contact"]);
 });
+
+test("Step 4D: ownerFacts are validated, kept, and become fact sources", async () => {
+  const { briefFactSources, ownerFactLines } = await import("../src/brief.js");
+  const brief = parseBrief({ ...validBrief, ownerFacts: [{ key: "phone", label: "Business phone", value: " 0400 111 222 " }] });
+  assert.deepEqual(brief.ownerFacts, [{ key: "phone", label: "Business phone", value: "0400 111 222" }]);
+  assert.deepEqual(ownerFactLines(brief), ["Business phone: 0400 111 222"]);
+  assert.ok(briefFactSources(brief).some((s) => s.includes("0400 111 222")));
+  assert.equal(parseBrief(validBrief).ownerFacts, undefined, "a brief without facts is unchanged");
+  assert.throws(() => parseBrief({ ...validBrief, ownerFacts: [{ key: "Bad Key", label: "x", value: "y" }] }), InvalidBriefError);
+  assert.throws(() => parseBrief({ ...validBrief, ownerFacts: [{ key: "phone", label: "x", value: "" }] }), InvalidBriefError);
+  assert.throws(() => parseBrief({ ...validBrief, ownerFacts: "phone" }), InvalidBriefError);
+});

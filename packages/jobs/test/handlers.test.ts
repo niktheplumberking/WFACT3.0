@@ -214,3 +214,132 @@ test("briefForBuild: a plan approved before page scope existed takes it from the
   assert.equal(briefForBuild({ brief, intake: intake("new_website") }).pageScope, "multi");
   assert.equal(briefForBuild({ brief: { ...brief, pageScope: "multi" }, intake: intake("landing_page") }).pageScope, "multi");
 });
+
+// ---- Step 4D: build recovery ----
+
+import { MemoryPlanInputStore } from "../src/inputStore.js";
+import { isTransientReviewerOutage } from "../src/handlers.js";
+
+async function approvedPlan(d: HandlerDeps, planStore: { decide: (id: string, s: "approved", n: null, t: "A") => void }) {
+  const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
+  const planId = intake.result.planId as string;
+  planStore.decide(planId, "approved", null, "A");
+  return planId;
+}
+
+test("Step 4D: the details an owner added reach the builder as sourced facts, and the result says how many were used", async () => {
+  const { d, planStore } = deps(CLEAN);
+  const seen: string[] = [];
+  d.workflow = { ...d.workflow, frontEndAgent: createFrontendBuilderAgent({ builderModel: new BuilderMock((r) => { seen.push(r.user); return CLEAN; }), evaluatorModel: new BuilderMock(() => "VERDICT: APPROVED") }) };
+  const inputs = new MemoryPlanInputStore();
+  d.inputs = inputs;
+  const planId = await approvedPlan(d, planStore);
+  inputs.rows.push({ planId, kind: "fact", key: "phone", label: "Business phone", value: "0400 111 222", waived: false, createdAt: "2026-10-07T10:00:00Z" });
+  inputs.rows.push({ planId, kind: "fact", key: "hours", label: "Opening hours", value: null, waived: true, createdAt: "2026-10-07T10:01:00Z" });
+  const out = await handleJob(job("build_plan", { planId }), d);
+  assert.equal(out.ok, true, out.reason ?? "");
+  assert.match(seen[0]!, /Owner-confirmed fact: Business phone: 0400 111 222/);
+  assert.ok(!seen[0]!.includes("Opening hours"), "a waived item is not given to the builder");
+  assert.equal(out.result.inputsUsed, 1);
+  assert.equal(out.result.inputsWaived, 1);
+  assert.deepEqual((out.result.progress as { saved: string }).saved, "verified");
+});
+
+test("Step 4D: a newer answer for the same key replaces the older one", async () => {
+  const inputs = new MemoryPlanInputStore();
+  const planId = crypto.randomUUID();
+  inputs.rows.push({ planId, kind: "fact", key: "phone", label: "Phone", value: "OLD", waived: false, createdAt: "2026-10-07T10:00:00Z" });
+  inputs.rows.push({ planId, kind: "fact", key: "phone", label: "Phone", value: "NEW", waived: false, createdAt: "2026-10-07T11:00:00Z" });
+  const cur = await inputs.current(planId);
+  assert.equal(cur.length, 1);
+  assert.equal(cur[0]!.value, "NEW");
+});
+
+test("Step 4D: a run that stopped at its cap is reopened by a resume job with reopen:true, and keeps its run id", async () => {
+  const { d, planStore } = deps(BROKEN);
+  const planId = await approvedPlan(d, planStore);
+  const failed = await handleJob(job("build_plan", { planId }), d);
+  assert.equal(failed.result.status, "failed_verification");
+  const runId = failed.result.workflowRunId as string;
+
+  // A plain resume still refuses a halted run...
+  const refused = await handleJob(job("resume", { workflowRunId: runId }), d);
+  assert.equal(refused.result.status, "already_finished");
+  // ...a person's "fix and continue" does not (the builder now returns a good page).
+  d.workflow = { ...d.workflow, frontEndAgent: createFrontendBuilderAgent({ builderModel: new BuilderMock(() => CLEAN), evaluatorModel: new BuilderMock(() => "VERDICT: APPROVED") }) };
+  const fixed = await handleJob(job("resume", { workflowRunId: runId, planId, reopen: true, reason: "fix and continue" }), d);
+  assert.equal(fixed.ok, true, fixed.reason ?? "");
+  assert.equal(fixed.result.workflowRunId, runId);
+  assert.equal((fixed.result.progress as { reopens: number }).reopens, 1);
+});
+
+test("Step 4D: an exception inside a started run still names the run, so it can be continued", async () => {
+  const { d, planStore } = deps(CLEAN);
+  const planId = await approvedPlan(d, planStore);
+  let boom = true;
+  const realWrite = d.workflow.artifacts.write.bind(d.workflow.artifacts);
+  d.workflow.artifacts.write = async (rel: string, content: string) => {
+    if (boom) throw new Error("artifact upload failed (HTTP 503): service unavailable");
+    return realWrite(rel, content);
+  };
+  const out = await handleJob(job("build_plan", { planId }), d);
+  assert.equal(out.ok, false);
+  assert.equal(out.result.status, "crashed");
+  assert.match(out.reason ?? "", /artifact upload failed \(HTTP 503\)/);
+  const runId = out.result.workflowRunId as string;
+  assert.match(runId, /^[0-9a-f-]{36}$/);
+  assert.equal((out.result.progress as { saved: string }).saved, "none");
+
+  boom = false;
+  const again = await handleJob(job("resume", { workflowRunId: runId }), d);
+  assert.equal(again.ok, true, again.reason ?? "");
+  assert.equal(again.result.workflowRunId, runId);
+});
+
+test("Step 4D: only 'everything passed, the reviewer did not answer' is retried by itself; credits, keys and failed checks are not", () => {
+  const out = (status: string, reason: string) => ({ ok: false, reason, result: { status } });
+  const outage = "deterministic checks passed but a required review could not run (render.design-review: NOT RUN: HTTP 502: upstream_unreachable) — checks alone are not verification";
+  assert.equal(isTransientReviewerOutage(out("not_verified_no_evaluator", outage)), true);
+  assert.equal(isTransientReviewerOutage(out("not_verified_no_evaluator", outage.replace("HTTP 502: upstream_unreachable", "HTTP 402: credits exhausted"))), false);
+  assert.equal(isTransientReviewerOutage(out("not_verified_no_evaluator", "deterministic checks passed but no evaluator model was configured")), false);
+  assert.equal(isTransientReviewerOutage(out("failed_verification", outage)), false);
+});
+
+test("Step 4D: a reviewer outage is retried (bounded) after the delay, on the saved site, without a new build", async () => {
+  const { d, planStore } = deps(CLEAN);
+  const realQa = d.workflow.qaAgent;
+  let qaCalls = 0;
+  const flaky = {
+    ...realQa,
+    execute: async (...args: Parameters<typeof realQa.execute>) => {
+      qaCalls += 1;
+      if (qaCalls === 1) {
+        return { status: "blocked_no_evaluator", checkResults: [{ checkId: "render.design-review", passed: false, details: ["NOT RUN: HTTP 502: upstream_unreachable"], notRun: true }], evaluator: null, costs: [] } as never;
+      }
+      return realQa.execute(...args);
+    },
+  };
+  d.workflow = { ...d.workflow, qaAgent: flaky as typeof realQa };
+  d.autoHeal = { delaysMs: [0, 0], maxElapsedMs: 60_000 };
+  d.sleep = async () => {};
+  let builds = 0;
+  const builderAgent = d.workflow.frontEndAgent;
+  d.workflow.frontEndAgent = { ...builderAgent, execute: async (...a: Parameters<typeof builderAgent.execute>) => { builds += 1; return builderAgent.execute(...a); } };
+  const planId = await approvedPlan(d, planStore);
+  const out = await handleJob(job("build_plan", { planId }), d);
+  assert.equal(out.ok, true, out.reason ?? "");
+  assert.equal(out.result.autoRetries, 1);
+  assert.equal(qaCalls, 2);
+  assert.equal(builds, 1, "the site was not built again");
+});
+
+test("Step 4D: a build links its Cockpit job to the run the moment it starts (so a job killed by a timeout can still be continued)", async () => {
+  const { d, planStore, audit } = deps(CLEAN);
+  const planId = await approvedPlan(d, planStore);
+  const j = job("build_plan", { planId });
+  const out = await handleJob(j, d);
+  const link = audit.events.find((e) => e.action === "job.run");
+  assert.ok(link, "job.run row written");
+  assert.equal(link!.taskId, j.id);
+  assert.equal(link!.runId, out.result.workflowRunId);
+});

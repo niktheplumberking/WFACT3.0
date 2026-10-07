@@ -248,3 +248,13 @@ test("a required testimonials section without brief quotes: left out with an ope
   const other = { ...brief, requiredSections: [...brief.requiredSections, "pricing"] };
   assert.match(validateSiteContent(c, other).errors.join("\n"), /requires a section with id "pricing" on some page; none has it/, "only customer-words sections can be waived");
 });
+
+test("Step 4D: a business fact the owner supplied is a valid source \"brief\" fact; without it the same fact is refused", () => {
+  const withPhone = fixture() as unknown as { business: { phone: { value: string; source: string } } };
+  withPhone.business.phone = { value: "0412 345 678", source: "brief" };
+  const before = validateSiteContent(withPhone, brief);
+  assert.ok(before.errors.some((e) => /phone/.test(e)), "unsourced phone is refused");
+  const supplied = { ...brief, ownerFacts: [{ key: "phone", label: "Business phone", value: "0412 345 678" }] };
+  const after = validateSiteContent(withPhone, supplied);
+  assert.ok(!after.errors.some((e) => /phone/.test(e)), "the owner's phone is sourced: " + after.errors.join("|"));
+});

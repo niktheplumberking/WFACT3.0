@@ -61,9 +61,17 @@ export async function runEvaluator(
     ctx.site ? `--- HTML of a ${ctx.site.pages.length}-page site to review, page by page ---` : "--- HTML to review ---",
     ctx.site ? siteForReview(ctx.site) : ctx.html,
   ].join("\n");
-  const raw = await model.complete({ system: RUBRIC, user });
-  return parseEvaluatorResponse(raw);
+  // A reply that ignores the format is a model hiccup, not a verdict about the site. Ask once more; if it happens again,
+  // stop with an error (the run stays resumable) instead of sending the garbled text to the builder as if it were a defect.
+  for (let attempt = 1; ; attempt += 1) {
+    const verdict = parseEvaluatorResponse(await model.complete({ system: RUBRIC, user }));
+    if (!isProtocolFailure(verdict)) return verdict;
+    if (attempt >= 2) throw new Error(`The evaluator's answer did not follow the VERDICT protocol after ${attempt} tries: ${verdict.issues[0]?.slice(0, 160) ?? ""}`);
+  }
 }
+
+export const PROTOCOL_FAILURE_PREFIX = "Evaluator response did not follow the VERDICT protocol";
+export const isProtocolFailure = (v: EvaluatorVerdict) => v.verdict === "changes_requested" && (v.issues[0] ?? "").startsWith(PROTOCOL_FAILURE_PREFIX);
 
 /**
  * Step 4B M3: every page of a site, in nav order. The stylesheet repeated on each page is sent once
@@ -104,7 +112,7 @@ export function parseEvaluatorResponse(raw: string): EvaluatorVerdict {
   if (!verdictMatch) {
     return {
       verdict: "changes_requested",
-      issues: [`Evaluator response did not follow the VERDICT protocol: "${trimmed.slice(0, 200)}"`],
+      issues: [`${PROTOCOL_FAILURE_PREFIX}: "${trimmed.slice(0, 200)}"`],
     };
   }
 

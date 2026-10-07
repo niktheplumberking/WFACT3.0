@@ -11,6 +11,8 @@ import { MockModelClient as EvaluatorMock } from "@wfact/verification/modelClien
 import {
   buildAndVerify,
   resumeBuildAndVerify,
+  runProgress,
+  runIdOfError,
   MemoryArtifactStore,
   type WorkflowDeps,
 } from "../src/buildAndVerify.js";
@@ -178,4 +180,111 @@ test("a malformed brief is refused before any row is written", async () => {
   const { deps, sink } = setup({ firstPage: CLEAN });
   await assert.rejects(() => buildAndVerify({ goal: "x" }, deps));
   assert.equal((sink as InMemoryAuditSink).events.length, 0);
+});
+
+// ---- Step 4D: a person can reopen a halted run and continue from what was saved ----
+
+test("reopen: a run halted at its revision cap continues from its saved site with a fresh revision budget", async () => {
+  const store = new MemoryArtifactStore();
+  const sink = new InMemoryAuditSink();
+  const first = setup({ firstPage: BROKEN, maxQaRevisions: 1, sink, store });
+  const halted = await buildAndVerify(brief, first.deps);
+  assert.equal(halted.status, "failed_verification");
+  assert.equal(runProgress(await sink.listByRun(halted.workflowRunId)).state, "halted");
+
+  // Without a person's request nothing is reopened.
+  const refused = await resumeBuildAndVerify(halted.workflowRunId, setup({ firstPage: CLEAN, sink, store }).deps);
+  assert.equal(refused.status, "already_finished");
+
+  // The builder is fixed (now answers with a clean page); a person presses "fix and continue".
+  const second = setup({ firstPage: CLEAN, maxQaRevisions: 1, sink, store });
+  const resumed = await resumeBuildAndVerify(halted.workflowRunId, second.deps, { reopen: { reason: "fix and continue", by: "user-1" } });
+  assert.equal(resumed.status, "awaiting_launch_approval", "a halted-at-cap run no longer halts again on its first failed check");
+  assert.equal(resumed.workflowRunId, halted.workflowRunId);
+  assert.ok(second.builder.calls.length >= 1, "the builder fixed the saved site's issues");
+  const acts = actions(sink.events, halted.workflowRunId);
+  assert.ok(acts.includes("workflow.reopen"));
+  const reopen = sink.events.find((e) => e.action === "workflow.reopen")!;
+  assert.equal(reopen.payload?.by, "user-1");
+  assert.equal(reopen.payload?.fromStatus, "failed_verification");
+});
+
+test("reopen: a run that reached the launch gate, or whose saved site changed, is never reopened (and nothing is written)", async () => {
+  const sink = new InMemoryAuditSink();
+  const store = new MemoryArtifactStore();
+  const done = await buildAndVerify(brief, setup({ firstPage: CLEAN, sink, store }).deps);
+  const gated = await resumeBuildAndVerify(done.workflowRunId, setup({ firstPage: CLEAN, sink, store }).deps, { reopen: { reason: "x", by: "u" } });
+  assert.equal(gated.status, "already_finished");
+  assert.ok(!sink.events.some((e) => e.action === "workflow.reopen"));
+
+  // checkpoint_corrupt: run halts because the artifact changed after its checkpoint
+  const sink2 = new InMemoryAuditSink();
+  const store2 = new MemoryArtifactStore();
+  let crash = true;
+  const crashing = { name: "c", listByRun: sink2.listByRun.bind(sink2), write: async (e: AuditEvent) => { if (crash && e.actor === "agent:qa-evaluator") throw new AuditWriteError("crash", null); return sink2.write(e); } };
+  await assert.rejects(() => buildAndVerify(brief, setup({ firstPage: CLEAN, sink: crashing, store: store2 }).deps));
+  const runId = sink2.events.find((e) => e.action === "workflow.start")!.runId!;
+  store2.files.set("clients/dreamsign-pilot/pages/clean-agency.html", CLEAN + "<!-- edited -->");
+  crash = false;
+  const corrupt = await resumeBuildAndVerify(runId, setup({ firstPage: CLEAN, sink: crashing, store: store2 }).deps);
+  assert.equal(corrupt.status, "checkpoint_corrupt");
+  const again = await resumeBuildAndVerify(runId, setup({ firstPage: CLEAN, sink: crashing, store: store2 }).deps, { reopen: { reason: "x", by: "u" } });
+  assert.equal(again.status, "checkpoint_corrupt");
+  assert.match(again.reason ?? "", /fresh build is needed/);
+  assert.ok(!sink2.events.some((e) => e.action === "workflow.reopen"), "a run that cannot continue is not reopened");
+});
+
+test("reopen: a run that stopped before anything was saved builds again under the same run id, with the facts the owner added", async () => {
+  const sink = new InMemoryAuditSink();
+  const store = new MemoryArtifactStore();
+  // The builder produces nothing usable the first time (no page).
+  const bad = setup({ firstPage: "", sink, store });
+  const halted = await buildAndVerify(brief, bad.deps);
+  assert.equal(halted.status, "build_failed");
+  assert.equal(halted.lastCheckpoint, null);
+  assert.equal(runProgress(await sink.listByRun(halted.workflowRunId)).saved, "none");
+
+  const withFacts = { ...brief, ownerFacts: [{ key: "phone", label: "Business phone", value: "0400 111 222" }] };
+  const good = setup({ firstPage: CLEAN, sink, store });
+  const resumed = await resumeBuildAndVerify(halted.workflowRunId, good.deps, { reopen: { reason: "details added", by: "u", brief: withFacts } });
+  assert.equal(resumed.status, "awaiting_launch_approval");
+  assert.equal(resumed.workflowRunId, halted.workflowRunId);
+  assert.match(good.builder.calls[0]!.user, /Business phone: 0400 111 222/, "the owner's fact reached the builder");
+  assert.deepEqual(actions(sink.events, halted.workflowRunId).filter((a) => a === "workflow.start").length, 1, "same run, not a second start");
+});
+
+test("an exception inside a started run carries its run id (so the Cockpit can offer to continue it)", async () => {
+  const store = new InMemoryAuditSink();
+  const crashing = { name: "c", listByRun: store.listByRun.bind(store), write: async (e: AuditEvent) => { if (e.actor === "agent:qa-evaluator") throw new AuditWriteError("down", null); return store.write(e); } };
+  let caught: unknown;
+  try {
+    await buildAndVerify(brief, setup({ firstPage: CLEAN, sink: crashing }).deps);
+  } catch (err) {
+    caught = err;
+  }
+  assert.ok(caught instanceof AuditWriteError, "the original error type is kept");
+  assert.equal(runIdOfError(caught), store.events.find((e) => e.action === "workflow.start")!.runId);
+});
+
+test("runProgress reads what is saved, how often it was reopened, and how it ended", async () => {
+  const sink = new InMemoryAuditSink();
+  const r = await buildAndVerify(brief, setup({ firstPage: CLEAN, sink }).deps);
+  const p = runProgress(await sink.listByRun(r.workflowRunId));
+  assert.deepEqual({ saved: p.saved, state: p.state, reopens: p.reopens, savedCycle: p.savedCycle }, { saved: "verified", state: "gate", reopens: 0, savedCycle: 0 });
+});
+
+test("reopen: a crashed run continued with a new brief keeps that brief and a revision budget from its saved site on the NEXT resume too", async () => {
+  const store = new InMemoryAuditSink();
+  let crash = true;
+  const sink = { name: "s", listByRun: store.listByRun.bind(store), write: async (e: AuditEvent) => { if (crash && e.actor === "agent:qa-evaluator") throw new AuditWriteError("crash", null); return store.write(e); } };
+  const artifacts = new MemoryArtifactStore();
+  await assert.rejects(() => buildAndVerify(brief, setup({ firstPage: BROKEN, sink, store: artifacts, maxQaRevisions: 1 }).deps));
+  const runId = store.events.find((e) => e.action === "workflow.start")!.runId!;
+  const withFacts = { ...brief, ownerFacts: [{ key: "phone", label: "Phone", value: "0400 111 222" }] };
+  const again = setup({ firstPage: BROKEN, sink, store: artifacts, maxQaRevisions: 1 });
+  crash = false;
+  await resumeBuildAndVerify(runId, again.deps, { reopen: { reason: "details added", by: "u", brief: withFacts } });
+  const row = store.events.find((e) => e.action === "workflow.reopen")!;
+  assert.equal(row.payload?.baseCycle, 0);
+  assert.ok(row.payload?.brief, "the newer brief is recorded");
 });

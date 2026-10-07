@@ -3,8 +3,9 @@
  * Cockpit already reads, so it is unit-tested without a database. It never invents state: every item
  * points at a real row, and an item disappears only when the rows say it was dealt with.
  */
-import { isActive, isStaleQueued, type JobRow } from "../jobsClient";
-import { KIND_LABEL, LEAD_LABEL, explainJobError, planName, shortDate, dateTime, type AccountRequestRow, type PlanRow } from "./model";
+import { isActive, isStaleQueued, isStaleRunning, type JobRow } from "../jobsClient";
+import { KIND_LABEL, LEAD_LABEL, planName, shortDate, dateTime, type AccountRequestRow, type PlanRow } from "./model";
+import { asStopped, diagnoseJob } from "./recovery";
 
 export type AttentionKind = "plan" | "account" | "launch" | "ready" | "failed" | "stuck";
 
@@ -111,15 +112,16 @@ export function buildAttention({ plans, jobs, accounts, myId, canDecide, now = D
         href: `/activity/${j.id}`,
         at: j.finished_at ?? j.created_at,
       });
-    } else if (j.status === "failed") {
+    } else if (j.status === "failed" || isStaleRunning(j, now)) {
+      const dg = diagnoseJob(asStopped(j, now), jobs.filter((x) => planIdOfJob(x, jobs) === planId), { planId });
       items.push({
         key: `failed:${j.id}`,
         kind: "failed",
         tone: "stop",
         isDecision: false,
-        label: "Needs fixing",
-        title: `The ${name} build stopped: ${explainJobError(j).headline}`,
-        why: `${KIND_LABEL[j.kind]}, ${dateTime(j.created_at)}. Open it to see what to do.`,
+        label: dg.cause === "info" ? "Needs your input" : dg.actor === "huraira" ? "With the technical team" : "Needs fixing",
+        title: dg.cause === "info" ? `The ${name} build needs a few details from you` : `The ${name} build stopped: ${dg.headline}`,
+        why: `${KIND_LABEL[j.kind]}, ${dateTime(j.created_at)}. ${dg.carryOn === "continue" ? "Open it: one button carries on from the saved step." : "Open it to see what to do."}`,
         href: `/activity/${j.id}`,
         at: j.created_at,
       });
@@ -152,7 +154,7 @@ export function buildAttention({ plans, jobs, accounts, myId, canDecide, now = D
       tone: "stop",
       isDecision: false,
       label: "Needs fixing",
-      title: `${KIND_LABEL[j.kind]} failed: ${explainJobError(j).headline}`,
+      title: `${KIND_LABEL[j.kind]} failed: ${diagnoseJob(j).headline}`,
       why: `${dateTime(j.created_at)}. Open it to see what to do.`,
       href: `/activity/${j.id}`,
       at: j.created_at,

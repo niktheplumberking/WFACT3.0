@@ -4,7 +4,7 @@
  * talks to the database.
  */
 import type { JobKind, JobRow } from "../jobsClient";
-import { isStaleQueued } from "../jobsClient";
+import { isStaleQueued, isStaleRunning } from "../jobsClient";
 
 export type Role = "owner" | "admin" | "pm";
 export type Track = "A" | "B";
@@ -141,9 +141,9 @@ export function jobState(j: JobRow, now = Date.now()): JobState {
     case "queued":
       return isStaleQueued(j, now) ? { label: "Never started", tone: "stop" } : { label: "Waiting to start", tone: "idle" };
     case "dispatched":
-      return { label: "Starting", tone: "idle" };
+      return isStaleRunning(j, now) ? { label: "Stopped without reporting", tone: "stop" } : { label: "Starting", tone: "idle" };
     case "running":
-      return { label: "Running", tone: "idle" };
+      return isStaleRunning(j, now) ? { label: "Stopped without reporting", tone: "stop" } : { label: "Running", tone: "idle" };
     case "cancelled":
       return { label: "Cancelled", tone: "idle" };
     case "failed":

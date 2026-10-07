@@ -17,6 +17,7 @@
 | `WFACT-3.0-Continuation-Build-Plan.md` | Stages 1–7 |
 | `WFACT-3.0-Factory-Completion-Plan.md` | Steps 1–24, one agent prompt per step, Standard Operating Rules |
 | `FRONTEND-UPGRADE-DESIGN.md` | Step 4B: the two front-end build tracks |
+| `BUILD-RECOVERY-DESIGN.md` | Step 4D: why builds stop, what the Cockpit tells the owner, and how a stopped build carries on |
 
 Live status: `../PROGRESS.md`. Waiting on Nick: `../BLOCKED-ON-NICK.md`.
 
