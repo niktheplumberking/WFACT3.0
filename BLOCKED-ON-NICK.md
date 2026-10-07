@@ -1,5 +1,19 @@
 # Blocked on Nick
 
+## Open now (verified 2026-10-07 alignment pass; the sprint-era tables below are kept as the record)
+
+| Item | Owner | Blocks |
+|---|---|---|
+| Scope: agency pipeline and lead-gen content engine are IN (Nick said yes 2026-10-07); revised direction for motion-rich all-site output and e-commerce needs Huraira's confirmation | Huraira, then Nick | Any new N-steps (Addendum) |
+| Real pilot brief and business rules (replace provisional `memory/context.md` R-01…R-13 and the synthetic `summit-line-roofing`) | Nick | Blueprint goal 1; Stage 7; Step 22 |
+| Governance split in CLAUDE.md §3; entity list (DreamSign, Bennett & Co) | Nick | Entity schema is N-capable; formal sign-off only |
+| Hermes-lite and Vercel-instead-of-Hostinger disclosures (written, never spoken to Nick) | Huraira | Step 5-era exit checks; Step 22 |
+| Higgsfield credits, key rotation (key was posted in chat), GitHub secret, spend cap | Huraira/Nick | Step 4B M5 |
+| OpenAI credits (second-vendor reviewer/evaluator) | Huraira | Independent cross-vendor review |
+| Press "continue" on a real stopped build in the Cockpit; re-run Track A `b5a45a8e` and Track B `4acbde1f` once CI is green | Huraira | Step 4D live proof; Step 4B M4 close |
+| Vercel plan upgrade (12-function ceiling); API spend ceiling; where the second brain and Hermes run | Nick | Step 20; Step 12; Step 13 |
+| Sprint-era "Access & credentials" rows below that say OPEN or DESCOPED (Hostinger, Higgsfield MCP) | — | Superseded by this table where they conflict |
+
 Live tracker, consolidated from `docs/archive/old-reports/wfact-3.0-nick-requirements.html`. Per the Operator's Manual's
 own rule: fire off every access request on Day 0, don't sit idle waiting — keep this list visible
 instead of quietly absorbing the delay. Update the Status column as items close; don't delete resolved

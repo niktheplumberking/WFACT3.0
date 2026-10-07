@@ -19,6 +19,7 @@ time-sensitive (model IDs, pricing, credentials) before relying on it.
    Operating Rules (Part C). One step at a time, report back, wait for Huraira's GO. Step 4B is described in
    `docs/FRONTEND-UPGRADE-DESIGN.md`.
 
+A consolidated, verified orientation (goals, current state, backlog, next task) is `docs/HANDOFF.md`; read it first.
 Live status is in `PROGRESS.md`; everything waiting on Nick is in `BLOCKED-ON-NICK.md`. The document index is
 `docs/INDEX.md`. The sprint-era phrasing elsewhere in this file ("proof sprint", "Phase 1") is history; the
 law sections below still apply unchanged.

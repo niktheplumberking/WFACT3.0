@@ -1,49 +1,13 @@
 # WFACT 3.0
 
-Private monorepo for WFACT 3.0. **Start here, in order:**
+Private monorepo for WFACT 3.0: an AI-run web-agency factory and its control room (the Cockpit).
 
-1. [`CLAUDE.md`](CLAUDE.md) — the law file. Every agent (human or AI) reads this first.
-2. [`PROGRESS.md`](PROGRESS.md) — live status of the current 100-hour build sprint, phase by phase.
-3. [`BLOCKED-ON-NICK.md`](BLOCKED-ON-NICK.md) — everything waiting on access, a decision, or budget.
-4. [`memory/context.md`](memory/context.md) — business identity, entities, standing rules (currently
-   draft, pending Nick's business-rules session).
-5. [`docs/`](docs/) — the full planning documents this repo executes against: the Build Playbook, the
-   Execution Roadmap, the Ecosystem Blueprint, and the 20-day sprint's Nick-facing plan + requirements +
-   the Operator's Manual.
+**Agents and engineers start here, in order:**
 
-## Structure
+1. [`docs/HANDOFF.md`](docs/HANDOFF.md) — goals, verified current state, architecture, backlog, setup, next task.
+2. [`CLAUDE.md`](CLAUDE.md) — the law file ("never trust done, only verified").
+3. [`PROGRESS.md`](PROGRESS.md) — live status; [`BLOCKED-ON-NICK.md`](BLOCKED-ON-NICK.md) — what waits on a human.
+4. [`docs/INDEX.md`](docs/INDEX.md) — which document governs what; [`docs/archive/MANIFEST.md`](docs/archive/MANIFEST.md) — what is retired.
 
-```
-CLAUDE.md               law file — read first
-PROGRESS.md             sprint phase tracker
-BLOCKED-ON-NICK.md       access/decision/budget tracker
-.env.example             env var shape, no real values, ever
-memory/
-  context.md             business-wide semantic memory (draft)
-  lessons-ledger.md       never-repeat mistakes, owner veto
-clients/
-  _template/memory.md    per-client memory file template
-apps/
-  cockpit/                the control room PWA (Phase 6+)
-packages/
-  db/
-    migrations/           versioned SQL, applied in order (entities, clients, projects, tasks,
-                           correction_rounds, RLS policies, entity-law triggers)
-    RLS_ATTACK_TEST_RESULTS.md   last real attack-test run against the sandbox project
-  hermes/
-    src/                  Hermes-lite (Phase 3 stand-in controller) — see packages/hermes/README.md
-                           for what it is, why it's a stand-in, and its verification status
-    test/                 unit tests, no credentials needed — `npm test` from packages/hermes/
-scripts/
-  rls_attack_test.sql     the actual isolation attack test, re-runnable against any fresh instance
-docs/                     source planning documents (do not treat this repo's other files as replacing
-                           these — they summarize the docs, the docs are the source of truth)
-```
-
-## What this is, right now
-
-Not the full multi-month build. This repo currently executes the **100-hour, 7-phase proof sprint**
-described in `docs/archive/sprint-100-hour/wfact-3.0-nick-plan.html` and `docs/archive/sprint-100-hour/wfact-3.0-operator-manual.html`: prove one real
-loop (controller → memory → front-end build → verification → cockpit visibility) end to end, on one
-real or pilot client, with honest measured numbers — not a finished product. See `PROGRESS.md` for
-where things stand today.
+See `.claude/QUICK_START.md` for commands and `.claude/ARCHITECTURE_MAP.md` for the layout. The 100-hour sprint that
+earlier versions of this README described is finished and archived.

@@ -13,14 +13,14 @@ after Step 4B M2 (CI `36871379578`); earlier `289ec00`…`c0f3d29`.
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
 [`docs/WFACT-3.0-Continuation-Build-Plan.md`](docs/WFACT-3.0-Continuation-Build-Plan.md), the plan in
 force since 2026-09-28, with the Blueprint (`docs/wfact-3.0-blueprint.html`) as the scope source of
-truth. The Phases 1–7 section above it is the historical record of the superseded 100-hour sprint
+truth. The Phases 1–7 section (now archived, see the pointer below) was the historical record of the superseded 100-hour sprint
 (`docs/archive/sprint-100-hour/wfact-3.0-operator-manual.html` / `docs/archive/sprint-100-hour/WFACT-3.0-Fast-Track-Plan.md`). Its checkboxes are not
 restructured to fit the new plan. `docs/WFACT-3.0-Factory-Completion-Plan.md` (committed `4ecfe4a`,
 revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in place of it: it maps the remaining Blueprint
 phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary**: Step **4D (build recovery) is PARTIAL**: built and tested locally (`a3198d8`), migration 0018 not applied, not pushed. On the Factory Completion Plan, Steps 1, 2, 3, 3A, **5, 6 and 7 are DONE** (5 and 7 on 2026-10-07: 5 proven on live
+**Status summary**: Step **4D (build recovery) is PARTIAL**: built, migration 0018 applied live (attack test 26/26), pushed and deployed (CI `37644039022` green); the live "continue" button has not been pressed on a real stopped build yet. (Corrected 2026-10-07 in the alignment pass; this line previously said "not applied, not pushed".) On the Factory Completion Plan, Steps 1, 2, 3, 3A, **5, 6 and 7 are DONE** (5 and 7 on 2026-10-07: 5 proven on live
 Cockpit builds, 7 CI `37617845669` green); Step 4 is PARTIAL (preview superseded by 4B M6); **Step 4B is IN PROGRESS**, about 90% through M4:
 Track B's live build `c775c396` passed every check except a simulated-LCP measurement that misses 2.5 s by 0.02-0.08 s for framework
 scripts alone (real LCP 0.05-0.72 s), and Track A's last re-run `ad49df57` died on one dropped Agent 37 connection, now retried (`734ded5`);
@@ -237,143 +237,11 @@ none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-
 
 ---
 
-# 100-Hour Sprint (superseded 2026-09-28 — historical record)
+# 100-Hour Sprint (superseded 2026-09-28 — archived 2026-10-07)
 
-Source: `docs/archive/sprint-100-hour/wfact-3.0-operator-manual.html`, sequenced per `docs/archive/sprint-100-hour/WFACT-3.0-Fast-Track-Plan.md`. Kept as
-written at the sprint's close; later changes appear only as dated inline notes.
+The Phases 1–7 checklist of the superseded sprint moved, unedited, to
+`docs/archive/2026-10-07-alignment/PROGRESS-sprint-phases-1-7.md` (see `docs/archive/MANIFEST.md`). History only; do not work from it.
 
-## Phase 1: Foundation & Access (Days 1–2 · 8 hrs)
-
-- [x] Set up repo skeleton, law file, memory scaffold, `BLOCKED-ON-NICK.md` tracker
-- [x] Base CI skeleton with zero-manual-step deploy — *closed 2026-09-28 under Continuation Stage 1*:
-      `deploy-cockpit` in `.github/workflows/ci.yml`, first green on run `36436468792`. (At sprint
-      close, no deploy automation existed and the Vercel deploy was a manual CLI call.)
-- [x] Secrets manager wired, nothing in plaintext — *closed 2026-09-30 under Continuation Stage 1*:
-      `.env.local` files deleted, grep criterion passes, everything runs from Doppler. See Stage 1.
-- [x] GitHub access confirmed — dedicated `niktheplumberking/WFACT3.0` repo, verified via `gh auth status`
-- [x] Supabase project access confirmed — `mcaxxhgjptwowwrluhra`, migrated (`0001`–`0005`) and RLS-attack-tested for real, 2026-09-22
-- [x] Vercel access confirmed — `vercel whoami` → `niktheplumberking`, verified in this environment
-- [ ] Hostinger access — descoped for this sprint (Huraira's call, 2026-09-22); Vercel substitutes for "live," substitution logged in `BLOCKED-ON-NICK.md`
-- [x] 3 SOPs + Operations Manual received — `docs/WFACT SOPS/`, added 2026-09-22
-- [x] Motion Sites MCP + 21st.dev credentials confirmed real — both call-tested live, 2026-09-21/22
-- [ ] Higgsfield MCP credentials — descoped for this sprint (Huraira's call, 2026-09-22)
-- [x] Claude/Anthropic API billing confirmed — real key, real live call made 2026-09-22
-- [ ] Which 2 entities confirmed — still Nick-only; placeholder in use (DreamSign + Bennett & Co)
-
-**Exit check** (MET 2026-09-28, after the sprint closed): *"A commit reaches a deployed preview through
-CI with zero manual steps, and every access item is either confirmed or has a tracked workaround in
-place."* At sprint close, every access item was confirmed or had a logged, disclosed workaround, but
-the CI-automated-deploy half didn't exist. That half was met by Continuation Stage 1 on run
-`36436468792` (a production deploy with no manual step and an HTTP 200 smoke-check).
-
-## Phase 2: State Layer & Second Brain v1 (Days 3–5 · 16 hrs)
-
-- [x] Schema, entity-law trigger (schema-level constraint, not just convention), RLS policies designed and migrated — `packages/db/migrations/0001`–`0005`
-- [x] RLS attack test passing for real, against the canonical project — Run 2, 2026-09-22 (`packages/db/RLS_ATTACK_TEST_RESULTS.md`); identical result to the original Run 1 against `wfact-3-sandbox`
-- [ ] `memory/context.md` business rules — still placeholder, pending Nick's real business-rules session
-
-**Exit check**: *"A test query ('what stage is client X is in') returns a correct answer from the
-memory files, and the RLS attack test fails to cross entity boundaries."* RLS half: met and re-verified
-against the canonical project. Memory-file half: trivially true only because `context.md` is still a
-placeholder — re-verify once real business rules land.
-
-## Phase 3: Hermes Controller Core (Days 6–8 · 14 hrs)
-
-- [x] Hermes-lite built — memory/state tools, schema-validated tool allowlist, plain-language tone filter, bounded retry/escalation, 26/26 tests passing
-- [x] Live smoke test with a real status question — **MET 2026-09-22**: `npm run ask -- "What is the status of DreamSign?"`, real `ANTHROPIC_API_KEY`, real Supabase state, answer independently checked against this session's own ground truth
-
-**Exit check: MET 2026-09-22.** *"Hermes (or its stand-in) answers 'what's the status of X' correctly
-and in plain language, sourced from real memory and state, not a canned response."* Real transcript,
-verified — see `packages/hermes/README.md` and this repo's commit history for detail.
-
-## Phase 4: Model Routing & Front-End Loop v1 (Days 9–12 · 22 hrs)
-
-- [x] Motion Sites + 21st.dev wired for real — live-fetched content (Motion Sites prompt `agency-services`, a real 21st.dev component search) translated into this pipeline's inline-CSS/no-build-step constraint; both services return React output, a real and disclosed limitation, not a credentials gap
-- [x] Front-end agent configured — builder: Agent 37 (default free-tier router), evaluator: Claude directly, for real vendor independence between the two roles (CLAUDE.md §6)
-- [ ] Real pilot brief from Nick — still using the placeholder (`clients/dreamsign-pilot/brief.json`, `source: "placeholder-2.0-case"`)
-- [x] Real loop run — 2 correction rounds, approved, beats DreamSign 2.0's 40+ baseline; round 1's flagged issue was substantive (an invented "500+ businesses served" stat and fabricated client names), genuinely fixed by round 2
-- [x] Correction rounds logged honestly — `clients/dreamsign-pilot/memory.md`
-- [x] Page live — deployed to Vercel (`https://dreamsign-deploy.vercel.app`), independently `curl`-verified (HTTP 200, correct title)
-
-**Exit check: MET 2026-09-22.** *"One real page live, plus an honest correction-round count logged and
-compared against DreamSign's 40+."* All three parts independently verified, not self-reported.
-
-## Phase 5: Verification Loop (Days 13–15 · 14 hrs)
-
-- [x] 6 deterministic checks built — the Manual's 5 named examples plus one backstop (required-sections), `packages/verification/src/checks/`
-- [x] Independent evaluator wired — separate Claude instance, distinct from Phase 4's builder/evaluator instances
-- [x] Deliberately broken build caught — proven via test fixture, 12/12 tests passing (re-confirmed 2026-09-22)
-- [x] Verification CLI run against the real Phase 4 page — **MET 2026-09-22**: all 6 checks PASS
-      against `clients/dreamsign-pilot/pages/clean-agency.html` (secrets-scan, responsive-check,
-      no-console-errors, image-optimization, isolation-check, required-sections)
-- [x] Live evaluator run (real model call, not mocked) — same run: live Claude evaluator approved,
-      real cost logged ($0.0160, 7924 in / 13 out tokens)
-
-**Exit check: MET (both halves) 2026-09-22.** *"A deliberately broken test build gets caught and
-returned before being marked done."* Proven against a fixture (Run 1, pre-dating this session) and
-now also run for real against Phase 4's actual live output — genuinely separate process, separate
-invocation, real Anthropic call. The full 78-check/50-point registry is out of scope for this sprint
-by the Manual's own explicit fallback ("5–8 well-chosen checks proving the loop works is the actual
-goal this sprint, completeness is next sprint's job") — this is that trimmed set, run for real.
-
-## Phase 6: Cockpit MVP (Days 16–18 · 16 hrs)
-
-- [x] Built the 3-room MVP (Pipeline, Approvals, Runs) per the Fast-Track Plan's scope — Vite +
-      React + TypeScript, `apps/cockpit/`, reading/writing Supabase directly with the anon key,
-      access controlled entirely by Phase 2's real RLS policies (no service-role key in the
-      browser bundle)
-- [x] Connected to Supabase for live data — verified with real data, not a mock: Pipeline and Runs
-      show the real DreamSign pilot project and its 2 real correction rounds (seeded from what
-      Phase 4 actually produced); Approvals genuinely advances `projects.stage` through a real
-      RLS-gated write (tested end-to-end: advanced then reverted via a real authenticated session,
-      not just a client-side check)
-- [x] Real login — Supabase magic-link auth (no password to manage), a real owner-role profile
-      seeded for Huraira via the Auth Admin API, not a raw table insert
-- [ ] Get Nick to actually look at it before day 20 — not yet done, this is explicitly his step
-
-**Exit check** (build half met, Nick's review not yet done): *"Nick can open one link and understand
-what's happening without asking a question first."* Live at
-`https://wfact-cockpit-niktheplumberkings-projects.vercel.app` — verified reachable via `curl`
-(HTTP 200). Vercel's default deployment-protection (SSO gate) was disabled for this project
-specifically, since it would have blocked exactly the one-link access this exit check asks for; the
-app's own Supabase auth + RLS is the real access control layer, not Vercel's. The review itself —
-Nick actually looking at it — is a Nick-only step, still open.
-
-**A second real issue, also caught by Huraira and fixed, not this session noticing on its own**:
-Huraira's first real sign-in attempt hit a stale magic-link email (from this session's own earlier
-dev-server testing on `localhost:5173`) that was also expired — real screenshot evidence
-(`ERR_CONNECTION_REFUSED`, `otp_expired`). Investigating found the actual underlying blocker:
-Supabase Auth's Site URL was still the project default (`http://localhost:3000`), so even a fresh
-link from the real production URL would have failed — confirmed by explicitly requesting
-`redirect_to` = the production URL via the Admin API and getting back a link that silently fell back
-to `localhost:3000` anyway. No available tool in this session could change that setting (it's
-dashboard/Management-API config, not reachable via the service-role key or SQL) — Huraira updated
-Site URL + Redirect URLs in the Supabase dashboard directly. Re-verified after: a fresh generated
-link now correctly resolves to the production URL, and the full verify step was completed end-to-end
-(real access token issued) before telling Huraira to try again for real. **Closed out 2026-09-22**:
-Huraira's real retry succeeded — login confirmed working end-to-end, logged in `BLOCKED-ON-NICK.md`.
-Still open: his own actual review of Pipeline/Approvals/Runs content, separate from login working.
-
-**A real regression happened and got fixed, logged honestly rather than smoothed over**: pushing this
-phase's commit to GitHub triggered Vercel's Git integration to auto-build from the repo root (this
-repo deliberately has no root `package.json`), which silently produced an empty output and overwrote
-the working manual deploy on the shared alias — Huraira caught this from a real 404 in his own
-browser, not something this session noticed on its own. Root cause confirmed via build logs (`Build
-Completed in [151ms]`, nothing built). Fixed properly, not just patched around: set the Vercel
-project's Root Directory to `apps/cockpit` and added real `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY`
-project environment variables (the anon key deliberately as `--type config`, i.e. public — matches
-`supabaseClient.ts`'s own design, RLS protects data, not this key), then verified a fresh git-shaped
-deploy actually builds correctly (`✓ 75 modules transformed`, not another empty build) before
-considering this closed. This also means future `git push`es now redeploy Cockpit automatically and
-correctly, which is real progress on Phase 1's still-open "zero manual steps" gap — for the Cockpit
-specifically, not the whole repo yet.
-
-## Phase 7: Proof Run & Handoff (Days 19–20 · 10 hrs)
-
-- [ ] Not started. Largely a documentation/presentation pass over what Phases 1–6 already proved
-      for real, plus Nick attending the review and deciding next steps — both Nick-only.
-
----
 
 # Continuation Build Plan (`docs/WFACT-3.0-Continuation-Build-Plan.md`)
 

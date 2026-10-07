@@ -1,9 +1,10 @@
 # Documentation Index
 
-**Last updated**: 2026-10-01
+**Last updated**: 2026-10-07 (alignment pass)
 
-## Session start (essential, ~800 tokens)
+## Session start (essential)
 
+- `docs/HANDOFF.md` (self-contained orientation: goals, verified state, backlog, next task; read first)
 - `CLAUDE.md` (law file)
 - `.claude/COMMON_MISTAKES.md`
 - `.claude/QUICK_START.md`
@@ -32,10 +33,17 @@ Live status: `../PROGRESS.md`. Waiting on Nick: `../BLOCKED-ON-NICK.md`.
 | `AGENT-PERMISSIONS.md` | Step 6: enforced agent scopes, role x capability inventory, injection defence, live attack evidence, NOT COVERED |
 | `WFACT SOPS/` | The 3 SOPs, Factory Book and Factory Audit (PDFs, with markdown copies) |
 
+## Proposals and history kept in place (not governing)
+
+| Doc | Status |
+|---|---|
+| `WFACT-3.0-Agency-Scope-Addendum-DRAFT.md` | DRAFT scope proposal. Section 2 (dynamic tiers) is superseded by Nick's 2026-10-07 reply; sections 1, 3, 5 still open. Needs Huraira and Nick decisions (HANDOFF section 6) |
+| `step-4c/PHASE-1-PROPOSAL.md` | Historical Step 4C audit; cited by Cockpit source comments |
+
 ## Planned outputs (created by later steps, not yet present)
 
 `DISASTER-RECOVERY.md`, `nick-briefing-<date>.md`, and dated results under `learnings/`.
 
 ## Archive (history only, zero token cost, do not work from it)
 
-`archive/` is listed in `.claudeignore`. See `archive/README.md` for what is in it.
+`archive/` is listed in `.claudeignore`. See `archive/README.md` and `archive/MANIFEST.md` (every move, original path and reason).
