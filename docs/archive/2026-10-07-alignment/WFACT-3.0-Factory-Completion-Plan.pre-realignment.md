@@ -10,7 +10,6 @@ to a Continuation Stage, that is noted.
 **Revised 2026-10-01**: added **Step 4B** (front-end upgrade: two build tracks, chosen per client) and **Step 4C** (Cockpit UI/UX
 redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
-**Realigned 2026-10-07**: product-and-solution alignment pass (`docs/HANDOFF.md` is the orientation; `docs/archive/MANIFEST.md` lists what moved). Changes to this plan: closed steps (1, 2, 3, 3A, 4, 4C, 5, 6, 7) keep their heading, status and evidence but their long agent prompts moved to the archived pre-realignment copy; open steps keep full prompts; Steps 12, 20 and 21 gained the verified gaps found in the audit; Part F lists proposed, UNAPPROVED additions (agency scope) and the decisions that gate them. The approved step order below is unchanged. The step table, headings and Part E remain machine-checked by `scripts/check-trackers.mjs`.
 **Status as of 2026-10-07**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
 Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done, M4 PARTIAL: built and verified in CI `37016971442`; live Track B
 build `f696ba43` failed on page count and invented testimonials, fixed in `c64bd0e`, not yet re-run; M5 groundwork `4bbd4bc`, live run
@@ -175,7 +174,44 @@ housekeeping: two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`) await Huraira'
 **Depends on**: none.
 **Maps to**: Cockpit jobs (unplanned work), Blueprint §14 headless runs; unblocks Steps 2–4.
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 1.
+
+CONTEXT
+Cockpit -> GitHub job dispatch has never worked end to end. Two build_plan jobs (a2a41d2d, cbf8bf7b) for
+approved plan 8f03181f are stuck in `queued`. The `Cockpit job` workflow (.github/workflows/cockpit-job.yml)
+has zero runs. Root cause history is in PROGRESS.md "Cockpit jobs" and docs/COCKPIT-JOBS.md: CORS allow-list
+in the dispatch-job Edge Function (now v4). It is still UNCONFIRMED whether GITHUB_DISPATCH_TOKEN is set in
+the function's secrets, and whether the browser POST ever reaches the function.
+
+TASK
+1. Establish current truth: list_edge_functions (version, status), recent function logs, the jobs table rows
+   for the two stuck jobs, and `gh run list --workflow cockpit-job.yml`.
+2. Determine whether GITHUB_DISPATCH_TOKEN exists in the function's secrets (check by name only, never print
+   a value). If it is missing, STOP and tell Huraira exactly what token scope and where to set it.
+3. Prove the dispatch leg WITHOUT the browser first: invoke dispatch-job with a valid owner session (or the
+   documented service path) for one queued job and confirm a cockpit-job.yml run appears and the job goes
+   queued -> running -> succeeded/failed with dispatched_at set.
+4. Then prove it from the real Cockpit in the browser pane (sign-in is Huraira's; if login is required, ask
+   Huraira to sign in, then continue). Click Start on a queued job. Confirm the POST reaches the function
+   (function logs show POST, not just OPTIONS).
+5. Fix any real defect found (CORS, headers, token, workflow inputs). Add or extend tests. Redeploy the
+   function if changed, and record the new version.
+6. Re-dispatch the build_plan job for plan 8f03181f and confirm the workflow runs `build-and-verify --plan`.
+   Do NOT deploy the resulting page anywhere; Launch is human-gated.
+7. Confirm the Cockpit Actions room shows the job's true status live.
+
+ACCEPTANCE
+- cockpit-job.yml has at least 1 successful run triggered from the Cockpit (dispatched_at not null).
+- The build_plan job for plan 8f03181f finishes with a real result and audit_log rows (workflow.start /
+  checkpoint / gate) read back by SQL.
+- Failure path proven: a deliberately invalid job fails visibly (status failed with a reason), never silently
+  queued.
+- PROGRESS.md "Cockpit jobs" section updated to reflect reality.
+
+REPORT in the Part C format, then STOP.
+```
 
 ---
 
@@ -188,7 +224,57 @@ in `BLOCKED-ON-NICK.md` (Step 22). The prompt is kept for the record.
 **Depends on**: none (can run in parallel with Step 1).
 **Maps to**: Continuation Stage 7 prerequisites; Blueprint §8 context.md; Phase 2.
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 2.
+
+CONTEXT
+Nick owes a real pilot brief and a business-rules session. Huraira has decided to proceed with realistic
+FICTIONAL inputs written by you now, to be swapped for Nick's real ones later. Anything you write must be
+honest about being provisional.
+
+TASK
+A. Business rules -> memory/context.md
+   1. Read the current file, the Factory Book/SOP markdown in docs/WFACT SOPS/Claude outputs/, the Playbook,
+      the Ecosystem Blueprint and the Blueprint's entity law. Reuse real facts already in those documents;
+      do not contradict them.
+   2. Replace every [PLACEHOLDER] with a concrete, sensible PROVISIONAL rule where you can reasonably infer
+      one (pricing bands, package tiers, standard timelines, revision limits, approval rules, what needs
+      owner sign-off, tone of client comms, banned claims such as invented statistics or fake client names).
+      Where a value would need real business knowledge (actual prices, actual entity confirmation), give a
+      clearly labelled provisional value and mark it: [PROVISIONAL - Nick to replace].
+   3. Keep the entity law intact: N-capable schema, one client per entity, two active entities for now
+      (DreamSign, Bennett & Co) with Rizm separate. Keep "Launch and Money are hard-gated to Nick".
+   4. Add a short "Provisional-rule register" at the bottom listing every provisional value, so Nick's
+      session becomes a checklist to confirm or change.
+B. Pilot brief
+   1. Design ONE fictional client that is new (not DreamSign, Northlight Signs or Harbor Street Bakery) and
+      realistic enough to stress the pipeline: a local service business needing a multi-section marketing
+      site (hero, services, proof/testimonials using clearly labelled sample content, pricing or packages,
+      FAQ, contact/booking). Include real constraints: brand tone, colour or style direction, forbidden
+      claims, required sections, a contact method, accessibility and performance expectations, and two
+      ambiguities the Intake agent should notice and flag.
+   2. Save it as clients/<slug>/brief.json in the exact shape frontend-loop's parseBrief accepts, with
+      `source: "synthetic-provisional-2026-09-30"`. Also save a raw-email version at
+      clients/<slug>/raw-request.txt, the way the lead would really write it, for the Intake test.
+   3. Copy clients/_template/ for the rest of the client folder (memory.md etc.). Assign the client to the
+      appropriate entity per the schema and the entity law. Do not break the one-client-per-entity rule; if
+      it would, STOP and ask.
+   4. Register the client in Supabase state only if the existing tooling does so through a documented path;
+      otherwise leave DB state to Step 4.
+C. Tracker
+   Update BLOCKED-ON-NICK.md: keep the two Nick rows OPEN but change their status text to "PROVISIONAL
+   DRAFT IN USE since 2026-09-30 - Nick to replace"; do not mark them closed. Update PROGRESS.md.
+
+ACCEPTANCE
+- context.md has no unlabelled placeholders; every provisional value is listed in the register.
+- The brief passes parseBrief (run it) and the Intake agent, run on raw-request.txt, produces a valid
+  classification (run it live only if Step 1 is done and the run is cheap; otherwise run with the existing
+  test harness and say so).
+- Nothing in either file presents invented facts as verified client or business facts.
+
+REPORT in the Part C format, then STOP.
+```
 
 ---
 
@@ -201,7 +287,40 @@ is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler 
 **Depends on**: none.
 **Maps to**: Continuation Stage 1 criterion 3; Blueprint §3 security.
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Follow the Standard Operating Rules in
+docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 3. This step needs HURAIRA to perform
+account actions; you guide and verify. Never print a secret value.
+
+CONTEXT
+Doppler is the real secrets source (project wfact-3-0-codebase, configs dev/prd). But .env.local and
+apps/cockpit/.env.local still hold plaintext keys, and a Doppler CLI token (dp.ct...) was exposed in a
+session transcript on 2026-09-28 and is not confirmed revoked.
+
+TASK
+1. Verify (without printing values) that every key in .env.local and apps/cockpit/.env.local exists with an
+   identical hash in Doppler dev/prd. List any key that exists only in the local file. If any exist, STOP
+   and tell Huraira to add them to Doppler first.
+2. Give Huraira a short numbered checklist (exact commands where safe) to: (a) delete both .env.local files,
+   (b) rotate each key that sat in plaintext (Supabase service role, Anthropic, OpenAI, Agent 37, Vercel
+   token, any others - list by NAME) and update Doppler, (c) run `doppler logout` and log in again to
+   revoke the leaked CLI token, (d) confirm the rotated DOPPLER_TOKEN and VERCEL_TOKEN GitHub secrets still
+   work.
+   Wait for Huraira to confirm each action. Do not perform account or key-rotation actions yourself.
+3. After Huraira confirms, verify: files are gone; the plan's grep criterion (docs/SECRETS.md) passes; a
+   command run via `doppler run --` works (e.g. the ask CLI writes an audit row); the Cockpit still builds;
+   a CI run on huraira-work is green; the new keys work in the deployed Edge Function paths you can test.
+4. Confirm the old leaked token no longer authenticates (a harmless read call should fail) - only if that
+   can be tested without exposing values.
+5. Update docs/SECRETS.md, PROGRESS.md Stage 1 (criterion 3 MET only if proven) and the Incidents entry.
+
+ACCEPTANCE
+- No plaintext secret files on disk; grep criterion passes.
+- Everything still runs from Doppler only.
+- Old token shown to be revoked, or explicitly listed as "not verified".
+
+REPORT in the Part C format, then STOP.
+```
 
 ---
 
@@ -216,7 +335,35 @@ confirmed by email, approved and signed in (needs Huraira); the Supabase Auth se
 
 Remaining verification prompt (run once Huraira has done the dashboard settings and created a test account):
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY the Step 3A live verification.
+
+CONTEXT
+Password sign-in and approval-gated accounts shipped (migration 0010, apps/cockpit Login, AccessPending,
+AccessRequests, SetPassword). Huraira has set Supabase Auth (email+password on, Confirm email on, minimum
+password length, leaked-password protection) and created ONE test account himself. You never create
+accounts or type passwords.
+
+TASK
+1. Read back by SQL (no secrets): the test account's account_requests row is 'pending' and it has no
+   profiles row.
+2. With Huraira signed in as owner in the browser pane, confirm the request appears in Approvals, then
+   ask Huraira to approve it as 'pm' (his click, not yours).
+3. Confirm by SQL: request 'approved', profiles row with role 'pm', an audit_log 'account.approved' row
+   whose actor is Huraira's user id.
+4. Ask Huraira to sign in as the test account in a private window and confirm it sees only what a pm
+   should (live RLS, not just hidden buttons).
+5. Ask Huraira to try "Forgot password?" for the test account and confirm the reset screen works.
+6. Re-run scripts/rls_attack_test_accounts.sql: 0 failures. Run get_advisors.
+7. Afterwards, with Huraira's OK, reject or remove the test account's access and confirm by SQL.
+
+ACCEPTANCE
+- One real account went pending -> approved -> signed in with the right access, end to end, audited.
+- Attack test still 32/32; advisors show no new findings.
+
+REPORT in the Part C format, then STOP.
+```
 
 ---
 
@@ -232,7 +379,41 @@ ends with a preview. Treat Step 4 as closed by Step 4B M6. The prompt is kept fo
 **Depends on**: Steps 1 and 2 (Step 3 recommended).
 **Maps to**: Continuation Stage 7 (third bullet); Blueprint Phase 7 acceptance; goal 1 (as a synthetic proof).
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 4.
+
+CONTEXT
+The pilot brief and provisional business rules from Step 2 exist. Cockpit dispatch works (Step 1). Goal:
+prove the whole factory on ONE run, through the Cockpit, measuring corrections honestly. The brief is
+SYNTHETIC, so the correction count demonstrates the factory but does NOT count against DreamSign's 40+.
+
+TASK
+1. Submit clients/<slug>/raw-request.txt through the Cockpit Actions room (new request -> Intake + Plan).
+   Confirm Intake's entity and lead-type, and that it flagged the two planted ambiguities. Record what it
+   missed.
+2. Owner approval of the plan is HURAIRA's step. Present the plan summary and ask for approve/reject. If
+   rejected, run the Re-plan action once, then escalate (per the design).
+3. After approval, run Build + verify from the Cockpit. Watch every stage. Record: correction rounds,
+   which checks failed each round, model calls per role, real cost per call, wall-clock time.
+4. Independently verify the built page with a SEPARATE process: run the verification CLI on the artifact and
+   re-hash it against the checkpoint. Also open it in the browser pane and check it visually at desktop and
+   phone widths; list any visible defects the automated checks missed.
+5. LAUNCH IS HUMAN. Do not deploy. Ask Huraira for explicit go to deploy a PREVIEW to Vercel (not a client
+   production site). After a yes, deploy the preview and curl-verify HTTP 200 and the page title.
+6. Pull the audit_log rows and model_traces rows for the run by SQL and confirm they join by task ID.
+7. Log the run honestly in the client's memory.md and PROGRESS.md as "synthetic pilot". Compare the
+   correction count to DreamSign 2.0's 40+ with the caveat stated.
+8. List every defect, friction point or manual step you hit; these become input for Steps 5-8.
+
+ACCEPTANCE
+- One raw request became a verified built page through the Cockpit with no hand-written intermediate.
+- Independent verification and human visual check completed; defects listed.
+- Preview URL live and curl-verified (only after Huraira's yes).
+- Correction count, cost and time recorded; caveat stated.
+
+REPORT in the Part C format, then STOP.
+```
 
 ---
 
@@ -356,7 +537,65 @@ which then build their rooms inside this design system. Can run in parallel with
 **Maps to**: Blueprint §9 (founder-glanceable control room, category dashboards, drill-down), CLAUDE.md pillar 4 ("held to a
 SaaS-sellable bar, not an internal-tool pass").
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/apps/cockpit. Follow the Standard
+Operating Rules in docs/WFACT-3.0-Factory-Completion-Plan.md Part C, including the design-quality rule.
+Do ONLY Step 4C. Before any design work, load the skills named in Part C (impeccable,
+design-taste-frontend, high-end-visual-design, ecc:frontend-design-direction, redesign-existing-projects,
+ecc:make-interfaces-feel-better, ecc:frontend-a11y, ecc:design-system).
+
+CONTEXT
+The Cockpit is the founders' control room. It grew room by room (Pipeline, Approvals incl. plan and
+account approvals, Actions, Runs, Models, login/sign-up/reset). Huraira wants it to be the ONE place where
+every factory feature, option and action is available, with a clean, uncluttered, well-designed UI, easy
+navigation and clear plain-language copy. Nick (non-technical) must be able to use it without help.
+
+PHASE 1 — Audit and plan (no code). STOP for GO at the end.
+1. Inventory every capability: each room and action today; every job kind in packages/jobs; every CLI
+   command in packages/* that has no Cockpit equivalent; every planned room in this plan (Steps 9, 10,
+   12, 14, 17, 23). Produce a table: capability, who uses it (owner/admin/pm), where it lives today,
+   where it should live.
+2. Heuristic review of the current UI with screenshots at desktop and phone: navigation, hierarchy,
+   clutter, copy, empty states, error states, loading states, contrast, focus, tap targets.
+3. Propose the information architecture: top-level navigation (few, clearly named areas), what goes in
+   each, primary action per screen, and how future rooms slot in. A "home" view that answers "is
+   everything OK and what needs me?" first.
+4. Propose the design system: tokens (colour, type pairing, spacing, radius, elevation, motion), core
+   components (nav, page header, card, table, status badge, form controls, dialogs, toasts, empty and
+   error states), dark theme first with a light theme, and a copy guide (plain language, verbs on
+   buttons, no jargon, every error says what happened and what to do).
+5. Provide 3-5 key screen mockups (HTML or images) applying the design-quality rule. STOP and send
+   the audit, IA, design system and mockups to Huraira for GO.
+
+PHASE 2 — Build, after GO.
+6. Implement the design system and the new navigation shell; migrate every existing room onto it
+   without losing any behaviour; keep RLS as the only access control and never put a service key in the
+   bundle.
+7. Make every capability from the inventory reachable in the Cockpit (or listed as deliberately
+   CLI-only with a reason). Do not fake data: a future room appears only when its step builds it, or as
+   an honest "coming in Step N" entry if Huraira prefers.
+8. Accessibility WCAG 2.2 AA (contrast, keyboard, focus visible, labels, reduced motion), responsive
+   from 360 px, installable PWA, fast (lazy-load rooms, no layout shift).
+9. Tests: component and interaction tests for navigation and the main flows; Cockpit typecheck and
+   production build pass; CI green.
+
+VERIFY (independently, in the browser pane, with screenshots at 1440 and 375 px)
+- Usability walkthrough with timed tasks, each in <= 3 clicks from home: start intake from a pasted
+  request; approve or reject a plan (with track choice); start a build; open a run and see why it
+  failed; approve an account request; sign out. Report clicks and any confusion honestly.
+- Lighthouse accessibility >= 95 and no axe violations on every room; no horizontal scroll at 375 px.
+- Before/after screenshots of every room; the design-quality rule passes (list each banned pattern
+  checked).
+- grep the built bundle for "service_role" (must be 0); existing behaviour preserved (list each room
+  and action checked live).
+
+ACCEPTANCE
+- Huraira approved the IA and design direction before build; every capability is reachable or
+  deliberately excluded with a reason; the walkthrough passes; accessibility and responsiveness proven
+  with evidence; CI green; no production client deploy path added.
+
+REPORT in the Part C format (Phase 1 report first, then the build report), then STOP.
+```
 
 ---
 
@@ -379,7 +618,41 @@ plain words and reach the builder as sourced facts; nothing is invented; nothing
 **Depends on**: Step 4.
 **Maps to**: Continuation Stage 6; Blueprint §8, §16D (Documentation agent).
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 5.
+
+CONTEXT
+Stage 6 of docs/WFACT-3.0-Continuation-Build-Plan.md, Blueprint §8. No `documentation` agent exists in any
+registry. Memory today is hand-written or appended by loops. The acceptance query is: "what happened on
+client X's build" answered from a structured memory file written by an agent, not a human.
+
+TASK
+1. Read Stage 6 of the Continuation Plan and Blueprint §8 (memory types, episodic memory tied to task IDs).
+2. Design the entry format (versioned): task ID, run ID, stage, timestamp, actor/role, inputs (hashes, not
+   contents), outcome, failed checks, corrections, cost, links to audit_log and model_traces rows. Keep it
+   both human-readable markdown and machine-parseable.
+3. Build the Documentation agent as a NEW package or module registered through the agent registry WITHOUT
+   editing agent-runtime's core (prove the extension point again). It runs at the end of every workflow
+   stage in packages/workflow, writes to clients/<name>/memory.md, and is audited like every agent.
+4. Hard rules: it appends only; never rewrites history; never records secrets or full client PII; if it
+   cannot write it escalates rather than silently skipping. Agent-writable memory is allowed now because
+   Phase 5 proved the runtime (Blueprint Phase 2 note).
+5. Backfill: generate entries for the Step 4 run from its audit_log and traces (marked backfilled).
+6. Add a memory query path: extend Hermes-lite's memory tool so `ask` can answer "what happened on client
+   X's build" from these entries. Keep the tone filter and tool allowlist.
+7. Tests: format validity, append-only behaviour, escalation on write failure, secret/PII redaction, and a
+   test proving the agent needs no changes to agent-runtime.
+
+ACCEPTANCE
+- After a workflow run, the memory file gets one correct entry per stage, written by the agent, joined to
+  audit task IDs.
+- `npm run ask -- "What happened on <pilot client>'s build?"` returns a correct, plain-language answer,
+  checked against SQL ground truth by you independently.
+- Existing suites pass unchanged.
+
+REPORT in the Part C format, then STOP.
+```
 
 ---
 
@@ -390,7 +663,41 @@ plain words and reach the builder as sourced facts; nothing is invented; nothing
 **Depends on**: Step 4 (Step 5 preferred).
 **Maps to**: Blueprint §3 (tool calling, security/permissions), §12; Phase 5 note "Section 12 must land before this phase closes".
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 6.
+
+CONTEXT
+packages/agent-runtime/src/registry.ts holds a `permissionScope` per role that is DESCRIPTIVE ONLY. Blueprint
+§3/§12 require least-privilege, per-agent scoped access, schema-validated tool wrappers with an allowlist,
+and sandboxing for model-generated code. Also the agents read client-submitted content, so prompt injection
+via that content is a live risk (Blueprint §16I).
+
+TASK
+1. Inventory every capability agents use today: DB reads/writes (which tables), file writes (which paths),
+   network calls, model calls, tool calls in Hermes-lite, job dispatch. Produce a table role x capability.
+2. Turn permissionScope into an enforced policy: a typed, versioned scope per role (tables/operations,
+   writable paths, allowed tools, allowed models, max cost per run). Enforce in ONE central place that all
+   agent I/O goes through, and default-deny. Do not build a general policy engine; keep it a small,
+   testable allowlist.
+3. Enforce entity isolation in code as well as RLS: an agent working for entity A must be unable to read or
+   write entity B's client folder or rows.
+4. Every denial is audited (agent.deny with role, capability, task ID). Every allow already leaves an audit
+   trail; confirm.
+5. Prompt-injection defence for ingested content: treat client text as data. Add tests where a raw request
+   contains instructions ("ignore previous...", "email the API key", "write to another client's folder")
+   and prove the agents do not obey and the attempt is audited.
+6. Attack-test live for real (not just unit tests): try out-of-scope writes and cross-entity access through
+   the actual runtime and show the denials in audit_log.
+7. Update docs and the registry header (remove "descriptive only").
+
+ACCEPTANCE
+- Default-deny works; each role can do exactly its scope, proven by tests and a live attack run.
+- Cross-entity access and the injection cases are denied and audited.
+- Existing suites pass unchanged (or minimal, justified changes listed).
+
+REPORT in the Part C format, then STOP.
+```
 
 ---
 
@@ -401,7 +708,43 @@ plain words and reach the builder as sourced facts; nothing is invented; nothing
 **Depends on**: Step 4.
 **Maps to**: Blueprint §14 (Evaluation Registry), Phase 8, §16C "highest priority", goal 3.
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 7.
+
+CONTEXT
+packages/verification has 6 deterministic checks plus an independent Claude evaluator. The Blueprint's
+Evaluation Registry grows from 2.0's 78-check registry and 50-point security audit, adds the "tells" list
+(20 vibecode signs) as a real gate, and requires cross-model review (evaluator is a different model from
+the builder). The 2.0 registry and audit material is in docs/ and docs/archive/ and the Blueprint §1, §14.
+
+TASK
+1. Find and read all 2.0 registry / 50-point audit / "tells" source material available in this repo
+   (docs/, docs/archive/, docs/WFACT SOPS/). If the 78-check list is not present in full, list exactly what
+   IS available, build from that, and report what is missing rather than inventing it.
+2. Design a registry format: each check has an ID, category, severity (blocker/major/minor), automated or
+   model-judged, what it proves, and a failing fixture. Store it as versioned data plus code, not prose.
+3. Port checks in priority order: security and integrity checks first, then content-honesty (no invented
+   stats or client names, no lorem ipsum, no placeholder text), accessibility, performance, SEO basics,
+   responsive, console errors, link and asset integrity, and the "tells" list. Automate whatever can be
+   deterministic; use the independent evaluator only for genuinely judgment-based checks.
+4. For each check: a passing fixture AND a deliberately broken fixture that it must catch (Blueprint Phase 8
+   acceptance: at least one deliberately introduced defect caught before a human sees it).
+5. Cross-model review: ensure the evaluator model differs from the builder model by config; fail loudly if
+   they resolve to the same model family.
+6. Wire the registry into the verification loop and the workflow gate, keep returned failures as exact check
+   IDs for FrontendLoop.revise().
+7. Run the whole registry on the Step 4 pilot page. Report pass/fail per check and any false positives.
+8. Keep an honest NOT-COVERED list (as 2.0 did) for anything you could not automate.
+
+ACCEPTANCE
+- Registry is versioned data + code; each check has a passing and a failing fixture and they all behave.
+- Pilot page run through it with a per-check result table.
+- Cross-model separation enforced by config.
+- Existing verification tests pass unchanged.
+
+REPORT in the Part C format, then STOP.
+```
 
 ---
 
@@ -578,8 +921,6 @@ REPORT in the Part C format, then STOP.
 ---
 
 ### STEP 12 — Cost governance per client (P2) — NOT STARTED
-
-**Realignment note (2026-10-07)**: include a price basis or a token ceiling for Agent 37 calls (`model_traces.cost_usd` is null; ~190k tokens per builder run are invisible to every USD ceiling). Pull ahead of Step 9 if Huraira approves Part F decision D2.
 
 **Depends on**: Steps 10 and 11.
 **Maps to**: Blueprint §3 (cost control), Fuel Gauges / Cost Sentinel "extend into Cost Governance"; goal 4.
@@ -908,8 +1249,6 @@ REPORT in the Part C format, then STOP.
 
 ### STEP 20 — Fix the Vercel serverless ceiling (P2) — NOT STARTED
 
-**Realignment note (2026-10-07)**: do this earlier if any new Cockpit endpoint is added (Part F, D2); the 12-function ceiling already caused one silent outage.
-
 **Depends on**: none technically; needs Huraira's decision.
 **Maps to**: Blueprint §1 (FIX, infrastructure), Phase 9 "Fix"; BLOCKED-ON-NICK "Vercel plan upgrade".
 
@@ -944,7 +1283,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 21 — Housekeeping (P2) — NOT STARTED (sub-items A and G were done in the 2026-10-07 alignment pass; H–L added)
+### STEP 21 — Housekeeping (P2) — NOT STARTED (note: uncommitted edits to CLAUDE.md §0, docs/INDEX.md and docs/archive were seen on disk 2026-10-01; verify and commit them as sub-items A and G)
 
 **Depends on**: none (best after Step 4).
 **Maps to**: Continuation "Gaps noticed" list.
@@ -973,16 +1312,6 @@ E. Knowledge graph: the graphify output has ~52 dangling edges and PDFs not extr
 F. The stale deployed DreamSign page: decide with Huraira whether to redeploy or leave; do not deploy
    without a yes.
 G. Docs: update docs/INDEX.md so every doc, including this plan, is indexed.
-H. (added 2026-10-07 from the audit) CI coverage gaps: add `packages/media`, a test for the `dispatch-job` Edge Function, the
-   `scripts/rls_attack_test*.sql` runs (against a scratch project) and `scripts/check-trackers.mjs` to CI.
-I. Track A writes the brief's open questions into the home page as HTML comments; keep them in `content.json` only. Add launch
-   files to both starters (sitemap, robots.txt, canonical, og:image; Track A 404 page) if Huraira says yes (see PROGRESS "Gaps noticed").
-J. Four copy-pasted mock model clients (`hermes`, `frontend-loop`, `planning`, `verification` `src/modelClient.ts`): extract one shared
-   test double. Move `packages/jobs/src/permissionsAttack.ts` out of `src/` or document why it stays.
-K. Hermes-lite: replace hard-coded `KNOWN_ENTITIES` (`packages/hermes/src/controller.ts`) with the entity table and stop using an entity slug
-   as a client folder name. Record why migration `0016` is absent.
-L. Remove dead references: the Continuation plan's path `packages/agent-runtime/registry.ts` (real: `src/registry.ts`); decide whether the
-   11 unregistered `.claude/hooks/*` scripts are wanted.
 
 ACCEPTANCE
 - Each sub-item done or explicitly deferred with a reason; CI green; no regressions.
@@ -1166,24 +1495,3 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 5 | Every agent action audited | largely met | 16, 21 |
 | 6 | Disaster-recovery drill | not verified | 19 |
 | 7 | Launch and Money hard-gated | met by design | every step |
-
----
-
-## Part F — Proposed additions (NOT APPROVED; not in Part B or Part E; not machine-checked)
-
-Source: `docs/WFACT-3.0-Agency-Scope-Addendum-DRAFT.md` plus Nick's 2026-10-07 reply (agency pipeline: yes; lead-gen content engine: yes, after
-delivery and with client consent; "static" meant visually flat; every site motion-rich with 21st.dev and conversion-focused; e-commerce
-needs a different site type). Nothing here may be started until Huraira (sequencing) and Nick (scope, money) approve it. When approved, add the
-steps to Part B, Part D and Part E in the same commit and run `node scripts/check-trackers.mjs`.
-
-| ID | Proposed step | Gated by |
-|---|---|---|
-| N1 | Revised front-end direction note: motion-rich conversion-first default for all sites, e-commerce site type, lead forms unchanged (replaces the Addendum's dynamic tiers D0–D4) | D1 |
-| N2 | Niche research and offer agents (cost-capped external data) | D1, Steps 12 and 13 |
-| N3 | Per-niche template capture and lessons write-back to starters | N2, Step 7 |
-| N4 | Lead-gen content engine, agency-side only, after delivery and client consent | D1; Steps 12 and 13 |
-| N5 | Dynamic features, only if D3 shows they are needed (captured leads, client-editable content via Owner's Key, live data) | D3 |
-
-Decisions (owners in `docs/HANDOFF.md` §6): **D1** confirm the revised direction; **D2** approve or reject pulling Steps 12 and 20 ahead of Step 8;
-**D3** dynamic runtime shape within the Hostinger/Vercel law; **D4** obtain the AIW2.0STACK website-factory shell to compare real output;
-**D5** spend caps for Higgsfield and Agent 37.

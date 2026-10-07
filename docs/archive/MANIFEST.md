@@ -21,6 +21,7 @@ Restore with `git mv <archive path> <original path>`. Rounds are in date order.
 | Original path | Archive path | Reason |
 |---|---|---|
 | `PROGRESS.md` lines 240-376, section "100-Hour Sprint … Phases 1–7" | `docs/archive/2026-10-07-alignment/PROGRESS-sprint-phases-1-7.md` | Superseded sprint checklist (superseded 2026-09-28) was 137 of 1,118 lines in the live tracker and is not parsed by `scripts/check-trackers.mjs` (checked: it still prints OK). Moved verbatim; a pointer remains in `PROGRESS.md`. |
+| `docs/WFACT-3.0-Factory-Completion-Plan.md` (full prior version) | `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md` | Plan recreated after realignment; copy keeps the 9 retired agent prompts of closed steps (1, 2, 3, 3A, 4, 4C, 5, 6, 7) |
 
 ## Reviewed in round 2 and deliberately NOT archived
 
