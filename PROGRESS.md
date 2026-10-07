@@ -3,7 +3,9 @@
 Last synced: 2026-10-06 (+05), via `/step-close 4B M4` — `8dae180`…`4bbd4bc` (claims gate 1.1.0, single-page and no-invented-testimonial
 builder fixes from Cockpit job `f696ba43`, `packages/media` Seedance groundwork); local tests green, **not pushed, no CI run yet**.
 Step 6 (parallel worktree, approved by Huraira 2026-10-06) merged locally: `58bf776`…`ee08f9d`; merged tree re-tested here.
-`8dae180`…`6cbde1d` were pushed to `huraira-work` 2026-10-06; CI runs only for `main`, so none has run yet.
+Both branches pushed and synced at `8b05a46` 2026-10-07 (Huraira: "push to both branches, keep both synced"); CI `37609559746` green, all
+13 jobs incl. the Cockpit deploy. Step 6 cost ceilings re-set from live `model_traces` 2026-10-07. Steps 5 and 7 running in parallel
+worktrees (GO 2026-10-07), not merged.
 Previous sync: 2026-10-02 (20:05 +05), via `/progress-sync` — folds in the push of `a9f4dcf`…`2d96962` to both branches (Huraira's word),
 CI `37016971442` green on `2d96962` (all 13 jobs incl. the new isolated Track B build and the Cockpit deploy), the other session's
 `c857150`…`0f00cde` (artifact-store CDN fix; CI `37019326469` still running at sync), and the live `jobs`/`plan_approvals`/`audit_log`
@@ -25,7 +27,7 @@ steps; this file tracks the Continuation Stages.
 Step 4 is **partial** (its preview is superseded by Step 4B M6), **Step 4B is IN PROGRESS** (M0 6 of 7 inputs, M1, M2, M3 done; **M4 PARTIAL**
 2026-10-02: built, verified locally and in CI `37016971442`; the live Track B build `f696ba43` failed on two factory contradictions,
 fixed 2026-10-06 in `c64bd0e` (not yet re-run live); M5–M6 not started), and
-**Step 6 is DONE** 2026-10-06 (enforced default-deny permissions, live attack verified; CI pending until pushed). **Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
+**Step 6 is DONE** 2026-10-06 (enforced default-deny permissions, live attack verified; CI `37609559746` green). **Step 4C is built and deployed** (redeployed from `2d96962` by CI `37016971442`; live URL HTTP 200 at sync). The live database shows real
 signed-in use on 2026-10-01: plan `b5a45a8e` approved as Track A (audited) and two Track A builds started from the Cockpit; both halted
 on a CDN bug that is now fixed but not yet re-run live. A full room-by-room signed-in check is still Huraira's to confirm.
 **Biggest open items**: push today's fixes and re-run Track A (`b5a45a8e`) and Track B (`4acbde1f`) live, Higgsfield credits and a
@@ -38,8 +40,7 @@ spending cap (M5), a different-vendor screenshot reviewer, Nick's real brief, a 
    client, the Track B budgets stand, Motion/Radix stay out of the starter.
 2. **Huraira**: add Higgsfield credits (the live Seedance run returned "Not enough credits"), rotate the key (it was posted in chat), put
    it in the GitHub secrets, and set a per-build and per-month spending cap; then GO for M5.
-3. **Huraira**: confirm the Step 6 per-run cost ceilings (builder $5, QA $2, Intake $0.50, Direction $1, Planner $1, Hermes $0.50); the
-   screenshot reviewer (deferred to after M6, 2026-10-06); Supabase Auth settings and one real sign-up for Step 3A; the
+3. **Huraira**: the screenshot reviewer (deferred to after M6, 2026-10-06); Supabase Auth settings and one real sign-up for Step 3A; the
    old Doppler CLI token check.
 
 **Gaps noticed**:
@@ -50,6 +51,8 @@ spending cap (M5), a different-vendor screenshot reviewer, Nick's real brief, a 
 - **QA link checker egress is open** (found in Step 6): it fetches any link on a built page, a possible SSRF on the job runner. Candidate
   for Step 7 or 21.
 - **Hermes-lite reads `clients/<entitySlug>/memory.md`** (an entity slug used as a client folder name), found in Step 6.
+- **Agent 37 builder calls are unpriced** (`model_traces.cost_usd` null; ~168k input + 25k output tokens per builder run, the biggest
+  token user), so no USD ceiling sees them. Needs a price basis or a token ceiling for unpriced providers (Step 12, cost governance).
 - **`packages/media` is not in CI yet**: its 8 tests run locally only; add it to the CI job list when M5 wires it into the pipeline.
 - **Track B "work" items can still be invented clients labelled SAMPLE**; quotes no longer can (2026-10-06). The design reviewer may
   read invented project panels as fake social proof too; watch the next live Track B build.
@@ -935,7 +938,7 @@ reason; the walkthrough passes; accessibility and responsiveness proven with evi
 the Cockpit and is blocked as a stage move), except that every room has only been checked with copied data, not with a live signed-in
 session. The phone layout shift on Projects (0.118, measured on the copied-data build) is also still open.
 
-## Step 6 — Enforce agent permissions (DONE 2026-10-06 — CI pending until pushed)
+## Step 6 — Enforce agent permissions (DONE 2026-10-06 — CI green 2026-10-07)
 
 Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 6 and Blueprint §3/§12/§16I. Built by a coding agent in a separate worktree
 (Huraira approved the parallel lane 2026-10-06), merged into `huraira-work` and re-verified in the main checkout. Full write-up, capability
@@ -954,8 +957,10 @@ inventory and NOT COVERED list: `docs/AGENT-PERMISSIONS.md`.
 - [x] Live attack run 2026-10-06 13:02 UTC through the real runtime and live `audit_log` (`npm run attack:permissions -- --real-model`, `128cd0a`):
       A1 `050c3329`, A2 `ed07cfaf`, A3 `cb7739a2`, A4 `7197fa12` all denied (1, 1, 1, 4 denials); A5 `9a692a2d` real models did not obey
 - [x] Registry header and docs updated ("descriptive only" removed) — `ee08f9d`
-- [ ] CI on the merged tree (runs only for `main`; pending Huraira's choice of PR or push)
-- [ ] Per-run cost ceilings confirmed by Huraira: builder $5, QA $2, Intake $0.50, Direction $1, Planner $1, Hermes $0.50
+- [x] CI on the merged tree: `8b05a46` pushed to both branches 2026-10-07, CI `37609559746` all 13 jobs success (incl. Cockpit deploy)
+- [x] Per-run cost ceilings: Huraira delegated the choice 2026-10-07 ("reduce cost, keep quality high"). Set from live `model_traces`
+      worst real run per role, with 5-18x headroom: builder $1 (worst $0.137), QA $0.50 ($0.066), Planner $0.25 ($0.041), Direction
+      $0.15 ($0.025), Hermes-lite $0.10 ($0.016), Intake $0.05 ($0.003, Haiku). Worst case per full pipeline drops from $10 to $2.05.
 
 **Verification** (independent of the building agent)
 - [x] Merged tree, main checkout: typecheck clean and tests pass in all packages — audit 14, agent-runtime 39, hermes 43, planning 32,
@@ -972,5 +977,5 @@ toward the cost ceiling (it can be exceeded by one call); Hermes-lite retries a 
 **Exit check**: *"Default-deny works; each role can do exactly its scope, proven by tests and a live attack run. Cross-entity access and the
 injection cases are denied and audited. Existing suites pass unchanged (or minimal, justified changes listed)."* — **MET**. Justified
 changes: `runAgent.test.ts` echo role uses a typed scope; one `trackA.test.ts` test supplies the role's gate; `verification.decision` rows
-inside an agent run now carry the run's entity in `entity_slug` (client slug moved to the payload). CI on the merged tree is still to run.
+inside an agent run now carry the run's entity in `entity_slug` (client slug moved to the payload). CI green: `37609559746`.
 
