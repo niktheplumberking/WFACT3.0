@@ -85,7 +85,7 @@ async function main() {
   }
   const metrics = qa.rendered.lastRun?.metrics ?? {};
   for (const [page, m] of Object.entries(metrics)) {
-    console.log(`metrics ${page}: JS ${(m.jsBytes / 1024).toFixed(1)} KB, LCP ${m.lcpMs === null ? "n/a" : `${(m.lcpMs / 1000).toFixed(2)} s`}, CLS ${m.cls ?? "n/a"}, Lighthouse perf ${m.performanceScore ?? "n/a"}`);
+    console.log(`metrics ${page}: JS ${(m.jsBytes / 1024).toFixed(1)} KB, LCP ${m.lcpMs === null ? "n/a" : `${(m.lcpMs / 1000).toFixed(2)} s`} (simulated, advisory: ${m.lcpSimulatedMs == null ? "n/a" : `${(m.lcpSimulatedMs / 1000).toFixed(2)} s`}), CLS ${m.cls ?? "n/a"}, Lighthouse perf ${m.performanceScore ?? "n/a"}`);
   }
   for (const c of qa.review.calls) {
     console.log(`review call: ${c.provider} ${c.model}, ${c.inputTokens} in / ${c.outputTokens} out tokens, ${c.costUsd === null ? "UNPRICED" : `$${c.costUsd.toFixed(4)}`}, ${(c.ms / 1000).toFixed(1)} s`);

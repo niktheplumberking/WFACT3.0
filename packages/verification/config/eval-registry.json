@@ -1,6 +1,6 @@
 {
   "_doc": "WFACT 3.0 evaluation registry (Factory Completion Plan Step 7; Blueprint §14 'the direct successor to 2.0's 78-check registry'). Versioned data, read and validated by src/evalRegistry.ts; every entry is a check with an ID, category, severity, mode (automated or model-judged), runner, stage, what it proves, its 2.0 source, the model it uses (null = no model), a passing fixture and a deliberately broken fixture. Runners: text = deterministic HTML/site-file checks (packages/verification, every entry point); rendered = headless Chromium suite (packages/rendered-qa/src/rendered.ts); review = screenshot reviewer model; evaluator = independent evaluator model; attack = system attack run on demand and in CI, not per page. Severity: blocker and major fail the gate; minor (text runner only) fails as advisory (WARN, audited, not sent to the builder on its own). Stage: preview = every build; launch = launch-candidate checks that need the production domain (N/A at preview, reason recorded). Fixture paths are repo-relative: a .html file is one page; a directory is a site (pages = its .html files except 404.html unless 'pages' is given); {test, name} points at the committed test that holds the fixture. 'isolated': the broken fixture fails this check and no other check of its runner/stage. Order is the builder's fix order. Change any entry = bump version.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "fixtureContext": {
     "_doc": "Context every text fixture runs with unless the fixture overrides it. Facts come from the SYNTHETIC Summit Line brief.",
     "brief": "clients/summit-line-roofing/brief.json",
@@ -174,7 +174,7 @@
       "source": "Step 4B M1 design rulebook (Huraira's design-quality rule 2026-10-01).", "model": null,
       "fixtures": { "pass": "packages/frontend-loop/design/fixtures/clean.html", "fail": "packages/frontend-loop/design/fixtures/DR-GRADIENT-HERO.html", "isolated": true } },
     { "id": "render.perf", "category": "performance", "severity": "major", "mode": "automated", "runner": "rendered", "stage": "preview",
-      "proves": "Lighthouse mobile LCP and CLS are within the track budget (Track A LCP < 2.0 s, Track B < 2.5 s, CLS < 0.1).",
+      "proves": "Lighthouse mobile LCP and CLS are within the track budget (Track A LCP < 2.0 s, Track B < 2.5 s, CLS < 0.1), measured with applied (devtools) throttling since registry 1.1.0 (Huraira 2026-10-07); the simulated LCP is recorded as advisory only.",
       "source": "Step 4B M1; 2.0 Stage 7 'Lighthouse mobile run recorded'.", "model": null,
       "fixtures": { "pass": { "test": "packages/rendered-qa/test/rendered.test.ts", "name": "clean fixture passes every rendered check, including Lighthouse against the Track A budget" }, "fail": { "test": "packages/rendered-qa/test/trackA.test.ts", "name": "over-budget fixture: 60 KB of script and a heavy hero image fail the JS budget and the LCP budget" }, "isolated": false } },
     { "id": "render.motion-budget", "category": "performance", "severity": "major", "mode": "automated", "runner": "rendered", "stage": "preview",

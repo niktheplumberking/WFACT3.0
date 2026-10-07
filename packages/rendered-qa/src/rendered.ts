@@ -13,7 +13,7 @@
  *   render.js-budget       total JavaScript bytes (inline + loaded) against the track budget
  *   render.reduced-motion  animations still running with prefers-reduced-motion: reduce
  *   render.design-rules    the design rulebook's DOM detectors (packages/frontend-loop/design/rulebook.json)
- *   render.perf            Lighthouse (mobile, simulated throttling): LCP and CLS against the track budget
+ *   render.perf            Lighthouse (mobile, applied throttling): LCP and CLS against the track budget; simulated LCP recorded, advisory
  *   render.motion-budget   (budgets with a motion part, i.e. Track B) what scrolling the page costs: no
  *                          layout properties animated, no long CSS/WAAPI entrances, main-thread blocking
  *                          during a scroll-through within the budget (Step 4B M4)
@@ -127,6 +127,8 @@ export interface RenderedMetrics {
   motion?: { blockingMs: number | null; longFrames: number | null; animations: number };
   jsBytes: number;
   lcpMs: number | null;
+  /** Lighthouse's simulated (lantern) LCP: advisory, recorded for comparison, never gates (2026-10-07). */
+  lcpSimulatedMs?: number | null;
   cls: number | null;
   performanceScore: number | null;
 }
@@ -238,7 +240,16 @@ async function checkLink(
 
 const LIGHTHOUSE_TIMEOUT_MS = 120_000;
 
-async function lighthouseRun(url: string): Promise<{ lcpMs: number; cls: number; score: number | null }> {
+/**
+ * How render.perf measures (Huraira's decision 2026-10-07, option 1): the gate uses Lighthouse with APPLIED
+ * ("devtools") throttling, which really slows the network and CPU and records when the page actually paints.
+ * The default simulated ("lantern") model charged the Track B starter ~2.5 s of LCP for framework scripts that load
+ * in parallel and do not delay the headline (Cockpit job c775c396: simulated 2.46-2.58 s; applied 0.72 s with or
+ * without the scripts; real Chrome 0.05 s). The simulated figure is still measured and recorded as advisory only.
+ */
+export type ThrottlingMethod = "devtools" | "simulate";
+
+async function lighthouseRun(url: string, throttlingMethod: ThrottlingMethod): Promise<{ lcpMs: number; cls: number; score: number | null }> {
   const [{ default: lighthouse }, chromeLauncher] = await Promise.all([import("lighthouse"), import("chrome-launcher")]);
   const chrome = await chromeLauncher.launch({
     chromePath: chromium.executablePath(),
@@ -252,7 +263,14 @@ async function lighthouseRun(url: string): Promise<{ lcpMs: number; cls: number;
     const timeout = new Promise<never>((_, reject) => {
       timer = setTimeout(() => reject(new Error(`Lighthouse did not finish within ${LIGHTHOUSE_TIMEOUT_MS / 1000} s`)), LIGHTHOUSE_TIMEOUT_MS);
     });
-    const run = await Promise.race([lighthouse(url, { port: chrome.port, output: "json", logLevel: "error", onlyCategories: ["performance"] }), timeout]);
+    const run = await Promise.race([
+      lighthouse(
+        url,
+        { port: chrome.port, output: "json", logLevel: "error", onlyCategories: ["performance"] },
+        { extends: "lighthouse:default", settings: { throttlingMethod } },
+      ),
+      timeout,
+    ]);
     if (!run) throw new Error("Lighthouse returned no result");
     const audits = run.lhr.audits;
     return {
@@ -429,11 +447,14 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
 
       if (opts.lighthouse !== false) {
         try {
-          const lh = await lighthouseRun(url);
+          const lh = await lighthouseRun(url, "devtools");
           m.lcpMs = lh.lcpMs;
           m.cls = lh.cls;
           m.performanceScore = lh.score;
-          if (!(lh.lcpMs < budget.lcpMs)) details["render.perf"]!.push(`${where}LCP ${(lh.lcpMs / 1000).toFixed(2)} s on mobile (Lighthouse, simulated throttling); the budget is ${(budget.lcpMs / 1000).toFixed(1)} s`);
+          if (!(lh.lcpMs < budget.lcpMs)) details["render.perf"]!.push(`${where}LCP ${(lh.lcpMs / 1000).toFixed(2)} s on mobile (Lighthouse, applied throttling); the budget is ${(budget.lcpMs / 1000).toFixed(1)} s`);
+          // Advisory only: never fails the check; a failure to measure it is null, not a defect. Home page only, so a
+          // multi-page site's QA cycles stay inside the 30-minute Cockpit job limit.
+          if (pageName === pages[0]) m.lcpSimulatedMs = await lighthouseRun(url, "simulate").then((r) => r.lcpMs, () => null);
           if (!(lh.cls < budget.cls)) details["render.perf"]!.push(`${where}CLS ${lh.cls.toFixed(3)}; the budget is ${budget.cls}`);
         } catch (err) {
           details["render.perf"]!.push(`${where}Lighthouse could not measure the page (${err instanceof Error ? err.message : String(err)}); performance is unverified`);
