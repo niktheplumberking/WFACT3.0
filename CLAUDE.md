@@ -15,8 +15,10 @@ time-sensitive (model IDs, pricing, credentials) before relying on it.
 
 1. `docs/wfact-3.0-blueprint.html`: scope source of truth (13 build phases, Cockpit §9, Definition of Done §16K).
 2. `docs/WFACT-3.0-Continuation-Build-Plan.md`: Stages 1–7.
-3. `docs/WFACT-3.0-Factory-Completion-Plan.md`: Steps 1–24 with one agent prompt per step and the Standard
-   Operating Rules (Part C). One step at a time, report back, wait for Huraira's GO. Step 4B is described in
+3. `docs/WFACT-3.0-Factory-Completion-Plan.md`: Steps 1–27 with one agent prompt per step and the Standard
+   Operating Rules (Part C). Follow its **Execution order** table (re-set 2026-10-07: Step 26 quality calibration, Step 27 Track A
+   motion budget, Step 25 real-client run, then the Step 8/12/20 reliability bundle), not numeric order. One step at a time, report
+   back, wait for Huraira's GO. Step 4B is described in
    `docs/FRONTEND-UPGRADE-DESIGN.md`.
 
 A consolidated, verified orientation (goals, current state, backlog, next task) is `docs/HANDOFF.md`; read it first.

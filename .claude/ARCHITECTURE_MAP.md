@@ -6,7 +6,7 @@ packages/
   agent-runtime/         agent registry, default-deny PermissionGate, injection defence
   audit/                 append-only audit + model-trace writer
   documentation/         Documentation agent (episodic memory -> clients/<slug>/memory.md)
-  frontend-loop/         builder + evaluator loop; starters/track-a (static multi-page), starters/track-b (Next.js, motion)
+  frontend-loop/         builder + evaluator loop; starters/track-a (static multi-page; motion budget planned, Step 27), starters/track-b (Next.js, motion)
   hermes/                "Hermes-lite" read-only status controller (ask jobs)
   jobs/                  runner for cockpit-job.yml (src/run.ts -> handlers.ts)
   media/                 Seedance/Higgsfield video (Step 4B M5; orphaned, no CI)

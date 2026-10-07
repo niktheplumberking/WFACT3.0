@@ -48,7 +48,7 @@ is held to a commercial bar, not an internal-tool pass.
 - No deploy button, ever. Launch and Money stay human-gated (CLAUDE.md §3).
 - Future rooms (System, Agents, Memory, Human Control, Business, Alerts) appear as honest "Coming in Step N"
   entries until their step builds them (Huraira 2026-10-01). No fake data in any room.
-- Track B builder does not exist yet (Step 4B M4); the UI must say so plainly where a Track B plan waits.
+- Track B builder exists (Step 4B M3-M4, live builds proven); Track A gets a motion budget in Step 27 (decision D1, 2026-10-07). The UI must still say plainly when a track's build is blocked or failed.
 
 ## Brand Commitments
 

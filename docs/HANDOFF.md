@@ -51,20 +51,20 @@ failure of "done" claims nobody verified (a whole feature pack was never install
 ### 1.6 Scope
 | In the current release (the plan in force) | Later | Out of scope (for now) |
 |---|---|---|
-| Steps 4B (finish), 4D (live proof), 8–22 of `docs/WFACT-3.0-Factory-Completion-Plan.md` | Step 23 Owner's Key port, closing reports, care plans; Step 24 autonomy upgrades; self-hosted/local models; SaaS packaging | Auto-deploy of client sites; moving money; Rizm's pipeline (Atif's, separate); knowledge graph (Cognee) before the Step 15 trial; simulation environment |
-| **Proposed, unapproved**: agency pipeline (niche research, offer design), lead-gen content engine, dynamic/motion-rich site tiers, e-commerce variant (see §6) | | |
+| Steps 4B (finish), 4D (live proof), 25, 26, 27, 8–22 of `docs/WFACT-3.0-Factory-Completion-Plan.md`, in the Execution order | Step 23 Owner's Key port, closing reports, care plans; Step 24 autonomy upgrades; self-hosted/local models; SaaS packaging | Auto-deploy of client sites; moving money; Rizm's pipeline (Atif's, separate); knowledge graph (Cognee) before the Step 15 trial; simulation environment |
+| **Proposed, sequenced after the first paid delivery**: agency pipeline (niche research, offer design), lead-gen content engine, dynamic features if ever needed (Part F of the plan). **Deferred**: e-commerce site type | | |
 
 ### 1.7 Confirmed vs assumed
 **Confirmed** (written, from the owners): the five pillars; entity law; hosting law; template-first doctrine; Launch/Money gates;
 two build tracks A/B chosen per build (Huraira 2026-10-01); AI images allowed if labelled; ask before any single build over $5;
 Agent 37 is the builder; Higgsfield is the image tool; Nick's 2026-10-07 answers (agency pipeline yes, content engine yes after
-delivery with client consent, "static" meant visually flat, every site motion-rich with 21st.dev and conversion-focused, e-commerce needs a different site type).
+delivery with client consent, "static" meant visually flat, every site motion-rich with 21st.dev and conversion-focused, e-commerce needs a different site type). Huraira's decisions the same day: D1 (two tracks, Track A motion budget, conversion hard gate), D2 (reliability bundle after the real-client run), e-commerce deferred.
 **Assumed / provisional**: all of `memory/context.md` business rules (R-01…R-13 are Huraira's drafts, Nick to replace); the
 pilot client (synthetic); the governance table; the entity list.
 **Recommendations (mine, not decisions)**: sequencing changes in §6.
 
 ### 1.8 Misunderstandings and direction changes on record
-- 100-hour sprint superseded 2026-09-28 by the Continuation Plan, then the Factory Completion Plan (steps 1–24).
+- 100-hour sprint superseded 2026-09-28 by the Continuation Plan, then the Factory Completion Plan (steps 1–24, since extended to 1–27).
 - Hostinger descoped 2026-09-22 for the sprint; Vercel stood in for "live". The hosting law itself is unchanged and Nick was never told in conversation (written disclosure only).
 - Hermes-lite replaced a real Hermes Agent by the manual's pre-authorised fallback; Nick not yet told in conversation.
 - **D1 decided 2026-10-07 (Huraira)**: two tracks kept, Track A motion budget (Step 27), conversion as a hard gate, e-commerce deferred.
@@ -77,7 +77,7 @@ pilot client (synthetic); the governance table; the entity list.
 
 1. `docs/wfact-3.0-blueprint.html` — scope source of truth (13 phases, Cockpit §9, Definition of Done §16K). `docs/WFACT-3.0-Ecosystem-Blueprint.md` is its text copy.
 2. `CLAUDE.md` — the law (verification, governance, architecture rules). Where it disagrees with the Blueprint, fix `CLAUDE.md`.
-3. `docs/WFACT-3.0-Continuation-Build-Plan.md` (Stages 1–7) and `docs/WFACT-3.0-Factory-Completion-Plan.md` (Steps 1–24, Standard Operating Rules in Part C — **read Part C before any step**).
+3. `docs/WFACT-3.0-Continuation-Build-Plan.md` (Stages 1–7) and `docs/WFACT-3.0-Factory-Completion-Plan.md` (Steps 1–27, Execution order after Part B, Standard Operating Rules in Part C — **read Part C before any step**).
 4. Step designs: `docs/FRONTEND-UPGRADE-DESIGN.md` (4B), `docs/BUILD-RECOVERY-DESIGN.md` (4D), `docs/AGENT-PERMISSIONS.md` (6), `docs/COCKPIT-JOBS.md`, `docs/SECRETS.md`; `PRODUCT.md` for the Cockpit's design constraints.
 5. Live state: `PROGRESS.md`, `BLOCKED-ON-NICK.md` (top table is current; below it is sprint-era record).
 6. Reference only: Playbook (pillars, 2.0 carry-over), SOPs/Factory Book PDFs.
@@ -107,7 +107,7 @@ Known conflicts and how they resolve: PROGRESS.md "Status summary" said 4D was u
 | Hermes-lite controller | **Partial, live** | read-only `ask` jobs; `KNOWN_ENTITIES` hard-coded (`packages/hermes/src/controller.ts:19`) |
 | `packages/media` (Seedance/Higgsfield) | **Orphaned groundwork** | no importer, no CI job; M5 blocked on Higgsfield credits |
 | Task/event queue, durable execution | **Missing** | Step 8; jobs table + GH Actions only |
-| Cost governance per client, alerts, DR drill, 3-client test, Owner's Key | **Missing** | Steps 12, 17, 19, 18, 23 |
+| Cost governance per client, alerts, DR drill, 3-client test, Owner's Key | **Missing** | Steps 12, 17, 19, 18, 23 (real-client run: 25; calibration: 26; Track A motion: 27) |
 | Launch files in starters (sitemap, robots, canonical, og:image; Track A 404) | **Missing** | Step 7 launch checks fail on them |
 | Hosting on Hostinger | **Blocked/descoped** | no live Hostinger deploy exists |
 
@@ -130,7 +130,7 @@ Cockpit PWA (Vercel) --anon key, RLS--> Supabase (Postgres, Auth, Edge Function 
 | Browser holds only the anon key; RLS is the access control | Client isolation is a 2.0 law | Every table needs an attack test |
 | Work runs on GitHub Actions, Cockpit only displays/gates | Hermes/Cockpit never execute code (CLAUDE.md §6) | ~15 min CI, 26 min job cap; Step 8 needed for durability |
 | Doppler is the sole secret store; one GH secret | CLAUDE.md §6 | Edge Function secrets live separately in Supabase |
-| Two tracks: A static multi-page (content JSON, starter owns code); B Next.js static export, isolated build | Different clients need different bars | Track B output differs byte-wise by platform; needs sudo/unshare sandbox |
+| Two tracks: A static multi-page (content JSON, starter owns code; motion budget coming in Step 27); B Next.js static export, isolated build | Different clients need different bars | Track B output differs byte-wise by platform; needs sudo/unshare sandbox |
 | Checkpoint-and-resume, evaluator ≠ builder | "Never trust done" | Same-vendor review today (gap) |
 | Deploys only from CI on `main`; `huraira-work` is the working branch | Launch stays human | **Pushing `main` deploys production** |
 
@@ -183,7 +183,7 @@ Order approved by Huraira 2026-10-07 (it replaces the numeric order; the full ta
 | 8 | Steps 18, 19, plus define the 50-point audit list | 8 | Three-client test, DR drill, goal 3 closable |
 | 9 | Step 21 (rest), 22 | real inputs | per plan |
 | 10 | After the first paid delivery: Step 23 and Part F proposals | revenue | per plan |
-| Deferred | Steps 15, 16, 24 | real data | revisit after item 7 |
+| Deferred | Steps 15, 16, 24 | real data | revisit after item 8 |
 
 Not in scope now: an e-commerce site type (Huraira 2026-10-07).
 

@@ -1,6 +1,7 @@
 # WFACT 3.0 — Continuation Build Plan
 
 **For**: a coding agent picking up this repo next.
+**Note 2026-10-07**: stage status lives in `PROGRESS.md`; the order of remaining work is the "Execution order" table in `docs/WFACT-3.0-Factory-Completion-Plan.md` (Stage 7, the real pilot, is now Step 25).
 **Supersedes**: the 100-hour Operator's Manual sprint as the thing you're optimizing for. That sprint
 proved a real vertical slice (verify-loop, RLS isolation, a live Cockpit) but its own exit checks were
 never the actual finish line — the [Ecosystem Blueprint](WFACT-3.0-Ecosystem-Blueprint.md) and the

@@ -8,6 +8,8 @@ requirements and brand direction, and **recommends** one track with its reasons.
 **Where it sits**: Step 4B, after Step 4 and before Step 5 of `docs/WFACT-3.0-Factory-Completion-Plan.md`. Launch and Money stay human
 hard-gates; nothing here deploys to production.
 
+**Update 2026-10-07 (decision D1, Huraira)**: both tracks stay. Track A gets a motion budget (CSS or vanilla JS only, `prefers-reduced-motion` respected, no framework scripts) so delivered sites are not visually flat; conversion is a hard gate (speed, layout shift and a visible call to action may not regress). Track B remains the full 21st.dev/React path. E-commerce is out of scope for now. Work and acceptance: Step 27 in `docs/WFACT-3.0-Factory-Completion-Plan.md`; Nick confirms by blind-rating sample builds. This update does not change the approved v3 design below, it adds to Track A.
+
 ## 1. Why
 
 Step 4 proved the machinery, but the builder can only make one text-only HTML file (`frontend-loop/src/loop.ts:140`, `planner.ts:93`), and

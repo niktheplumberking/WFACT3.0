@@ -17,14 +17,14 @@ truth. The Phases 1–7 section (now archived, see the pointer below) was the hi
 (`docs/archive/sprint-100-hour/wfact-3.0-operator-manual.html` / `docs/archive/sprint-100-hour/WFACT-3.0-Fast-Track-Plan.md`). Its checkboxes are not
 restructured to fit the new plan. `docs/WFACT-3.0-Factory-Completion-Plan.md` (committed `4ecfe4a`,
 revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in place of it: it maps the remaining Blueprint
-phases to numbered steps 1–24 and is the source for "Next up" below. Its Part E checklist tracks those
+phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
 **Status summary**: Step **4D (build recovery) is PARTIAL**: built, migration 0018 applied live (attack test 26/26), pushed and deployed (CI `37644039022` green); the live "continue" button has not been pressed on a real stopped build yet. (Corrected 2026-10-07 in the alignment pass; this line previously said "not applied, not pushed".) On the Factory Completion Plan, Steps 1, 2, 3, 3A, **5, 6 and 7 are DONE** (5 and 7 on 2026-10-07: 5 proven on live
 Cockpit builds, 7 CI `37617845669` green); Step 4 is PARTIAL (preview superseded by 4B M6); **Step 4B is IN PROGRESS**, about 90% through M4:
 Track B's live build `c775c396` passed every check except a simulated-LCP measurement that misses 2.5 s by 0.02-0.08 s for framework
 scripts alone (real LCP 0.05-0.72 s), and Track A's last re-run `ad49df57` died on one dropped Agent 37 connection, now retried (`734ded5`);
-M5 blocked on Higgsfield API credit; M6 not started. Step 4C BUILT AND DEPLOYED (signed-in check pending). Steps 8–24 not started.
+M5 blocked on Higgsfield API credit; M6 not started. Step 4C BUILT AND DEPLOYED (signed-in check pending). Steps 8–27 not started (new: 25 real-client run, 26 quality calibration, 27 Track A motion budget).
 Continuation Stages 1–5 MET; Stage 6 = Step 5 (MET except the Cognee write-up, Step 15); Stage 7 waits on Nick. **Biggest blocker**:
 none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-07).
 

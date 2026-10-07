@@ -10,6 +10,8 @@ be motion-rich with 21st.dev components and still conversion-focused, and e-comm
 from a local-business site. So **section 2 (dynamic tiers D0–D4) misread the request and is superseded**; sections 1, 3 (N4–N6) and 5
 still stand. A revised direction is pending Huraira's confirmation.
 
+**Update 2026-10-07 (Huraira)**: section 4's reorder is decided differently: the approved order is the "Execution order" table in the Factory Completion Plan (D2 approved: Steps 12 and 20 join Step 8 after the real-client run). D1 is decided (two tracks, Track A motion budget, conversion hard gate, e-commerce deferred). The agency pipeline and content engine are IN but sequenced after the first paid delivery (Plan Part F). Sections 2, 4 and 5 are historical; do not plan from them.
+
 **Why this exists**: Nick shared that the original factory idea came from
 [deanwhitex/AIW2.0STACK](https://github.com/deanwhitex/AIW2.0STACK). That stack reaches a one-shot local-business site, but the
 site content is almost static. WFACT 3.0 is meant to scale that up and to cover everything an AI web agency needs, not only a

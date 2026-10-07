@@ -16,7 +16,7 @@
 |---|---|
 | `wfact-3.0-blueprint.html` | Scope source of truth: 13 phases, Cockpit map (§9), Definition of Done (§16K) |
 | `WFACT-3.0-Continuation-Build-Plan.md` | Stages 1–7 |
-| `WFACT-3.0-Factory-Completion-Plan.md` | Steps 1–24, one agent prompt per step, Standard Operating Rules |
+| `WFACT-3.0-Factory-Completion-Plan.md` | Steps 1–27, one agent prompt per step, Execution order (re-set 2026-10-07), Standard Operating Rules |
 | `FRONTEND-UPGRADE-DESIGN.md` | Step 4B: the two front-end build tracks |
 | `BUILD-RECOVERY-DESIGN.md` | Step 4D: why builds stop, what the Cockpit tells the owner, and how a stopped build carries on |
 
