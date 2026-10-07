@@ -1,7 +1,7 @@
-# Graph Report - wfact-3.0-build  (2026-10-06)
+# Graph Report - wfact-3.0-build  (2026-10-07)
 
 ## Corpus Check
-- 309 files · ~799,063 words
+- 309 files · ~799,256 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `6228ca30`
+- Built from commit: `171d57af`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

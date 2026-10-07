@@ -2405,7 +2405,7 @@
       "file_type": "code",
       "norm_label": "modelplan",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L66"
+      "source_location": "L67"
     },
     {
       "id": "packages_planning_src_planstore_memoryplanstore",
@@ -2431,7 +2431,7 @@
       "file_type": "code",
       "norm_label": "plannerinput",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L88"
+      "source_location": "L89"
     },
     {
       "id": "packages_planning_src_planner_planvalidationerror",
@@ -2444,7 +2444,7 @@
       "file_type": "code",
       "norm_label": "planvalidationerror",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L141"
+      "source_location": "L142"
     },
     {
       "id": "packages_audit_src_index_auditcontext",
@@ -3146,7 +3146,7 @@
       "file_type": "code",
       "norm_label": "plan",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L86"
+      "source_location": "L87"
     },
     {
       "id": "packages_planning_src_planstore_buildtrack",
@@ -9189,7 +9189,7 @@
       "file_type": "code",
       "norm_label": "assembleplan()",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L186"
+      "source_location": "L187"
     },
     {
       "id": "packages_planning_src_planner_planvalidationerror_constructor",
@@ -9201,7 +9201,7 @@
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L142"
+      "source_location": "L143"
     },
     {
       "id": "packages_planning_src_planner_systemprompt",
@@ -9213,7 +9213,7 @@
       "file_type": "code",
       "norm_label": "systemprompt()",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L94"
+      "source_location": "L95"
     },
     {
       "id": "packages_planning_src_planner_userprompt",
@@ -9225,7 +9225,7 @@
       "file_type": "code",
       "norm_label": "userprompt()",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L116"
+      "source_location": "L117"
     },
     {
       "id": "packages_audit_src_index_auditreader_listbyrun",
@@ -10113,7 +10113,7 @@
       "file_type": "code",
       "norm_label": "createplanneragent()",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L148"
+      "source_location": "L149"
     },
     {
       "id": "packages_planning_src_planstore_planstorefromenv",
@@ -11229,7 +11229,7 @@
       "file_type": "code",
       "norm_label": "createseedregistry()",
       "source_file": "packages/agent-runtime/src/registry.ts",
-      "source_location": "L115"
+      "source_location": "L118"
     },
     {
       "id": "packages_agent_runtime_test_injection_test_scanningregistry",
@@ -25974,7 +25974,7 @@
       "file_type": "code",
       "norm_label": "executable_stages",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L41"
+      "source_location": "L42"
     },
     {
       "id": "packages_planning_src_planner_model_plan_json_schema",
@@ -25985,7 +25985,7 @@
       "file_type": "code",
       "norm_label": "model_plan_json_schema",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L67"
+      "source_location": "L68"
     },
     {
       "id": "packages_planning_src_planner_modelplanschema",
@@ -25996,7 +25996,7 @@
       "file_type": "code",
       "norm_label": "modelplanschema",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L49"
+      "source_location": "L50"
     },
     {
       "id": "packages_planning_src_planner_plan_version",
@@ -26029,7 +26029,7 @@
       "file_type": "code",
       "norm_label": "planschema",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L69"
+      "source_location": "L70"
     },
     {
       "id": "packages_planning_src_planner_template_ids",
@@ -26040,7 +26040,7 @@
       "file_type": "code",
       "norm_label": "template_ids",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L46"
+      "source_location": "L47"
     },
     {
       "id": "packages_audit_src_index",
@@ -38050,7 +38050,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "packages/agent-runtime/src/registry.ts",
-      "source_location": "L116",
+      "source_location": "L119",
       "weight": 1.0
     },
     {
@@ -41530,7 +41530,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L189",
+      "source_location": "L190",
       "weight": 1.0
     },
     {
@@ -43932,7 +43932,7 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L89",
+      "source_location": "L90",
       "weight": 1.0
     },
     {
@@ -72006,7 +72006,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/agent-runtime/src/registry.ts",
-      "source_location": "L115",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -80597,7 +80597,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L116",
+      "source_location": "L117",
       "weight": 1.0
     },
     {
@@ -80608,7 +80608,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L141",
+      "source_location": "L142",
       "weight": 1.0
     },
     {
@@ -80619,7 +80619,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L148",
+      "source_location": "L149",
       "weight": 1.0
     },
     {
@@ -80630,7 +80630,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L186",
+      "source_location": "L187",
       "weight": 1.0
     },
     {
@@ -80674,7 +80674,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -80685,7 +80685,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L46",
+      "source_location": "L47",
       "weight": 1.0
     },
     {
@@ -80696,7 +80696,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L49",
+      "source_location": "L50",
       "weight": 1.0
     },
     {
@@ -80707,7 +80707,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L66",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -80718,7 +80718,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0
     },
     {
@@ -80729,7 +80729,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L69",
+      "source_location": "L70",
       "weight": 1.0
     },
     {
@@ -80740,7 +80740,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L86",
+      "source_location": "L87",
       "weight": 1.0
     },
     {
@@ -80751,7 +80751,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L88",
+      "source_location": "L89",
       "weight": 1.0
     },
     {
@@ -80762,7 +80762,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L94",
+      "source_location": "L95",
       "weight": 1.0
     },
     {
@@ -87101,7 +87101,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "packages/planning/src/planner.ts",
-      "source_location": "L142",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -94081,5 +94081,5 @@
       "source_file": "packages/rendered-qa/README.md"
     }
   ],
-  "built_at_commit": "6228ca30743f1c74c199d724de0c7548e8c64a13"
+  "built_at_commit": "171d57af5d7ed66596628f27f11c5d9fe901c694"
 }

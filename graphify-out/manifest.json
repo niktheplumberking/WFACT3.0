@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1791292766.729472,
-    "seen": 1791292774.453745,
-    "ast_hash": "28c560bc0f957b66d0e2bcae8cabe5c6",
+    "mtime": 1791370595.1546166,
+    "seen": 1791370740.140723,
+    "ast_hash": "3f965321b5fd707a16d5e44219bb0e96",
     "semantic_hash": ""
   },
   "README.md": {
@@ -786,9 +786,9 @@
     "semantic_hash": ""
   },
   "packages/agent-runtime/src/registry.ts": {
-    "mtime": 1791292213.787623,
-    "seen": 1791292774.4508438,
-    "ast_hash": "95b957ba6aeaaf2a6b1576e07ce31ca8",
+    "mtime": 1791370524.1764145,
+    "seen": 1791370740.1377878,
+    "ast_hash": "402eeb3fedf5d06d4ca87497d130270b",
     "semantic_hash": ""
   },
   "packages/agent-runtime/src/runAgent.ts": {
@@ -906,9 +906,9 @@
     "semantic_hash": "8b617a7ba7abcb2b3292c3b9fb803e17"
   },
   "packages/planning/src/intake.ts": {
-    "mtime": 1791292213.7938828,
-    "seen": 1791292774.452491,
-    "ast_hash": "dc2b65394f47087b0378e48c1a3032af",
+    "mtime": 1791370524.1767738,
+    "seen": 1791370740.1395059,
+    "ast_hash": "f4e029d61e2f5f9e1a8b052b73b129eb",
     "semantic_hash": ""
   },
   "packages/planning/src/modelClient.ts": {
@@ -930,9 +930,9 @@
     "semantic_hash": "9cd858610a3574fb843943fa616d5d6a"
   },
   "packages/planning/src/planner.ts": {
-    "mtime": 1791292213.794286,
-    "seen": 1791292774.452522,
-    "ast_hash": "343350263eeaabfd90e26c4187c769a4",
+    "mtime": 1791370524.1765356,
+    "seen": 1791370740.1395452,
+    "ast_hash": "96779f6a633a1ca0d9ee66da80abfaa1",
     "semantic_hash": ""
   },
   "packages/planning/test/planning.test.ts": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1791292349.0089688,
-    "seen": 1791292774.45403,
-    "ast_hash": "71287fe0c33eb331690f8d7d7b27d348",
+    "mtime": 1791370595.1552343,
+    "seen": 1791370740.140985,
+    "ast_hash": "52a39c860c4ec76f8c5cb1a117796ae0",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1476,9 +1476,9 @@
     "semantic_hash": "d2c5570ee73accd70e5b05f44b444fd2"
   },
   "packages/planning/src/direction.ts": {
-    "mtime": 1791292213.7935503,
-    "seen": 1791292774.4524748,
-    "ast_hash": "ccdb9e3105bcd831df4cb51dc026d305",
+    "mtime": 1791370524.1766574,
+    "seen": 1791370740.139492,
+    "ast_hash": "d6875d33b0f5e1426a58278b7fa4f66e",
     "semantic_hash": ""
   },
   "packages/planning/src/evalDirection.ts": {
@@ -2808,9 +2808,9 @@
     "semantic_hash": ""
   },
   "packages/agent-runtime/src/permissions.ts": {
-    "mtime": 1791292213.7874916,
-    "seen": 1791292774.4508438,
-    "ast_hash": "63c98be25698a6fdd26735dae9e48ed3",
+    "mtime": 1791370524.1770277,
+    "seen": 1791370740.1377869,
+    "ast_hash": "0a9157d0ba5cee0df28d36788114f59e",
     "semantic_hash": ""
   },
   "packages/agent-runtime/test/injection.test.ts": {
@@ -2820,9 +2820,9 @@
     "semantic_hash": ""
   },
   "packages/agent-runtime/test/permissions.test.ts": {
-    "mtime": 1791292213.7881715,
-    "seen": 1791292774.450846,
-    "ast_hash": "ea5cc24c80e13d2a3c6132bf7cd05147",
+    "mtime": 1791370574.8031092,
+    "seen": 1791370740.137816,
+    "ast_hash": "43142b3225e84c6a1f47bc6f86afe504",
     "semantic_hash": ""
   },
   "packages/frontend-loop/test/permissions.test.ts": {
