@@ -120,6 +120,10 @@ none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
+- **A push made a live QA crash possible (2026-10-07).** `8cb26e9` (render.perf on applied throttling) added a second Lighthouse Chrome per
+  page; `5c3ae67`'s CI (`37627375120`) then failed Rendered QA with an uncaught `ECONNRESET` from the QA server's error-less CONNECT sockets.
+  `main` (which the Cockpit runner builds from) carried the risk from `8cb26e9` until the fix; live jobs on it: Track B `c7fba41a` and
+  Track A `9c853a49`, neither hit it (both reached a verdict). Found by CI, fixed the same hour (socket error listeners, one Chrome per page).
 - **A live Higgsfield API key was pasted into the chat (2026-10-06).** Huraira posted `HIGGSFIELD_API_KEY` in the session so it could be stored;
   the agent stored it in Doppler (`HF_CREDENTIALS`, value never printed, logged or committed; staged diffs scanned before each commit, 0
   matches). The key is still exposed in the chat transcript: **rotation pending (Huraira)**. No use beyond two refused calls ("Not enough credits").
@@ -913,6 +917,10 @@ time to reach you" / "what time of day works best" (jobs `21350a42`, `5ed238ac`)
 - [x] Offline dry run of the Track A content stage with the real models on plan `b5a45a8e`'s exact brief (before spending another live
       build): the builder's own content reviewer still demanded the waived testimonials section (3 rejections, would have failed live).
       Fixed in the brief summary both models read and in both reviewer prompts; re-run: approved first round, 5 pages, 125 s.
+- [x] CI `37627375120` (`5c3ae67`) failed Rendered QA with an uncaught `ECONNRESET` (test 45, clean Track B site): the QA server's refused
+      CONNECT sockets had no error listener, and the second Lighthouse Chrome per page (advisory run) was killed with sockets open. Fixed:
+      socket error listeners on the QA server, both Lighthouse runs on one Chrome, the advisory run can fail without touching the gate;
+      rendered-qa 52/52 locally. The Cockpit runner on `5c3ae67` carried the crash risk until this push.
 - [x] `render.perf` measurement changed (Huraira chose option 1, 2026-10-07): the gate uses Lighthouse with applied (devtools) throttling,
       same budgets (Track A 2.0 s, Track B 2.5 s); the simulated LCP is recorded on the home page as advisory only; eval registry 1.1.0.
       The over-budget fixture (60 KB script, heavy hero) still fails LCP under the new method; rendered-qa 52/52, verification 98/98.
