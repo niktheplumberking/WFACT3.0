@@ -16,6 +16,7 @@ import {
 } from "@wfact/agent-runtime";
 import { HermesLite, type HermesAnswer } from "@wfact/hermes-lite/controller";
 import { buildToolRegistry } from "@wfact/hermes-lite/tools/registry";
+import { listClientSlugs } from "@wfact/hermes-lite/tools/memoryTools";
 import type { StateReader } from "@wfact/hermes-lite/state";
 import type { ModelClient } from "@wfact/hermes-lite/modelClient";
 
@@ -24,6 +25,8 @@ export interface GatedHermesDeps {
   stateReader: StateReader | null;
   /** Already traced by the caller. Guarded here. */
   modelClient: ModelClient;
+  /** Step 5: known client folders (default: the repo's clients/ directory names). */
+  clientSlugs?: string[];
   /** Tests only: a narrower scope to prove refusals. Production always uses HERMES_LITE_SCOPE. */
   scope?: AgentScope;
   runId?: string;
@@ -40,6 +43,7 @@ export async function askHermesGated(question: string, deps: GatedHermesDeps): P
   const hermes = new HermesLite({
     toolRegistry: buildToolRegistry(deps.stateReader, ctx, (name) => gate.authorize({ kind: "tool", name })),
     modelClient: guardModelClient(deps.modelClient, "hermes"),
+    clientSlugs: deps.clientSlugs ?? listClientSlugs(),
   });
   return withPermissionGate(gate, () => hermes.answerStatusQuestion(question));
 }

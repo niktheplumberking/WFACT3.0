@@ -14,6 +14,7 @@ import type { ToolRegistry } from "./tools/schema.js";
 import type { ModelClient } from "./modelClient.js";
 import { applyToneFilter, buildPlainLanguageSystemPrompt, type ToneFilterResult } from "./toneFilter.js";
 import { withBoundedRetry, EscalationError } from "./escalation.js";
+import { digestEpisodes, type Episode } from "./tools/episodes.js";
 
 // Placeholder entities per memory/context.md §2 and BLOCKED-ON-NICK.md — swap for the real,
 // confirmed list once Nick closes that decision. Aliases exist because a founder will type
@@ -33,9 +34,34 @@ export function detectEntitySlug(question: string): string | null {
   return null;
 }
 
+/**
+ * Step 5: which client folder a question is about. "What happened on Summit Line Roofing's build?" names the
+ * `summit-line-roofing` client: the slug's words must appear in the question as whole words. Longest match wins
+ * (so a client named "summit-line" never shadows "summit-line-roofing"). The question is data used only to pick
+ * which allowlisted read to make; it never becomes a path (the slug comes from the known list).
+ */
+export function detectClientSlug(question: string, clientSlugs: readonly string[]): string | null {
+  const normalized = ` ${question.toLowerCase().replace(/['’]s\b/g, "").replace(/[^a-z0-9]+/g, " ").trim()} `;
+  let best: string | null = null;
+  for (const slug of clientSlugs) {
+    if (!/^[a-z][a-z0-9-]*$/.test(slug)) continue;
+    if (normalized.includes(` ${slug.replace(/-/g, " ")} `) && (!best || slug.length > best.length)) best = slug;
+  }
+  return best;
+}
+
+/** "What happened", "how did the build go", "history": answered from the episodic entries, not hand-written prose. */
+export function isHistoryQuestion(question: string): boolean {
+  return /\b(happen(ed|ing)?|history|so far|went|go(ne)?|build|built|run|runs|timeline|progress)\b/i.test(question);
+}
+
 export interface HermesAnswer {
   question: string;
   entitySlug: string | null;
+  /** Step 5: the client folder the question named, when it named one. */
+  clientSlug?: string | null;
+  /** Step 5: how many episodic entries the answer was given (0 when none were used). */
+  episodesUsed?: number;
   sourcesUsed: string[];
   answer: string;
   toneFilter: ToneFilterResult;
@@ -47,23 +73,29 @@ export interface HermesLiteOptions {
   toolRegistry: ToolRegistry;
   modelClient: ModelClient;
   retry?: { maxAttempts: number; baseDelayMs: number };
+  /** Step 5: known client folder names (memoryTools.listClientSlugs), so a question can name a client. */
+  clientSlugs?: string[];
 }
 
 export class HermesLite {
   private readonly toolRegistry: ToolRegistry;
   private readonly modelClient: ModelClient;
   private readonly retry: { maxAttempts: number; baseDelayMs: number };
+  private readonly clientSlugs: string[];
 
   constructor(opts: HermesLiteOptions) {
     this.toolRegistry = opts.toolRegistry;
     this.modelClient = opts.modelClient;
     this.retry = opts.retry ?? { maxAttempts: 3, baseDelayMs: 500 };
+    this.clientSlugs = opts.clientSlugs ?? [];
   }
 
   async answerStatusQuestion(question: string, explicitEntitySlug?: string): Promise<HermesAnswer> {
-    const entitySlug = explicitEntitySlug ?? detectEntitySlug(question);
+    let entitySlug = explicitEntitySlug ?? detectEntitySlug(question);
+    const clientSlug = detectClientSlug(question, this.clientSlugs);
     const sourcesUsed: string[] = [];
     const contextParts: string[] = [];
+    let episodesUsed = 0;
 
     // 1. Business-wide memory — always pulled, it's small and it's the law file's own §8 order.
     const context = (await this.toolRegistry.invoke("memory.readContext", {})) as {
@@ -73,7 +105,38 @@ export class HermesLite {
     sourcesUsed.push(context.path);
     contextParts.push(`--- ${context.path} ---\n${context.content}`);
 
-    if (entitySlug) {
+    if (clientSlug) {
+      // 2a. Step 5: the question named a client folder. Its memory comes through the same allowlisted tool; for a
+      // "what happened" question the answer is built from the Documentation agent's structured entries only, so it
+      // rests on the audited record rather than on hand-written notes.
+      const mem = (await this.toolRegistry.invoke("memory.readClient", { clientSlug })) as {
+        found: boolean;
+        content: string | null;
+        path: string;
+        episodes: Episode[];
+        episodeProblems: { line: number; entryId: string | null; problem: string }[];
+      };
+      const episodes = (mem.episodes ?? []).filter((e) => e.clientSlug === clientSlug);
+      if (!entitySlug && episodes[0]) entitySlug = episodes[0].entitySlug;
+      if (mem.found && episodes.length > 0 && isHistoryQuestion(question)) {
+        episodesUsed = episodes.length;
+        sourcesUsed.push(`${mem.path}#episodic-log (${episodes.length} entries)`);
+        contextParts.push(
+          `--- ${mem.path}, episodic log: structured entries written by the Documentation agent from the audit trail ` +
+            `(not by a human), oldest first ---\n${digestEpisodes(episodes)}` +
+            (mem.episodeProblems.length
+              ? `\n(${mem.episodeProblems.length} entr${mem.episodeProblems.length === 1 ? "y was" : "ies were"} left out because ${mem.episodeProblems.length === 1 ? "it" : "they"} failed validation or had been edited by hand; say so.)`
+              : ""),
+        );
+      } else if (mem.found && mem.content) {
+        sourcesUsed.push(mem.path);
+        contextParts.push(`--- ${mem.path} ---\n${mem.content}`);
+      } else {
+        contextParts.push(`--- clients/${clientSlug}/memory.md ---\n(no client memory file yet)`);
+      }
+    }
+
+    if (entitySlug && !clientSlug) {
       // 2. Per-client memory, if a client folder exists for this entity yet.
       const clientMemory = (await this.toolRegistry.invoke("memory.readClient", {
         clientSlug: entitySlug,
@@ -84,7 +147,10 @@ export class HermesLite {
       } else {
         contextParts.push(`--- clients/${entitySlug}/memory.md ---\n(no client memory file yet)`);
       }
+    }
 
+    // A history answer built from episodes needs no live project rows (they may be fixture data, see below).
+    if (entitySlug && episodesUsed === 0) {
       // 3. Live state, only if the state tool is actually registered (i.e. Supabase is configured).
       if (this.toolRegistry.listAllowlisted().some((t) => t.name === "state.projectStatus")) {
         const state = (await this.toolRegistry.invoke("state.projectStatus", {
@@ -119,6 +185,8 @@ export class HermesLite {
       return {
         question,
         entitySlug,
+        clientSlug,
+        episodesUsed,
         sourcesUsed,
         answer: toneFilter.text,
         toneFilter,
@@ -132,6 +200,8 @@ export class HermesLite {
       return {
         question,
         entitySlug,
+        clientSlug,
+        episodesUsed,
         sourcesUsed,
         answer: "",
         toneFilter: { text: "", replacedTerms: [], remainingAcronyms: [] },
