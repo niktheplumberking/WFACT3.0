@@ -87,34 +87,79 @@ export class ClaudeModelClient implements ModelClient {
  * message content (`hermes.failed: true`, `finish_reason: "error"`). complete() treats that the
  * same as a network failure — throws, never returns an error string dressed up as a real answer.
  */
+/**
+ * Transient gateway failures are retried after a wait, with a hard cap, then thrown (CLAUDE.md §6: bounded,
+ * exponential backoff, then escalate). One dropped connection ("fetch failed" after 25 ms) ended a whole live
+ * Track A build (Cockpit job ad49df57, 2026-10-07) because the builder client had no retry at all.
+ * Transient = no response (network error), HTTP 5xx or 429. Anything else (4xx, an unusable answer) is not retried here.
+ */
+export const AGENT37_RETRY_DELAYS_MS = [5_000, 15_000, 45_000];
+
+class TransientGatewayError extends Error {}
+
 export class Agent37ModelClient implements ModelClient {
   readonly name = "agent37";
   private readonly baseUrl: string;
   private readonly apiKey: string;
+  private readonly retryDelaysMs: number[];
+  private readonly fetchImpl: typeof fetch;
+  private readonly sleep: (ms: number) => Promise<void>;
   public totalUsage = { promptTokens: 0, completionTokens: 0 };
+  /** Transient failures retried so far by this instance (visible to tests and traces' callers). */
+  public retries = 0;
 
-  constructor(baseUrl: string, apiKey: string) {
+  constructor(
+    baseUrl: string,
+    apiKey: string,
+    opts: { retryDelaysMs?: number[]; fetchImpl?: typeof fetch; sleep?: (ms: number) => Promise<void> } = {},
+  ) {
     this.baseUrl = baseUrl.replace(/\/+$/, "");
     this.apiKey = apiKey;
+    this.retryDelaysMs = opts.retryDelaysMs ?? AGENT37_RETRY_DELAYS_MS;
+    this.fetchImpl = opts.fetchImpl ?? fetch;
+    this.sleep = opts.sleep ?? ((ms) => new Promise((r) => setTimeout(r, ms)));
   }
 
-  async complete({ system, user }: ModelRequest): Promise<string> {
-    const res = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "hermes-agent",
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: user },
-        ],
-      }),
-    });
+  async complete(request: ModelRequest): Promise<string> {
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        return await this.completeOnce(request);
+      } catch (err) {
+        const delay = this.retryDelaysMs[attempt];
+        if (!(err instanceof TransientGatewayError) || delay === undefined) {
+          throw err instanceof TransientGatewayError
+            ? new Error(`${err.message} (after ${attempt + 1} attempts; gateway unavailable, escalating)`)
+            : err;
+        }
+        this.retries += 1;
+        await this.sleep(delay);
+      }
+    }
+  }
+
+  private async completeOnce({ system, user }: ModelRequest): Promise<string> {
+    let res: Response;
+    try {
+      res = await this.fetchImpl(`${this.baseUrl}/chat/completions`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "hermes-agent",
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: user },
+          ],
+        }),
+      });
+    } catch (err) {
+      throw new TransientGatewayError(`Agent 37 request failed: no response (${err instanceof Error ? err.message : String(err)})`);
+    }
     if (!res.ok) {
-      throw new Error(`Agent 37 request failed: HTTP ${res.status} ${await res.text()}`);
+      const msg = `Agent 37 request failed: HTTP ${res.status} ${(await res.text()).slice(0, 300)}`;
+      throw res.status >= 500 || res.status === 429 ? new TransientGatewayError(msg) : new Error(msg);
     }
     const data = (await res.json()) as {
       choices?: { message?: { content?: string }; finish_reason?: string }[];
