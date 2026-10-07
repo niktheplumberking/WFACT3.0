@@ -53,7 +53,11 @@ test("Step 4D: a call that hangs is cut off by the timeout and retried like a dr
     timeoutMs: 20,
     fetchImpl: ((_url: string, init: RequestInit) => {
       calls += 1;
-      if (calls === 1) return new Promise((_res, rej) => init.signal!.addEventListener("abort", () => rej(init.signal!.reason)));
+      // AbortSignal.timeout's timer does not keep the process alive on its own; hold the loop open until the abort fires.
+      if (calls === 1) {
+        const keepAlive = setTimeout(() => {}, 5_000);
+        return new Promise((_res, rej) => init.signal!.addEventListener("abort", () => { clearTimeout(keepAlive); rej(init.signal!.reason); }));
+      }
       return Promise.resolve(ok("page"));
     }) as unknown as typeof fetch,
     sleep: async (ms) => void slept.push(ms),
