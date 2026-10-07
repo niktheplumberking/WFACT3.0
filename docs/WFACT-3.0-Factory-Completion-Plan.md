@@ -14,7 +14,7 @@ parallel with Steps 5-8 because it only touches `apps/cockpit`.
 Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done, M4 PARTIAL: built and verified in CI `37016971442`; live Track B
 build `f696ba43` failed on page count and invented testimonials, fixed in `c64bd0e`, not yet re-run; M5 groundwork `4bbd4bc`, live run
 blocked on Higgsfield credits; M6 not started); Step 4C is **BUILT AND DEPLOYED** (`main` `fb08be3`, live signed-in check pending);
-Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **PARTIAL** (merged 2026-10-07; live run with the agent pending); Step 7 is built and verified locally (parallel worktree, GO 2026-10-07), not yet merged to `huraira-work`; Steps 8–24 are not started. Each step heading below carries its
+Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **PARTIAL** (merged 2026-10-07; live run with the agent pending); Step 7 is **DONE** (merged 2026-10-07, CI pending until pushed); Steps 8–24 are not started. Each step heading below carries its
 status; Part E is the checklist.
 
 ## How to use this file
@@ -689,7 +689,9 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 7 — Expand the evaluation registry (P1) — NOT STARTED
+### STEP 7 — Expand the evaluation registry (P1) — DONE 2026-10-07, CI pending until pushed
+
+**Status: DONE** (parallel worktree, GO 2026-10-07; `64222b1`…`0e13e30`, merged `c1e511a`). Registry v1.0.0 as data + code: 48 checks, each with a passing and a failing fixture, severity/stage gate, cost per check; one gate for every QA entry point; builder/evaluator model-family separation enforced by `config/evaluator.json` (+ OpenAI adapter, migration 0017 applied); QA-runner SSRF closed. Gaps stated, not hidden: the full 78-check list and 50-point audit are not in this repo (only summaries survive; recorded in the registry's `sourceInventory`/`notCovered`), model-judged checks proven on mocks, the OpenAI evaluator has no live success (no credits).
 
 **Depends on**: Step 4.
 **Maps to**: Blueprint §14 (Evaluation Registry), Phase 8, §16C "highest priority", goal 3.
@@ -1450,7 +1452,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 | 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`; redeploy `fb08be3`, CI `36907274448`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
 | 5 | Documentation agent | **PARTIAL** (`08fc069`…`530f4cb`; 26 live backfilled entries = 26 `documentation.entry` rows over 8 runs; live ask answer SQL-checked; pending: a live Cockpit build with the agent attached and CI) | 2026-10-07 | |
 | 6 | Enforce agent permissions | **DONE** (`58bf776`…`ee08f9d`; 285 package tests + rendered-qa pass on the merged tree; live attack runs `050c3329`, `ed07cfaf`, `cb7739a2`, `7197fa12`, `9a692a2d`, 7 `agent.deny` rows verified by SQL; CI `37609559746` green; cost ceilings set from live traces 2026-10-07: builder $1, QA $0.50, Planner $0.25, Direction $0.15, Hermes $0.10, Intake $0.05) | 2026-10-06 | |
-| 7 | Evaluation registry | not started | | |
+| 7 | Evaluation registry | **DONE** (`64222b1`…`0e13e30`, merged `c1e511a`; merged tree verification 98, rendered-qa 52 and all packages pass; migration 0017 applied live; CI pending until pushed; 78-check and 50-point sources missing from the repo, OpenAI evaluator unproven live) | 2026-10-07 | |
 | 8 | Queue and durable execution | not started | | |
 | 9 | Cockpit: status and System room | not started | | |
 | 10 | Cockpit: Agents and Workflows | not started | | |
@@ -1475,7 +1477,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 |---|---|---|---|
 | 1 | One real client, fewer than 40 corrections | open (synthetic run done in Step 4: 2 change rounds, not comparable; comparable output needs Step 4B; real brief after Step 22) | 4B, 22 |
 | 2 | Three concurrent clients | open | 18 |
-| 3 | 50-point audit and registry re-run | partial | 7 |
+| 3 | 50-point audit and registry re-run | partial (Step 7: 48-check registry re-run on the Step 4 page with a per-check table; the 78-check and 50-point source lists are not in this repo) | 7 |
 | 4 | Real cost per client | partial | 12 |
 | 5 | Every agent action audited | largely met | 16, 21 |
 | 6 | Disaster-recovery drill | not verified | 19 |

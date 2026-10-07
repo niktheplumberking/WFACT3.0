@@ -23,29 +23,25 @@ steps; this file tracks the Continuation Stages.
 **Step 4B is IN PROGRESS** (M1–M3 done, M4 PARTIAL, about 80% through M4: both live re-runs on 2026-10-07 failed on factory defects that
 are now fixed, Track A `4d6e1abb` on the open-question cap, Track B `6f68adbd` only on its fixed enquiry form; M5 blocked on Higgsfield API
 credit; M6 not started); **Step 5 is PARTIAL** (built, merged, CI green, live backfill SQL-checked; no live build with it yet); Step 4C is
-BUILT AND DEPLOYED (signed-in check pending); **Step 7 is built and verified locally, not merged to `huraira-work` yet**; Steps 8–24 not
+BUILT AND DEPLOYED (signed-in check pending); **Step 7 is DONE** (merged `c1e511a`, CI pending until pushed); Steps 8–24 not
 started. Continuation Stages 1–5 MET; Stage 6 = Step 5 (PARTIAL); Stage 7 waits on Nick. **Biggest blocker**: none hard; M4 needs one
 passing live build per track.
 
 **Next up**:
 1. **Huraira**: when CI `37615794583` (`c1b386a`) is green, re-run Track B `4acbde1f` and Track A `b5a45a8e` from the Cockpit; this is also
    Step 5's first live run. Then the agent reviews screenshots and closes M4.
-2. **Agent**: after both runs are dispatched, push the Step 7 merge (`step7-merge`: rendered-qa re-run in progress; the other 10 packages
-   pass, verification 98/98) and close Step 7 in the trackers.
+2. **Agent**: after both runs are dispatched, push the Step 7 merge (`c1e511a`, verified locally) and confirm CI; then Step 8 (queue and
+   durable execution).
 3. **Huraira**: decide on adding launch files (sitemap, robots.txt, canonical, og:image, 404) to both starters, and on removing open
    questions from the Track A page source; OpenAI and Higgsfield API credit when convenient; rotate the Higgsfield key.
 
 **Gaps noticed**:
 - **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`
   (the only dead path found in a link check of the 7 main docs this sync).
-- **Two ways in to QA still differ, and the QA link checker egress is open (possible SSRF)**: both fixed in Step 7 (one registry gate for every
-  entry point; confined QA browser, public-only external checks), which is not merged to `huraira-work` yet. Remove this line on merge.
 - **Track A writes the brief's open questions into the home page as HTML comments**: readable by anyone viewing the page source (Step 7 report).
   Should live in `content.json` only. Awaiting Huraira's yes.
 - **Both starters lack launch files**: no sitemap, robots.txt, canonical, og:image (Track A also no 404 page); Step 7's launch-stage checks
   fail on them. Needed before any launch; awaiting Huraira's decision on doing it in 4B.
-- **Migration `0017_model_traces_openai` is applied live (20261007114354) but its file is only on `step7-merge`**: trunk and the live schema
-  disagree until Step 7 is merged.
 - **Second-vendor evaluator has never made a successful live call**: OpenAI returns HTTP 429 "no credits remaining" (checked 2026-10-07). Only
   matters when the builder falls back to Claude; with Agent 37 as builder, Claude stays the evaluator.
 - **Hermes-lite reads `clients/<entitySlug>/memory.md`** (an entity slug used as a client folder name), found in Step 6.
@@ -1019,4 +1015,39 @@ file is lost with the disk until `npm run document` is run and committed; client
 **Exit check**: *"one correct entry per stage after a workflow run, written by the agent and joined to the audit task ids; `npm run ask`
 answers correctly, checked against SQL; existing suites pass unchanged."* — **PARTIALLY MET**: met in process and through the live backfill
 path (same extraction code); not yet on a live workflow run with the agent attached.
+
+## Step 7 — Expand the evaluation registry (DONE 2026-10-07 — CI pending until pushed)
+
+Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 7. Built by a coding agent in a parallel worktree (GO 2026-10-07), merged
+(`c1e511a`) and re-verified in the main checkout. Docs: the registry's own `_doc`/`notCovered`, the egress write-up and `docs/AGENT-PERMISSIONS.md`.
+
+- [x] Registry as versioned data + code: `packages/verification/config/eval-registry.json` v1.0.0, 48 entries (33 text checks, 23 new; 10
+      rendered; screenshot review; evaluator; 3 attack checks), each with id, category, severity, mode, stage, source, model, passing and
+      failing fixture; blocker/major fail the gate, minor warns; 6 launch checks N/A until `--stage launch`; cost per check — `64222b1`
+- [x] Cross-model separation by config (`config/evaluator.json`): same-family pair, unknown model or same instance refused at composition;
+      OpenAI evaluator adapter, traced and metered; migration `0017_model_traces_openai` applied live 2026-10-07 (20261007114354), constraint
+      verified by SQL, advisors nothing new — `681b9a8`
+- [x] QA-runner SSRF closed: QA browser and Lighthouse confined to the site's own server; same-site links checked against built files;
+      external links public-only (post-DNS check, pinned, redirects re-checked, 8 s timeout); attack tests (30 forbidden URL forms, DNS
+      rebinding, metadata, a live Chromium canary reached only without confinement) — `e28f328`
+- [x] One registry gate for every QA entry point (jobs runner, workflow CLI, `npm run qa`, `npm run verify`); advisory failures not sent to
+      revise — `7988390`; docs and CI fixture-drift check — `0e13e30`
+- [x] Step 4 pilot page through the full gate with a per-check table: 33 text checks 20 PASS / 4 FAIL / 2 WARN / 7 N/A; browser 6 PASS /
+      3 FAIL (agent's evidence)
+- [ ] CI on the merged tree (pushed after the 2026-10-07 M4 re-runs are dispatched)
+- [ ] Live screenshot-review / evaluator run through the registry (mocks only so far); OpenAI evaluator live (HTTP 429, no credits — Huraira)
+
+**Verification** (independent of the building agent)
+- [x] Merged tree, main checkout: typecheck clean and tests pass in every package — verification 98, rendered-qa 52 (real Chromium), workflow
+      27, jobs 17, frontend-loop 67, hermes 48, documentation 18, planning 32, agent-runtime 39, audit 14, media 8
+- [x] Runner composition read: the Cockpit runner's builder is Agent 37, so `evaluatorModelClientFromEnv` still picks Claude; OpenAI is only
+      picked for a Claude builder
+
+**NOT COVERED** (stated plainly): the full 78-check registry and 50-point audit (source lists not in this repo; 10 of the 20 "tells" named,
+the other 10 counted as missing); model-judged checks proven on mocks; launch stage not called by anything (nothing launches); Agent 37's
+upstream model is undisclosed, so its "family" rests on the gateway's self-description.
+
+**Exit check**: *"registry versioned with fixtures that behave; pilot page re-run with a per-check table; cross-model separation enforced by
+config; existing verification tests pass unchanged."* — **MET** (44 -> 98 tests, additions only), with the source-list and live-model
+gaps above. CI on the merged tree still to run.
 
