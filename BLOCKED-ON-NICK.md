@@ -4,7 +4,7 @@
 
 | Item | Owner | Blocks |
 |---|---|---|
-| Scope: agency pipeline and content engine are IN (Nick yes 2026-10-07) but sequenced after the first paid delivery; e-commerce deferred (Huraira 2026-10-07); Nick to confirm the motion-rich, conversion-focused default | Nick | Part F proposals N1-N5 |
+| Nick to confirm decision D1 (two tracks, Track A motion budget, conversion as a hard gate) by blind-rating sample builds from Step 27; agency pipeline and content engine are IN but sequenced after the first paid delivery; e-commerce deferred (Huraira 2026-10-07) | Nick | Step 27 sign-off; Part F proposals |
 | Real pilot brief and business rules (replace provisional `memory/context.md` R-01…R-13 and the synthetic `summit-line-roofing`) | Nick | Blueprint goal 1; Stage 7; Step 22 |
 | Governance split in CLAUDE.md §3; entity list (DreamSign, Bennett & Co) | Nick | Entity schema is N-capable; formal sign-off only |
 | Hermes-lite and Vercel-instead-of-Hostinger disclosures (written, never spoken to Nick) | Huraira | Step 5-era exit checks; Step 22 |

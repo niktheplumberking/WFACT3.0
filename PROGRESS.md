@@ -31,9 +31,10 @@ none; `render.perf` now gates on applied throttling (Huraira, option 1, 2026-10-
 **Next up** (order re-set and approved by Huraira 2026-10-07; see "Execution order" in the Factory Completion Plan):
 1. **Huraira**: re-run Track B `4acbde1f` and Track A `b5a45a8e` (closes 4B M4); press "continue" on a real stopped build (4D live proof); OpenAI and Higgsfield credits; rotate the Higgsfield key.
 2. **Agent**: Step 26 quality calibration (different-vendor evaluator, human calibration, reference set).
-3. **Agent**: Step 25 real-client proof run (Nick's real brief, or the real 2.0 DreamSign case); 4B M5/M6 when Higgsfield credits land.
-4. **Agent**: Steps 8, 12, 20 as one reliability bundle (with Step 21 sub-item H); then Steps 9-10 as one thin Health room.
-5. Not in scope now: e-commerce site type. Deferred: Steps 15, 16, 24.
+3. **Agent**: Step 27 Track A motion budget (decision D1: two tracks, motion budget, conversion hard gate).
+4. **Agent**: Step 25 real-client proof run (Nick's real brief, or the real 2.0 DreamSign case); 4B M5/M6 when Higgsfield credits land.
+5. **Agent**: Steps 8, 12, 20 as one reliability bundle (with Step 21 sub-item H); then Steps 9-10 as one thin Health room.
+6. Not in scope now: e-commerce site type. Deferred: Steps 15, 16, 24.
 
 **Gaps noticed**:
 - **Stale path in the Continuation plan**: it names `packages/agent-runtime/registry.ts`; the file is `packages/agent-runtime/src/registry.ts`

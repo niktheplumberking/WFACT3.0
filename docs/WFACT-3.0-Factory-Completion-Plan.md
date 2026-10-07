@@ -95,6 +95,7 @@ the goals · **P3** later or depends on Nick.
 | 24 | Advanced autonomy and optimization | Earns auto-pass gates from measured runs; local-model migration decision | Blueprint Phases 11–12 need real data first | Evidence-backed autonomy upgrades | P3 |
 | 25 | Real-client proof run (added 2026-10-07) | Runs one real client (Nick's brief, or the real 2.0 DreamSign case if his brief is not ready) through intake, build, verify and human launch; measures corrections, cost, time | Goal 1; the loop has only run on synthetic clients | Measured result against the 40+ baseline, with a failure analysis | P0 |
 | 26 | Quality calibration (added 2026-10-07) | Gets a different-vendor evaluator working live; calibrates the automated reviewer against Nick's blind ratings; builds per-niche reference outputs with visual regression | A passing check must mean a good site; reviewer and builder share a vendor today | Calibration report; reference set in CI | P0 |
+| 27 | Track A motion budget (added 2026-10-07, decision D1) | Makes Track A visibly richer within a motion budget (CSS/vanilla only, reduced-motion respected, no framework scripts) with conversion as a hard gate; builds one brief on both tracks for Nick's blind rating | Nick found delivered sites visually flat; Track B's framework cost hurts speed and reliability for local business | Richer Track A passing the existing performance, layout-shift and CTA checks; blind-rating result | P0 |
 
 ### Execution order (approved by Huraira 2026-10-07; supersedes "do them in order of number")
 
@@ -104,16 +105,19 @@ Step numbers are identifiers, not the sequence. Do them in this order; each stil
 |---|---|---|
 | 1 | Huraira actions: close Step 4B M4 (re-run Track A `b5a45a8e`, Track B `4acbde1f`), press "continue" on a real stopped build (4D live proof), buy OpenAI and Higgsfield credits, rotate the Higgsfield key | Unblocks everything; nothing else is trustworthy until M4 closes |
 | 2 | **26** Quality calibration | A passing check must mean a good site before we measure a real client |
-| 3 | **25** Real-client proof run (with 4B M5/M6 when credits land) | Goal 1: the core loop has never run on a real client; one client needs no queue |
-| 4 | **8, 12, 20** as one reliability bundle, plus Step 21 sub-item H (CI coverage) | Queue, cost governance (price or cap Agent 37) and the Vercel ceiling belong together; attack tests move into CI |
-| 5 | **9 then 10** as one thin Health room (what is running, what failed, which check failed) | Founders' stated need; defer the rest of the rooms |
-| 6 | **11, 13, 14, 17** as needed | Second model, remaining agents, Memory and Human Control rooms, alerts |
-| 7 | **18, 19**, plus defining the 50-point audit list (goal 3) | Scale and recovery proof |
-| 8 | **21** (rest), **22** | Housekeeping and Nick's items |
-| 9 | After the first paid delivery: **23** and the Part F proposals | Product features follow revenue |
+| 3 | **27** Track A motion budget (D1) | The real client should be built on the richer Track A, and Nick's blind rating of both tracks settles D1 |
+| 4 | **25** Real-client proof run (with 4B M5/M6 when credits land) | Goal 1: the core loop has never run on a real client; one client needs no queue |
+| 5 | **8, 12, 20** as one reliability bundle, plus Step 21 sub-item H (CI coverage) | Queue, cost governance (price or cap Agent 37) and the Vercel ceiling belong together; attack tests move into CI |
+| 6 | **9 then 10** as one thin Health room (what is running, what failed, which check failed) | Founders' stated need; defer the rest of the rooms |
+| 7 | **11, 13, 14, 17** as needed | Second model, remaining agents, Memory and Human Control rooms, alerts |
+| 8 | **18, 19**, plus defining the 50-point audit list (goal 3) | Scale and recovery proof |
+| 9 | **21** (rest), **22** | Housekeeping and Nick's items |
+| 10 | After the first paid delivery: **23** and the Part F proposals | Product features follow revenue |
 | Deferred | **15, 16, 24** | Need real data first; revisit after step 7 |
 
 Not in scope now: an e-commerce site type (Huraira 2026-10-07).
+
+**Decision D1 (Huraira, 2026-10-07)**: keep two tracks. Track A gets a motion budget (Step 27); Track B stays the full 21st.dev/React path; the direction step still recommends a track and the owner picks. Conversion is a hard gate: motion may not fail speed, layout-shift or visible-CTA checks. Nick confirms by blind-rating sample builds, not by conversation.
 
 ---
 
@@ -1198,6 +1202,38 @@ REPORT in the Part C format, then STOP.
 
 ---
 
+### STEP 27 — Track A motion budget (P0, added 2026-10-07, decision D1) — NOT STARTED
+
+**Depends on**: Step 4B M4 closed; Step 26 item 3 (reference set) preferred.
+**Maps to**: Decision D1; `docs/FRONTEND-UPGRADE-DESIGN.md` (Track A).
+
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules in
+docs/WFACT-3.0-Factory-Completion-Plan.md Part C, including the design-quality rule and the skills it names. Do ONLY Step 27.
+
+CONTEXT
+Huraira decided (2026-10-07): keep Track A (local business, static multi-page) and Track B (Next.js, full motion). Nick found delivered
+sites visually flat. Track A gets a motion budget; conversion is a hard gate. E-commerce is out of scope.
+
+TASK
+1. Before building: read packages/frontend-loop starters and docs/FRONTEND-UPGRADE-DESIGN.md. Note that 21st.dev components are React and
+   Track A is static HTML; state which patterns you port or restyle and which you skip. Send a one-page design and WAIT for GO.
+2. After GO, implement the motion budget in the Track A starter: scroll reveals, hover/press states, a considered hero, sticky CTA,
+   all CSS or vanilla JS, no framework scripts, prefers-reduced-motion respected, no layout shift.
+3. Add rulebook items and checks so motion cannot fail conversion: LCP and CLS thresholds unchanged, CTA visible above the fold, no
+   motion on first paint blocking content. A seeded violation must fail verification.
+4. Build one brief on both tracks and prepare a blind rating sheet for Nick (labels hidden, short rubric, includes a conversion question).
+5. Do not change Track B beyond what is needed to share the rulebook.
+
+ACCEPTANCE
+- Existing suites pass unchanged; rendered QA passes on the richer Track A; seeded motion violation fails.
+- Blind-rating sheet delivered; result recorded in docs. Nick's rating confirms or reopens D1.
+
+REPORT in the Part C format, then STOP.
+```
+
+---
+
 ## Part E — Progress checklist (update as steps close)
 
 | # | Step | Status | Reported | Approved by Huraira |
@@ -1232,6 +1268,7 @@ REPORT in the Part C format, then STOP.
 | 24 | Advanced autonomy and optimization (A–C) | not started | | |
 | 25 | Real-client proof run | not started | | |
 | 26 | Quality calibration | not started | | |
+| 27 | Track A motion budget | not started | | |
 
 **Goal tracker (Blueprint §16K)**
 
@@ -1256,12 +1293,11 @@ steps to Part B, Part D and Part E in the same commit and run `node scripts/chec
 
 | ID | Proposed step | Gated by |
 |---|---|---|
-| N1 | Revised front-end direction note: motion-rich, conversion-first default for local-business sites, lead forms unchanged (replaces the Addendum's dynamic tiers D0–D4). **E-commerce site type deferred, Huraira 2026-10-07** | D1 (remaining: Nick confirms motion-rich default) |
-| N2 | Niche research and offer agents (cost-capped external data) | D1, Steps 12 and 13 |
-| N3 | Per-niche template capture and lessons write-back to starters | N2, Step 7 |
-| N4 | Lead-gen content engine, agency-side only, after delivery and client consent | D1; Steps 12 and 13 |
-| N5 | Dynamic features, only if D3 shows they are needed (captured leads, client-editable content via Owner's Key, live data) | D3 |
+| N1 | Niche research and offer agents (cost-capped external data) | Steps 12 and 13, first paid delivery |
+| N2 | Per-niche template capture and lessons write-back to starters | N2, Step 7 |
+| N3 | Lead-gen content engine, agency-side only, after delivery and client consent | Steps 12 and 13, first paid delivery |
+| N4 | Dynamic features, only if D3 shows they are needed (captured leads, client-editable content via Owner's Key, live data) | D3 |
 
-Decisions (owners in `docs/HANDOFF.md` §6): **D1** confirm the revised direction (e-commerce deferred by Huraira 2026-10-07; motion-rich default awaits Nick's confirmation); **D2** APPROVED by Huraira 2026-10-07: Steps 12 and 20 are pulled forward with Step 8 as one reliability bundle, after the real-client proof run (see Execution order);
+Decisions (owners in `docs/HANDOFF.md` §6): **D1** DECIDED by Huraira 2026-10-07 (two tracks, Track A motion budget, conversion as a hard gate, e-commerce deferred; Nick confirms via the Step 27 blind rating; N1 is absorbed by Step 27); **D2** APPROVED by Huraira 2026-10-07: Steps 12 and 20 are pulled forward with Step 8 as one reliability bundle, after the real-client proof run (see Execution order);
 **D3** dynamic runtime shape within the Hostinger/Vercel law; **D4** obtain the AIW2.0STACK website-factory shell to compare real output;
 **D5** spend caps for Higgsfield and Agent 37.

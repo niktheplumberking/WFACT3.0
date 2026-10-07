@@ -67,7 +67,8 @@ pilot client (synthetic); the governance table; the entity list.
 - 100-hour sprint superseded 2026-09-28 by the Continuation Plan, then the Factory Completion Plan (steps 1–24).
 - Hostinger descoped 2026-09-22 for the sprint; Vercel stood in for "live". The hosting law itself is unchanged and Nick was never told in conversation (written disclosure only).
 - Hermes-lite replaced a real Hermes Agent by the manual's pre-authorised fallback; Nick not yet told in conversation.
-- Static output was a deliberate 4B choice, then Nick (2026-10-07) said "static" meant flat, not technically static — the Addendum's dynamic tiers D0–D4 misread this and are superseded. **A revised direction is not yet confirmed.**
+- **D1 decided 2026-10-07 (Huraira)**: two tracks kept, Track A motion budget (Step 27), conversion as a hard gate, e-commerce deferred.
+- Static output was a deliberate 4B choice, then Nick (2026-10-07) said "static" meant flat, not technically static — the Addendum's dynamic tiers D0–D4 misread this and are superseded. The revised direction is now decided (D1 above); Nick confirms it by rating sample builds.
 - Track B builder: planned as a different vendor from reviewer; today both are Agent 37 (same vendor), recorded in `packages/rendered-qa/config/reviewer.json`.
 
 ---
@@ -141,7 +142,7 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 
 | # | Item | Risk |
 |---|---|---|
-| 1 | Revised product direction (motion-rich all sites, e-commerce variant, agency pipeline) unconfirmed | **High** — building new steps now could be wasted or contradict Nick |
+| 1 | Nick has not yet confirmed D1 (he will, via the Step 27 blind rating); the agency pipeline is sequenced after the first paid delivery | Medium |
 | 2 | Only synthetic clients; business rules provisional | High for goal 1 |
 | 3 | Same-vendor reviewer; OpenAI 429; evaluator second vendor unproven live | Medium |
 | 4 | Agent 37 builder unpriced; no USD or token ceiling sees ~190k tokens/run | Medium (Step 12) |
@@ -158,9 +159,9 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 
 | # | Question | Owner | Why it matters |
 |---|---|---|---|
-| D1 | Confirm with Nick the motion-rich, conversion-focused default with 21st.dev and unchanged lead forms. **E-commerce deferred by Huraira 2026-10-07** | Huraira → Nick | Changes Step 4B design, adds steps |
+| D1 | **DECIDED 2026-10-07 (Huraira)**: keep two tracks; Track A gets a motion budget; Track B stays full 21st.dev/React; conversion is a hard gate (speed, layout shift, visible CTA); e-commerce deferred. Nick confirms by blind-rating sample builds (Step 27), not by conversation | Huraira | — |
 | D2 | **DECIDED 2026-10-07 (Huraira): approved.** Steps 12 and 20 join Step 8 as one bundle, after the real-client proof run | Huraira | — |
-| D3 | Runtime shape for any dynamic features within the Hostinger/Vercel law | Huraira | Only if D1 needs dynamic |
+| D3 | Runtime shape for any dynamic features within the Hostinger/Vercel law | Huraira | Only if dynamic features are proposed |
 | D4 | Obtain AIW2.0STACK "website-factory shell" to compare real output | Huraira | Comparison currently rests on Nick's description |
 | D5 | Spend caps: Higgsfield per build/month; Agent 37 auto top-up | Nick | M5 |
 
@@ -174,13 +175,14 @@ Order approved by Huraira 2026-10-07 (it replaces the numeric order; the full ta
 |---|---|---|---|
 | 1 | **Huraira actions**: re-run Track B `4acbde1f` and Track A `b5a45a8e` (closes 4B M4); press "continue" on a stopped build (4D live proof); buy OpenAI and Higgsfield credits; rotate the Higgsfield key | CI green | M4 closes when one live build per track passes and screenshots are reviewed |
 | 2 | **Step 26** quality calibration | OpenAI credits | Live different-vendor call with trace row; human-vs-automated calibration table; visual-regression baseline that fails on a seeded regression |
-| 3 | **Step 25** real-client proof run (with 4B M5/M6 when Higgsfield credits land) | Nick's real brief or the real 2.0 DreamSign case; Step 26 | Measured corrections, cost, time vs the 40+ baseline; defects the checks missed listed; stops at the launch gate |
-| 4 | **Steps 8, 12, 20** as one reliability bundle, plus Step 21 sub-item H (CI coverage) | 4, 6 | Crash-resume, capped retries + escalation, per-client serialisation; Agent 37 priced or token-capped; no 12-function risk; attack tests in CI |
-| 5 | **Steps 9 then 10**: one thin Health room | 8 | Real data; failed check named |
-| 6 | Steps 11, 13, 14, 17 as needed | 8–12 | Bounded scopes under the Step 6 model |
-| 7 | Steps 18, 19, plus define the 50-point audit list | 8 | Three-client test, DR drill, goal 3 closable |
-| 8 | Step 21 (rest), 22 | real inputs | per plan |
-| 9 | After the first paid delivery: Step 23 and Part F proposals | revenue | per plan |
+| 3 | **Step 27** Track A motion budget (decision D1) | Step 26 | One-page design approved first; richer Track A passes speed, layout-shift and CTA checks; seeded motion violation fails; blind-rating sheet for Nick |
+| 4 | **Step 25** real-client proof run (with 4B M5/M6 when Higgsfield credits land) | Nick's real brief or the real 2.0 DreamSign case; Step 26 | Measured corrections, cost, time vs the 40+ baseline; defects the checks missed listed; stops at the launch gate |
+| 5 | **Steps 8, 12, 20** as one reliability bundle, plus Step 21 sub-item H (CI coverage) | 4, 6 | Crash-resume, capped retries + escalation, per-client serialisation; Agent 37 priced or token-capped; no 12-function risk; attack tests in CI |
+| 6 | **Steps 9 then 10**: one thin Health room | 8 | Real data; failed check named |
+| 7 | Steps 11, 13, 14, 17 as needed | 8–12 | Bounded scopes under the Step 6 model |
+| 8 | Steps 18, 19, plus define the 50-point audit list | 8 | Three-client test, DR drill, goal 3 closable |
+| 9 | Step 21 (rest), 22 | real inputs | per plan |
+| 10 | After the first paid delivery: Step 23 and Part F proposals | revenue | per plan |
 | Deferred | Steps 15, 16, 24 | real data | revisit after item 7 |
 
 Not in scope now: an e-commerce site type (Huraira 2026-10-07).
