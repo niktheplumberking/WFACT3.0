@@ -21,6 +21,9 @@ time-sensitive (model IDs, pricing, credentials) before relying on it.
    back, wait for Huraira's GO. Step 4B is described in
    `docs/FRONTEND-UPGRADE-DESIGN.md`.
 
+**MVP override (Decision D3, 2026-10-10)**: until Wed 2026-10-14 the work is a Website Build Module MVP proven on Bennett & Co
+(websites only, no e-commerce). Scope fence, schedule and cost cap: `docs/MVP-CUTLINE.md`. It overrides the Execution order above.
+
 A consolidated, verified orientation (goals, current state, backlog, next task) is `docs/HANDOFF.md`; read it first.
 Live status is in `PROGRESS.md`; everything waiting on Nick is in `BLOCKED-ON-NICK.md`. The document index is
 `docs/INDEX.md`. The sprint-era phrasing elsewhere in this file ("proof sprint", "Phase 1") is history; the
@@ -137,6 +140,22 @@ clicked. Existing in the 2.0 repo is not itself a reason to inherit something in
 ✓ .claude/QUICK_START.md          # Essential commands
 ✓ .claude/ARCHITECTURE_MAP.md     # File locations
 ```
+
+**MANDATORY step-file checks** at the start of each session, before starting new work. The steps-and-prompts file is
+`docs/WFACT-3.0-Factory-Completion-Plan.md` (Part D = steps with their AI prompts, Part E = checklist).
+1. Run `node scripts/check-trackers.mjs`. It must print OK.
+2. Compare `git log` since the plan's last update with Part D. Every step that has been worked on must have a current status,
+   what is done and what is left, a **Next action** line, and an up-to-date prompt.
+3. Check the prompts. A partly done or blocked step's prompt continues only the part that is left: done work is cited by SHA
+   or path, and the blocker is named. A step that looks done but has no independent evidence (not re-run, not deployed,
+   awaiting a live check or sign-off) carries a **verification prompt**. That prompt verifies first, fixes only the gaps it
+   finds, then runs `/step-close` and moves on.
+4. Check closed steps. Only DONE steps with citable evidence sit in the **`### Closed steps`** subsection at the end of
+   Part D, just before Part E, ordered by step number. They keep their `### STEP N — … — DONE …` heading so the checker still
+   parses them; long prompts stay archived, per the 2026-10-07 realignment. A step that needs verification is never closed.
+5. If any check fails, run the `progress-sync` skill (its Step 4 does exactly this) before starting the task, or tell Huraira
+   what is stale and ask. Status words must stay in the checker's vocabulary: DONE, BUILT AND DEPLOYED, IN PROGRESS, PARTIAL,
+   BLOCKED, NOT STARTED. "Needs verification" is written as BUILT AND DEPLOYED or PARTIAL, plus "verification pending".
 
 **At task completion:**
 - Create completion doc in `.claude/completions/YYYY-MM-DD-task-name.md`

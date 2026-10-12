@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WFACT Website Builder — Progress report</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --border: #e4e7eb; --text: #1f2430; --text-muted: #616b7a;
+    --done-bg: #e7f6ec; --done-text: #1b7a3d;
+    --progress-bg: #fff4e0; --progress-text: #a06400;
+    --notstarted-bg: #eef0f3; --notstarted-text: #626b78;
+    --blocked-bg: #fdeaea; --blocked-text: #c0392b;
+    --fixed-bg: #eaf1fd; --fixed-text: #1c5fb0;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 32px 20px 60px; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.55; }
+  .wrap { max-width: 780px; margin: 0 auto; }
+  header.report-header { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 28px 28px 24px; margin-bottom: 20px; }
+  header.report-header .eyebrow { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin: 0 0 6px; }
+  header.report-header h1 { margin: 0 0 4px; font-size: 26px; line-height: 1.25; }
+  header.report-header .client-line { color: var(--text-muted); font-size: 15px; margin: 0 0 18px; }
+  header.report-header .summary { font-size: 16px; padding-top: 16px; border-top: 1px solid var(--border); margin: 0 0 16px; }
+  .stat-strip { display: flex; flex-wrap: wrap; gap: 10px; }
+  .stat-pill { font-size: 13px; font-weight: 600; padding: 6px 13px; border-radius: 999px; }
+  h2.section-title { font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin: 28px 4px 12px; }
+  .phase-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px 28px; margin-bottom: 18px; }
+  .phase-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 10px; }
+  .phase-head h3 { margin: 0; font-size: 18px; }
+  .phase-state { margin: 0 0 16px; color: var(--text-muted); font-size: 15px; }
+  .phase-block { margin-top: 16px; }
+  .phase-block h4 { margin: 0 0 8px; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); }
+  .phase-block ul { margin: 0; padding-left: 18px; }
+  .phase-block li { margin-bottom: 6px; font-size: 14.5px; }
+  .phase-block li:last-child { margin-bottom: 0; }
+  .phase-block.blockers h4, .phase-block.needed-client h4 { color: var(--blocked-text); }
+  .phase-block.fixed-note h4 { color: var(--fixed-text); }
+  .badge { flex-shrink: 0; font-size: 12.5px; font-weight: 600; padding: 5px 12px; border-radius: 999px; white-space: nowrap; }
+  .status-done { background: var(--done-bg); color: var(--done-text); }
+  .status-progress { background: var(--progress-bg); color: var(--progress-text); }
+  .status-notstarted { background: var(--notstarted-bg); color: var(--notstarted-text); }
+  .status-blocked { background: var(--blocked-bg); color: var(--blocked-text); }
+  .timeline { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 28px; }
+  .timeline table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  .timeline td { padding: 8px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .timeline tr:last-child td { border-bottom: 0; }
+  .timeline td:first-child { white-space: nowrap; font-weight: 600; width: 90px; }
+  .timeline td:last-child { white-space: nowrap; text-align: right; }
+  footer.report-footer { text-align: center; color: var(--text-muted); font-size: 13px; margin-top: 28px; }
+  @media (max-width: 480px) {
+    body { padding: 20px 14px 48px; }
+    header.report-header, .phase-card, .timeline { padding: 20px; border-radius: 12px; }
+    header.report-header h1 { font-size: 22px; }
+    .phase-head { flex-direction: column; gap: 8px; }
+    .timeline td:last-child { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="report-header">
+      <p class="eyebrow">Progress report, Monday October 12, 2026</p>
+      <h1>WFACT Website Builder: first real build</h1>
+      <p class="client-line">Prepared for Nick. Proving project: the new Bennett &amp; Co agency site</p>
+      <p class="summary">The factory itself is built and has made test websites end to end. The Bennett &amp; Co build has not started yet, because the brief and a few answers have not come in and no build work has run since October 7. Wednesday is at real risk. We think Thursday or Friday is more realistic if the brief and credits arrive today.</p>
+      <div class="stat-strip">
+        <span class="stat-pill status-done">2 parts done</span>
+        <span class="stat-pill status-blocked">3 need your input</span>
+        <span class="stat-pill status-notstarted">4 not started yet</span>
+      </div>
+    </header>
+
+    <h2 class="section-title">The plan for this week</h2>
+    <div class="timeline">
+      <table>
+        <tr><td>Sat 10th</td><td>Receive the Bennett &amp; Co brief and record your fixed colors and logo</td><td><span class="badge status-blocked">Not done</span></td></tr>
+        <tr><td>Sun 11th</td><td>Spending limits, independent second review, launch basics</td><td><span class="badge status-notstarted">Not done</span></td></tr>
+        <tr><td>Mon 12th</td><td>Design direction and first full build</td><td><span class="badge status-notstarted">Waiting on the above</span></td></tr>
+        <tr><td>Tue 13th</td><td>Your review and a limited number of correction rounds</td><td><span class="badge status-notstarted">Not started</span></td></tr>
+        <tr><td>Wed 14th</td><td>Final checks, your go or no go, then the site waits for your launch approval</td><td><span class="badge status-notstarted">At risk</span></td></tr>
+      </table>
+    </div>
+
+    <h2 class="section-title">Part by part</h2>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>The factory itself</h3>
+        <span class="badge status-done">Done</span>
+      </div>
+      <p class="phase-state">The control room is live and working. From it, a request can be turned into a written plan. You approve or reject the plan, a website gets built in one of two styles, and every result is checked automatically before anyone calls it finished. So far it has only run on practice clients, not a real one.</p>
+      <div class="phase-block">
+        <h4>What's happened</h4>
+        <ul>
+          <li>Approved team members can sign in, and each client's information stays separate and private.</li>
+          <li>Two build styles exist: a fast, simple multi-page site, and a more polished site with motion.</li>
+          <li>Every build is checked automatically for layout, speed, accessibility and honesty (no made-up reviews or clients) before it goes to a person.</li>
+          <li>Each AI worker can only do what it is explicitly allowed to. Everything it does is recorded, along with what it cost.</li>
+          <li>If a build stops partway, the control room explains why in plain words and lets it carry on from where it stopped.</li>
+        </ul>
+      </div>
+      <div class="phase-block fixed-note">
+        <h4>Found and fixed</h4>
+        <ul>
+          <li>One test build stopped because a connection to the building tool dropped. It now retries automatically.</li>
+          <li>The checker was wrongly marking a site as broken for having no customer reviews when none had been provided. That is fixed, and it no longer pushes for fake reviews.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>Taking in the Bennett &amp; Co brief</h3>
+        <span class="badge status-blocked">Needs your input</span>
+      </div>
+      <p class="phase-state">This is the first step of the real build, and nothing else on the list can start until it is done. As of this morning the Bennett &amp; Co brief is not on file anywhere in the factory.</p>
+      <div class="phase-block blockers">
+        <h4>What's holding it up</h4>
+        <ul><li>We cannot lock your colors and logo or plan the pages without the brief and the existing site files.</li></ul>
+      </div>
+      <div class="phase-block needed-client">
+        <h4>Needed from you</h4>
+        <ul>
+          <li>The Bennett &amp; Co brief, or the existing site files, and which pages the agency site needs.</li>
+          <li>The logo file and exact colors, or confirmation that they are already in the site files.</li>
+          <li>Any real case studies or client quotes. If there are none, we build without them rather than invent any.</li>
+          <li>Where enquiries from the contact form should go, and confirmation that the live site goes on Hostinger.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>Design direction</h3>
+        <span class="badge status-notstarted">Not started yet</span>
+      </div>
+      <p class="phase-state">The factory reads the brief, suggests which of the two styles fits and why, and sets out a look and feel. You or Huraira pick the style. This already works on practice clients. It runs for Bennett &amp; Co as soon as the brief is in.</p>
+    </section>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>First full Bennett &amp; Co build</h3>
+        <span class="badge status-notstarted">Not started yet</span>
+      </div>
+      <p class="phase-state">One complete site in the chosen style. If there is time, it is rebuilt in the other style so you can compare the two. The build tools work, but the most recent practice run of each style still had a small open issue: the polished style missed one speed target by a fraction of a second, and the simple style still needs a fresh run after the connection fix above.</p>
+    </section>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>Agency-site pages and contact form</h3>
+        <span class="badge status-notstarted">Not started yet</span>
+      </div>
+      <p class="phase-state">The pages an agency site needs: services, how you work, proof of results, trust signals, and a contact form that delivers each enquiry to where you track leads. Proof sections will only use real material or be clearly labelled as samples.</p>
+    </section>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>Ready for search engines and sharing</h3>
+        <span class="badge status-notstarted">Not started yet</span>
+      </div>
+      <p class="phase-state">The behind-the-scenes files that help Google find the site, plus the preview image that shows when someone shares a link and a proper "page not found" page. Neither build style has these yet, and the launch checks correctly fail without them. This is a known, contained piece of work.</p>
+    </section>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>Spending limits</h3>
+        <span class="badge status-blocked">Needs your input</span>
+      </div>
+      <p class="phase-state">We measured what builds actually cost. Everything except the main building tool has cost about $1.32 in total so far. The building tool is the expensive part, about $0.50 to $2 per attempt by our estimate. It is roughly $12 of the recent $15 top-up and it does not report its own prices yet, so no limit can stop it today. The plan is a $5 cap per build, counting retries, and a $20 weekly cap while credits are thin.</p>
+      <div class="phase-block needed-client">
+        <h4>Needed from you</h4>
+        <ul>
+          <li>Approval of the $5 per build and $20 per week caps.</li>
+          <li>A credit top-up for the building tool, so the Bennett build does not stop halfway.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>Independent second opinion</h3>
+        <span class="badge status-blocked">Needs your input</span>
+      </div>
+      <p class="phase-state">A different AI company's model is supposed to review each finished site, so the builder never grades its own work. That reviewer is set up, but it has never run, because that account has no credit. For now, review falls back to the same company as the builder plus human review by Huraira and you.</p>
+      <div class="phase-block needed-client">
+        <h4>Needed from you</h4>
+        <ul><li>A small credit top-up on the second AI account (OpenAI). A few dollars covers the Bennett build.</li></ul>
+      </div>
+    </section>
+
+    <section class="phase-card">
+      <div class="phase-head">
+        <h3>You approve the launch</h3>
+        <span class="badge status-done">Done</span>
+      </div>
+      <p class="phase-state">Every build stops at "awaiting launch approval". Nothing goes live and no money moves unless you approve it. This is built in on purpose and cannot be switched off by the factory.</p>
+    </section>
+
+    <footer class="report-footer">Report generated October 12, 2026, from the project records, the build history and the live system. No build activity has been recorded since October 7.</footer>
+  </div>
+</body>
+</html>

@@ -18,6 +18,7 @@
 | `WFACT-3.0-Continuation-Build-Plan.md` | Stages 1–7 |
 | `WFACT-3.0-Factory-Completion-Plan.md` | Steps 1–27, one agent prompt per step, Execution order (re-set 2026-10-07), Standard Operating Rules |
 | `FRONTEND-UPGRADE-DESIGN.md` | Step 4B: the two front-end build tracks |
+| `MVP-CUTLINE.md` | Decision D3 (2026-10-10): the Bennett & Co MVP due 2026-10-14, scope fence, schedule, cost evidence and proposed spend cap |
 | `BUILD-RECOVERY-DESIGN.md` | Step 4D: why builds stop, what the Cockpit tells the owner, and how a stopped build carries on |
 
 Live status: `../PROGRESS.md`. Waiting on Nick: `../BLOCKED-ON-NICK.md`.

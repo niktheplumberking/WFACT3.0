@@ -161,7 +161,8 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 |---|---|---|---|
 | D1 | **DECIDED 2026-10-07 (Huraira)**: keep two tracks; Track A gets a motion budget; Track B stays full 21st.dev/React; conversion is a hard gate (speed, layout shift, visible CTA); e-commerce deferred. Nick confirms by blind-rating sample builds (Step 27), not by conversation | Huraira | — |
 | D2 | **DECIDED 2026-10-07 (Huraira): approved.** Steps 12 and 20 join Step 8 as one bundle, after the real-client proof run | Huraira | — |
-| D3 | Runtime shape for any dynamic features within the Hostinger/Vercel law | Huraira | Only if dynamic features are proposed |
+| D3 | **DECIDED 2026-10-10 (Huraira, from the Nick chat of 2026-10-08)**: MVP of the Website Build Module proven on Bennett & Co by Wed 2026-10-14; websites only; scope fence, schedule and cost cap proposal in `docs/MVP-CUTLINE.md`. The cap itself (Agent 37 priced, $5 per build, $20 per week) awaits Huraira's yes and Nick's top-up | Huraira, Nick | Overrides the order in §7 until the MVP ships |
+| D3b | Runtime shape for any dynamic features within the Hostinger/Vercel law (was D3 before 2026-10-10) | Huraira | Only if dynamic features are proposed |
 | D4 | Obtain AIW2.0STACK "website-factory shell" to compare real output | Huraira | Comparison currently rests on Nick's description |
 | D5 | Spend caps: Higgsfield per build/month; Agent 37 auto top-up | Nick | M5 |
 
@@ -170,6 +171,8 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 ## 7. Ordered implementation backlog
 
 Order approved by Huraira 2026-10-07 (it replaces the numeric order; the full table is "Execution order" in the Factory Completion Plan). Each step: read its Part D prompt, follow Part C, report, wait for GO.
+
+**MVP override (Decision D3, 2026-10-10)**: until Wed 2026-10-14 only items 1 to 4 below run, trimmed to the Bennett & Co proof (what must work and what is deferred: `docs/MVP-CUTLINE.md`). Items 5 onward wait until after the MVP.
 
 | Order | Item | Depends on | Acceptance / verification (summary) |
 |---|---|---|---|
