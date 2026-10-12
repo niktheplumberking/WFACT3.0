@@ -21,13 +21,15 @@ import { TRACK_B_STARTER_DIR } from "../paths.js";
 import { buildTrackBPalette } from "./palette.js";
 import { probeIsolation, runIsolated, type IsolationMethod, type IsolationProbe } from "./isolate.js";
 import type { SiteContent } from "./content.js";
+import { OG_IMAGE_FILE, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
 
-export const STARTER_VERSION = "track-b-starter/1.1.0"; // 1.1.0: contact form variants (enquiry | signup), "Location" label
+// 1.1.0: contact form variants (enquiry | signup), "Location" label. 1.2.0: launch files (robots, llms, sitemap, share card, canonical)
+export const STARTER_VERSION = "track-b-starter/1.2.0";
 
 /** Extensions read back as text; everything else in the export is binary (base64). */
 const TEXT_EXT = new Set([".html", ".txt", ".js", ".css", ".json", ".svg", ".xml", ".webmanifest", ".map"]);
 /** Starter paths that are never source: installed packages, build output, per-build generated files. */
-const SKIP = new Set(["node_modules", ".next", "out", "content", "next-env.d.ts", "tsconfig.tsbuildinfo"]);
+const SKIP = new Set(["node_modules", ".next", "out", "content", "public", "next-env.d.ts", "tsconfig.tsbuildinfo"]);
 
 export class TrackBBuildError extends Error {
   constructor(
@@ -84,14 +86,26 @@ export function starterSourceFiles(starterDir = TRACK_B_STARTER_DIR): string[] {
 
 export const pageFile = (slug: string) => (slug === "index" ? "index.html" : `${slug}/index.html`);
 
-export async function buildTrackBSite(content: SiteContent, opts: { starterDir?: string; keep?: boolean; method?: IsolationMethod } = {}): Promise<TrackBBuild> {
+/** Site-relative URL path of a page, as the export serves it (trailingSlash): "/" and "/services/". */
+const urlPath = (slug: string) => (slug === "index" ? "/" : `/${slug}/`);
+
+export interface TrackBBuildOptions {
+  starterDir?: string;
+  keep?: boolean;
+  method?: IsolationMethod;
+  /** The live site's https origin (launch.ts siteUrlOf). Without it there is no canonical, og:url, og:image or sitemap. */
+  siteUrl?: string | null;
+}
+
+export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOptions = {}): Promise<TrackBBuild> {
   const { palette, problems } = buildTrackBPalette(content.brand.colors);
   if (!palette) throw new TrackBBuildError(`brand colours are not usable: ${problems.join(" ")}`, "");
   const starterDir = opts.starterDir ?? TRACK_B_STARTER_DIR;
   // A stable folder per content + starter version: webpack's chunk split depends on the absolute path,
   // so a random temp name made two builds of the same content differ (found by the determinism test).
   // Two simultaneous builds of the same content would share this folder; each runner builds one site at a time.
-  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).digest("hex").slice(0, 16);
+  const siteUrl = opts.siteUrl ?? null;
+  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").digest("hex").slice(0, 16);
   const work = path.join(tmpdir(), "wfact-track-b", key);
   rmSync(work, { recursive: true, force: true });
   mkdirSync(work, { recursive: true });
@@ -103,6 +117,16 @@ export async function buildTrackBSite(content: SiteContent, opts: { starterDir?:
     mkdirSync(path.join(work, "content"));
     writeFileSync(path.join(work, "content/site.json"), `${JSON.stringify(content, null, 2)}\n`);
     writeFileSync(path.join(work, "content/theme.json"), `${JSON.stringify(palette, null, 2)}\n`);
+    writeFileSync(path.join(work, "content/launch.json"), `${JSON.stringify({ siteUrl }, null, 2)}\n`);
+    // Launch files (MVP M5): Next copies public/ into the export as is.
+    mkdirSync(path.join(work, "public"));
+    writeFileSync(path.join(work, "public/robots.txt"), robotsTxt(siteUrl));
+    writeFileSync(
+      path.join(work, "public/llms.txt"),
+      llmsTxt({ name: content.business.name, tagline: content.business.tagline, siteUrl, pages: content.pages.map((p) => ({ path: urlPath(p.slug), title: p.title, description: p.description })) }),
+    );
+    if (siteUrl) writeFileSync(path.join(work, "public/sitemap.xml"), sitemapXml(siteUrl, content.pages.map((p) => urlPath(p.slug))));
+    writeFileSync(path.join(work, "public", OG_IMAGE_FILE), ogImagePng({ deep: palette.deep, accent: palette.accent }));
 
     const isolation = await probeIsolation(work, opts.method);
     if (isolation.network !== "blocked") throw new TrackBBuildError(`refusing to build: the isolated build could reach the network (${isolation.attempts.join("; ")})`, "");
@@ -132,7 +156,7 @@ export async function buildTrackBSite(content: SiteContent, opts: { starterDir?:
     for (const p of pages) if (files[p] === undefined) throw new TrackBBuildError(`the export has no ${p}`, build.output);
 
     const source: Record<string, string> = {};
-    for (const rel of [...starterSourceFiles(work), "lib/type.generated.ts", "content/site.json", "content/theme.json", ...walk(path.join(work, "app")).filter((f) => f.endsWith("/page.tsx")).map((f) => `app/${f}`)]) {
+    for (const rel of [...starterSourceFiles(work), "lib/type.generated.ts", "content/site.json", "content/theme.json", "content/launch.json", ...walk(path.join(work, "app")).filter((f) => f.endsWith("/page.tsx")).map((f) => `app/${f}`)]) {
       // Dotfiles (.gitignore) are tooling, not the site's source, and the artifact store refuses them.
       if (rel.split("/").some((seg) => seg.startsWith("."))) continue;
       if (source[rel] === undefined && existsSync(path.join(work, rel))) source[rel] = readFileSync(path.join(work, rel), "utf8");

@@ -5,12 +5,14 @@
  */
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { content, palette } from "@/lib/content";
+import { content, palette, siteUrl } from "@/lib/content";
 import { displayFace, textFace } from "@/lib/type.generated";
 import { MotionRoot } from "@/components/motion/MotionRoot";
 
 export const metadata: Metadata = {
   title: { default: content.business.name, template: `%s | ${content.business.name}` },
+  // Makes the page-level canonical, og:url and og:image absolute (components/PageView.tsx).
+  ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
 };
 
 const lum = (hex: string) => {

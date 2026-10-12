@@ -6,6 +6,7 @@
  */
 import site from "../content/site.json";
 import theme from "../content/theme.json";
+import launch from "../content/launch.json";
 
 export type Source = "brief" | "sample";
 export interface Fact {
@@ -130,6 +131,10 @@ export interface Theme {
 
 export const content = site as SiteContent;
 export const palette = theme as Theme;
+/** The live site's https origin, from the owner (never the builder); null until it is known. */
+export const siteUrl = (launch as { siteUrl: string | null }).siteUrl;
+/** The share card the build writes to public/ (src/launch.ts). */
+export const OG_IMAGE = "/og-image.png";
 
 export const pageBySlug = (slug: string): Page => {
   const page = content.pages.find((p) => p.slug === slug);

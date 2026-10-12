@@ -64,3 +64,13 @@ test("Step 4D: ownerFacts are validated, kept, and become fact sources", async (
   assert.throws(() => parseBrief({ ...validBrief, ownerFacts: [{ key: "phone", label: "x", value: "" }] }), InvalidBriefError);
   assert.throws(() => parseBrief({ ...validBrief, ownerFacts: "phone" }), InvalidBriefError);
 });
+
+test("MVP M5: the live address comes from the brief or the owner fact site_url, never anywhere else", async () => {
+  const { siteUrlOf } = await import("../src/launch.js");
+  assert.equal(siteUrlOf(parseBrief({ ...validBrief, siteUrl: "https://bennettandco.com" })), "https://bennettandco.com");
+  assert.equal(siteUrlOf(parseBrief({ ...validBrief, ownerFacts: [{ key: "site_url", label: "Website address", value: "https://bennettandco.com/" }] })), "https://bennettandco.com");
+  assert.equal(siteUrlOf(parseBrief(validBrief)), null, "no address given: none is guessed");
+  assert.equal(siteUrlOf(parseBrief({ ...validBrief, ownerFacts: [{ key: "site_url", label: "Website", value: "https://bennett.vercel.app" }] })), null, "a Vercel preview is not the live site");
+  assert.throws(() => parseBrief({ ...validBrief, siteUrl: "http://bennettandco.com" }), InvalidBriefError);
+  assert.throws(() => parseBrief({ ...validBrief, siteUrl: "https://bennettandco.com/about" }), InvalidBriefError);
+});

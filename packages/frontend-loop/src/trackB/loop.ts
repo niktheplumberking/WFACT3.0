@@ -22,6 +22,7 @@ import { DESIGN_RULEBOOK } from "../rulebook.js";
 import { BANNED_CLAIMS, briefBlock } from "../trackA/loop.js";
 import { CONTENT_SCHEMA_VERSION, SITE_CONTENT_JSON_SCHEMA, extractJson, validateSiteContent, type SiteContent } from "./content.js";
 import { buildTrackBSite, STARTER_VERSION, TrackBBuildError, type TrackBBuild } from "./build.js";
+import { siteUrlOf } from "../launch.js";
 
 export const TRACK_B_TEMPLATE: PageTemplate = {
   id: "track-b",
@@ -40,7 +41,7 @@ export interface TrackBLoopOptions {
   maxValidationAttempts?: number;
   nowIso?: () => string;
   /** The build step; replaceable in tests. Default: the isolated Next.js build. */
-  build?: (content: SiteContent) => Promise<TrackBBuild>;
+  build?: (content: SiteContent, brief: PilotBrief) => Promise<TrackBBuild>;
 }
 
 export function trackBSystemPrompt(scope: PageScope = "multi"): string {
@@ -110,7 +111,7 @@ export class TrackBLoop {
   private readonly maxRounds: number;
   private readonly maxValidation: number;
   private readonly nowIso: () => string;
-  private readonly build: (content: SiteContent) => Promise<TrackBBuild>;
+  private readonly build: (content: SiteContent, brief: PilotBrief) => Promise<TrackBBuild>;
 
   constructor(opts: TrackBLoopOptions) {
     if (opts.builderModel === opts.evaluatorModel) {
@@ -121,7 +122,7 @@ export class TrackBLoop {
     this.maxRounds = opts.maxRounds ?? 3;
     this.maxValidation = opts.maxValidationAttempts ?? 3;
     this.nowIso = opts.nowIso ?? (() => new Date().toISOString());
-    this.build = opts.build ?? ((c) => buildTrackBSite(c));
+    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b) }));
   }
 
   async run(brief: PilotBrief): Promise<FrontendLoopResult> {
@@ -204,7 +205,7 @@ export class TrackBLoop {
   private async buildApproved(brief: PilotBrief, content: SiteContent, contentJson: string, rounds: CorrectionRound[]): Promise<FrontendLoopResult> {
     let built: TrackBBuild;
     try {
-      built = await this.build(content);
+      built = await this.build(content, brief);
     } catch (err) {
       // A failed build is the starter's or the host's problem, not something the content writer can fix: a human looks.
       const log = err instanceof TrackBBuildError && err.log ? ` Build log (end): ${err.log.slice(-1500)}` : "";

@@ -40,6 +40,11 @@ export interface PilotBrief {
   ownerFacts?: OwnerFact[];
   /** Labels of details the owner chose to build without (Step 4D "skip"): the builder labels them sample or leaves them out, and does not ask again. */
   ownerSkipped?: string[];
+  /**
+   * The live site's address ("https://bennettandco.com"), supplied by the owner (MVP M5). Canonical links, the
+   * sitemap and og:image need it; without it they are left out and the launch-stage checks say so. See launch.ts.
+   */
+  siteUrl?: string;
   /** Provenance — never silently treat a placeholder brief as Nick's real one. */
   source: "nick" | "placeholder-2.0-case" | "intake-planner" | "synthetic-provisional-2026-09-30";
 }
@@ -123,6 +128,9 @@ export function parseBrief(raw: unknown): PilotBrief {
   if (record.pageScope !== undefined && record.pageScope !== "single" && record.pageScope !== "multi") {
     throw new InvalidBriefError('Brief "pageScope", if present, must be "single" or "multi".');
   }
+  if (record.siteUrl !== undefined && (typeof record.siteUrl !== "string" || !/^https:\/\/[^/\s]+\/?$/i.test(record.siteUrl))) {
+    throw new InvalidBriefError('Brief "siteUrl", if present, must be the live site\'s https:// address with no path.');
+  }
 
   const ownerFacts = parseOwnerFacts(record.ownerFacts);
   const ownerSkipped = Array.isArray(record.ownerSkipped) ? (record.ownerSkipped as unknown[]).filter((x): x is string => typeof x === "string" && x.length <= OWNER_FACT_LIMITS.label).slice(0, OWNER_FACT_LIMITS.count) : [];
@@ -136,6 +144,7 @@ export function parseBrief(raw: unknown): PilotBrief {
     brandNotes: record.brandNotes as string,
     templatePreference: record.templatePreference as string | undefined,
     ...(record.pageScope !== undefined ? { pageScope: record.pageScope as PageScope } : {}),
+    ...(record.siteUrl !== undefined ? { siteUrl: record.siteUrl as string } : {}),
     ...(ownerFacts.length > 0 ? { ownerFacts } : {}),
     ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}),
     source: record.source as PilotBrief["source"],

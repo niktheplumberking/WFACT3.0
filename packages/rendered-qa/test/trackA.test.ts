@@ -123,7 +123,7 @@ test("the rendered suite serves a whole site from the verification context", asy
 
 // --- Step 7: the evaluation registry's full text gate on the real Track A starter output ---------------------
 
-test("Step 7: the Track A starter passes the registry gate at preview (advisories only); at launch it fails exactly the launch tells it lacks", () => {
+test("Step 7: the Track A starter passes the registry gate at preview (advisories only); at launch it passes with the owner's address and without one fails only the URL tells", () => {
   const ctx = {
     html: site.files["index.html"]!,
     clientSlug: brief.clientSlug,
@@ -134,8 +134,12 @@ test("Step 7: the Track A starter passes the registry gate at preview (advisorie
   };
   const preview = runChecks({ ...ctx, stage: "preview" }, registryGateChecks());
   assert.deepEqual(preview.filter(gates).map((r) => r.checkId), [], preview.filter(gates).flatMap((r) => r.details).join("\n"));
-  assert.deepEqual(preview.filter((r) => r.advisory).map((r) => r.checkId), ["seo.open-graph", "tells.favicon"]);
-  // A known, reported gap (Step 7 report): the starter ships no 404 page, sitemap, robots.txt, canonical or og:image.
+  assert.deepEqual(preview.filter((r) => r.advisory).map((r) => r.checkId), ["tells.favicon"]);
+  // MVP M5: the starter ships 404.html, robots.txt and llms.txt always; the sitemap, canonical and og:image need the
+  // production address, which only the owner supplies, so without it exactly those fail at launch.
   const launch = runChecks({ ...ctx, stage: "launch" }, registryGateChecks());
-  assert.deepEqual(launch.filter(gates).map((r) => r.checkId), ["tells.404-page", "tells.sitemap", "tells.robots", "tells.canonical", "tells.og-image"]);
+  assert.deepEqual(launch.filter(gates).map((r) => r.checkId), ["tells.sitemap", "tells.canonical", "tells.og-image"]);
+  const live = renderSite(content, { siteUrl: "https://summitline.co" });
+  const atLaunch = runChecks({ ...ctx, html: live.files["index.html"]!, site: { files: live.files, pages: live.pages, binary: live.binary }, stage: "launch" }, registryGateChecks());
+  assert.deepEqual(atLaunch.filter(gates).map((r) => r.checkId), [], atLaunch.filter(gates).flatMap((r) => r.details).join("\n"));
 });

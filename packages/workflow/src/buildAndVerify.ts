@@ -83,7 +83,7 @@ const sha256 = (s: string | Buffer) => (typeof s === "string" ? createHash("sha2
  * with the extensions a static site and its source use; never "..", never a dotfile.
  */
 export const ARTIFACT_PATH_RE =
-  /^clients\/[a-z][a-z0-9-]*\/(pages\/[a-z0-9-]+\.html|sites\/[a-z0-9-]+\/(?!.*\.\.)[A-Za-z0-9_][A-Za-z0-9_.-]*(\/[A-Za-z0-9_][A-Za-z0-9_.-]*)*\.(html|json|txt|xml|js|mjs|css|svg|woff2|ico|webmanifest|ts|tsx))$/;
+  /^clients\/[a-z][a-z0-9-]*\/(pages\/[a-z0-9-]+\.html|sites\/[a-z0-9-]+\/(?!.*\.\.)[A-Za-z0-9_][A-Za-z0-9_.-]*(\/[A-Za-z0-9_][A-Za-z0-9_.-]*)*\.(html|json|txt|xml|js|mjs|css|svg|woff2|ico|png|webmanifest|ts|tsx))$/;
 
 function assertSafeRelPath(relPath: string): void {
   const normalized = path.posix.normalize(relPath);

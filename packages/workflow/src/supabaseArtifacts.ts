@@ -16,8 +16,8 @@ const PATH_RE = ARTIFACT_PATH_RE;
 const sha256 = (s: string | Buffer) => (typeof s === "string" ? createHash("sha256").update(s, "utf8") : createHash("sha256").update(s)).digest("hex");
 
 /**
- * Content type per file extension. Must stay inside the bucket's allowed list (migrations 0009, 0012, 0014):
- * the static export (html, css, js, txt, svg, woff2, ico) and the Track B source (ts, tsx, mjs as text/plain).
+ * Content type per file extension. Must stay inside the bucket's allowed list (migrations 0009, 0012, 0014, 0019):
+ * the static export (html, css, js, txt, svg, woff2, ico, png share card) and the Track B source (ts, tsx, mjs as text/plain).
  */
 const CONTENT_TYPES: Record<string, string> = {
   html: "text/html",
@@ -33,6 +33,7 @@ const CONTENT_TYPES: Record<string, string> = {
   svg: "image/svg+xml",
   woff2: "font/woff2",
   ico: "image/x-icon",
+  png: "image/png",
 };
 export const contentTypeFor = (relPath: string): string => {
   const type = CONTENT_TYPES[relPath.slice(relPath.lastIndexOf(".") + 1).toLowerCase()];

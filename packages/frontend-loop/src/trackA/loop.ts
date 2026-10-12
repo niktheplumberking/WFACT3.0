@@ -17,6 +17,7 @@ import { parseReviewResponse, type CorrectionRound, type FrontendLoopResult } fr
 import { DESIGN_RULEBOOK } from "../rulebook.js";
 import { CONTENT_SCHEMA_VERSION, SITE_CONTENT_JSON_SCHEMA, extractJson, validateSiteContent, type SiteContent } from "./content.js";
 import { renderSite, STARTER_VERSION } from "./render.js";
+import { siteUrlOf } from "../launch.js";
 
 export const TRACK_A_TEMPLATE: PageTemplate = {
   id: "track-a",
@@ -204,9 +205,9 @@ export class TrackALoop {
       if ("invalid" in content) {
         return this.escalate(brief, rounds, null, `The builder's content was still invalid after ${this.maxValidation} attempts: ${content.invalid.slice(0, 5).join(" | ")}`);
       }
-      const site = renderSite(content);
+      const site = renderSite(content, { siteUrl: siteUrlOf(brief) });
       const contentJson = JSON.stringify(content, null, 2);
-      const built = { files: site.files, pages: site.pages, contentJson, starterVersion: STARTER_VERSION };
+      const built = { files: site.files, pages: site.pages, binary: site.binary, contentJson, starterVersion: STARTER_VERSION };
       const review = await this.review(brief, contentJson);
       rounds.push({ round, verdict: review.verdict, issues: review.issues, timestamp: this.nowIso() });
       if (review.verdict === "approved") {

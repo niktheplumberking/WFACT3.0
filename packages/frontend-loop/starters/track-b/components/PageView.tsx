@@ -3,14 +3,28 @@
  * client islands. Page metadata (title, description) comes from the content.
  */
 import type { Metadata } from "next";
-import { content, href, actionHref, pageBySlug } from "@/lib/content";
+import { content, href, actionHref, pageBySlug, siteUrl, OG_IMAGE } from "@/lib/content";
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
 import { SectionView } from "./Sections";
 
+/** Title, description and share tags. Canonical, og:url and og:image only once the live address is known. */
 export function pageMetadata(slug: string): Metadata {
   const page = pageBySlug(slug);
-  return { title: page.title, description: page.description };
+  const url = href(slug);
+  return {
+    title: page.title,
+    description: page.description,
+    ...(siteUrl ? { alternates: { canonical: url } } : {}),
+    openGraph: {
+      type: "website",
+      siteName: content.business.name,
+      title: page.title,
+      description: page.description,
+      ...(siteUrl ? { url, images: [{ url: OG_IMAGE, width: 1200, height: 630 }] } : {}),
+    },
+    ...(siteUrl ? { twitter: { card: "summary_large_image" } } : {}),
+  };
 }
 
 export function PageView({ slug }: { slug: string }) {

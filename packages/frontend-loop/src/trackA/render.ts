@@ -11,17 +11,25 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import type { Fact, Page, Section, SiteContent } from "./content.js";
 import { buildPalette, type Palette } from "./palette.js";
+import { OG_IMAGE_FILE, absoluteUrl, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
 
-export const STARTER_VERSION = "track-a-starter/1.0.0";
+export const STARTER_VERSION = "track-a-starter/1.1.0"; // 1.1.0: launch files (404, robots, llms, sitemap, share card, canonical)
 const STARTER_DIR = path.join(import.meta.dirname, "..", "..", "starters", "track-a");
 const STARTER_CSS = readFileSync(path.join(STARTER_DIR, "styles.css"), "utf-8");
 const STARTER_JS = readFileSync(path.join(STARTER_DIR, "site.js"), "utf-8");
 
 export interface RenderedSite {
-  /** Relative path → file content. Pages only today (images arrive in M5). */
+  /** Relative path → file content: the pages, 404.html and the launch files (launch.ts). Binary files are base64. */
   files: Record<string, string>;
   /** Page files in navigation order; pages[0] is index.html. */
   pages: string[];
+  /** Paths in `files` whose value is base64 (the share card). */
+  binary: string[];
+}
+
+export interface RenderOptions {
+  /** The live site's https origin (launch.ts siteUrlOf). Without it there is no canonical, og:url, og:image or sitemap. */
+  siteUrl?: string | null;
 }
 
 export class RenderError extends Error {
@@ -298,7 +306,27 @@ function jsonLd(content: SiteContent): string {
 
 const comment = (s: string) => `<!-- OPEN QUESTION for a human (not shown on the page): ${s.replace(/--+/g, "-").replace(/>/g, "&gt;")} -->`;
 
-function renderPage(content: SiteContent, page: Page, palette: Palette): string {
+/** The URL path a page is served at: "" for the home page, "services.html" for the rest. */
+const pagePath = (slug: string) => (slug === "index" ? "" : pageFile(slug));
+
+function shareTags(content: SiteContent, page: Page, siteUrl: string | null): string[] {
+  return [
+    '<meta property="og:type" content="website">',
+    `<meta property="og:site_name" content="${esc(content.business.name)}">`,
+    `<meta property="og:title" content="${esc(page.title)}">`,
+    `<meta property="og:description" content="${esc(page.description)}">`,
+    ...(siteUrl
+      ? [
+          `<link rel="canonical" href="${esc(absoluteUrl(siteUrl, pagePath(page.slug)))}">`,
+          `<meta property="og:url" content="${esc(absoluteUrl(siteUrl, pagePath(page.slug)))}">`,
+          `<meta property="og:image" content="${esc(absoluteUrl(siteUrl, OG_IMAGE_FILE))}">`,
+          '<meta name="twitter:card" content="summary_large_image">',
+        ]
+      : []),
+  ];
+}
+
+function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl: string | null): string {
   const ctx: Ctx = { content, page };
   // One h1 per page: the first section's heading. Plain sections alternate a tint for rhythm; the hero
   // and the call-to-action band are deep brand fields and reset the alternation.
@@ -325,6 +353,7 @@ function renderPage(content: SiteContent, page: Page, palette: Palette): string 
     `<meta name="description" content="${esc(page.description)}">`,
     `<meta name="theme-color" content="${palette.deep}">`,
     `<meta name="generator" content="WFACT ${STARTER_VERSION}">`,
+    ...shareTags(content, page, siteUrl),
     `<style>${rootTokens(palette, content)}\n${STARTER_CSS}</style>`,
     isHome ? jsonLd(content) : "",
     isHome ? content.openQuestions.map(comment).join("\n") : "",
@@ -344,16 +373,60 @@ function renderPage(content: SiteContent, page: Page, palette: Palette): string 
     .join("\n");
 }
 
-/** Renders every page. Throws RenderError only for content that validateSiteContent would also reject. */
-export function renderSite(content: SiteContent): RenderedSite {
+/**
+ * The 404 page: the site's header and footer around a plain message and a way home. A host serves it at any
+ * depth, so its page links are made root-relative ("/services.html"); in-page anchors stay as they are.
+ */
+function renderNotFound(content: SiteContent, palette: Palette): string {
+  const page: Page = { slug: "404", navLabel: "Not found", title: `Page not found | ${content.business.name}`, description: "This page does not exist.", sections: [] };
+  const ctx: Ctx = { content, page };
+  const html = [
+    "<!doctype html>",
+    '<html lang="en">',
+    "<head>",
+    '<meta charset="utf-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1">',
+    `<title>${esc(page.title)}</title>`,
+    '<meta name="robots" content="noindex">',
+    `<meta name="theme-color" content="${palette.deep}">`,
+    `<meta name="generator" content="WFACT ${STARTER_VERSION}">`,
+    `<style>${rootTokens(palette, content)}\n${STARTER_CSS}</style>`,
+    "</head>",
+    "<body>",
+    '<a class="skip" href="#main">Skip to content</a>',
+    sprite(),
+    header(ctx),
+    `<main id="main"><section class="section" id="not-found" aria-labelledby="not-found-title"><div class="wrap"><div class="section-head"><h1 id="not-found-title">This page does not exist.</h1><p>The address may be mistyped, or the page has moved.</p></div><a class="btn" href="index.html">Go to the home page${icon("arrow")}</a></div></section></main>`,
+    footer(ctx),
+    `<script>${STARTER_JS}</script>`,
+    "</body>",
+    "</html>",
+    "",
+  ].join("\n");
+  return html.replace(/href="(?!#|\/|[a-z]+:)/g, 'href="/');
+}
+
+/** Renders every page and the launch files. Throws RenderError only for content that validateSiteContent would also reject. */
+export function renderSite(content: SiteContent, opts: RenderOptions = {}): RenderedSite {
   const { palette, problems } = buildPalette(content.brand.colors);
   if (!palette) throw new RenderError(problems.join(" "));
+  const siteUrl = opts.siteUrl ?? null;
   const files: Record<string, string> = {};
   const pages: string[] = [];
   for (const page of content.pages) {
     const file = pageFile(page.slug);
-    files[file] = renderPage(content, page, palette);
+    files[file] = renderPage(content, page, palette, siteUrl);
     pages.push(file);
   }
-  return { files, pages };
+  files["404.html"] = renderNotFound(content, palette);
+  files["robots.txt"] = robotsTxt(siteUrl);
+  files["llms.txt"] = llmsTxt({
+    name: content.business.name,
+    tagline: content.business.tagline,
+    siteUrl,
+    pages: content.pages.map((p) => ({ path: pagePath(p.slug), title: p.title, description: p.description })),
+  });
+  if (siteUrl) files["sitemap.xml"] = sitemapXml(siteUrl, content.pages.map((p) => pagePath(p.slug)));
+  files[OG_IMAGE_FILE] = ogImagePng({ deep: palette.deep, accent: palette.accent }).toString("base64");
+  return { files, pages, binary: [OG_IMAGE_FILE] };
 }
