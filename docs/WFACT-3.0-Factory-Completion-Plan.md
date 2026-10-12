@@ -11,12 +11,17 @@ to a Continuation Stage, that is noted.
 redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
 **Realigned 2026-10-07**: product-and-solution alignment pass (`docs/HANDOFF.md` is the orientation; `docs/archive/MANIFEST.md` lists what moved). Changes to this plan: closed steps (1, 2, 3, 3A, 4, 4C, 5, 6, 7) keep their heading, status and evidence but their long agent prompts moved to the archived pre-realignment copy; open steps keep full prompts; Steps 12, 20 and 21 gained the verified gaps found in the audit; Part F lists proposed, UNAPPROVED additions (agency scope) and the decisions that gate them. The execution order was re-set on 2026-10-07 (see "Execution order" after Part B); Steps 25 and 26 were added. The step table, headings and Part E remain machine-checked by `scripts/check-trackers.mjs`.
-**Status as of 2026-10-07**: Steps **1, 2, 3 and 3A are DONE**; Step 4 is **PARTIAL** (one criterion superseded by Step 4B);
-Step 4B is **IN PROGRESS** (M0 6 of 7 inputs decided, M1, M2 and M3 done, M4 PARTIAL: built and verified in CI `37016971442`; live Track B
-build `f696ba43` failed on page count and invented testimonials, fixed in `c64bd0e`, not yet re-run; M5 groundwork `4bbd4bc`, live run
-blocked on Higgsfield credits; M6 not started); Step 4C is **BUILT AND DEPLOYED** (`main` `fb08be3`, live signed-in check pending); Step 4D (build recovery) is **PARTIAL** (`a3198d8`…`a643d2d`; migration 0018 applied live, 26/26 attack checks; CI `37644039022` green and deployed; live continue not yet run);
-Step 6 is **DONE** (enforced default-deny agent permissions, CI `37609559746` green); Step 5 is **DONE** (proven on live Cockpit builds 2026-10-07); Step 7 is **DONE** (CI `37617845669` green); Steps 8–27 are not started. Each step heading below carries its
-status; Part E is the checklist.
+**Last synced 2026-10-12** via `/progress-sync` (Step 4 of that skill): every step re-audited against git (no commits since `072b391`,
+2026-10-07), CI and the live database. Closed steps (DONE with citable evidence: 1, 2, 3, 5, 6, 7) moved to **"Closed steps"** at the end of
+Part D; open steps carry a **Next action** line and a continuation or verification prompt.
+**Status as of 2026-10-12**: Steps **1, 2, 3, 5, 6 and 7 are DONE and closed**. Step 3A is **DONE** but its live sign-up proof is still
+pending, so it stays open with a verification prompt. Step 4 is **PARTIAL** (closed by 4B M6). Step 4B is **IN PROGRESS**: M4 still open.
+Track A re-run `b880a7d5` (plan `b5a45a8e`, 2026-10-07 17:14 UTC) passed every deterministic check, but the required design review could not
+run (Agent 37 HTTP 502, 4 attempts). Track B `4acbde1f` has not been re-run. M5 is blocked on Higgsfield credits and M6 has not started.
+Step 4C is **BUILT AND DEPLOYED**, with the signed-in check pending. Step 4D is **PARTIAL**: deployed, but the live "continue" has not been
+run (`b880a7d5` is the ready candidate). Steps 8–27 are not started. **Decision D3 (MVP on Bennett & Co by 2026-10-14) overrides the order**:
+Nick's brief is not in the repo (no `clients/bennett*`), and no MVP item from `docs/MVP-CUTLINE.md` §2 has started. Each step heading below
+carries its status; Part E is the checklist.
 
 ## How to use this file
 
@@ -71,7 +76,7 @@ the goals · **P3** later or depends on Nick.
 | 3 | Retire plaintext secrets (Huraira acts, agent verifies) | Deletes `.env.local` files, rotates keys, revokes the leaked Doppler token | Stage 1 is unmet and a token is exposed | The plan's `grep` check passes | P0 |
 | 3A | Password sign-in and approval-gated accounts (added 2026-09-30) | Email + password sign-in, account requests, owner/admin approval, forgot-password; fixed an admin-to-owner escalation hole | Huraira asked for it; magic-link-only sign-in was a blocker | Live in the Cockpit; 32/32 attack checks pass | P0 |
 | 4 | Full run on the pilot brief | Intake → plan → approval → build → verify → human Launch | Proves the factory end to end; measures corrections | Verified live page, correction count, audit and trace rows | P0 |
-| 4B | Front-end upgrade: two build tracks | Track A (local business, conversion-first, multi-page static; motion budget in Step 27) and Track B (motion-rich, Next.js); a direction step detects niche, requirements and brand direction and recommends a track; the owner picks per build in the Cockpit; rendered screenshot QA; anti-slop design rulebook | Step 4 output was one text-only page and checks never looked at the rendered page | Both tracks build multi-page sites that pass rendered QA; track choice in the Cockpit; Summit Line rebuilt | P0 |
+| 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done; M4 partial (built, CI `37016971442`; live-build fixes `c64bd0e`…`7c68eb8` on `main`; Track A `b880a7d5` passed every deterministic check 2026-10-07 but the design review did not run (Agent 37 HTTP 502), continue pending; Track B `4acbde1f` re-run pending; screenshot review pending); M5 groundwork `4bbd4bc` (blocked: Higgsfield credits); M6 not started (deferred by D3) | 2026-10-12 (sync) | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | Information architecture, navigation, design system, plain copy, every factory action reachable, accessible and responsive | The Cockpit is the control room; today it grew room by room | A redesigned Cockpit verified in the browser at desktop and phone, with a usability walkthrough | P1 |
 | 5 | Stage 6: Documentation agent | Writes structured episodic memory per stage, tied to task IDs | Blueprint wants machine-written memory | Auto-written `memory.md` entries; a passing "what happened" query | P1 |
 | 6 | Enforce agent permissions | Makes each agent's permission scope enforced, not descriptive | Must land before more agents or concurrency | Out-of-scope calls denied and audited | P1 |
@@ -116,6 +121,8 @@ Step numbers are identifiers, not the sequence. Do them in this order; each stil
 | Deferred | **15, 16, 24** | Need real data first; revisit after step 7 |
 
 Not in scope now: an e-commerce site type (Huraira 2026-10-07).
+
+**Decision D3 (Huraira, 2026-10-10; MVP override of the order above until 2026-10-14)**: Nick wants the Website Build Module proven on one real project, Bennett & Co (colors and logo fixed, fonts free, proper web agency site), by Wednesday 2026-10-14, because he starts ads and mass client acquisition right after. Until that date the working sequence is: (1) Huraira's open actions and Nick's brief, (2) Step 26 item 1 only plus a minimal slice of Step 12 (price Agent 37, per-build cap), (3) Step 27 motion budget limited to what the Bennett build needs, (4) Step 25 on the Bennett & Co brief, stopping at "awaiting launch approval". Steps 8, 12 (rest), 20 and everything after them in the table above wait until after the MVP. The scope fence, schedule, cost evidence and proposed spend cap are in `docs/MVP-CUTLINE.md`. The date is a target, not a promise: it depends on Nick's brief arriving and on how many correction rounds the first build needs. Websites only; e-commerce stays out.
 
 **Decision D1 (Huraira, 2026-10-07)**: keep two tracks. Track A gets a motion budget (Step 27); Track B stays the full 21st.dev/React path; the direction step still recommends a track and the owner picks. Conversion is a hard gate: motion may not fail speed, layout-shift or visible-CTA checks. Nick confirms by blind-rating sample builds, not by conversation.
 
@@ -189,44 +196,10 @@ Ready for Step N+1?:  (yes/no and why)
 Each prompt is self-contained. Paste it as-is. The line "Follow the Standard Operating Rules" refers to
 Part C above; if the agent has not been given this file, paste Part C first.
 
----
-
-### STEP 1 — Fix Cockpit → GitHub dispatch (P0) — DONE 2026-09-30
-
-**Status: DONE.** Dispatch worked end to end: job `b952aaba` ran as `cockpit-job.yml` run `36455639903`; the browser leg was proven
-live on 2026-09-30 (job `1dd90f25`, dispatched 8 s after the click); the failure path was proven by job `e5d29358`. Open
-housekeeping: two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`) await Huraira's OK to close. The prompt is kept for the record.
-
-**Depends on**: none.
-**Maps to**: Cockpit jobs (unplanned work), Blueprint §14 headless runs; unblocks Steps 2–4.
-
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
-
----
-
-### STEP 2 — Write the pilot brief and business rules (P0) — DONE 2026-09-30 (provisional inputs)
-
-**Status: DONE** (`2c188d0`). `memory/context.md` has concrete provisional rules and a 13-row register (R-01…R-13);
-`clients/summit-line-roofing/` holds the synthetic brief, raw request and memory. Nick's real brief and rules session remain open
-in `BLOCKED-ON-NICK.md` (Step 22). The prompt is kept for the record.
-
-**Depends on**: none (can run in parallel with Step 1).
-**Maps to**: Continuation Stage 7 prerequisites; Blueprint §8 context.md; Phase 2.
-
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
-
----
-
-### STEP 3 — Retire plaintext secrets (P0, Huraira acts, agent verifies) — DONE 2026-09-30
-
-**Status: DONE** (`f74b0bc`). Both `.env.local` files deleted, grep criterion passes, keys rotated and working from Doppler,
-CI deploys with the rotated keys (`main` runs `36698432470`, `36699308136`). Per this step's own acceptance, the old leaked CLI token
-is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler dashboard). The prompt is kept for the record.
-
-**Depends on**: none.
-**Maps to**: Continuation Stage 1 criterion 3; Blueprint §3 security.
-
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+**Layout (since 2026-10-12)**: open steps come first, in step-number order. Each open step carries a **Next action** line. A partly
+done or blocked step has a **Continuation prompt** (paste it instead of the original, which would restart the step), and a step that
+looks done but lacks independent proof has a **Verification prompt**. DONE steps with citable evidence sit in **Closed steps** at the
+end of this part. `/progress-sync` (Step 4) and `/step-close` keep this current.
 
 ---
 
@@ -239,9 +212,31 @@ older policy that let an admin promote themselves to owner was replaced with own
 requests panel in Approvals. `scripts/rls_attack_test_accounts.sql`: 32/32. **Not yet proven live**: a real new account signed up,
 confirmed by email, approved and signed in (needs Huraira); the Supabase Auth settings below are Huraira's.
 
-Remaining verification prompt (run once Huraira has done the dashboard settings and created a test account):
+**Kept open (2026-10-12 sync)**: approved as DONE by Huraira, but the live end-to-end sign-up is still unproven, so the step is not moved to
+Closed until the verification below has run. Not on the MVP path (D3); do it when Huraira has five minutes.
+**Next action**: Huraira creates one test account in the live Cockpit (sign up → confirm email → approve → sign in); then run the prompt below.
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+Verification prompt — updated 2026-10-12:
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/ on branch huraira-work. Follow Part C of
+docs/WFACT-3.0-Factory-Completion-Plan.md. Do ONLY the verification of Step 3A. Do not rebuild anything.
+
+ALREADY DONE (do not redo): password sign-in, account requests, approval, forgot-password, owner-only profile
+writes (`2223344`, `856e483`; migration 0010_account_requests; CI 36698432470, 36699308136);
+scripts/rls_attack_test_accounts.sql 32/32.
+
+VERIFY FIRST
+1. Ask Huraira for the test account's email (never a password). Confirm by read-only SQL on project
+   mcaxxhgjptwowwrluhra: an account_requests row for it, its decision row and audit row, then a profiles row
+   created only after approval, with the approved role.
+2. Ask Huraira to sign in with it in the live Cockpit and confirm it sees only what its role allows; confirm
+   the sign-in in Supabase Auth logs.
+3. Re-run scripts/rls_attack_test_accounts.sql in a rolled-back transaction: expect 32/32.
+REPORT what passed and what did not. Fix only gaps found (with tests). Then run `/step-close 3A`; if every check
+passed, move the Step 3A block into "Closed steps" at the end of Part D. Then STOP and wait for GO.
+```
+
+*The original agent prompt for this step is retired from the live plan. It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
 
 ---
 
@@ -257,7 +252,10 @@ ends with a preview. Treat Step 4 as closed by Step 4B M6. The prompt is kept fo
 **Depends on**: Steps 1 and 2 (Step 3 recommended).
 **Maps to**: Continuation Stage 7 (third bullet); Blueprint Phase 7 acceptance; goal 1 (as a synthetic proof).
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+**Left (2026-10-12)**: only the preview deploy, which now happens in Step 4B M6. **Next action**: none of its own. Close Step 4 in the
+same `/step-close` that closes 4B M6, citing M6's preview evidence. No continuation prompt: Step 4B's prompt carries this work.
+
+*The original agent prompt for this step is retired from the live plan. It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
 
 ---
 
@@ -274,8 +272,43 @@ checkpoint), migration 0012; acceptance fixtures pass/fail as required; live Sum
 independent re-check. See `PROGRESS.md`. **M4 PARTIAL 2026-10-02** (`a9f4dcf`…`13ec854`): Track B Next.js starter, isolated build
 (no network, allow-listed env, `npm ci --offline`, deterministic), artifact (output + source) checkpointed in the private bucket
 (migration 0014), Track B budget + motion budget, all fixtures fail as required, all suites green locally and in CI `37016971442`
-(isolated Linux build: network blocked, no secrets). **Open**: a live Agent 37 pipeline build (needs a decision on the synthetic client's entity), the screenshot
-review's DR-SINGLE-DEFAULT-FONT verdict, and Huraira's decisions on the budgets and on Motion/Radix (design doc §11).
+(isolated Linux build: network blocked, no secrets). **M4 since then (2026-10-03 to 10-07, details in `PROGRESS.md` Step 4B)**: there were
+eight live Cockpit builds. Each failure was traced to a factory contradiction or an outage and fixed: page scope `c64bd0e`, invented quotes
+`8dae180`, signup form, Agent 37 retry `e9abe87`, waived testimonials `db8b1e2`/`99766a8`, evaluator honesty rules `ed07d79`, and
+`render.perf` on applied throttling `dfc2998` (Huraira, option 1). Track B `c7fba41a` passed all 44 registry checks and failed only on the
+evaluator points fixed in `ed07d79`. **Latest (2026-10-07 17:14 UTC, after the last sync)**: Track A job `b880a7d5` (plan `b5a45a8e`, run
+`15ad4086`, GitHub run `37657523407`) checkpointed the build and passed every deterministic check. It then halted because the required
+`render.design-review` was NOT RUN: the Agent 37 reviewer returned HTTP 502 `upstream_unreachable` after 4 attempts. The site was not at
+fault. **Left for M4**: one passing live build per track (Track A: continue `b880a7d5` once Agent 37 answers; Track B: re-run `4acbde1f`),
+then the human screenshot review at desktop and phone, then `/step-close 4B M4`.
+
+**Next action (2026-10-12)**: Huraira checks that the Agent 37 gateway answers, then presses "continue" on `b880a7d5` in the Cockpit. That
+one press also proves Step 4D live. Then re-run Track B `4acbde1f`. Under D3, M5 and M6 are replaced by the Bennett & Co build (Step 25,
+`docs/MVP-CUTLINE.md`).
+
+Continuation prompt — updated 2026-10-12 (use this instead of starting 4B from M0):
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/ on branch huraira-work. Follow Part C of
+docs/WFACT-3.0-Factory-Completion-Plan.md, including the design-quality rule. Do ONLY Step 4B, milestone M4,
+then STOP for GO. Decision D3 (docs/MVP-CUTLINE.md) is in force until 2026-10-14: do not start M5 or M6.
+
+ALREADY DONE (do not redo): M0 (6 of 7 inputs), M1, M2, M3 (see PROGRESS.md Step 4B). M4 code: Track B starter,
+isolated build, artifact checkpointing (migration 0014), CI 37016971442; the live-build fixes c64bd0e, 8dae180,
+e9abe87, db8b1e2, 99766a8, ed07d79, dfc2998, 7c68eb8 (all on main 072b391).
+
+LEFT
+1. Check that the Agent 37 gateway answers (GET /models; one tiny completion), without printing its URL or key.
+   If it does not answer, STOP and tell Huraira. Do not switch the reviewer vendor without his decision.
+2. Track A: Huraira presses "continue" on job b880a7d5 (run 15ad4086). Confirm by SQL (audit_log for that run:
+   workflow.reopen, then verification.decision success), with no new builder calls before the review (the saved
+   site is reused).
+3. Track B: Huraira re-runs plan 4acbde1f. Confirm the verdict the same way. If it fails, diagnose against the
+   registry results and fix only a real factory defect (with a failing test first).
+4. Human screenshot review of both passing builds at 1440 and 375: list every defect the checks missed.
+EXIT CHECK (M4): one live build per track passes rendered QA, the claims gate and the design rulebook, verified
+independently (re-hash against the checkpoint, screenshots). Then run `/step-close 4B M4`, report in the Part C
+format and STOP.
+```
 
 **Depends on**: Step 4. Design approved by Huraira 2026-10-01: `docs/FRONTEND-UPGRADE-DESIGN.md` (v2 + Next.js for Track B).
 **Maps to**: Blueprint Phase 6-7 front-end loop, Playbook "Motion Sites + GSAP" and Stage 3 Assets; fixes the Step 4 finding that every
@@ -320,31 +353,32 @@ M0  (Mostly done 2026-10-01, see docs/FRONTEND-UPGRADE-DESIGN.md section 10.) Re
     niche taxonomy, image policy (AI images only if clearly labelled) and the $5 per-build ceiling are
     decided. Before M3, get the builder-model decision; before M5, the image tool. If either is still
     missing when you reach that milestone, STOP and ask. Never exceed $5 for one build without asking.
-M1  Rendered QA + claims gate on TODAY's builder. Headless Chromium (Playwright) screenshots at
+M1  [DONE 2026-10-01 - skip] Rendered QA + claims gate on TODAY's builder. Headless Chromium (Playwright) screenshots at
     1440/768/375; axe accessibility; Lighthouse performance; link and asset crawl; console errors; text
     checks for content after </html>, required SAMPLE labels, banned claims, and factual claims with no
     source field. Add a screenshot review by a model from a different vendor than the builder.
     Acceptance: re-checking the Step 4 artifact (sha256 960b61ba...) FAILS on the leaked tool text, the
     unlabelled testimonials and the invented phone/hours; clean fixtures pass. Results are exact check
     IDs that FrontendLoop.revise() can act on.
-M2  Direction step + track choice. A new agent registered without editing agent-runtime runs after
+M2  [DONE 2026-10-01 - skip] Direction step + track choice. A new agent registered without editing agent-runtime runs after
     Intake: niche (fixed, versioned taxonomy), audience, primary conversion goal, requirements, brand
     direction (each point quoting the request), recommended track + confidence + reasons, open
     questions; no recommendation when confidence is low. Build 10-15 labelled synthetic fixtures across
     niches and report per-case results. Cockpit: plan card shows the direction summary and the
     recommended track pre-selected; owner chooses or overrides; stored on the plan (append-only
     migration, RLS attack-tested) and audited; no build can start without a track.
-M3  Track A starter + multi-page build through the pipeline. Acceptance: a 3+ page local-business site
+M3  [DONE 2026-10-01 - skip] Track A starter + multi-page build through the pipeline. Acceptance: a 3+ page local-business site
     builds, passes rendered QA, the rulebook and its budgets; a broken-link fixture and an over-budget
     fixture fail.
-M4  Track B starter (Next.js static export) + multi-page build. The build runs in CI with no secrets in
+M4  [PARTIAL - built; only the live passes and screenshot review are left: use the
+    continuation prompt above] Track B starter (Next.js static export) + multi-page build. The build runs in CI with no secrets in
     the build step and no network beyond the package cache; artifact = static output + source in the
     private artifacts bucket with a checkpoint hash. Acceptance as M3, plus reduced-motion respected and
     an over-budget animation fixture fails.
-M5  Assets: generated or supplied images, always labelled, never presented as the client's own work,
+M5  [NOT STARTED - groundwork 4bbd4bc; blocked on Higgsfield credits; deferred by D3] Assets: generated or supplied images, always labelled, never presented as the client's own work,
     alt text required, size/format budgets. Use the image tool only with the access and budget Huraira
     approved in M0. An unlabelled generated image fixture is caught.
-M6  Full runs through the Cockpit: Summit Line Roofing (expected Track A) and a second synthetic,
+M6  [NOT STARTED - deferred by D3; the Bennett & Co build in Step 25 comes first] Full runs through the Cockpit: Summit Line Roofing (expected Track A) and a second synthetic,
     motion-led client (expected Track B). Record rounds, failed checks per round, model calls and cost
     per call, wall-clock time. Human review at desktop and phone with screenshots attached; list every
     defect the checks missed. Preview deploy ONLY after Huraira's explicit yes.
@@ -381,7 +415,31 @@ which then build their rooms inside this design system. Can run in parallel with
 **Maps to**: Blueprint §9 (founder-glanceable control room, category dashboards, drill-down), CLAUDE.md pillar 4 ("held to a
 SaaS-sellable bar, not an internal-tool pass").
 
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+**Needs verification (2026-10-12)**: built and deployed. The live Cockpit answers HTTP 200 at
+`wfact-cockpit-niktheplumberkings-projects.vercel.app` (checked 2026-10-12), but no room has been checked with a real signed-in session.
+The Projects phone layout shift (CLS 0.118) is still open. Note: production deploys for `7cb475a`, `113276a` and `072b391` failed before
+any step ran (CI `37653665566`, `37653814793`, `37653952730`), so the live Cockpit is the `01f6c9e` deploy (CI `37652704145`). `git diff 01f6c9e 072b391 -- apps packages` is
+empty, so the app code is the same. **Next action**: Huraira signs in once, then run the prompt below. Not on the MVP path unless the Bennett run
+needs a room fixed.
+
+Verification prompt — updated 2026-10-12:
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/ on branch huraira-work. Follow Part C of
+docs/WFACT-3.0-Factory-Completion-Plan.md. Do ONLY the verification of Step 4C. Do not redesign anything.
+
+ALREADY DONE (do not redo): new shell and rooms (70cd7d1…e76cff2, redeploy fb08be3; CI 36905237284, 36907274448),
+migration 0013_jobs_cancel (17/17), 23 tests, axe 0 and Lighthouse a11y 100 on rows copied read-only.
+
+VERIFY FIRST
+1. Confirm which commit the live Cockpit serves (Vercel deployment or bundle hash) and that its app code equals main.
+2. With Huraira signed in (he drives the browser; you never type his password), walk Home, Decisions, Projects,
+   Activity and Costs at 1440 and 375: real rows show, no console errors, every action reachable in 3 clicks or fewer.
+3. Re-measure Projects CLS at 375 (target < 0.1).
+REPORT pass/fail per room with screenshots. Fix only gaps found (with tests). Then `/step-close 4C`: DONE only if every
+room passed signed in; if so, move the Step 4C block into "Closed steps". STOP and wait for GO.
+```
+
+*The original agent prompt for this step is retired from the live plan. It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
 
 ---
 
@@ -395,38 +453,34 @@ killed by a timeout is linked to its run (`job.run`) and can still be continued;
 **Acceptance**: a build that stopped (failed checks, outage, missing facts) continues from its saved site in one press; missing facts are asked in
 plain words and reach the builder as sourced facts; nothing is invented; nothing publishes. **Open**: one live stop continued end to end after the Cockpit deploys.
 
----
+**Done (verified)**: code `a3198d8`…`a643d2d`; migration 0018 applied live (listed as `build_recovery` 20261007144150, checked 2026-10-12);
+attack script 26/26; CI `37644039022` green and deployed. **Left**: one live continue, end to end. **New since the last sync**: Track A job
+`b880a7d5` (run `15ad4086`) stopped 2026-10-07 17:40 UTC in the "reviewer outage" bucket (Agent 37 HTTP 502 after the bounded retries). It
+saved a checkpointed site that passed every deterministic check, so it is the ideal live test. Also not covered (unchanged): file uploads, closing a
+stale `running` row, a per-build total spend cap (pulled into the MVP as `docs/MVP-CUTLINE.md` M6), saving approved content before the site
+build. **Next action**: same press as Step 4B's: Huraira presses "continue" on `b880a7d5` once Agent 37 answers. Waits on Huraira and on
+the Agent 37 gateway.
 
-### STEP 5 — Stage 6: Documentation agent and episodic memory (P1) — DONE 2026-10-07
+Continuation prompt — updated 2026-10-12:
+```
+You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/ on branch huraira-work. Follow Part C of
+docs/WFACT-3.0-Factory-Completion-Plan.md. Do ONLY the live proof of Step 4D. Design: docs/BUILD-RECOVERY-DESIGN.md.
 
-**Status: DONE** (parallel worktree, GO 2026-10-07; `08fc069`…`530f4cb`, merged; proven on live Cockpit builds `ad49df57` and `c775c396`). `packages/documentation` writes one versioned, append-only episodic entry per stage from the run's audit rows (no model, $0 ceiling, scope-gated to the bound client); Hermes-lite answers "what happened" from those entries. Proven: in-process full workflow test, live backfill of 26 entries (SQL-matched), live `npm run ask` answer checked against SQL. Live: Cockpit job `c775c396` (3 cycles) got one entry per build and QA stage (6 `documentation.entry` rows), job `ad49df57` one for its halted build stage; CI `documentation` job green since `37614606732`.
+ALREADY DONE (do not redo): workflow.reopen, owner details, seven-bucket diagnosis, details form, bounded reviewer
+retry, job.run link, one-active-build guard (a3198d8…a643d2d); migration 0018 live; attack test 26/26; CI 37644039022.
 
-**Depends on**: Step 4.
-**Maps to**: Continuation Stage 6; Blueprint §8, §16D (Documentation agent).
-
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
-
----
-
-### STEP 6 — Enforce agent permissions (P1) — DONE 2026-10-06, CI green 2026-10-07
-
-**Status: DONE** (parallel worktree, approved by Huraira 2026-10-06; `58bf776`…`ee08f9d`, merged into `huraira-work`). Typed, versioned, default-deny scopes enforced in `packages/agent-runtime/src/permissions.ts`; live attack run 2026-10-06 13:02 UTC denied and audited all four out-of-scope cases (7 `agent.deny` rows, re-counted independently by SQL); the real models did not obey an injected request. NOT COVERED (see `docs/AGENT-PERMISSIONS.md`): network egress outside the Track B sandbox, shared runner credentials, ungated local CLIs.
-
-**Depends on**: Step 4 (Step 5 preferred).
-**Maps to**: Blueprint §3 (tool calling, security/permissions), §12; Phase 5 note "Section 12 must land before this phase closes".
-
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
-
----
-
-### STEP 7 — Expand the evaluation registry (P1) — DONE 2026-10-07, CI green
-
-**Status: DONE** (parallel worktree, GO 2026-10-07; `64222b1`…`0e13e30`, merged `c1e511a`). Registry v1.0.0 as data + code: 48 checks, each with a passing and a failing fixture, severity/stage gate, cost per check; one gate for every QA entry point; builder/evaluator model-family separation enforced by `config/evaluator.json` (+ OpenAI adapter, migration 0017 applied); QA-runner SSRF closed. Gaps stated, not hidden: the full 78-check list and 50-point audit are not in this repo (only summaries survive; recorded in the registry's `sourceInventory`/`notCovered`), model-judged checks proven on mocks, the OpenAI evaluator has no live success (no credits).
-
-**Depends on**: Step 4.
-**Maps to**: Blueprint §14 (Evaluation Registry), Phase 8, §16C "highest priority", goal 3.
-
-*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+LEFT
+1. Check that the Agent 37 gateway answers before asking Huraira to press anything. If it does not, STOP and say so.
+2. Huraira opens job b880a7d5 in the Cockpit. Confirm the page shows the reviewer-outage explanation in plain words
+   and offers one button, then he presses it.
+3. Verify by read-only SQL on run 15ad4086: a workflow.reopen row (who, why), no duplicate active build, the saved
+   site reused (same checkpoint hash, no new builder call before the review), and then a verification.decision. Nothing
+   published.
+4. If it fails, fix only the defect it shows, with a failing test first.
+EXIT CHECK: "a build that stopped continues from its saved site in one press; missing facts are asked in plain words
+and reach the builder as sourced facts; nothing is invented; nothing publishes." The missing-facts half is proven
+in tests; say plainly if it is still unproven live. Then `/step-close 4D`, report in the Part C format and STOP.
+```
 
 ---
 
@@ -434,6 +488,8 @@ plain words and reach the builder as sourced facts; nothing is invented; nothing
 
 **Depends on**: Steps 4 and 6 (Step 7 preferred).
 **Maps to**: Blueprint §3 (queues, retries, failure recovery), §14, Phase 6; goal 2.
+
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
@@ -475,6 +531,8 @@ REPORT in the Part C format (include the approved design), then STOP.
 
 **Depends on**: Step 4 (Step 8 helps for queue depth).
 **Maps to**: Blueprint §9 (top-level status, System category); goal 6 (backup status).
+
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/apps/cockpit. Follow the Standard Operating
@@ -520,6 +578,8 @@ REPORT in the Part C format, then STOP.
 **Depends on**: Steps 6 and 9 (Step 5 preferred).
 **Maps to**: Blueprint §9 (Agents, Workflows, drill-down); Phase 9 acceptance ("what is happening and why").
 
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
+
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/apps/cockpit. Follow the Standard Operating
 Rules in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 10.
@@ -561,6 +621,8 @@ REPORT in the Part C format, then STOP.
 
 **Depends on**: Step 4.
 **Maps to**: Blueprint §7, Phase 4 acceptance; Continuation Plan "gaps" (routing covers only Intake and Planner).
+
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
@@ -609,6 +671,8 @@ REPORT in the Part C format, then STOP.
 **Depends on**: Steps 10 and 11.
 **Maps to**: Blueprint §3 (cost control), Fuel Gauges / Cost Sentinel "extend into Cost Governance"; goal 4.
 
+**Next action (2026-10-12)**: D3 pulls one slice into the MVP (`docs/MVP-CUTLINE.md` §4, item M6): give Agent 37 a price basis, a $5 hard cap per build across retries, and a $20 weekly cap. **Waits on Huraira's yes on the cap and Nick's sign-off (D5)**. Do that slice with this prompt's per-run budget-guard part only. Everything else in Step 12 waits until after the MVP.
+
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
 in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 12.
@@ -647,6 +711,8 @@ REPORT in the Part C format, then STOP.
 
 **Depends on**: Steps 5, 6, 7, 8 and 11.
 **Maps to**: Blueprint §16D, §5 workflow table, Phase 7.
+
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
@@ -695,6 +761,8 @@ REPORT in the Part C format after each group, then STOP.
 **Depends on**: Steps 5, 10 and 13 (group E).
 **Maps to**: Blueprint §9 (Memory, Human Control).
 
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
+
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/apps/cockpit. Follow the Standard Operating
 Rules in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 14.
@@ -737,6 +805,8 @@ REPORT in the Part C format, then STOP.
 **Depends on**: Step 5.
 **Maps to**: Continuation Stage 6 bullet 2; Blueprint §8 ("leading candidate to trial, not a locked choice").
 
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
+
 ```
 You are the coding agent for WFACT 3.0. Follow the Standard Operating Rules in
 docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 15. Time-box: ONE working session; stop when
@@ -775,6 +845,8 @@ REPORT in the Part C format, then STOP.
 
 **Depends on**: Steps 6 and 10.
 **Maps to**: Blueprint §3 (observability), §13 (Langfuse trigger); goal 5; Continuation "gaps" (traces cover model calls, not tool calls).
+
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
@@ -815,6 +887,8 @@ REPORT in the Part C format, then STOP.
 **Depends on**: Steps 9, 10 and 14.
 **Maps to**: Blueprint §9 (alerts, permissions).
 
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
+
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
 in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 17.
@@ -854,6 +928,8 @@ REPORT in the Part C format, then STOP.
 **Depends on**: Steps 6, 8, 9, 10 and 12 (13 preferred).
 **Maps to**: Blueprint §16K item 2; Phase 12 infrastructure; goal 2.
 
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
+
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
 in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 18.
@@ -892,6 +968,8 @@ REPORT in the Part C format, then STOP.
 
 **Depends on**: Step 3 (Step 9 for the backup-status signal).
 **Maps to**: Blueprint §16K item 6, Phase 12.
+
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
 
 ```
 You are the coding agent for WFACT 3.0. Follow the Standard Operating Rules in
@@ -938,6 +1016,8 @@ REPORT in the Part C format, then STOP.
 **Depends on**: none technically; needs Huraira's decision.
 **Maps to**: Blueprint §1 (FIX, infrastructure), Phase 9 "Fix"; BLOCKED-ON-NICK "Vercel plan upgrade".
 
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
+
 ```
 You are the coding agent for WFACT 3.0. Follow the Standard Operating Rules in
 docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 20. Do not change billing or plans yourself.
@@ -973,6 +1053,8 @@ REPORT in the Part C format, then STOP.
 
 **Depends on**: none (best after Step 4).
 **Maps to**: Continuation "Gaps noticed" list.
+
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
@@ -1022,6 +1104,8 @@ REPORT in the Part C format, then STOP.
 **Depends on**: none. Best after Step 4, so Nick sees real results.
 **Maps to**: BLOCKED-ON-NICK.md; goal 1 (real brief); Blueprint calibration note.
 
+**Next action (2026-10-12)**: one D3 item is due now. Nick's Bennett & Co brief, logo, colors, CRM target and credit top-up (`docs/MVP-CUTLINE.md` §6, asked once in one message). As of 2026-10-12 nothing is in the repo (no `clients/bennett*`). The rest of this step waits until after the MVP.
+
 ```
 You are the coding agent for WFACT 3.0. Follow the Standard Operating Rules in
 docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 22. You PREPARE materials; HURAIRA sends
@@ -1066,6 +1150,8 @@ REPORT in the Part C format, then STOP.
 
 **Depends on**: Steps 7, 10 and 14 solid; Nick's real brief preferred.
 **Maps to**: Blueprint Phase 10; Business/Product category; keeps 2.0's security bar.
+
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
@@ -1113,6 +1199,8 @@ REPORT in the Part C format after each sub-part, then STOP.
 **Depends on**: Steps 4, 7, 12, 18 and a real track record.
 **Maps to**: Blueprint Phases 11–12, §11.
 
+**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
+
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
 in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 24, and only the sub-part Huraira names.
@@ -1152,6 +1240,14 @@ REPORT in the Part C format after each sub-part, then STOP.
 **Depends on**: Step 4B M4 closed; Step 26 done (or Huraira's explicit waiver); a real brief from Nick, or Huraira's choice of the real 2.0 DreamSign case.
 **Maps to**: Blueprint §16K goal 1; Continuation Stage 7.
 
+**MVP scope under D3 (2026-10-12)**: this is the MVP's main build. Run it on **Bennett & Co** (Nick's own LLC, a real client; colors and logo
+fixed, fonts free, a proper web agency site, websites only). `docs/MVP-CUTLINE.md` §2 M1–M4 and M8 are its acceptance on top of the
+prompt below. Target Wed 2026-10-14. Report slippage on Monday evening 2026-10-12. The dependency on "4B M4 closed" and "Step 26 done" is
+narrowed by D3 to Step 26 item 1 and the cost-cap slice of Step 12.
+**Next action (2026-10-12)**: blocked on **Nick's brief** (repo name or brief, logo file, exact colors, pages, real case studies, CRM target:
+`docs/MVP-CUTLINE.md` §6). Nothing is in the repo yet. When it lands, record it under `clients/bennett-co/` (entity `bennett-co`) with the
+locked colors and logo as constraints (M1), then run this prompt. Per the cut-line schedule this is already a day behind.
+
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules in
 docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 25.
@@ -1178,6 +1274,10 @@ REPORT in the Part C format, then STOP.
 
 **Depends on**: OpenAI (or another different-vendor) credits; Step 4B M4 closed.
 **Maps to**: Blueprint §1 "never trust done"; goal 3.
+
+**MVP scope under D3 (2026-10-12)**: only **item 1** (one live different-vendor call from the evaluator and the screenshot reviewer, with a
+`model_traces` row; `docs/MVP-CUTLINE.md` M7) runs before 2026-10-14. Items 2–4 wait until after the MVP. **Next action**: blocked on
+**OpenAI credits** (HTTP 429 "no credits remaining", last checked 2026-10-07). Huraira or Nick tops up, then run item 1 only.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules in
@@ -1207,6 +1307,10 @@ REPORT in the Part C format, then STOP.
 **Depends on**: Step 4B M4 closed; Step 26 item 3 (reference set) preferred.
 **Maps to**: Decision D1; `docs/FRONTEND-UPGRADE-DESIGN.md` (Track A).
 
+**MVP scope under D3 (2026-10-12)**: only the motion budget the Bennett & Co build needs, plus the seeded-violation check (task items 1–3).
+The blind-rating sheet (item 4) is made only if Nick wants it. **Next action**: send the one-page design in task item 1 to Huraira for GO.
+It can start now, since nothing it needs is blocked. If Bennett's track is picked as Track B, this step waits until after the MVP.
+
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules in
 docs/WFACT-3.0-Factory-Completion-Plan.md Part C, including the design-quality rule and the skills it names. Do ONLY Step 27.
@@ -1234,6 +1338,84 @@ REPORT in the Part C format, then STOP.
 
 ---
 
+### Closed steps
+
+DONE and verified with citable evidence, ordered by step number. Moved here on 2026-10-12 by `/progress-sync`. Headings are unchanged so references and `scripts/check-trackers.mjs` still resolve. Their long prompts stay archived (`docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`). A step that regresses moves back up with a note.
+
+---
+
+### STEP 1 — Fix Cockpit → GitHub dispatch (P0) — DONE 2026-09-30
+
+**Status: DONE.** Dispatch worked end to end: job `b952aaba` ran as `cockpit-job.yml` run `36455639903`; the browser leg was proven
+live on 2026-09-30 (job `1dd90f25`, dispatched 8 s after the click); the failure path was proven by job `e5d29358`. Open
+housekeeping: two orphaned `queued` jobs (`a2a41d2d`, `cbf8bf7b`) await Huraira's OK to close. (2026-10-12: the live `jobs` table has 0 queued or running rows, so they are no longer open.) The prompt is kept for the record.
+
+**Depends on**: none.
+**Maps to**: Cockpit jobs (unplanned work), Blueprint §14 headless runs; unblocks Steps 2–4.
+
+*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+
+---
+
+### STEP 2 — Write the pilot brief and business rules (P0) — DONE 2026-09-30 (provisional inputs)
+
+**Status: DONE** (`2c188d0`). `memory/context.md` has concrete provisional rules and a 13-row register (R-01…R-13);
+`clients/summit-line-roofing/` holds the synthetic brief, raw request and memory. Nick's real brief and rules session remain open
+in `BLOCKED-ON-NICK.md` (Step 22). The prompt is kept for the record.
+
+**Depends on**: none (can run in parallel with Step 1).
+**Maps to**: Continuation Stage 7 prerequisites; Blueprint §8 context.md; Phase 2.
+
+*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+
+---
+
+### STEP 3 — Retire plaintext secrets (P0, Huraira acts, agent verifies) — DONE 2026-09-30
+
+**Status: DONE** (`f74b0bc`). Both `.env.local` files deleted, grep criterion passes, keys rotated and working from Doppler,
+CI deploys with the rotated keys (`main` runs `36698432470`, `36699308136`). Per this step's own acceptance, the old leaked CLI token
+is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler dashboard). The prompt is kept for the record.
+
+**Depends on**: none.
+**Maps to**: Continuation Stage 1 criterion 3; Blueprint §3 security.
+
+*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+
+---
+
+### STEP 5 — Stage 6: Documentation agent and episodic memory (P1) — DONE 2026-10-07
+
+**Status: DONE** (parallel worktree, GO 2026-10-07; `08fc069`…`530f4cb`, merged; proven on live Cockpit builds `ad49df57` and `c775c396`). `packages/documentation` writes one versioned, append-only episodic entry per stage from the run's audit rows (no model, $0 ceiling, scope-gated to the bound client); Hermes-lite answers "what happened" from those entries. Proven: in-process full workflow test, live backfill of 26 entries (SQL-matched), live `npm run ask` answer checked against SQL. Live: Cockpit job `c775c396` (3 cycles) got one entry per build and QA stage (6 `documentation.entry` rows), job `ad49df57` one for its halted build stage; CI `documentation` job green since `37614606732`.
+
+**Depends on**: Step 4.
+**Maps to**: Continuation Stage 6; Blueprint §8, §16D (Documentation agent).
+
+*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+
+---
+
+### STEP 6 — Enforce agent permissions (P1) — DONE 2026-10-06, CI green 2026-10-07
+
+**Status: DONE** (parallel worktree, approved by Huraira 2026-10-06; `58bf776`…`ee08f9d`, merged into `huraira-work`). Typed, versioned, default-deny scopes enforced in `packages/agent-runtime/src/permissions.ts`; live attack run 2026-10-06 13:02 UTC denied and audited all four out-of-scope cases (7 `agent.deny` rows, re-counted independently by SQL); the real models did not obey an injected request. NOT COVERED (see `docs/AGENT-PERMISSIONS.md`): network egress outside the Track B sandbox, shared runner credentials, ungated local CLIs.
+
+**Depends on**: Step 4 (Step 5 preferred).
+**Maps to**: Blueprint §3 (tool calling, security/permissions), §12; Phase 5 note "Section 12 must land before this phase closes".
+
+*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+
+---
+
+### STEP 7 — Expand the evaluation registry (P1) — DONE 2026-10-07, CI green
+
+**Status: DONE** (parallel worktree, GO 2026-10-07; `64222b1`…`0e13e30`, merged `c1e511a`). Registry v1.0.0 as data + code: 48 checks, each with a passing and a failing fixture, severity/stage gate, cost per check; one gate for every QA entry point; builder/evaluator model-family separation enforced by `config/evaluator.json` (+ OpenAI adapter, migration 0017 applied); QA-runner SSRF closed. Gaps stated, not hidden: the full 78-check list and 50-point audit are not in this repo (only summaries survive; recorded in the registry's `sourceInventory`/`notCovered`), model-judged checks proven on mocks, the OpenAI evaluator has no live success (no credits).
+
+**Depends on**: Step 4.
+**Maps to**: Blueprint §14 (Evaluation Registry), Phase 8, §16C "highest priority", goal 3.
+
+*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+
+---
+
 ## Part E — Progress checklist (update as steps close)
 
 | # | Step | Status | Reported | Approved by Huraira |
@@ -1241,11 +1423,11 @@ REPORT in the Part C format, then STOP.
 | 1 | Fix Cockpit → GitHub dispatch | **DONE** (job `b952aaba`, run `36455639903`; browser leg job `1dd90f25`) | 2026-09-30 | yes |
 | 2 | Pilot brief and business rules | **DONE**, provisional inputs (`2c188d0`) | 2026-09-30 | yes |
 | 3 | Retire plaintext secrets | **DONE** (`f74b0bc`); old CLI token listed as not verified, per the step's acceptance | 2026-09-30 | yes |
-| 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove | 2026-09-30 | yes |
+| 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove, so kept open with a verification prompt (2026-10-12) | 2026-09-30 | yes |
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
 | 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done; M4 partial (`a9f4dcf`…`13ec854`, migration 0014, CI `37016971442` green; live Track B `f696ba43` failures fixed in `c64bd0e`/`8dae180`, not pushed or re-run; screenshot review pending); M5 groundwork `4bbd4bc` (live run blocked: no Higgsfield credits) | 2026-10-06 | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`; redeploy `fb08be3`, CI `36907274448`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
-| 4D | Build recovery | **PARTIAL** (`a3198d8`: engine, Cockpit and tests green locally: workflow 33, jobs 24, frontend-loop 75, verification 100, Cockpit 67; independent review done and its findings fixed; migration 0018 applied live 2026-10-07 and its attack script passed 26/26 rolled back; pushed and deployed, CI `37644039022` green (first run `37638990031` failed on a flaky test of mine, fixed `a643d2d`); one live continued build still to prove) | 2026-10-07 | |
+| 4D | Build recovery | **PARTIAL** (`a3198d8`: engine, Cockpit and tests green locally: workflow 33, jobs 24, frontend-loop 75, verification 100, Cockpit 67; independent review done and its findings fixed; migration 0018 applied live 2026-10-07 and its attack script passed 26/26 rolled back; pushed and deployed, CI `37644039022` green (first run `37638990031` failed on a flaky test of mine, fixed `a643d2d`); one live continued build still to prove; candidate: stopped Track A job `b880a7d5`, checked 2026-10-12) | 2026-10-07 | |
 | 5 | Documentation agent | **DONE** (`08fc069`…`530f4cb`; live Cockpit builds `c775c396` 6 entries / 6 stages and `ad49df57` 1 / 1; backfill 26 = 26 rows; live ask SQL-checked; CI `37614606732`) | 2026-10-07 | |
 | 6 | Enforce agent permissions | **DONE** (`58bf776`…`ee08f9d`; 285 package tests + rendered-qa pass on the merged tree; live attack runs `050c3329`, `ed07cfaf`, `cb7739a2`, `7197fa12`, `9a692a2d`, 7 `agent.deny` rows verified by SQL; CI `37609559746` green; cost ceilings set from live traces 2026-10-07: builder $1, QA $0.50, Planner $0.25, Direction $0.15, Hermes $0.10, Intake $0.05) | 2026-10-06 | |
 | 7 | Evaluation registry | **DONE** (`64222b1`…`0e13e30`, merged `c1e511a`; merged tree verification 98, rendered-qa 52 and all packages pass; migration 0017 applied live; CI `37617845669` green; 78-check and 50-point sources missing from the repo, OpenAI evaluator unproven live) | 2026-10-07 | |
@@ -1296,8 +1478,8 @@ steps to Part B, Part D and Part E in the same commit and run `node scripts/chec
 | N1 | Niche research and offer agents (cost-capped external data) | Steps 12 and 13, first paid delivery |
 | N2 | Per-niche template capture and lessons write-back to starters | N2, Step 7 |
 | N3 | Lead-gen content engine, agency-side only, after delivery and client consent | Steps 12 and 13, first paid delivery |
-| N4 | Dynamic features, only if D3 shows they are needed (captured leads, client-editable content via Owner's Key, live data) | D3 |
+| N4 | Dynamic features, only if D3b shows they are needed (captured leads, client-editable content via Owner's Key, live data) | D3b |
 
 Decisions (owners in `docs/HANDOFF.md` §6): **D1** DECIDED by Huraira 2026-10-07 (two tracks, Track A motion budget, conversion as a hard gate, e-commerce deferred; Nick confirms via the Step 27 blind rating; N1 is absorbed by Step 27); **D2** APPROVED by Huraira 2026-10-07: Steps 12 and 20 are pulled forward with Step 8 as one reliability bundle, after the real-client proof run (see Execution order);
-**D3** dynamic runtime shape within the Hostinger/Vercel law; **D4** obtain the AIW2.0STACK website-factory shell to compare real output;
+**D3** DECIDED by Huraira 2026-10-10: the Website Build Module MVP on Bennett & Co by 2026-10-14 (`docs/MVP-CUTLINE.md`); **D3b** (was D3 before 2026-10-10) dynamic runtime shape within the Hostinger/Vercel law; **D4** obtain the AIW2.0STACK website-factory shell to compare real output;
 **D5** spend caps for Higgsfield and Agent 37.
