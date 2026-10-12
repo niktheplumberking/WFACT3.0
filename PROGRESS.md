@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-12, via `/progress-sync`. Re-synced after `072b391`: no commits since 2026-10-07 on any branch (local, `origin/huraira-work`, `origin/main` all at `072b391`; one worktree), so no tests were re-run. The uncommitted D3 docs (`docs/MVP-CUTLINE.md`, CLAUDE.md, HANDOFF, INDEX, this file) were folded in, and the Factory Completion Plan was restructured (closed steps 1, 2, 3, 5, 6, 7 moved to "Closed steps"; a Next action plus a continuation or verification prompt on every open step). CI: the three runs the last sync could not confirm are now settled. `37652704145` (`01f6c9e`) succeeded, including the deploy. `37653665566` (`7cb475a`), `37653814793` (`113276a`) and `37653952730` (`072b391`) passed every test job, but their **Deploy Cockpit to Vercel** job failed with 0 steps and no runner (it never started). Live: Cockpit HTTP 200 (2026-10-12), serving the `01f6c9e` deploy; app code equals `072b391` (`git diff 01f6c9e 072b391 -- apps packages` is empty). Supabase: 24 jobs, last 2026-10-07 17:14 UTC, 0 queued or running; 114 `model_traces` rows; latest migration still `build_recovery` 20261007144150. One live build after the last sync: Track A `b880a7d5` (see Step 4B). Not checked: Agent 37 gateway, signed-in Cockpit, Doppler.
+Last synced: 2026-10-12 (+05), via `/step-close 21` (MVP M5 launch files): `9968019` on `huraira-work`, not pushed, so no CI yet. Local: typecheck clean in frontend-loop, verification, workflow, jobs, rendered-qa; tests frontend-loop 77, verification 103, workflow 33, jobs 24, rendered-qa 52, all pass. Live: migration `0019_artifacts_png` applied to `mcaxxhgjptwowwrluhra` and confirmed by SQL (bucket still private, 2 MB, `image/png` added).
+Previous sync: 2026-10-12, via `/progress-sync`. Re-synced after `072b391`: no commits since 2026-10-07 on any branch (local, `origin/huraira-work`, `origin/main` all at `072b391`; one worktree), so no tests were re-run. The uncommitted D3 docs (`docs/MVP-CUTLINE.md`, CLAUDE.md, HANDOFF, INDEX, this file) were folded in, and the Factory Completion Plan was restructured (closed steps 1, 2, 3, 5, 6, 7 moved to "Closed steps"; a Next action plus a continuation or verification prompt on every open step). CI: the three runs the last sync could not confirm are now settled. `37652704145` (`01f6c9e`) succeeded, including the deploy. `37653665566` (`7cb475a`), `37653814793` (`113276a`) and `37653952730` (`072b391`) passed every test job, but their **Deploy Cockpit to Vercel** job failed with 0 steps and no runner (it never started). Live: Cockpit HTTP 200 (2026-10-12), serving the `01f6c9e` deploy; app code equals `072b391` (`git diff 01f6c9e 072b391 -- apps packages` is empty). Supabase: 24 jobs, last 2026-10-07 17:14 UTC, 0 queued or running; 114 `model_traces` rows; latest migration still `build_recovery` 20261007144150. One live build after the last sync: Track A `b880a7d5` (see Step 4B). Not checked: Agent 37 gateway, signed-in Cockpit, Doppler.
 Previous sync: 2026-10-07 (21:40 +05), via `/progress-sync` — folded in the alignment pass `ec71c89`…`113276a` (docs, plan order, decisions D1/D2; no application code changed). Both branches at `113276a`. Evidence this sync: local re-run typecheck clean for all 10 packages and the Cockpit; tests agent-runtime 39, audit 14, documentation 18, hermes 48, jobs 24, media 8, planning 32, verification 100, workflow 33, frontend-loop 75, Cockpit 67 all pass (rendered-qa not re-run locally). CI: `37651786532` (`fa12bbe`) success and `37651306672` (`122c071`) success; `37652704145`, `37653665566` and `37653814793` (the last three doc commits) were still running at sync, so they are NOT confirmed green. Live: Cockpit HTTP 200; Supabase `mcaxxhgjptwowwrluhra` migrations list ends `0017_model_traces_openai` then `build_recovery` (20261007144150, which is repo file `0018_build_recovery.sql` under a different name; 0016 is absent live too). Not checked: signed-in Cockpit, Doppler, GitHub secrets.
 Previous sync: 2026-10-07 (20:45 +05), via `/progress-sync` — folded in `a3198d8`…`a643d2d` (Step 4D). Both branches at `a643d2d`; CI green `37644039022` (all jobs incl. Rendered QA 14 min, Deploy Cockpit to Vercel success); the first Step 4D CI `37638990031` FAILED on one test of mine (event loop ended before the Agent 37 timeout fired on the runner), fixed in `a643d2d`. Live: Cockpit HTTP 200 and the deployed bundle contains the new recovery copy ("Save the details and continue"); database latest migration `0018_build_recovery` (20261007144150), 0 queued/running jobs, 0 plan_inputs rows, 23 jobs total.
 Previous sync: 2026-10-07 (19:55 +05) via `/step-close 4D`; before that 2026-10-07 (17:05 +05), via `/progress-sync` — re-synced `1032b23`…`c1b386a` (claims gate 1.1.0, Track B single-page /
@@ -22,7 +23,7 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-12)**: Day 3 of the 5-day MVP window (D3, due Wed 2026-10-14). **No MVP item in `docs/MVP-CUTLINE.md` §2 has started**: Nick's Bennett & Co brief is not in the repo, the cost cap awaits Huraira's yes, and OpenAI has no credits. No code has changed since 2026-10-07. The one new live fact: Track A re-run `b880a7d5` passed every deterministic check but stopped because the Agent 37 design reviewer was unreachable (HTTP 502). Pressing "continue" on it would close the Track A half of 4B M4 and prove Step 4D live. The MVP date is at risk until the brief arrives. Earlier summary (2026-10-07) follows.
+**Status summary (2026-10-12, evening)**: MVP M5 (launch files for both starters) is built in `9968019`, which makes Step 21 **PARTIAL** (verification pending: CI on push, one live launch-stage build with a real address). Everything else below still holds. **Earlier the same day**: Day 3 of the 5-day MVP window (D3, due Wed 2026-10-14). **No MVP item in `docs/MVP-CUTLINE.md` §2 had started**: Nick's Bennett & Co brief is not in the repo, the cost cap awaits Huraira's yes, and OpenAI has no credits. No code has changed since 2026-10-07. The one new live fact: Track A re-run `b880a7d5` passed every deterministic check but stopped because the Agent 37 design reviewer was unreachable (HTTP 502). Pressing "continue" on it would close the Track A half of 4B M4 and prove Step 4D live. The MVP date is at risk until the brief arrives. Earlier summary (2026-10-07) follows.
 
 Step **4D (build recovery) is PARTIAL**: built, migration 0018 applied live (attack test 26/26), pushed and deployed (CI `37644039022` green); the live "continue" button has not been pressed on a real stopped build yet. (Corrected 2026-10-07 in the alignment pass; this line previously said "not applied, not pushed".) On the Factory Completion Plan, Steps 1, 2, 3, 3A, **5, 6 and 7 are DONE** (5 and 7 on 2026-10-07: 5 proven on live
 Cockpit builds, 7 CI `37617845669` green); Step 4 is PARTIAL (preview superseded by 4B M6); **Step 4B is IN PROGRESS**, about 90% through M4:
@@ -34,13 +35,20 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-12; Decision D3 overrides the 2026-10-07 order until 2026-10-14; each step's Next action and prompt are in the Factory Completion Plan):
+**Next up** (2026-10-12 evening, after `/step-close 21`):
+1. **Huraira**: review the M5 report; say whether to push `9968019` (CI then proves it; the Cockpit deploy job must run this time); give the cost-cap yes so M6 can start; send Nick the cut-line questions, now including the live site address (needed for canonical, sitemap and og:image).
+2. **Agent, on GO**: MVP M6 (per-build cap, Agent 37 priced) if the cap is approved, else Step 27's one-page motion-budget design.
+3. **Nick**: Bennett & Co brief, logo, colours, live address, CRM target, credits.
+Earlier list (2026-10-12 morning):
 1. **Nick / Huraira**: Nick's Bennett & Co brief (repo or brief, logo, exact colors, pages, real case studies, CRM target); Huraira's yes on the cost cap ($5 per build across retries, $20 per week, Agent 37 priced); OpenAI and Agent 37 credits (`docs/MVP-CUTLINE.md` §4, §6).
 2. **Huraira**: check that the Agent 37 gateway answers, then press "continue" on Track A `b880a7d5` (closes Track A for 4B M4 and proves 4D live); re-run Track B `4acbde1f`; rotate the Higgsfield key.
 3. **Agent** (can start now, nothing blocks it): Step 27's one-page motion-budget design for GO; the launch files for both starters (MVP M5); the per-build cap code once Huraira says yes (MVP M6, the Step 12 slice). Then Step 25 on the Bennett brief, stopping at "awaiting launch approval".
 After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bundle, Health room). Deferred: Steps 15, 16, 24; e-commerce out of scope.
 
 **Gaps noticed**:
+- **The live address must be supplied for launch**: without the brief's `siteUrl` (or an owner fact `site_url`) the launch-stage checks tells.canonical, tells.og-image and tells.sitemap fail by design; there is no Cockpit field for it yet. Add it to the Bennett intake.
+- **The share card is a plain colour card** (brand deep colour, accent rule, no text or logo). Replace it with a designed card from the client's own assets when supplied.
+- **No favicon in either starter** (tells.favicon, advisory). Small; could ride with the Bennett logo.
 - **Live migration name differs from the repo file**: applied as `build_recovery` (20261007144150), repo file is `0018_build_recovery.sql`; `0016` is absent in both. Cause not recorded.
 - **Doc-only commits trigger the full CI and a production deploy of the Cockpit** (three runs queued for three doc commits). Consider a paths filter (Step 21 H). Those three deploy jobs then failed without starting (0 steps, no runner; CI `37653665566`, `37653814793`, `37653952730`). The cause is not visible (logs show nothing; possibly the queued runs colliding or an Actions limit). The app code is unaffected, but the next real code push must confirm the deploy job runs.
 - **The MVP schedule has slipped**: `docs/MVP-CUTLINE.md` §5 planned the brief for Sat 10-10, the cap and launch files for Sun 10-11, and the first build for Mon 10-12. None of these is in the repo as of 2026-10-12. The cut-line asks for slippage to be reported on Monday evening.
@@ -50,8 +58,6 @@ After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bund
   (the only dead path found in a link check of the 7 main docs this sync).
 - **Track A writes the brief's open questions into the home page as HTML comments**: readable by anyone viewing the page source (Step 7 report).
   Should live in `content.json` only. Awaiting Huraira's yes.
-- **Both starters lack launch files**: no sitemap, robots.txt, canonical, og:image (Track A also no 404 page); Step 7's launch-stage checks
-  fail on them. Needed before any launch; awaiting Huraira's decision on doing it in 4B.
 - **Second-vendor evaluator has never made a successful live call**: OpenAI returns HTTP 429 "no credits remaining" (checked 2026-10-07). Only
   matters when the builder falls back to Claude; with Agent 37 as builder, Claude stays the evaluator.
 - **Hermes-lite reads `clients/<entitySlug>/memory.md`** (an entity slug used as a client folder name), found in Step 6.
@@ -1001,3 +1007,26 @@ that fixes it and continues from where it left off; when something is missing, a
 
 **Verification**: workflow 33/33, jobs 24/24, frontend-loop 75/75, verification 100/100, Cockpit 67/67, all typechecks clean, Cockpit builds. No live run.
 **Exit check**: *"a build that stopped continues from its saved site in one press; missing facts are asked in plain words and reach the builder as sourced facts; nothing is invented; nothing publishes."* — **PARTIALLY MET**: met in tests; migration 0018 is live and the Cockpit is deployed (corrected 2026-10-12: this line said "migration and deploy pending", which was out of date after `9730d99`/`a643d2d`); not yet proven on a live stopped build.
+
+## Step 21 — Housekeeping (PARTIAL 2026-10-12 — launch files (MVP M5) built in `9968019`; verification pending)
+
+Governed by the Factory Completion Plan Step 21 sub-item I (second half), pulled forward as MVP item M5 by Decision D3
+(`docs/MVP-CUTLINE.md` §2). The other sub-items stay deferred until the MVP ships; A and G were done in the 2026-10-07 alignment pass.
+
+- [x] Shared launch-file module `packages/frontend-loop/src/launch.ts`: robots.txt, llms.txt and a 1200x630 share card always; sitemap.xml,
+      canonical, og:url and og:image only with the owner's live address (brief `siteUrl` or owner fact `site_url`, https origin only, a
+      `vercel.app` preview refused). Evidence: `9968019`, `frontend-loop/test/brief.test.ts`, `verification/test/launchFiles.test.ts`.
+- [x] Track A: 404.html (root-relative links, noindex), og:title/description on every page; starter 1.1.0. Evidence: `launchFiles.test.ts`,
+      `rendered-qa/test/trackA.test.ts` (the old "fails the launch tells it lacks" assertion updated: preview advisories now only tells.favicon).
+- [x] Track B: launch.json + public/ files written before the isolated build, Next metadata for canonical and share tags; starter 1.2.0.
+      Evidence: a real isolated build in `frontend-loop/test/trackB.test.ts` passes every launch-stage check with an address.
+- [x] Artifact store accepts the PNG: `ARTIFACT_PATH_RE` and content types in `packages/workflow`, migration `0019_artifacts_png` applied
+      live and confirmed by SQL.
+- [ ] Sub-item I first half: open questions out of Track A's HTML comments.
+- [ ] Sub-items B–F, H, J–L (deferred by D3).
+
+**Verification**: local only. Typecheck clean in five packages; frontend-loop 77, verification 103, workflow 33, jobs 24, rendered-qa 52 pass.
+Not yet: CI (not pushed), a live build with a real address run at stage `launch`.
+
+**Exit check** (MVP M5): "Step 7 launch-stage checks pass on the output". **PARTIALLY MET**: they pass on both starters' output in tests with
+an address; not yet on a live build.

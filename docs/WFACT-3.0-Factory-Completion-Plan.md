@@ -19,8 +19,8 @@ pending, so it stays open with a verification prompt. Step 4 is **PARTIAL** (clo
 Track A re-run `b880a7d5` (plan `b5a45a8e`, 2026-10-07 17:14 UTC) passed every deterministic check, but the required design review could not
 run (Agent 37 HTTP 502, 4 attempts). Track B `4acbde1f` has not been re-run. M5 is blocked on Higgsfield credits and M6 has not started.
 Step 4C is **BUILT AND DEPLOYED**, with the signed-in check pending. Step 4D is **PARTIAL**: deployed, but the live "continue" has not been
-run (`b880a7d5` is the ready candidate). Steps 8–27 are not started. **Decision D3 (MVP on Bennett & Co by 2026-10-14) overrides the order**:
-Nick's brief is not in the repo (no `clients/bennett*`), and no MVP item from `docs/MVP-CUTLINE.md` §2 has started. Each step heading below
+run (`b880a7d5` is the ready candidate). Step 21 is **PARTIAL** (launch files, MVP M5, `9968019`; verification pending). Steps 8–20 and 22–27 are not started. **Decision D3 (MVP on Bennett & Co by 2026-10-14) overrides the order**:
+Nick's brief is not in the repo (no `clients/bennett*`); of the MVP items in `docs/MVP-CUTLINE.md` §2 only M5 (launch files) is built. Each step heading below
 carries its status; Part E is the checklist.
 
 ## How to use this file
@@ -1049,12 +1049,13 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 21 — Housekeeping (P2) — NOT STARTED (sub-items A and G were done in the 2026-10-07 alignment pass; H–L added)
+### STEP 21 — Housekeeping (P2) — PARTIAL 2026-10-12, launch files (sub-item I, second half; MVP M5) done in `9968019`, verification pending; A and G done 2026-10-07; rest open
 
 **Depends on**: none (best after Step 4).
 **Maps to**: Continuation "Gaps noticed" list.
 
-**Next action (2026-10-12)**: none until the MVP ships (Decision D3, `docs/MVP-CUTLINE.md` §3 defers this step); then follow the Execution order table. Prompt below unchanged and still current.
+**Done 2026-10-12 (MVP M5, pulled forward by D3)**: launch files for both starters in `9968019`: `packages/frontend-loop/src/launch.ts` makes robots.txt, llms.txt, a 1200x630 share card (og-image.png) and, only when the owner supplies the live address (brief `siteUrl` or owner fact `site_url`; https, no Vercel), sitemap.xml plus canonical/og:url/og:image tags. Track A also ships a 404 page and og:title/description; Track B gets them through Next metadata and `public/`. Migration `0019_artifacts_png` (image/png in the artifacts bucket) applied live, confirmed by SQL. Evidence: the real Step 7 launch-stage checks pass on both starters with an address (`packages/verification/test/launchFiles.test.ts`, Track B on a real isolated build in `frontend-loop/test/trackB.test.ts`), and fail only canonical/og-image/sitemap without one. Local: frontend-loop 77, verification 103, workflow 33, jobs 24, rendered-qa 52 pass; typecheck clean.
+**Next action (2026-10-12)**: verify M5: push (Huraira's say-so), confirm CI green, then one live build with a real `siteUrl` run at stage `launch`. Every other sub-item waits until the MVP ships (D3). Sub-item I's first half (open questions out of the HTML) is still open. Prompt below unchanged for the remaining sub-items.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
@@ -1444,7 +1445,7 @@ is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler 
 | 18 | Three-concurrent-clients test | not started | | |
 | 19 | Disaster-recovery drill | not started | | |
 | 20 | Vercel serverless ceiling | not started | | |
-| 21 | Housekeeping | not started | | |
+| 21 | Housekeeping | **PARTIAL** (launch files, MVP M5: `9968019`, migration 0019 applied live, local suites pass; CI and a live launch-stage build pending; other sub-items open) | 2026-10-12 | |
 | 22 | Nick's items | not started | | |
 | 23 | Product features (A–E) | not started | | |
 | 24 | Advanced autonomy and optimization (A–C) | not started | | |
