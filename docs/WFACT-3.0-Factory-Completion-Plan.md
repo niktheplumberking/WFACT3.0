@@ -19,7 +19,7 @@ pending, so it stays open with a verification prompt. Step 4 is **PARTIAL** (clo
 Track A re-run `b880a7d5` (plan `b5a45a8e`, 2026-10-07 17:14 UTC) passed every deterministic check, but the required design review could not
 run (Agent 37 HTTP 502, 4 attempts). Track B `4acbde1f` has not been re-run. M5 is blocked on Higgsfield credits and M6 has not started.
 Step 4C is **BUILT AND DEPLOYED**, with the signed-in check pending. Step 4D is **PARTIAL**: deployed, but the live "continue" has not been
-run (`b880a7d5` is the ready candidate). Step 12 is **PARTIAL** (MVP M6 slice `2223856`, 2026-10-13: Agent 37 priced as an estimate, screenshot reviewer traced, caps built but off pending the amounts, Cockpit Costs page; migration 0020 live; not pushed). Step 21 is **PARTIAL** (launch files, MVP M5, `9968019`; verification pending). Steps 8–11, 13–20 and 22–27 are not started. **Decision D3 (MVP on Bennett & Co by 2026-10-14) overrides the order**:
+run (`b880a7d5` is the ready candidate). Step 12 is **PARTIAL** (MVP M6 slice `2223856`, deployed with CI `38433400406`: Agent 37 priced as an estimate, screenshot reviewer traced, caps on at $5 per build and $20 per week, Cockpit Costs page; migration 0020 live; one live build still to prove the new trace rows). Step 21 is **PARTIAL** (launch files, MVP M5, `9968019`; verification pending). Steps 8–11, 13–20 and 22–27 are not started. **Decision D3 (MVP on Bennett & Co by 2026-10-14) overrides the order**:
 Nick's brief is not in the repo (no `clients/bennett*`); of the MVP items in `docs/MVP-CUTLINE.md` §2 M5 (launch files) and M6 (cost control) are built. Each step heading below
 carries its status; Part E is the checklist.
 
@@ -664,7 +664,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 12 — Cost governance per client (P2) — PARTIAL 2026-10-13, MVP M6 slice built in `2223856`, caps off pending amounts
+### STEP 12 — Cost governance per client (P2) — PARTIAL 2026-10-13, MVP M6 slice deployed (CI `38433400406`), caps on ($5/build, $20/week); live build pending
 
 **Realignment note (2026-10-07)**: include a price basis or a token ceiling for Agent 37 calls (`model_traces.cost_usd` is null; ~190k tokens per builder run are invisible to every USD ceiling). Pull ahead of Step 9 if Huraira approves Part F decision D2.
 
@@ -684,7 +684,13 @@ REPORT in the Part C format, then STOP.
 - One live build. It must write `estimated` rows and reviewer rows. It is blocked today: Agent 37 answers HTTP 402 "AI credits exhausted" (probe 2026-10-13).
 - The rest of Step 12 (per-client budgets and alerts) waits until after the MVP.
 
-**Next action**: Huraira and Nick set the cap amounts, Huraira tops up Agent 37 and pushes, then verify with the prompt below.
+**Update (2026-10-13, later)**:
+- **Pushed and deployed:** CI `38433400406` is green, the deploy smoke check returned HTTP 200, and both branches are at `17b1526`.
+- **Caps on:** Nick approved $5 per build and $20 per 7 days, and they are set in `spend-caps.json` 1.1.0. A read-only check against live spend allowed the real caps ($0.29 this week) and refused a seeded $0.10 cap.
+- **Agent 37:** topped up and answering. The 32k output ceiling is accepted.
+- **New leak:** Agent 37 adds about 21k hidden input tokens to every call (`docs/AI-COST-AUDIT.md` 1b).
+
+**Next action**: the next live build (Step 25, Bennett & Co) proves items 3 and 4 of the prompt below. Then run `/step-close 12`.
 
 Verification prompt (MVP M6):
 ```
@@ -1463,7 +1469,7 @@ is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler 
 | 9 | Cockpit: status and System room | not started | | |
 | 10 | Cockpit: Agents and Workflows | not started | | |
 | 11 | Model routing and second model | not started | | |
-| 12 | Cost governance per client | **PARTIAL** (MVP M6 slice `2223856`, migration 0020 live, tests pass locally; caps built but off until the amounts are agreed; not pushed, no CI; live build blocked by Agent 37 HTTP 402) | 2026-10-13 | |
+| 12 | Cost governance per client | **PARTIAL** (MVP M6 slice `2223856`, CI `38433400406` green incl. Cockpit deploy, migration 0020 live; caps ON $5/build and $20/week (Nick approved 2026-10-13), checked against live spend; one live build still to prove the new trace rows) | 2026-10-13 | |
 | 13 | Remaining core agents (A–E) | not started | | |
 | 14 | Cockpit: Memory and Human Control | not started | | |
 | 15 | Cognee trial write-up | not started | | |
