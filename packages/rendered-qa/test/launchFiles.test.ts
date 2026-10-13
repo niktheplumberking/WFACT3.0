@@ -1,19 +1,23 @@
 /**
- * MVP M5 (`docs/MVP-CUTLINE.md`): the Track A starter's launch files, judged by the real Step 7 launch-stage
- * checks rather than by the code that wrote them. With the owner's production address every launch check passes;
- * without it the ones that need an absolute URL fail and say what is missing. The Track B equivalent runs on a
- * real isolated build in packages/frontend-loop/test/trackB.test.ts.
+ * MVP M5 (`docs/MVP-CUTLINE.md`): both starters' launch files, judged by the real Step 7 launch-stage checks rather
+ * than by the code that wrote them. With the owner's production address every launch check passes; without it the
+ * ones that need an absolute URL fail and say what is missing. Track B runs on a real isolated build.
+ *
+ * It lives here, not in frontend-loop or verification, because it needs both packages: this is the only CI job
+ * that installs both (each package's own job installs only its own dependencies).
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { runChecks } from "../src/registry.js";
-import { gateTextChecks, registry } from "../src/evalRegistry.js";
-import type { VerificationContext } from "../src/checks/types.js";
+import { runChecks } from "@wfact/verification/registry";
+import { gateTextChecks, registry } from "@wfact/verification/evalRegistry";
+import type { VerificationContext } from "@wfact/verification/checks/types";
 import { loadBrief } from "../../frontend-loop/src/brief.js";
 import { validateSiteContent } from "../../frontend-loop/src/trackA/content.js";
 import { renderSite } from "../../frontend-loop/src/trackA/render.js";
+import { validateSiteContent as validateTrackB } from "../../frontend-loop/src/trackB/content.js";
+import { buildTrackBSite, type TrackBBuild } from "../../frontend-loop/src/trackB/build.js";
 import { normalizeSiteUrl } from "../../frontend-loop/src/launch.js";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..", "..");
@@ -62,4 +66,24 @@ test("only a real https production origin is accepted as the site address", () =
   for (const bad of ["http://bennettandco.com", "https://bennettandco.com/home", "https://wfact-preview.vercel.app", "https://localhost", "https://example.com", "https://10.0.0.1", "bennettandco.com", ""]) {
     assert.equal(normalizeSiteUrl(bad), null, bad);
   }
+});
+
+test("Track B on a real isolated build: with the address every launch-stage check passes; without it nothing is guessed", { timeout: 600_000 }, async () => {
+  const FX = path.join(ROOT, "packages", "frontend-loop", "test", "fixtures", "track-b");
+  const nfBrief = loadBrief(path.join(FX, "northfold.brief.json"));
+  const nf = validateTrackB(JSON.parse(readFileSync(path.join(FX, "northfold.content.json"), "utf-8")), nfBrief).content!;
+  const launchCheck = (b: TrackBBuild) =>
+    runChecks(
+      { html: b.files["index.html"]!, clientSlug: nfBrief.clientSlug, requiredSections: [], otherClientSlugs: [], site: { files: b.files, pages: b.pages, binary: b.binary }, stage: "launch" },
+      gateTextChecks().filter((c) => LAUNCH_IDS.includes(c.id)),
+    );
+  const live = await buildTrackBSite(nf, { siteUrl: "https://northfold.studio" });
+  for (const r of launchCheck(live)) assert.ok(r.passed && !r.notApplicable, `${r.checkId}: ${r.details.join(" | ")}`);
+  assert.match(live.files["services/index.html"]!, /<link rel="canonical" href="https:\/\/northfold\.studio\/services\/"/);
+  assert.match(live.files["index.html"]!, /<meta property="og:image" content="https:\/\/northfold\.studio\/og-image\.png"/);
+  assert.match(live.files["robots.txt"]!, /^Sitemap: https:\/\/northfold\.studio\/sitemap\.xml$/m);
+  assert.deepEqual(JSON.parse(live.source["content/launch.json"]!), { siteUrl: "https://northfold.studio" });
+
+  const failed = launchCheck(await buildTrackBSite(nf)).filter((r) => !r.passed).map((r) => r.checkId).sort();
+  assert.deepEqual(failed, ["tells.canonical", "tells.og-image", "tells.sitemap"], "no address: the URL checks fail and say so");
 });

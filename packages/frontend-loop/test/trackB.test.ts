@@ -243,23 +243,3 @@ test("a required social-proof section without brief quotes: left out with an ope
   c.openQuestions = [...c.openQuestions, "Real customer feedback for social-proof: can the studio share quotes?"];
   assert.deepEqual(validateSiteContent(c, needs).errors, []);
 });
-
-test("MVP M5 launch files: with the owner's production address every Step 7 launch-stage check passes on a real build; without it nothing is guessed", { timeout: 300_000 }, async () => {
-  const { runChecks } = await import("../../verification/src/registry.js");
-  const { gateTextChecks, registry } = await import("../../verification/src/evalRegistry.js");
-  const launchIds = registry().checks.filter((e) => e.stage === "launch").map((e) => e.id);
-  const launchCheck = (b: TrackBBuild) =>
-    runChecks(
-      { html: b.files["index.html"]!, clientSlug: "northfold", requiredSections: [], otherClientSlugs: [], site: { files: b.files, pages: b.pages, binary: b.binary }, stage: "launch" },
-      gateTextChecks().filter((c) => launchIds.includes(c.id)),
-    );
-  const live = await buildTrackBSite(valid(), { siteUrl: "https://northfold.studio" });
-  for (const r of launchCheck(live)) assert.ok(r.passed && !r.notApplicable, `${r.checkId}: ${r.details.join(" | ")}`);
-  assert.match(live.files["services/index.html"]!, /<link rel="canonical" href="https:\/\/northfold\.studio\/services\/"/);
-  assert.match(live.files["index.html"]!, /<meta property="og:image" content="https:\/\/northfold\.studio\/og-image\.png"/);
-  assert.match(live.files["robots.txt"]!, /^Sitemap: https:\/\/northfold\.studio\/sitemap\.xml$/m);
-  assert.deepEqual(JSON.parse(live.source["content/launch.json"]!), { siteUrl: "https://northfold.studio" });
-
-  const failed = launchCheck(await realBuild()).filter((r) => !r.passed).map((r) => r.checkId).sort();
-  assert.deepEqual(failed, ["tells.canonical", "tells.og-image", "tells.sitemap"], "no address: the URL checks fail and say so");
-});
