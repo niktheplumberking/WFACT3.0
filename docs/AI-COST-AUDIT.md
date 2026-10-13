@@ -5,10 +5,10 @@ It feeds MVP milestone M6 (`docs/MVP-CUTLINE.md` §4).
 
 **Status (2026-10-13):**
 - Built: section 3A items 1, 2, 3 (mechanism) and 4 (output ceiling only), and section 4.
-- Caps: built but OFF. The amounts are pending Huraira and Nick.
+- Caps: ON since 2026-10-13: $5 per build and $20 per rolling 7 days, approved by Nick.
 - Deferred: the timeout retry in item 4, and item 5.
 - Not built: section 3B (after the MVP).
-- **Blocker found:** on 2026-10-13 the Agent 37 gateway answers "HTTP 402: AI credits exhausted", so no build can run until it is topped up.
+- Agent 37 was out of credits (HTTP 402) earlier on 2026-10-13. It has been topped up and answers again.
 
 ## 1. What we actually spent
 
@@ -37,6 +37,9 @@ It feeds MVP milestone M6 (`docs/MVP-CUTLINE.md` §4).
    - Within one run, input grows about 32k → 65k → 108k tokens per call.
    - One DreamSign call (2026-09-28, run 9bb96676) used **629k input tokens**. The fixed prompt cannot account for that. It suggests `hermes-agent` loops internally and bills every internal turn: a hypothesis to check on the Agent 37 dashboard.
    - A timed-out call (6-minute limit) is retried, which can bill twice.
+1b. **Agent 37 adds about 21k hidden input tokens to every call.** A 5-word test message (2026-10-13) was billed 21,182 input tokens. That is the `hermes-agent` wrapper's own instructions: about $0.06 per call at the estimate, before our prompt is counted.
+   - Ask Agent 37 whether a plain model route without the agent wrapper exists.
+   - If it does, it would remove this fixed cost from every builder and reviewer call.
 2. **Screenshot review: up to 35 images per call, up to 5 resends, invisible.**
    - A 5-page site sends 11 home-page slices plus 2 per viewport for each other page, at high detail on desktop and tablet (`rendered-qa/src/reviewer.ts:195-260`).
    - This repeats on every QA cycle and every auto-heal, even when the content has not changed.

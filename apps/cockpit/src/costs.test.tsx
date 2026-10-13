@@ -84,11 +84,14 @@ describe("Costs page", () => {
     expect(screen.getByText(/\$1\.00 at list prices; \$5\.00 is an estimate for Agent 37/)).toBeInTheDocument();
     expect(screen.getByText("Estimates are not a bill.")).toBeInTheDocument();
   });
-  it("shows the caps as proposed and off until the amounts are agreed", async () => {
+  it("shows the approved caps, counting only priced spend (not pre-pricing history)", async () => {
     start();
-    expect(await screen.findByRole("meter", { name: "Last 7 days" }, T)).toBeInTheDocument();
-    expect(screen.getAllByText("(proposed, not enforced)").length).toBeGreaterThan(0);
-    expect(screen.getByText(/Caps are built but switched off/)).toBeInTheDocument();
+    const week = await screen.findByRole("meter", { name: "Last 7 days" }, T);
+    // $1.00 list price + $0.50 estimated; the $4.50 history is in the total, not in the cap.
+    expect(week).toHaveAttribute("aria-valuenow", "1.5");
+    expect(week).toHaveAttribute("aria-valuemax", "20");
+    expect(screen.getByText("$1.50 of $20.00")).toBeInTheDocument();
+    expect(screen.getByText(/is refused before the next model call/)).toBeInTheDocument();
   });
   it("lists builds and the biggest calls, with history marked as an estimate", async () => {
     start();

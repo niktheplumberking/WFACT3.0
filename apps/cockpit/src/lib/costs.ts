@@ -20,7 +20,6 @@ export const PRICING_VERSION = routing.version;
 export const CAPS = {
   perBuildUsd: capsFile.perBuildUsd as number | null,
   weeklyUsd: capsFile.weeklyUsd as number | null,
-  proposed: capsFile.proposed as { perBuildUsd: number; weeklyUsd: number },
   status: capsFile.status,
 };
 
@@ -90,6 +89,8 @@ export interface Spend {
   outputTokens: number;
 }
 export const total = (s: Spend) => s.metered + s.estimated + s.history;
+/** What the spend caps count (packages/hermes/src/spendCaps.ts): priced rows only, never the pre-pricing history. */
+export const capped = (s: Spend) => s.metered + s.estimated;
 const empty = (): Spend => ({ metered: 0, estimated: 0, history: 0, unknownCalls: 0, calls: 0, inputTokens: 0, outputTokens: 0 });
 
 function addDay(s: Spend, r: DayRow): Spend {

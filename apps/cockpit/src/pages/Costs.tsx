@@ -6,7 +6,7 @@
  */
 import { dateTime } from "../lib/model";
 import { useLoad, useMe } from "../lib/state";
-import { CAPS, PRICING_VERSION, byKey, callCost, dayKey, fetchCostData, money, runSpend, sumDays, tokens, total, type Spend, type TraceRow } from "../lib/costs";
+import { CAPS, PRICING_VERSION, byKey, callCost, capped, dayKey, fetchCostData, money, runSpend, sumDays, tokens, total, type Spend, type TraceRow } from "../lib/costs";
 import { Empty, LoadError, Loading, Notice, PageHead, Plate } from "../components/ui";
 
 const role = (actor: string) => actor.replace(/^agent:/, "").replace(/-/g, " ");
@@ -34,19 +34,26 @@ function CallCost({ t }: { t: TraceRow }) {
   );
 }
 
-function CapLine({ label, spent, cap, proposed }: { label: string; spent: number; cap: number | null; proposed: number }) {
-  const limit = cap ?? proposed;
-  const pct = Math.min(100, Math.round((spent / limit) * 100));
+function CapLine({ label, spent, cap }: { label: string; spent: number; cap: number | null }) {
+  if (cap === null) {
+    return (
+      <div className="cap">
+        <div className="cap-head">
+          <b>{label}</b>
+          <span className="fig">{money(spent)} <span className="quiet">(no cap set)</span></span>
+        </div>
+      </div>
+    );
+  }
+  const pct = Math.min(100, Math.round((spent / cap) * 100));
   return (
     <div className="cap">
       <div className="cap-head">
         <b>{label}</b>
-        <span className="fig">
-          {money(spent)} of {money(limit)} {cap === null ? <span className="quiet">(proposed, not enforced)</span> : null}
-        </span>
+        <span className="fig">{money(spent)} of {money(cap)}</span>
       </div>
-      <div className="cap-bar" role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={limit} aria-valuenow={Number(spent.toFixed(2))}>
-        <span style={{ width: `${pct}%` }} className={spent >= limit ? "over" : pct >= 80 ? "near" : undefined} />
+      <div className="cap-bar" role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={cap} aria-valuenow={Number(spent.toFixed(2))}>
+        <span style={{ width: `${pct}%` }} className={spent >= cap ? "over" : pct >= 80 ? "near" : undefined} />
       </div>
     </div>
   );
@@ -98,15 +105,15 @@ export function Costs() {
         {d && d.days.length > 0 && week && (
           <Plate title="Spend caps" note={capsOff ? "Off" : "On"}>
             <div className="caps">
-              <CapLine label="Last 7 days" spent={total(week)} cap={CAPS.weeklyUsd} proposed={CAPS.proposed.weeklyUsd} />
+              <CapLine label="Last 7 days" spent={capped(week)} cap={CAPS.weeklyUsd} />
               {latestBuild && d.runs[0] && (
-                <CapLine label={`Latest build (${client(d.runs[0].entity_slug)}, ${dateTime(d.runs[0].first_call_at)})`} spent={total(latestBuild)} cap={CAPS.perBuildUsd} proposed={CAPS.proposed.perBuildUsd} />
+                <CapLine label={`Latest build (${client(d.runs[0].entity_slug)}, ${dateTime(d.runs[0].first_call_at)})`} spent={capped(latestBuild)} cap={CAPS.perBuildUsd} />
               )}
-              {capsOff && (
-                <p className="fine quiet">
-                  Caps are built but switched off: the amounts are pending Huraira and Nick ({CAPS.status}). Once set, a build or week over its cap is refused before the next model call.
-                </p>
-              )}
+              <p className="fine quiet">
+                {capsOff
+                  ? "Caps are switched off."
+                  : "A build or a week at its cap is refused before the next model call. Caps count spend priced since 13 October; earlier calls show in the totals above as history."}
+              </p>
             </div>
           </Plate>
         )}
@@ -181,7 +188,7 @@ export function Costs() {
                 <tbody>
                   {d.runs.map((r) => {
                     const s = runSpend(r);
-                    const limit = CAPS.perBuildUsd ?? CAPS.proposed.perBuildUsd;
+                    const limit = CAPS.perBuildUsd;
                     return (
                       <tr key={r.run_id}>
                         <td className="fig">{dateTime(r.first_call_at)}</td>
@@ -190,7 +197,7 @@ export function Costs() {
                         <td className="fig">{tokens(Number(r.input_tokens))} / {tokens(Number(r.output_tokens))}</td>
                         <td className="fig">
                           <Amount s={s} />
-                          {total(s) >= limit && <span className="tag-over"> over {money(limit)}</span>}
+                          {limit !== null && capped(s) >= limit && <span className="tag-over"> at the {money(limit)} cap</span>}
                         </td>
                         <td className="fig">{r.run_id.slice(0, 8)}</td>
                       </tr>

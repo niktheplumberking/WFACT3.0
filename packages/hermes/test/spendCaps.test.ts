@@ -14,10 +14,11 @@ const ledger = (build: number, week: number): SpendLedger & { reads: number } =>
 const RUN = "0cfc6675-c312-47b1-8c51-a48c62202fa6";
 const inRun = <T>(fn: () => Promise<T>) => runContext.run({ runId: RUN, taskId: null, actor: "agent:front-end-builder", entitySlug: "bennett-co" }, fn);
 
-test("the shipped caps are OFF until the amounts are agreed (D5: money is Nick's call)", () => {
+test("the shipped caps are the amounts Nick approved on 2026-10-13 (D5): $5 per build, $20 per 7 days", () => {
   const c = loadSpendCaps({});
-  assert.equal(c.perBuildUsd, null);
-  assert.equal(c.weeklyUsd, null);
+  assert.equal(c.perBuildUsd, 5);
+  assert.equal(c.weeklyUsd, 20);
+  assert.equal(c.source, "config");
 });
 
 test("env overrides a cap for one run; a bad value is refused", () => {
