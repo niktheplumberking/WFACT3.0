@@ -124,6 +124,8 @@ Not in scope now: an e-commerce site type (Huraira 2026-10-07).
 
 **Decision D3 (Huraira, 2026-10-10; MVP override of the order above until 2026-10-14)**: Nick wants the Website Build Module proven on one real project, Bennett & Co (colors and logo fixed, fonts free, proper web agency site), by Wednesday 2026-10-14, because he starts ads and mass client acquisition right after. Until that date the working sequence is: (1) Huraira's open actions and Nick's brief, (2) Step 26 item 1 only plus a minimal slice of Step 12 (price Agent 37, per-build cap), (3) Step 27 motion budget limited to what the Bennett build needs, (4) Step 25 on the Bennett & Co brief, stopping at "awaiting launch approval". Steps 8, 12 (rest), 20 and everything after them in the table above wait until after the MVP. The scope fence, schedule, cost evidence and proposed spend cap are in `docs/MVP-CUTLINE.md`. The date is a target, not a promise: it depends on Nick's brief arriving and on how many correction rounds the first build needs. Websites only; e-commerce stays out.
 
+**Decision D4 (Huraira, 2026-10-13; ad campaign starts Mon 2026-10-19)**: until 2026-10-19 the work is the core loop needed to take ad-sourced clients, in this order. Tier 1: a Step 25 **rehearsal** on a synthetic brief (Lanternworks Studio, `clients/lanternworks-studio/`, labelled SYNTHETIC; it does not count toward Step 25's real-client acceptance or goal 1, and Step 25 stays open for a real brief); closing 4B M4 and the 4D live continue; Step 26 item 1 (second-vendor reviewer, needs OpenAI credits); Step 27 (Track A motion budget). Tier 2 if time allows: build-stop and cap alerts (a slim Step 17), a Step 21 slice (intake fields for the logo and live address, favicon, open questions out of the page source), cost per client (Step 12), and a minimal Step 8 queue only if several clients will build at once. Each still needs Huraira's GO.
+
 **Decision D1 (Huraira, 2026-10-07)**: keep two tracks. Track A gets a motion budget (Step 27); Track B stays the full 21st.dev/React path; the direction step still recommends a track and the owner picks. Conversion is a hard gate: motion may not fail speed, layout-shift or visible-CTA checks. Nick confirms by blind-rating sample builds, not by conversation.
 
 ---
@@ -1278,6 +1280,7 @@ REPORT in the Part C format after each sub-part, then STOP.
 fixed, fonts free, a proper web agency site, websites only). `docs/MVP-CUTLINE.md` §2 M1–M4 and M8 are its acceptance on top of the
 prompt below. Target Wed 2026-10-14. Report slippage on Monday evening 2026-10-12. The dependency on "4B M4 closed" and "Step 26 done" is
 narrowed by D3 to Step 26 item 1 and the cost-cap slice of Step 12.
+**Rehearsal (D4, 2026-10-13)**: GO from Huraira to rehearse Step 25 on the synthetic Lanternworks Studio brief (`clients/lanternworks-studio/`) through the live Cockpit. Gap found before the run: intake cannot take a logo file or the live address (`siteUrl`), so M1 cannot be met by any brief yet. The real run still needs Nick's brief.
 **Next action (2026-10-12)**: blocked on **Nick's brief** (repo name or brief, logo file, exact colors, pages, real case studies, CRM target:
 `docs/MVP-CUTLINE.md` §6). Nothing is in the repo yet. When it lands, record it under `clients/bennett-co/` (entity `bennett-co`) with the
 locked colors and logo as constraints (M1), then run this prompt. Per the cut-line schedule this is already a day behind.
@@ -1304,7 +1307,17 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 26 — Quality calibration (P0, added 2026-10-07) — NOT STARTED
+### STEP 26 — Quality calibration (P0, added 2026-10-07) — PARTIAL 2026-10-14, item 1 built (Anthropic screenshot reviewer, `67033f7`), verification pending
+
+**Item 1 progress (2026-10-14)**: the screenshot reviewer moved from Agent 37 to Anthropic claude-sonnet-5 (`reviewer.json` 1.1.0, Huraira
+approved 2026-10-13), a different vendor from the Agent 37 builder, after every Agent 37 review was cut at Node's 300 s fetch header
+limit (root cause, fixed in the same commit). Local live proof: Summit Line Track A, 5 pages, 15 images, review PASSED in 32 s, $0.071.
+**Left**: a Cockpit build whose review writes an `anthropic` `model_traces` row (press "continue" on `83f2841f` or `63278e56` once CI
+deploys `67033f7`); OpenAI as a third vendor stays blocked on credits; items 2–4 after the MVP.
+**Verification prompt (2026-10-14)**: verify first. Confirm CI is green on the commit after `67033f7`. In the Cockpit, press "continue" on
+the stopped Lanternworks build `83f2841f` (Track B) and on Summit Line `63278e56` (Track A). Each must reach "awaiting launch approval" or
+fail on a named check, never on "design review NOT RUN". Query `model_traces` for `provider='anthropic'` rows from `agent:qa-evaluator` and
+cite them. Fix only the gaps found, then run `/step-close 26` and move to Step 27.
 
 **Depends on**: OpenAI (or another different-vendor) credits; Step 4B M4 closed.
 **Maps to**: Blueprint §1 "never trust done"; goal 3.
@@ -1483,7 +1496,7 @@ is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler 
 | 23 | Product features (A–E) | not started | | |
 | 24 | Advanced autonomy and optimization (A–C) | not started | | |
 | 25 | Real-client proof run | not started | | |
-| 26 | Quality calibration | not started | | |
+| 26 | Quality calibration | **PARTIAL**: item 1 built (`67033f7`, Anthropic screenshot reviewer, local live review passed 32 s / $0.071); Cockpit trace row pending | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
 
 **Goal tracker (Blueprint §16K)**

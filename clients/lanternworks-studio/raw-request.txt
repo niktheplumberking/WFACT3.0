@@ -1,0 +1,41 @@
+From: Priya Halden (Lanternworks Studio) <hello@lanternworks.example>
+To: Bennett & Co <hello@bennettandco.example>
+Subject: Website for our studio, brand is locked
+
+Hi Bennett & Co,
+
+We're Lanternworks Studio, a three-person brand and web design studio. We work with small service
+businesses (clinics, trades, local professional firms) on logos, brand guidelines and websites. Our own
+site is a single page we made in a weekend and it's embarrassing for a design studio. We're about to start
+running ads and we need a site that actually sells what we do.
+
+Brand: this part is fixed, please don't change it.
+- Colours: ink navy #14213D, paper white #FAF7F2, and one signal orange #F26B38 for buttons and links only.
+  Nothing else except tints of those.
+- Logo: the lantern mark plus the word "Lanternworks". I've attached logo.svg. Use it as is, don't redraw it.
+- Fonts: we don't mind, pick something that fits a studio that cares about type.
+
+Pages we'd like:
+- Home: who we are and what we do, in one line, with a clear "Book a discovery call" button
+- Services: Brand identity, Websites, and Ongoing care (monthly updates and small changes)
+- How we work: discovery call, proposal, design, build, launch, care
+- Work: we have case studies but the clients haven't all said yes to being shown yet. Can you put
+  something there for now?
+- About: the three of us, but no photos yet
+- Contact: a short form (name, email, company, what you need, rough budget) that goes into our CRM
+
+We'd like to say we've done "200+ projects" and that we're "award-winning" (we were shortlisted once).
+Also some client quotes would help, maybe make a few up until we collect real ones.
+
+It should feel calm and confident, with some tasteful motion, not a template. Lots of people will land
+from ads on their phones, so it has to be fast and the call button always easy to find.
+
+The live address will be https://lanternworks.example
+
+Thanks,
+Priya
+
+---
+SYNTHETIC REHEARSAL REQUEST for WFACT (Factory Completion Plan, Step 25 rehearsal, written 2026-10-13 on
+Huraira's instruction). "Lanternworks Studio", "Priya Halden" and every fact above are FICTIONAL; this is not
+a real client, its result does not count toward Step 25's real-client acceptance or Blueprint goal 1.
