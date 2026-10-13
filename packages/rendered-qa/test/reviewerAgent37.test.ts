@@ -15,7 +15,13 @@ const ids = loadRulebook().rules.filter((r) => r.detect.review).map((r) => r.id)
 const shots: Shot[] = [{ page: "index.html", viewport: "phone", width: 375, file: "/dev/null", slices: [Buffer.from("x")] }];
 const ctx: VerificationContext = { html: "<html></html>", clientSlug: "summit-line-roofing", requiredSections: [], otherClientSlugs: [], factSources: ["brief"] };
 const answer = JSON.stringify({ findings: ids.map((id) => ({ ruleId: id, verdict: "pass", evidence: "ok" })) });
-const decision = loadReviewerDecision();
+// The Agent 37 decision as it stood in reviewer.json 1.0.0 (2026-10-01); the committed record moved to Anthropic in 1.1.0.
+const decision: ReviewerDecision = {
+  version: "1.0.0",
+  provider: "agent37",
+  model: "hermes-agent",
+  sameVendorAsBuilder: { vendor: "agent37", approvedBy: "Huraira", on: "2026-10-01", why: "OpenAI has no credits" },
+};
 
 function gateway(contents: { content: string; finish_reason?: string }[]) {
   const calls: { url: string; body: Record<string, unknown> }[] = [];
@@ -27,11 +33,11 @@ function gateway(contents: { content: string; finish_reason?: string }[]) {
   return { impl, calls };
 }
 
-test("the committed decision record names Agent 37 and who approved the same-vendor review", () => {
-  assert.equal(decision.provider, "agent37");
+test("an Agent 37 decision record must name who approved the same-vendor review", () => {
   assert.equal(decision.sameVendorAsBuilder?.vendor, "agent37");
   assert.equal(decision.sameVendorAsBuilder?.approvedBy, "Huraira");
   assert.match(decision.sameVendorAsBuilder?.on ?? "", /^\d{4}-\d{2}-\d{2}$/);
+  assert.notEqual(loadReviewerDecision().provider, "agent37", "the committed reviewer is no longer Agent 37 (1.1.0)");
 });
 
 test("same vendor as the builder is refused without a recorded approval", () => {

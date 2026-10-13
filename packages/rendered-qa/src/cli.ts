@@ -10,7 +10,7 @@
  * Like VerificationLoop, the review is skipped (no model spend) when a deterministic check failed,
  * unless --review-always is given (used to gather evidence on a page already known to fail).
  *
- * The reviewer is the one config/reviewer.json names; its key (AGENT37_API_KEY + AGENT37_BASE_URL, or
+ * The reviewer is the one config/reviewer.json names; its key (ANTHROPIC_API_KEY, AGENT37_API_KEY + AGENT37_BASE_URL, or
  * OPENAI_API_KEY) comes from the environment (`doppler run -- npm run qa ...`) and is never printed.
  * WFACT_BUILDER_VENDOR names the builder's vendor (default "agent37", today's builder).
  * Exit 0 only when every check passed and the review ran and passed.

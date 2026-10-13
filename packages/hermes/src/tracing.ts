@@ -58,7 +58,7 @@ export function reviewerTraceHooks(
   capCheck?: () => Promise<void>,
 ): {
   beforeCall: () => Promise<void>;
-  onCall: (call: { provider: "openai" | "agent37"; model: string; inputTokens: number; outputTokens: number; ms: number; outcome: "success" | "error"; error: string | null }) => Promise<void>;
+  onCall: (call: { provider: "openai" | "agent37" | "anthropic"; model: string; inputTokens: number; outputTokens: number; ms: number; outcome: "success" | "error"; error: string | null }) => Promise<void>;
 } {
   return {
     beforeCall: async () => {

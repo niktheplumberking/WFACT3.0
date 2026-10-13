@@ -30,7 +30,7 @@ export const DIRECTION_DEFINITION: AgentDefinition = {
     "Reads the raw request and states niche, audience, conversion goal, requirements and brand direction (each quoted), and recommends a build track for the owner to confirm (Step 4B).",
   skillset: ["niche-classification", "brand-direction", "track-recommendation"],
   // Step 6: one model slot. It reads the raw request text, so its input is screened for injection (audit-only).
-  permissionScope: defineScope({ models: ["direction"], maxCostUsdPerRun: 0.15 /* worst real run $0.025, model_traces 2026-10-06 */, scanInputForInjection: true }),
+  permissionScope: defineScope({ models: ["direction"], maxCostUsdPerRun: 0.15 /* worst real run $0.026; worst case at DIRECTION_MAX_TOKENS about $0.07 (Sonnet 5 list price) */, scanInputForInjection: true }),
   modelSlots: ["direction"],
 };
 
@@ -46,6 +46,13 @@ interface Taxonomy {
 export const DIRECTION_TAXONOMY: Taxonomy = JSON.parse(
   readFileSync(path.join(import.meta.dirname, "..", "config", "direction-taxonomy.json"), "utf-8"),
 );
+/**
+ * Output budget. 2048 was too tight: the one successful live run used 1,921 tokens (2026-10-01) and both calls
+ * on the Lanternworks request were cut off at exactly 2048 (model_traces 2026-10-13 18:05), so the retry failed
+ * the same way. With the list caps in the prompt, the same request used 2,901 tokens live (2026-10-13), so 6144 leaves room
+ * for longer requests (up to 20k characters).
+ */
+export const DIRECTION_MAX_TOKENS = 6144;
 /** Below this, a recommendation that goes against the niche's usual track is withheld as conflicting. */
 export const CONFLICT_CONFIDENCE = 0.8;
 
@@ -192,6 +199,7 @@ function systemPrompt(): string {
     "Do not invent facts, numbers, names or preferences the request does not state.",
     "recommendedTrack: A, B, or none if the request does not let you choose. confidence: 0 to 1, honest; use below 0.6 when signals are thin or conflicting.",
     "reasons: two to four plain sentences tying the track to quoted evidence. openQuestions: what a human should confirm.",
+    "Keep it short: at most 6 requirements, 6 constraints, 6 brandDirection points and 5 openQuestions, the most important first. Each point is one sentence under 20 words; each quote is a short phrase under 12 words.",
   ].join("\n\n");
 }
 
@@ -218,7 +226,7 @@ export function createDirectionAgent(opts: { model: JsonModelClient }): Agent<Di
             "</raw_request>",
           ].join("\n"),
           schema: MODEL_DIRECTION_JSON_SCHEMA,
-          maxTokens: 2048,
+          maxTokens: DIRECTION_MAX_TOKENS,
         }),
       );
       return applyDirectionRules(out, rawText);

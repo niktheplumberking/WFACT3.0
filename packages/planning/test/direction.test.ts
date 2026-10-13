@@ -6,7 +6,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createSeedRegistry, runAgent } from "@wfact/agent-runtime";
-import { applyDirectionRules, createDirectionAgent, DIRECTION_ROLE, DIRECTION_TAXONOMY, quotedIn, type ModelDirection } from "../src/direction.js";
+import { applyDirectionRules, createDirectionAgent, DIRECTION_MAX_TOKENS, DIRECTION_ROLE, DIRECTION_TAXONOMY, quotedIn, type ModelDirection } from "../src/direction.js";
 import { MockJsonClient } from "../src/modelClient.js";
 import { MemoryPlanStore } from "../src/planStore.js";
 import { intakeAndPlan, registryWithPlanning, registryWithPlanningAndDirection, replan, type PlanningDeps } from "../src/pipeline.js";
@@ -101,6 +101,15 @@ test("the agent fences the request as data and asks for verbatim quotes; registe
   assert.deepEqual(createSeedRegistry().list().map((d) => d.role), ["front-end-builder", "qa-evaluator"]);
   assert.deepEqual(registryWithPlanning().list().map((d) => d.role), ["front-end-builder", "qa-evaluator", "intake", "planner"]);
   assert.ok(registryWithPlanningAndDirection().has(DIRECTION_ROLE));
+});
+
+test("output budget: at least 4096 tokens and a prompt that caps list lengths (2048 truncated live on 2026-10-13)", async () => {
+  const m = new MockJsonClient(() => model());
+  const run = await runAgent(createDirectionAgent({ model: m }), { taskId: crypto.randomUUID(), role: DIRECTION_ROLE, input: { intake, rawText: RAW } }, { registry: registryWithPlanningAndDirection() });
+  assert.equal(run.status, "completed");
+  assert.ok(DIRECTION_MAX_TOKENS >= 4096);
+  assert.equal(m.calls[0]!.maxTokens, DIRECTION_MAX_TOKENS);
+  assert.match(m.calls[0]!.system, /at most 6 requirements, 6 constraints, 6 brandDirection points and 5 openQuestions/);
 });
 
 // ---------------- pipeline ----------------

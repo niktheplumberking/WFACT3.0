@@ -5,7 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { REVIEW_RETRY_DELAYS_MS, createScreenshotReviewSuite, parseReview, REVIEW_CHECK_ID } from "../src/reviewer.js";
+import { REVIEW_RETRY_DELAYS_MS, REVIEW_REQUEST_TIMEOUT_MS, REVIEW_TOTAL_BUDGET_MS, createScreenshotReviewSuite, parseReview, REVIEW_CHECK_ID } from "../src/reviewer.js";
 import { loadRulebook } from "../src/rulebook.js";
 import type { Shot } from "../src/rendered.js";
 import type { VerificationContext } from "@wfact/verification/checks/types";
@@ -116,6 +116,70 @@ test("a gateway outage that outlasts every wait is NOT RUN after a hard cap, nev
 test("the default waits grow and are capped", () => {
   assert.ok(REVIEW_RETRY_DELAYS_MS.length >= 2 && REVIEW_RETRY_DELAYS_MS.length <= 4);
   for (let i = 1; i < REVIEW_RETRY_DELAYS_MS.length; i++) assert.ok(REVIEW_RETRY_DELAYS_MS[i]! > REVIEW_RETRY_DELAYS_MS[i - 1]!);
+});
+
+/**
+ * A gateway that never answers: the call ends only when the caller's signal fires (what Agent 37 did on
+ * 2026-10-13). `then[i]`, when set, answers call i+1 instead of hanging.
+ */
+function hungFetch(then: (string | { status: number } | null)[] = []) {
+  const calls: number[] = [];
+  const impl = (async (url: string, init: RequestInit) => {
+    calls.push(Date.now());
+    const next = then[calls.length - 1];
+    if (next != null) return mockFetch([next]).impl(url, init);
+    return new Promise<Response>((_resolve, reject) => {
+      init.signal!.addEventListener("abort", () => reject(init.signal!.reason), { once: true });
+    });
+  }) as unknown as typeof fetch;
+  return { impl, calls };
+}
+
+test("P0 defaults: one call is cut at 120 s and the whole review ends within 5 minutes", () => {
+  assert.equal(REVIEW_REQUEST_TIMEOUT_MS, 120_000);
+  assert.ok(REVIEW_TOTAL_BUDGET_MS <= 300_000, `review budget ${REVIEW_TOTAL_BUDGET_MS} ms`);
+  // A hang gets one retry: two full calls fit the budget, so the retry is never cut short by design.
+  assert.ok(2 * REVIEW_REQUEST_TIMEOUT_MS <= REVIEW_TOTAL_BUDGET_MS);
+});
+
+test("a hung call is no answer: retried once straight away (no backoff), then NOT RUN", async () => {
+  const { impl, calls } = hungFetch();
+  const started = Date.now();
+  const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, retryDelaysMs: [5_000, 5_000, 5_000], requestTimeoutMs: 60, totalBudgetMs: 5_000 }).run(ctx);
+  assert.equal(calls.length, 2, "one retry after a timeout, not four");
+  assert.ok(Date.now() - started < 1_000, "the 5 s transport waits were not used for a timeout");
+  assert.equal(r!.notRun, true);
+  assert.equal(r!.passed, false);
+  assert.match(r!.details[0]!, /after 2 attempts \(no answer within 0 s\)/);
+});
+
+test("a hang then a good answer: the retry passes", async () => {
+  const { impl, calls } = hungFetch([null, allPass()]);
+  const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, requestTimeoutMs: 60, totalBudgetMs: 5_000 }).run(ctx);
+  assert.equal(calls.length, 2);
+  assert.equal(r!.passed, true);
+});
+
+test("the review time budget is a hard ceiling: a wait that would end past it is not taken", async () => {
+  const { impl, calls } = mockFetch([{ status: 502 }]);
+  const started = Date.now();
+  const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, retryDelaysMs: [50, 100, 400], totalBudgetMs: 300 }).run(ctx);
+  const elapsed = Date.now() - started;
+  assert.ok(elapsed < 300, `ended in ${elapsed} ms, inside the 300 ms budget`);
+  assert.equal(calls.length, 3, "502, wait 50, 502, wait 100, 502, then the 400 ms wait would pass the deadline");
+  assert.equal(r!.notRun, true);
+  assert.match(r!.details[0]!, /HTTP 502.*review time budget used up/);
+});
+
+test("worst case, scaled: hangs and outages mixed never run past the budget", async () => {
+  // The defaults' shape (call 120 s, waits 15/45/120 s, budget 300 s) at 1/1000 scale: two fast 502s, then hangs.
+  const { impl, calls } = hungFetch([{ status: 502 }, { status: 502 }]);
+  const started = Date.now();
+  const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, retryDelaysMs: [15, 45, 120], requestTimeoutMs: 120, totalBudgetMs: 300 }).run(ctx);
+  const elapsed = Date.now() - started;
+  assert.ok(elapsed < 300 + 50, `ended in ${elapsed} ms against a 300 ms budget`);
+  assert.ok(calls.length >= 3);
+  assert.equal(r!.notRun, true);
 });
 
 test("parseReview rejects unknown ids and duplicate answers", () => {

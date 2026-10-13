@@ -18,6 +18,7 @@
  * additive later (a `KimiModelClient implements ModelClient`).
  */
 import Anthropic from "@anthropic-ai/sdk";
+import { fetchWithTimeout } from "./longFetch.js";
 
 export interface ModelRequest {
   system: string;
@@ -96,6 +97,7 @@ export class ClaudeModelClient implements ModelClient {
 export const AGENT37_RETRY_DELAYS_MS = [5_000, 15_000, 45_000];
 /** One call that takes longer than this is treated as no answer (and retried like one). Without it a hung gateway ran to the 30-minute job limit. */
 export const AGENT37_REQUEST_TIMEOUT_MS = 6 * 60_000;
+// Above Node's 5-minute fetch limit, so the default fetch is fetchWithTimeout (longFetch.ts); plain fetch would cut it at 300 s.
 /**
  * MVP M6: an output ceiling per call, so one runaway answer cannot bill without limit. The largest real builder
  * answer was 29,969 output tokens (model_traces, 2026-09-30); a full site's content JSON fits well inside this.
@@ -126,7 +128,7 @@ export class Agent37ModelClient implements ModelClient {
     this.baseUrl = baseUrl.replace(/\/+$/, "");
     this.apiKey = apiKey;
     this.retryDelaysMs = opts.retryDelaysMs ?? AGENT37_RETRY_DELAYS_MS;
-    this.fetchImpl = opts.fetchImpl ?? fetch;
+    this.fetchImpl = opts.fetchImpl ?? fetchWithTimeout(this.timeoutMs);
     this.sleep = opts.sleep ?? ((ms) => new Promise((r) => setTimeout(r, ms)));
   }
 

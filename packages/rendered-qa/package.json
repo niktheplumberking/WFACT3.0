@@ -19,7 +19,8 @@
     "@wfact/verification": "file:../verification",
     "chrome-launcher": "1.2.2",
     "lighthouse": "13.5.0",
-    "playwright": "1.63.0"
+    "playwright": "1.63.0",
+    "undici": "7.30.0"
   },
   "devDependencies": {
     "@types/node": "^22.20.2",

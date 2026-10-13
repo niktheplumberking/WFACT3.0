@@ -16,7 +16,7 @@ import { QA_GATE_CHECKS, gates, registryGateChecks, runChecks } from "@wfact/ver
 import { loadBrief } from "../../frontend-loop/src/brief.js";
 import { validateSiteContent } from "../../frontend-loop/src/trackA/content.js";
 import { renderSite } from "../../frontend-loop/src/trackA/render.js";
-import { runRenderedQa, createRenderedSuite, type RenderedRun } from "../src/rendered.js";
+import { runRenderedQa, createRenderedSuite, EXTRA_PAGE_SLICES, VIEWPORTS, type RenderedRun } from "../src/rendered.js";
 
 const repo = path.resolve(import.meta.dirname, "..", "..", "..");
 const brief = loadBrief(path.join(repo, "clients/summit-line-roofing/brief.json"));
@@ -63,7 +63,9 @@ test("clean Track A site: every rendered check and the Track A speed budget pass
   }
   assert.equal(r.shots.length, site.pages.length * 3, "full-page screenshots of every page at 1440/768/375");
   const extra = r.shots.filter((s) => s.page !== "index.html");
-  assert.ok(extra.every((s) => s.slices.length <= 2), "pages after the first send at most 2 slices per viewport to the reviewer");
+  for (const s of extra) assert.equal(s.slices.length, EXTRA_PAGE_SLICES[s.viewport], `${s.page} ${s.viewport}: slices sent to the reviewer`);
+  const first = r.shots.filter((s) => s.page === "index.html");
+  assert.ok(first.every((s) => s.slices.length >= 1 && s.slices.length <= VIEWPORTS.find((v) => v.name === s.viewport)!.slices), "first page: 1 to Viewport.slices per viewport");
 });
 
 test("broken-link fixture: the site with one page removed fails render.links on every page that links to it", async () => {

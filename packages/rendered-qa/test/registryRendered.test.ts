@@ -76,6 +76,9 @@ test("production QA runs the registry gate and refuses a same-family builder/eva
     CrossModelViolationError,
   );
   assert.throws(() => productionQaOptions({ evaluatorModel: claudeEvaluator, builderVendor: "claude", env: {} }), CrossModelViolationError);
-  // No evaluator configured: allowed at composition (the run ends "not verified", never approved).
-  assert.doesNotThrow(() => productionQaOptions({ evaluatorModel: null, builderVendor: "claude", env: {} }));
+  // No evaluator configured: allowed at composition with an Agent 37 builder (the run ends "not verified", never approved).
+  assert.doesNotThrow(() => productionQaOptions({ evaluatorModel: null, builderVendor: "agent37", env: {} }));
+  // reviewer.json 1.1.0 (2026-10-13): the screenshot reviewer is Anthropic, so a Claude builder is refused at composition
+  // by the reviewer's same-vendor guard too, before any build is paid for (previously it built and ended "not verified").
+  assert.throws(() => productionQaOptions({ evaluatorModel: null, builderVendor: "claude", env: {} }), /same vendor as the builder/);
 });

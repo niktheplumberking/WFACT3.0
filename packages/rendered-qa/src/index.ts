@@ -20,9 +20,9 @@ export interface ReviewerSetup {
 
 /** The reviewer the decision record names, with its key from the environment (names only in errors). */
 export function reviewerFromEnv(env: NodeJS.ProcessEnv = process.env, decision: ReviewerDecision = loadReviewerDecision()): ReviewerSetup {
-  return decision.provider === "agent37"
-    ? { provider: "agent37", model: decision.model, apiKey: env.AGENT37_API_KEY, baseUrl: env.AGENT37_BASE_URL, decision }
-    : { provider: "openai", model: decision.model, apiKey: env.OPENAI_API_KEY, decision };
+  if (decision.provider === "agent37") return { provider: "agent37", model: decision.model, apiKey: env.AGENT37_API_KEY, baseUrl: env.AGENT37_BASE_URL, decision };
+  if (decision.provider === "anthropic") return { provider: "anthropic", model: decision.model, apiKey: env.ANTHROPIC_API_KEY, decision };
+  return { provider: "openai", model: decision.model, apiKey: env.OPENAI_API_KEY, decision };
 }
 
 export interface RenderedQaSetup extends RenderedQaOptions {

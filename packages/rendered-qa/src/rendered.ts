@@ -107,9 +107,9 @@ export interface Viewport {
   slices: number;
 }
 export const VIEWPORTS: Viewport[] = [
-  { name: "desktop", width: 1440, height: 900, mobile: false, slices: 4 },
-  { name: "tablet", width: 768, height: 1024, mobile: false, slices: 2 },
-  { name: "phone", width: 375, height: 812, mobile: true, slices: 5 },
+  { name: "desktop", width: 1440, height: 900, mobile: false, slices: 3 },
+  { name: "tablet", width: 768, height: 1024, mobile: false, slices: 1 },
+  { name: "phone", width: 375, height: 812, mobile: true, slices: 3 },
 ];
 
 export interface Shot {
@@ -156,8 +156,13 @@ export interface RenderedQaOptions {
   rulebook?: Rulebook;
 }
 
-/** Screenshot slices per viewport the reviewer gets for each page after the first. */
-export const EXTRA_PAGE_SLICES = 2;
+/**
+ * Screenshot slices per viewport the reviewer gets for each page after the first (the first page gets
+ * `Viewport.slices`). Cut on 2026-10-13 from 4/2/5 and 2 per viewport: a five-page site sent 35 images and
+ * the review never came back inside five minutes. Now 7 for the first page and 2 per extra page (desktop and
+ * phone tops; tablet only on the first page), so five pages send 15. Full-page PNGs of every page are still written.
+ */
+export const EXTRA_PAGE_SLICES: Record<Viewport["name"], number> = { desktop: 1, tablet: 0, phone: 1 };
 
 const AXE_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -354,7 +359,7 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
         const slices: Buffer[] = [];
         // The reviewer sees the first page in full and the top of every other page (Step 4B M3: keeps a
         // multi-page review inside one model call). Full-page PNGs of every page are still written.
-        const maxSlices = pageName === pages[0] ? vp.slices : Math.min(vp.slices, EXTRA_PAGE_SLICES);
+        const maxSlices = pageName === pages[0] ? vp.slices : Math.min(vp.slices, EXTRA_PAGE_SLICES[vp.name]);
         for (let i = 0; i < maxSlices && i * vp.height < height; i += 1) {
           const y = i * vp.height;
           slices.push(await page.screenshot({ type: "jpeg", quality: 60, fullPage: true, clip: { x: 0, y, width: vp.width, height: Math.min(vp.height, height - y) } }));
