@@ -128,8 +128,11 @@ function hungFetch(then: (string | { status: number } | null)[] = []) {
     calls.push(Date.now());
     const next = then[calls.length - 1];
     if (next != null) return mockFetch([next]).impl(url, init);
+    // AbortSignal.timeout's timer is unref'd; a real hung socket keeps the process alive, so the mock holds a
+    // timer of its own or Node ends the test run with "Promise resolution is still pending" (CI 38452956084).
     return new Promise<Response>((_resolve, reject) => {
-      init.signal!.addEventListener("abort", () => reject(init.signal!.reason), { once: true });
+      const keepAlive = setInterval(() => {}, 1_000);
+      init.signal!.addEventListener("abort", () => { clearInterval(keepAlive); reject(init.signal!.reason); }, { once: true });
     });
   }) as unknown as typeof fetch;
   return { impl, calls };
