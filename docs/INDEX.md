@@ -20,6 +20,7 @@
 | `FRONTEND-UPGRADE-DESIGN.md` | Step 4B: the two front-end build tracks |
 | `MVP-CUTLINE.md` | Decision D3 (2026-10-10): the Bennett & Co MVP due 2026-10-14, scope fence, schedule, cost evidence and proposed spend cap |
 | `BUILD-RECOVERY-DESIGN.md` | Step 4D: why builds stop, what the Cockpit tells the owner, and how a stopped build carries on |
+| `BUILD-SPEED-UX-PROMPTS.md` | Proposed (2026-10-13): measured build-time baseline and agent prompts P0–P6 for build speed and progress UX |
 
 Live status: `../PROGRESS.md`. Waiting on Nick: `../BLOCKED-ON-NICK.md`.
 
