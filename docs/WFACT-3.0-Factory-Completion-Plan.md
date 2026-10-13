@@ -1445,7 +1445,7 @@ is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler 
 | 18 | Three-concurrent-clients test | not started | | |
 | 19 | Disaster-recovery drill | not started | | |
 | 20 | Vercel serverless ceiling | not started | | |
-| 21 | Housekeeping | **PARTIAL** (launch files, MVP M5: `9968019`, migration 0019 applied live, local suites pass; CI and a live launch-stage build pending; other sub-items open) | 2026-10-12 | |
+| 21 | Housekeeping | **PARTIAL** (launch files, MVP M5: `9968019`, migration 0019 applied live; CI `38292111323` failed on cross-package test imports, fixed in `b107de4`; green CI and a live launch-stage build pending; other sub-items open) | 2026-10-12 | |
 | 22 | Nick's items | not started | | |
 | 23 | Product features (A–E) | not started | | |
 | 24 | Advanced autonomy and optimization (A–C) | not started | | |

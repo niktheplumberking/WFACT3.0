@@ -1025,8 +1025,10 @@ Governed by the Factory Completion Plan Step 21 sub-item I (second half), pulled
 - [ ] Sub-item I first half: open questions out of Track A's HTML comments.
 - [ ] Sub-items B–F, H, J–L (deferred by D3).
 
-**Verification**: local only. Typecheck clean in five packages; frontend-loop 77, verification 103, workflow 33, jobs 24, rendered-qa 52 pass.
-Not yet: CI (not pushed), a live build with a real address run at stage `launch`.
+**Verification**: pushed 2026-10-12; CI `38292111323` on `423c7c1` FAILED in the Frontend loop and Verification jobs (my new tests imported
+across packages, and each CI job installs only its own dependencies), so the Cockpit deploy was skipped. Fixed 2026-10-13 in `b107de4` by moving
+those tests into `packages/rendered-qa/test/launchFiles.test.ts` (that job installs both). Local after the fix: frontend-loop 76, verification 100,
+rendered-qa launch + Track A 10, typecheck clean. Not yet: a green CI run on the fix, a live build with a real address at stage `launch`.
 
 **Exit check** (MVP M5): "Step 7 launch-stage checks pass on the output". **PARTIALLY MET**: they pass on both starters' output in tests with
 an address; not yet on a live build.
