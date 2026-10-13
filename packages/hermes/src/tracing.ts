@@ -11,7 +11,7 @@
  *   - "openai"          verification's second-vendor QA evaluator (Step 7)        → complete(), totalUsage.{inputTokens,outputTokens}, modelIdUsed
  * Anything else is refused loudly — an unknown client would otherwise go untraced.
  */
-import { traceModelCalls, type TraceSink } from "@wfact/audit";
+import { runContext, traceModelCalls, type TraceSink } from "@wfact/audit";
 import { costForModel } from "./routing.js";
 
 type AnyClient = { name: string; totalUsage?: Record<string, number>; modelIdUsed?: string };
@@ -45,4 +45,44 @@ export function traceModelClient<T extends object>(client: T, sink: TraceSink, f
     });
   }
   throw new Error(`traceModelClient: don't know how to trace a "${c.name}" client — add it here rather than run it untraced`);
+}
+
+/**
+ * MVP M6: the screenshot reviewer (packages/rendered-qa) calls its gateway directly, not through a model client,
+ * so its calls were never traced. These hooks write one model_traces row per reviewer call (priced from the one
+ * price table, tagged with the current runContext) and check the spend caps before each call.
+ */
+export function reviewerTraceHooks(
+  sink: TraceSink,
+  fallbackActor: string,
+  capCheck?: () => Promise<void>,
+): {
+  beforeCall: () => Promise<void>;
+  onCall: (call: { provider: "openai" | "agent37"; model: string; inputTokens: number; outputTokens: number; ms: number; outcome: "success" | "error"; error: string | null }) => Promise<void>;
+} {
+  return {
+    beforeCall: async () => {
+      await capCheck?.();
+    },
+    onCall: async (call) => {
+      const ctx = runContext.getStore();
+      const price = costForModel(call.model, { inputTokens: call.inputTokens, outputTokens: call.outputTokens });
+      await sink.writeTrace({
+        runId: ctx?.runId ?? null,
+        taskId: ctx?.taskId ?? null,
+        actor: ctx?.actor ?? fallbackActor,
+        provider: call.provider,
+        model: call.model,
+        inputTokens: call.inputTokens,
+        outputTokens: call.outputTokens,
+        costUsd: price.basis === "unpriced" ? null : price.costUsd,
+        priceBasis: price.basis,
+        pricingVersion: price.pricingVersion,
+        latencyMs: call.ms,
+        outcome: call.outcome,
+        error: call.error ? call.error.slice(0, 500) : null,
+        entitySlug: ctx?.entitySlug ?? null,
+      });
+    },
+  };
 }

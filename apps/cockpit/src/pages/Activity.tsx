@@ -14,7 +14,8 @@ import {
   KIND_LABEL, clock, dateTime, duration, explainJobError, jobState, planName, shortId,
   type PlanRow, type RoundRow,
 } from "../lib/model";
-import { fetchJob, useFactory, useLoad, useToast } from "../lib/state";
+import { fetchJob, useFactory, useLoad, useMe, useToast } from "../lib/state";
+import { fetchRunSpend, money, total } from "../lib/costs";
 import { stageLabel } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
 import { ClientNeedsPanel, RecoveryPanel } from "../components/Recovery";
@@ -319,6 +320,21 @@ function Results({ j }: { j: JobRow }) {
   );
 }
 
+const runIdOf = (j: JobRow): string | null => {
+  const id = j.result?.workflowRunId ?? j.params?.workflowRunId;
+  return typeof id === "string" ? id : null;
+};
+
+/** MVP M6: this build's AI spend (every retry and reopen of the run). Owners only, like the Costs page. */
+function RunCost({ runId }: { runId: string | null }) {
+  const me = useMe();
+  const owner = me.role === "owner";
+  const spend = useLoad(() => (owner && runId ? fetchRunSpend(runId) : Promise.resolve(null)), [owner, runId]);
+  const s = spend.data;
+  if (!s) return null;
+  return <>. AI spend {money(total(s))}{s.estimated + s.history > 0 ? " est." : ""} over {s.calls} calls</>;
+}
+
 export function RunPage() {
   const { jobId = "" } = useParams();
   const f = useFactory();
@@ -369,6 +385,7 @@ export function RunPage() {
             <span className="fig" style={{ marginLeft: 10 }}>
               {dateTime(j.created_at)}
               {duration(j.started_at, j.finished_at) ? `. Took ${duration(j.started_at, j.finished_at)}` : ""}
+              <RunCost runId={runIdOf(j)} />
             </span>
           </>
         }

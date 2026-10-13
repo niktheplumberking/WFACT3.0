@@ -49,7 +49,7 @@ export interface AgentScope {
   fsWrite: string[];
   /** Named tools (Hermes-lite tools, the isolated build, the QA browser). */
   tools: string[];
-  /** Hard ceiling on metered model spend for one run, USD. A call is refused once the run has spent this much. */
+  /** Hard ceiling on priced (metered or estimated) model spend for one run, USD. A call is refused once the run has spent this much. */
   maxCostUsdPerRun: number;
   /**
    * Only for a read-only controller (Hermes-lite answers the owner's questions about any entity). A cross-entity
@@ -431,7 +431,7 @@ export function guardModelClient<T extends object>(client: T, slot: string): T {
               const usage = { inputTokens: Math.max(0, after.inputTokens - before.inputTokens), outputTokens: Math.max(0, after.outputTokens - before.outputTokens) };
               try {
                 const price = costForModel(meter.model, usage);
-                gate.recordSpend(price.basis === "metered" ? price.costUsd : null);
+                gate.recordSpend(price.basis === "unpriced" ? null : price.costUsd);
               } catch {
                 // Price table unreadable: the call already happened and is traced; spend just isn't counted here.
               }

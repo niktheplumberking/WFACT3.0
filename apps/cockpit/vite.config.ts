@@ -3,6 +3,8 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  // MVP M6: the Costs page reads the factory's one price table and spend caps (packages/hermes/config) at build time.
+  server: { fs: { allow: [".", "../../packages/hermes/config"] } },
   plugins: [
     react(),
     // Step 4C: installable PWA. The service worker precaches only the app shell (built JS/CSS/fonts/icons);

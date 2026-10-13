@@ -8,7 +8,8 @@
  * route and build their own client from it. Selection order: env override
  * `WFACT_ROUTE_<SLOT>=<provider>:<model>` → config/model-routing.json → refuse (no silent default).
  * Prices come from the config's single `models` table; a model not in it is unpriced — reported as
- * unknown, never guessed.
+ * unknown, never guessed. A model whose price is marked `estimate` (Agent 37, MVP M6) is priced but
+ * reported as "estimated", so a total that includes it is labelled an estimate, never a bill.
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -30,7 +31,7 @@ interface RoutingFile {
   version: string;
   slots: Record<string, { provider: string; model: string; tier: string }>;
   /** The one price table (Stage 5). null price = no price on file = "unpriced". */
-  models: Record<string, { provider: string; usdPerMTok: { input: number; output: number } | null }>;
+  models: Record<string, { provider: string; usdPerMTok: { input: number; output: number } | null; estimate?: boolean }>;
 }
 
 export class RoutingError extends Error {
@@ -115,8 +116,20 @@ export function estimateCostUsd(route: ModelRoute, usage: { inputTokens: number;
 
 export interface ModelCost {
   costUsd: number | null;
-  basis: "metered" | "unpriced";
+  /** "estimated": priced from a rate the provider does not publish (config `estimate: true`); still counted by every cap. */
+  basis: "metered" | "estimated" | "unpriced";
   pricingVersion: string;
+}
+
+// Parsed once per path: costForModel runs on every model call, and the file only changes with a deploy.
+const priceTables = new Map<string, RoutingFile>();
+function priceTable(configPath: string): RoutingFile {
+  let t = priceTables.get(configPath);
+  if (!t) {
+    t = JSON.parse(readFileSync(configPath, "utf-8")) as RoutingFile;
+    priceTables.set(configPath, t);
+  }
+  return t;
 }
 
 export function costForModel(
@@ -124,12 +137,10 @@ export function costForModel(
   usage: { inputTokens: number; outputTokens: number },
   configPath: string = DEFAULT_CONFIG_PATH,
 ): ModelCost {
-  const raw = JSON.parse(readFileSync(configPath, "utf-8")) as {
-    version: string;
-    models?: Record<string, { usdPerMTok: { input: number; output: number } | null }>;
-  };
-  const price = raw.models?.[model]?.usdPerMTok ?? null;
+  const raw = priceTable(configPath);
+  const entry = raw.models?.[model];
+  const price = entry?.usdPerMTok ?? null;
   if (!price) return { costUsd: null, basis: "unpriced", pricingVersion: raw.version };
   const costUsd = (usage.inputTokens / 1e6) * price.input + (usage.outputTokens / 1e6) * price.output;
-  return { costUsd: Math.round(costUsd * 1e6) / 1e6, basis: "metered", pricingVersion: raw.version };
+  return { costUsd: Math.round(costUsd * 1e6) / 1e6, basis: entry?.estimate ? "estimated" : "metered", pricingVersion: raw.version };
 }

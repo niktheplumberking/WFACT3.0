@@ -58,7 +58,21 @@ export interface ReviewCall {
   ms: number;
 }
 
-export interface ScreenshotReviewOptions {
+/** One reviewer HTTP call as reported to `onCall` (MVP M6: written to model_traces by the job runner). */
+export interface ReviewCallRecord extends ReviewCall {
+  outcome: "success" | "error";
+  error: string | null;
+}
+
+/** MVP M6 hooks. Both are awaited: a hook that throws stops the review (fail closed, like the trace writer). */
+export interface ReviewCallHooks {
+  /** Runs before every call; the spend-cap check throws here to refuse the call. */
+  beforeCall?: () => Promise<void>;
+  /** Runs after every call, with or without a usable answer, so every paid call is recorded. */
+  onCall?: (call: ReviewCallRecord) => Promise<void>;
+}
+
+export interface ScreenshotReviewOptions extends ReviewCallHooks {
   provider?: ReviewerProvider;
   apiKey: string | null | undefined;
   /** Agent 37 gateway base URL (AGENT37_BASE_URL); required for provider "agent37". */
@@ -223,8 +237,16 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
         await new Promise((r) => setTimeout(r, delays[transportRetries++]));
         return true;
       };
+      const record = async (usage: { prompt_tokens?: number; completion_tokens?: number } | undefined, ms: number, error: string | null) => {
+        const inputTokens = usage?.prompt_tokens ?? 0;
+        const outputTokens = usage?.completion_tokens ?? 0;
+        const call: ReviewCall = { provider, model, inputTokens, outputTokens, costUsd: costForModel(model, { inputTokens, outputTokens }).costUsd, ms };
+        if (usage) suite.calls.push(call);
+        await opts.onCall?.({ ...call, outcome: error ? "error" : "success", error });
+      };
       for (;;) {
         calls += 1;
+        await opts.beforeCall?.();
         const started = Date.now();
         let res: Response;
         try {
@@ -236,6 +258,7 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
           });
         } catch (err) {
           lastError = `request failed: ${err instanceof Error ? err.message : String(err)}`;
+          await record(undefined, Date.now() - started, lastError);
           if (await retryAfterTransportError()) continue;
           break;
         }
@@ -244,10 +267,9 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
           usage?: { prompt_tokens?: number; completion_tokens?: number };
           error?: { message?: string } | string;
         };
-        if (json.usage) {
-          const inputTokens = json.usage.prompt_tokens ?? 0;
-          const outputTokens = json.usage.completion_tokens ?? 0;
-          suite.calls.push({ provider, model, inputTokens, outputTokens, costUsd: costForModel(model, { inputTokens, outputTokens }).costUsd, ms: Date.now() - started });
+        {
+          const msg = typeof json.error === "string" ? json.error : json.error?.message;
+          await record(json.usage, Date.now() - started, res.ok ? null : `HTTP ${res.status}: ${msg?.slice(0, 200) ?? "no message"}`);
         }
         if (!res.ok) {
           const msg = typeof json.error === "string" ? json.error : json.error?.message;

@@ -89,9 +89,10 @@ export const SEED_AGENT_DEFINITIONS: AgentDefinition[] = [
       models: ["builder", "evaluator"],
       fsWrite: ["clients/{client}/pages/*", "clients/{client}/sites/**"],
       tools: ["build.trackBIsolated"],
-      // Worst real builder run (Claude, all rounds) $0.137 in model_traces 2026-10-06; ~7x headroom for every correction round.
-      // Agent 37 calls are unpriced (null cost) and are NOT counted here; see PROGRESS.md gaps.
-      maxCostUsdPerRun: 1,
+      // MVP M6 (2026-10-13): Agent 37 calls are now priced (estimate) and counted here. Worst real builder task at that
+      // estimate was $2.75 (DreamSign, 2026-09-28), p90 $0.68 (model_traces). $3 keeps that one passing; the per-build
+      // total across every task and retry is capped separately (packages/hermes/config/spend-caps.json).
+      maxCostUsdPerRun: 3,
     }),
     modelSlots: ["builder", "evaluator"],
   },

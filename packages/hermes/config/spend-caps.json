@@ -1,0 +1,8 @@
+{
+  "_doc": "MVP M6 spend caps (docs/MVP-CUTLINE.md §4, docs/AI-COST-AUDIT.md). Read by packages/hermes/src/spendCaps.ts before EVERY model call in a Cockpit job, and shown by the Cockpit Costs page. perBuildUsd = total priced spend (metered + estimated) of one build run, across every retry and reopen (they keep the run id). weeklyUsd = total priced spend of the last 7 days. null = that cap is OFF. Money is Nick's decision (D5): the proposed values stay off until Huraira and Nick agree them; then set them here and bump version. A run over a cap is refused with SpendCapExceededError, never retried silently. Env WFACT_CAP_PER_BUILD_USD / WFACT_CAP_WEEKLY_USD override for one run (used by the seeded over-cap test).",
+  "version": "1.0.0",
+  "perBuildUsd": null,
+  "weeklyUsd": null,
+  "status": "off: amounts pending Huraira and Nick (2026-10-13)",
+  "proposed": { "perBuildUsd": 5, "weeklyUsd": 20 }
+}

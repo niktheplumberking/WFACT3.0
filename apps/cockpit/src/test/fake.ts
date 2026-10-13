@@ -190,5 +190,7 @@ export function fixtures(): Record<string, Row[]> {
     clients: [],
     model_usage_by_actor: [],
     model_traces: [],
+    model_cost_by_day: [],
+    model_cost_by_run: [],
   };
 }

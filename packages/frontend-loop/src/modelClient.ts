@@ -96,6 +96,12 @@ export class ClaudeModelClient implements ModelClient {
 export const AGENT37_RETRY_DELAYS_MS = [5_000, 15_000, 45_000];
 /** One call that takes longer than this is treated as no answer (and retried like one). Without it a hung gateway ran to the 30-minute job limit. */
 export const AGENT37_REQUEST_TIMEOUT_MS = 6 * 60_000;
+/**
+ * MVP M6: an output ceiling per call, so one runaway answer cannot bill without limit. The largest real builder
+ * answer was 29,969 output tokens (model_traces, 2026-09-30); a full site's content JSON fits well inside this.
+ * An answer cut off at the ceiling is thrown as an error, never parsed as if it were complete.
+ */
+export const AGENT37_MAX_OUTPUT_TOKENS = 32_000;
 
 class TransientGatewayError extends Error {}
 
@@ -153,6 +159,7 @@ export class Agent37ModelClient implements ModelClient {
         signal: AbortSignal.timeout(this.timeoutMs),
         body: JSON.stringify({
           model: "hermes-agent",
+          max_tokens: AGENT37_MAX_OUTPUT_TOKENS,
           messages: [
             { role: "system", content: system },
             { role: "user", content: user },
@@ -183,6 +190,9 @@ export class Agent37ModelClient implements ModelClient {
     if (data.usage) {
       this.totalUsage.promptTokens += data.usage.prompt_tokens ?? 0;
       this.totalUsage.completionTokens += data.usage.completion_tokens ?? 0;
+    }
+    if (choice.finish_reason === "length") {
+      throw new Error(`Agent 37 answer was cut off at the ${AGENT37_MAX_OUTPUT_TOKENS}-token output ceiling (finish_reason: length)`);
     }
     return choice.message.content;
   }

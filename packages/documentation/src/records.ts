@@ -30,7 +30,7 @@ export interface RunTraceRow {
   inputTokens: number;
   outputTokens: number;
   costUsd: number | null;
-  priceBasis: "metered" | "unpriced";
+  priceBasis: "metered" | "estimated" | "unpriced";
   outcome: "success" | "error";
   entitySlug: string | null;
 }
@@ -78,7 +78,7 @@ export class SupabaseRunRecordReader implements RunRecordReader {
 
   async traces(runId: string): Promise<RunTraceRow[]> {
     if (!UUID_RE.test(runId)) throw new RunRecordReadError(`runId must be a UUID, got ${JSON.stringify(runId)}`);
-    type Row = { id: string; occurred_at: string; task_id: string | null; actor: string; provider: string; model: string; input_tokens: number; output_tokens: number; cost_usd: number | string | null; price_basis: "metered" | "unpriced"; outcome: "success" | "error"; entity_slug: string | null };
+    type Row = { id: string; occurred_at: string; task_id: string | null; actor: string; provider: string; model: string; input_tokens: number; output_tokens: number; cost_usd: number | string | null; price_basis: "metered" | "estimated" | "unpriced"; outcome: "success" | "error"; entity_slug: string | null };
     const rows = await this.get<Row>(
       "model_traces",
       `run_id=eq.${runId}&order=occurred_at.asc,id.asc&select=id,occurred_at,task_id,actor,provider,model,input_tokens,output_tokens,cost_usd,price_basis,outcome,entity_slug`,

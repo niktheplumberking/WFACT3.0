@@ -26,14 +26,16 @@ test("an env override swaps the model with no code change; its price comes from 
   assert.equal(estimateCostUsd(unpriced, { inputTokens: 1000, outputTokens: 1000 }), null);
 });
 
-test("costForModel: metered for priced models, UNPRICED (not $0) for Agent 37's builder", () => {
+test("costForModel: metered for list-priced models, ESTIMATED for Agent 37, UNPRICED (not $0) for unknown models", () => {
   const haiku = costForModel("claude-haiku-4-5", { inputTokens: 882, outputTokens: 167 });
   assert.equal(haiku.basis, "metered");
   assert.equal(haiku.costUsd, 0.001717); // the live Stage 4 intake call: 882 in / 167 out at $1/$5
+  // MVP M6: Agent 37 publishes no rate, so it is priced at the $3/$15 estimate and labelled as one (counted by every cap).
   const agent37 = costForModel("hermes-agent", { inputTokens: 20_000, outputTokens: 3_000 });
-  assert.equal(agent37.basis, "unpriced");
-  assert.equal(agent37.costUsd, null);
+  assert.equal(agent37.basis, "estimated");
+  assert.equal(agent37.costUsd, 0.105);
   assert.equal(costForModel("never-heard-of-it", { inputTokens: 1, outputTokens: 1 }).basis, "unpriced");
+  assert.equal(costForModel("never-heard-of-it", { inputTokens: 1, outputTokens: 1 }).costUsd, null);
 });
 
 test("a malformed override is refused", () => {

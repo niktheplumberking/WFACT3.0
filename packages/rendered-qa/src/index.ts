@@ -7,7 +7,7 @@
  * Which reviewer runs comes from config/reviewer.json (see reviewer.ts).
  */
 import { createRenderedSuite, type RenderedQaOptions, type RenderedSuite } from "./rendered.js";
-import { createScreenshotReviewSuite, loadReviewerDecision, type ReviewerDecision, type ReviewerProvider, type ScreenshotReviewSuite } from "./reviewer.js";
+import { createScreenshotReviewSuite, loadReviewerDecision, type ReviewCallHooks, type ReviewerDecision, type ReviewerProvider, type ScreenshotReviewSuite } from "./reviewer.js";
 
 export interface ReviewerSetup {
   provider: ReviewerProvider;
@@ -27,6 +27,8 @@ export function reviewerFromEnv(env: NodeJS.ProcessEnv = process.env, decision: 
 
 export interface RenderedQaSetup extends RenderedQaOptions {
   reviewer: ReviewerSetup;
+  /** MVP M6: trace every reviewer call and check the spend caps before each one. */
+  reviewerHooks?: ReviewCallHooks;
   /** Vendor of the builder model, e.g. "agent37". A same-vendor reviewer needs the recorded approval. */
   builderVendor: string;
 }
@@ -47,6 +49,7 @@ export function createRenderedQa(setup: RenderedQaSetup): RenderedQa {
     builderVendor: setup.builderVendor,
     rulebook: setup.rulebook,
     shots: () => rendered.lastRun?.shots ?? [],
+    ...setup.reviewerHooks,
   });
   return { rendered, review };
 }

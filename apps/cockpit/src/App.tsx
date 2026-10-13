@@ -24,7 +24,7 @@ const NewRequest = lazy(() => import("./pages/Work").then((m) => ({ default: m.N
 const Activity = lazy(() => import("./pages/Activity"));
 const FixRounds = lazy(() => import("./pages/Activity").then((m) => ({ default: m.FixRounds })));
 const RunPage = lazy(() => import("./pages/Activity").then((m) => ({ default: m.RunPage })));
-const Costs = lazy(() => import("./pages/Misc").then((m) => ({ default: m.Costs })));
+const Costs = lazy(() => import("./pages/Costs").then((m) => ({ default: m.Costs })));
 const ComingSoon = lazy(() => import("./pages/Misc").then((m) => ({ default: m.ComingSoon })));
 const More = lazy(() => import("./pages/Misc").then((m) => ({ default: m.More })));
 const Settings = lazy(() => import("./pages/Misc").then((m) => ({ default: m.Settings })));

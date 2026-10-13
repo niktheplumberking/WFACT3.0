@@ -294,7 +294,8 @@ export interface TraceEvent {
   outputTokens: number;
   /** null ⇔ basis "unpriced" (enforced by a table constraint too). */
   costUsd: number | null;
-  priceBasis: "metered" | "unpriced";
+  /** "estimated" = priced from a rate the provider does not publish (Agent 37, migration 0020). */
+  priceBasis: "metered" | "estimated" | "unpriced";
   pricingVersion: string | null;
   latencyMs: number;
   outcome: "success" | "error";
@@ -366,7 +367,7 @@ export interface TraceOptions {
   /** Price lookup — callers pass Hermes-lite's `costForModel` (the one price table). */
   cost: (model: string, usage: { inputTokens: number; outputTokens: number }) => {
     costUsd: number | null;
-    basis: "metered" | "unpriced";
+    basis: "metered" | "estimated" | "unpriced";
     pricingVersion: string | null;
   };
   /** Actor for calls made outside any agent run. */
@@ -417,7 +418,7 @@ export function traceModelCalls<T extends object>(client: T, opts: TraceOptions)
       model: opts.model,
       inputTokens: usage.inputTokens,
       outputTokens: usage.outputTokens,
-      costUsd: price.basis === "metered" ? price.costUsd : null,
+      costUsd: price.basis === "unpriced" ? null : price.costUsd,
       priceBasis: price.basis,
       pricingVersion: price.pricingVersion,
       latencyMs: Date.now() - started,

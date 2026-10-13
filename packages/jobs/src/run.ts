@@ -17,7 +17,8 @@ import path from "node:path";
 import { auditReaderFromEnv, auditSinkFromEnv, traceSinkFromEnv } from "@wfact/audit";
 import { createSeedRegistry } from "@wfact/agent-runtime";
 import { resolveModelRoute } from "@wfact/hermes-lite/routing";
-import { traceModelClient } from "@wfact/hermes-lite/tracing";
+import { reviewerTraceHooks, traceModelClient } from "@wfact/hermes-lite/tracing";
+import { capCheckForCurrentRun, capModelClient, loadSpendCaps, SupabaseSpendLedger } from "@wfact/hermes-lite/spendCaps";
 import { stateReaderFromEnv } from "@wfact/hermes-lite/state";
 import { modelClientFromEnv as hermesModelFromEnv } from "@wfact/hermes-lite/modelClient";
 import { createFrontendBuilderAgent } from "@wfact/frontend-loop/agent";
@@ -65,22 +66,29 @@ function buildDeps(): HandlerDeps {
   const { store: planStore } = planStoreFromEnv();
   if (!audit || !reader || !traces || !planStore) throw new Error("audit/trace/plan stores need SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY");
   const actor = "job-runner";
+  // MVP M6: every model call in a job first checks the spend caps (config/spend-caps.json; off until the amounts are agreed),
+  // then is traced. The per-build cap reads the run's recorded spend, so retries and reopens all count against it.
+  const caps = loadSpendCaps();
+  const ledger = new SupabaseSpendLedger(url, serviceKey);
+  const traced = <T extends object>(client: T, method: "complete" | "completeJson", who: string = actor): T =>
+    capModelClient(traceModelClient(client, traces, who), method, caps, ledger);
+  const reviewerHooks = reviewerTraceHooks(traces, actor, capCheckForCurrentRun(caps, ledger));
 
-  const intakeModel = traceModelClient(new ClaudeJsonClient(resolveModelRoute("intake"), apiKey), traces, actor);
-  const plannerModel = traceModelClient(new ClaudeJsonClient(resolveModelRoute("planner"), apiKey), traces, actor);
+  const intakeModel = traced(new ClaudeJsonClient(resolveModelRoute("intake"), apiKey), "completeJson");
+  const plannerModel = traced(new ClaudeJsonClient(resolveModelRoute("planner"), apiKey), "completeJson");
   // Step 4B M2: the direction step (niche, brand direction, track recommendation) between Intake and Planner.
-  const directionModel = traceModelClient(new ClaudeJsonClient(resolveModelRoute("direction"), apiKey), traces, actor);
+  const directionModel = traced(new ClaudeJsonClient(resolveModelRoute("direction"), apiKey), "completeJson");
 
   const builder = modelClientFromEnv("builder");
   const reviewer = modelClientFromEnv("evaluator");
   // Step 7: the QA evaluator is chosen from config/evaluator.json in a different model family from the builder.
   const qa = evaluatorModelClientFromEnv(process.env, builder.client ? { avoid: modelIdentity(builder.client) } : {});
   if (!builder.client || !reviewer.client) throw new Error(`builder models unavailable: ${builder.reason ?? reviewer.reason}`);
-  const qaModel = qa.client ? traceModelClient(qa.client, traces, actor) : null;
+  const qaModel = qa.client ? traced(qa.client, "complete") : null;
   const artifacts = new SupabaseArtifactStore(url, serviceKey);
   const slugs = knownClientSlugs();
 
-  const qaAgent = createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client }));
+  const qaAgent = createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client, reviewerHooks }));
   // Step 5: the Documentation agent records every finished stage. On a runner the memory file is written to the
   // checkout (gone when the job ends); the durable copy is the agent's documentation.entry row in audit_log, which
   // `npm run document` (packages/documentation) later writes into clients/<slug>/memory.md exactly as recorded.
@@ -92,8 +100,8 @@ function buildDeps(): HandlerDeps {
   });
   const workflow: HandlerDeps["workflow"] = {
     frontEndAgent: createFrontendBuilderAgent({
-      builderModel: traceModelClient(builder.client, traces, actor),
-      evaluatorModel: traceModelClient(reviewer.client, traces, actor),
+      builderModel: traced(builder.client, "complete"),
+      evaluatorModel: traced(reviewer.client, "complete"),
     }),
     // Step 4B M1: claims gate + rendered QA + screenshot review, then the evaluator.
     qaAgent,
@@ -114,8 +122,8 @@ function buildDeps(): HandlerDeps {
     trackAWorkflow: {
       ...workflow,
       frontEndAgent: createTrackABuilderAgent({
-        builderModel: traceModelClient(builder.client, traces, actor),
-        evaluatorModel: traceModelClient(reviewer.client, traces, actor),
+        builderModel: traced(builder.client, "complete"),
+        evaluatorModel: traced(reviewer.client, "complete"),
       }),
     },
     // Step 4B M4: Track B plans: Agent 37 fills the Next.js starter's content, the static build runs with no
@@ -123,10 +131,10 @@ function buildDeps(): HandlerDeps {
     trackBWorkflow: {
       ...workflow,
       frontEndAgent: createTrackBBuilderAgent({
-        builderModel: traceModelClient(builder.client, traces, actor),
-        evaluatorModel: traceModelClient(reviewer.client, traces, actor),
+        builderModel: traced(builder.client, "complete"),
+        evaluatorModel: traced(reviewer.client, "complete"),
       }),
-      qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client, budget: TRACK_B_BUDGET })),
+      qaAgent: createQaEvaluatorAgent(productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client, budget: TRACK_B_BUDGET, reviewerHooks })),
     },
     workflow,
     readArtifact: (p) => artifacts.read(p),
@@ -139,7 +147,7 @@ function buildDeps(): HandlerDeps {
       if (!client) throw new Error("ANTHROPIC_API_KEY missing for Hermes-lite");
       const { reader: stateReader } = stateReaderFromEnv();
       // Step 6: tool and model calls go through the controller's PermissionGate (hermesAsk.ts).
-      return askHermesGated(question, { audit, stateReader, modelClient: traceModelClient(client, traces, "hermes-lite") });
+      return askHermesGated(question, { audit, stateReader, modelClient: traced(client, "complete", "hermes-lite") });
     },
   };
 }

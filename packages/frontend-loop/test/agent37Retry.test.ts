@@ -1,7 +1,7 @@
 /** Agent 37 client: transient gateway failures are retried with a hard cap; nothing else is. No network. */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Agent37ModelClient, AGENT37_RETRY_DELAYS_MS } from "../src/modelClient.js";
+import { Agent37ModelClient, AGENT37_MAX_OUTPUT_TOKENS, AGENT37_RETRY_DELAYS_MS } from "../src/modelClient.js";
 
 const ok = (content: string) =>
   new Response(JSON.stringify({ choices: [{ message: { content }, finish_reason: "stop" }], usage: { prompt_tokens: 3, completion_tokens: 2 } }), { status: 200 });
@@ -65,4 +65,19 @@ test("Step 4D: a call that hangs is cut off by the timeout and retried like a dr
   assert.equal(await c.complete(REQ), "page");
   assert.equal(calls, 2);
   assert.deepEqual(slept, [AGENT37_RETRY_DELAYS_MS[0]]);
+});
+
+test("MVP M6: every call carries the output ceiling; an answer cut off at it throws (tokens still counted), never retried", async () => {
+  let body: Record<string, unknown> = {};
+  const c = new Agent37ModelClient("https://gw.example/v1/", "k", {
+    fetchImpl: (async (_u: string, init: RequestInit) => {
+      body = JSON.parse(String(init.body));
+      return new Response(JSON.stringify({ choices: [{ message: { content: "{\"half\":" }, finish_reason: "length" }], usage: { prompt_tokens: 40000, completion_tokens: 32000 } }), { status: 200 });
+    }) as typeof fetch,
+    sleep: async () => {},
+  });
+  await assert.rejects(c.complete(REQ), /cut off at the 32000-token output ceiling/);
+  assert.equal(body.max_tokens, AGENT37_MAX_OUTPUT_TOKENS);
+  assert.equal(c.retries, 0);
+  assert.deepEqual(c.totalUsage, { promptTokens: 40000, completionTokens: 32000 }, "the paid tokens are still traced");
 });

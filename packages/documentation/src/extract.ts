@@ -117,7 +117,7 @@ export function extractStageDrafts(rowsIn: RunAuditRow[], traces: RunTraceRow[],
     const summary = isObj(agentEnd?.payload.summary) ? (agentEnd!.payload.summary as Record<string, unknown>) : {};
     const stageTraces = st.taskId ? traces.filter((t) => t.taskId === st.taskId) : [];
     const cost = {
-      meteredUsd: Math.round(stageTraces.reduce((s, t) => s + (t.priceBasis === "metered" && t.costUsd !== null ? t.costUsd : 0), 0) * 1e6) / 1e6,
+      meteredUsd: Math.round(stageTraces.reduce((s, t) => s + (t.priceBasis !== "unpriced" && t.costUsd !== null ? t.costUsd : 0), 0) * 1e6) / 1e6,
       calls: stageTraces.length,
       unpricedCalls: stageTraces.filter((t) => t.priceBasis === "unpriced").length,
       inputTokens: stageTraces.reduce((s, t) => s + t.inputTokens, 0),

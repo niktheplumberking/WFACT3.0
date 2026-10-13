@@ -50,7 +50,32 @@ test("with the approval: allowed, flagged, sent to the gateway without OpenAI-on
   assert.equal(calls[0]!.url, "https://gw.example/v1/chat/completions");
   assert.equal(calls[0]!.body.model, "hermes-agent");
   assert.equal(calls[0]!.body.response_format, undefined);
-  assert.equal(suite.calls[0]!.costUsd, null, "Agent 37 has no price on file: UNPRICED, not $0");
+  // MVP M6: Agent 37 is priced at the $3/$15 estimate (model-routing.json 1.4.0): 21,000 in / 900 out.
+  assert.equal(suite.calls[0]!.costUsd, 0.0765);
+});
+
+test("MVP M6: every reviewer call is reported to onCall (errors too), and beforeCall can refuse the call", async () => {
+  const { impl, calls } = gateway([{ content: "upstream broke", finish_reason: "error" }, { content: answer }]);
+  const seen: { outcome: string; inputTokens: number; error: string | null }[] = [];
+  let checks = 0;
+  const suite = createScreenshotReviewSuite({
+    provider: "agent37", apiKey: "k", baseUrl: "https://gw.example", builderVendor: "agent37", shots: () => shots, decision, fetchImpl: impl,
+    beforeCall: async () => { checks++; },
+    onCall: async (c) => { seen.push({ outcome: c.outcome, inputTokens: c.inputTokens, error: c.error }); },
+  });
+  const [r] = await suite.run(ctx);
+  assert.equal(r!.passed, true);
+  assert.equal(checks, 2);
+  assert.equal(seen.length, 2, "both paid calls recorded, including the one whose answer was unusable");
+  assert.equal(seen[0]!.inputTokens, 21000);
+
+  const refused = createScreenshotReviewSuite({
+    provider: "agent37", apiKey: "k", baseUrl: "https://gw.example", builderVendor: "agent37", shots: () => shots, decision, fetchImpl: impl,
+    beforeCall: async () => { throw new Error("Spend cap reached"); },
+  });
+  const before = calls.length;
+  await assert.rejects(refused.run(ctx), /Spend cap reached/);
+  assert.equal(calls.length, before, "no request sent once the cap refuses");
 });
 
 test("a different-vendor builder needs no approval and is not flagged", () => {

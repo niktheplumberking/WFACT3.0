@@ -28,7 +28,7 @@ import { productionQaOptions } from "@wfact/rendered-qa/production";
 import { TRACK_B_BUDGET } from "@wfact/rendered-qa/rendered";
 import { evaluatorModelClientFromEnv } from "@wfact/verification/modelClient";
 import { modelIdentity } from "@wfact/verification/crossModel";
-import { traceModelClient } from "@wfact/hermes-lite/tracing";
+import { reviewerTraceHooks, traceModelClient } from "@wfact/hermes-lite/tracing";
 import { knownClientSlugs } from "@wfact/verification/paths";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
 import { createDocumentationAgent, createDocumentationObserver, FileMemoryStore, registerDocumentationAgent, runRecordReaderFromEnv } from "@wfact/documentation";
@@ -137,7 +137,7 @@ async function main() {
     // Step 4B M1: claims gate + rendered QA + cross-vendor screenshot review, then the evaluator. Track B is
     // held to its own budget (LCP 2.5 s, its JS ceiling, the motion budget).
     qaAgent: createQaEvaluatorAgent(
-      productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client, ...(track === "B" ? { budget: TRACK_B_BUDGET } : {}) }),
+      productionQaOptions({ evaluatorModel: qaModel, builderVendor: builder.client.name, builderModel: builder.client, reviewerHooks: reviewerTraceHooks(traceSink, "cli:build-and-verify"), ...(track === "B" ? { budget: TRACK_B_BUDGET } : {}) }),
     ),
     registry,
     audit: sink,

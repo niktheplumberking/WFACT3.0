@@ -18,6 +18,7 @@ import type { ModelClient } from "@wfact/verification/modelClient";
 import { assertCrossModelSeparation, identityFromVendor, modelIdentity, type Separation } from "@wfact/verification/crossModel";
 import { createRenderedQa, reviewerFromEnv } from "./index.js";
 import type { Budget } from "./rendered.js";
+import type { ReviewCallHooks } from "./reviewer.js";
 
 export interface ProductionQaSetup {
   evaluatorModel: ModelClient | null;
@@ -30,6 +31,8 @@ export interface ProductionQaSetup {
   env?: NodeJS.ProcessEnv;
   /** The track's budget (TRACK_A_BUDGET by default; TRACK_B_BUDGET, with its motion budget, for Track B). */
   budget?: Budget;
+  /** MVP M6: the job runner traces every screenshot-review call into model_traces and checks the spend caps first. */
+  reviewerHooks?: ReviewCallHooks;
 }
 
 /** Throws CrossModelViolationError when the evaluator would be the builder's instance or model family. */
@@ -47,6 +50,7 @@ export function productionQaOptions(setup: ProductionQaSetup): QaEvaluatorAgentO
     reviewer: reviewerFromEnv(env),
     builderVendor: setup.builderVendor,
     ...(setup.budget ? { budget: setup.budget } : {}),
+    ...(setup.reviewerHooks ? { reviewerHooks: setup.reviewerHooks } : {}),
   });
   return {
     evaluatorModel: setup.evaluatorModel,
