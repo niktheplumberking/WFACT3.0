@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-12 (+05), via `/step-close 21` (MVP M5 launch files): `9968019` on `huraira-work`, not pushed, so no CI yet. Local: typecheck clean in frontend-loop, verification, workflow, jobs, rendered-qa; tests frontend-loop 77, verification 103, workflow 33, jobs 24, rendered-qa 52, all pass. Live: migration `0019_artifacts_png` applied to `mcaxxhgjptwowwrluhra` and confirmed by SQL (bucket still private, 2 MB, `image/png` added).
+Last synced: 2026-10-13 (+05), via `/step-close 12` (MVP M6 cost control): `2223856` on `huraira-work`, not pushed, so no CI yet. Local: typecheck clean in 8 packages and the Cockpit; tests hermes 56, audit 14, agent-runtime 39, frontend-loop 77, documentation 18, jobs 24, workflow 33, verification 100, planning 32, rendered-qa 57, Cockpit 75 (incl. 8 new Costs tests), all pass; Cockpit production build OK. Independent review (separate agent) found no defects; its one latent finding (a blank cap variable read as "off") is fixed. Live: migration `0020_model_cost_m6` applied to `mcaxxhgjptwowwrluhra` and confirmed by SQL (new checks, 27 runs in `model_cost_by_run`, RLS on). Agent 37 probe: HTTP 402 "AI credits exhausted".
+Previous sync: 2026-10-12 (+05), via `/step-close 21` (MVP M5 launch files): `9968019` on `huraira-work`, not pushed, so no CI yet. Local: typecheck clean in frontend-loop, verification, workflow, jobs, rendered-qa; tests frontend-loop 77, verification 103, workflow 33, jobs 24, rendered-qa 52, all pass. Live: migration `0019_artifacts_png` applied to `mcaxxhgjptwowwrluhra` and confirmed by SQL (bucket still private, 2 MB, `image/png` added).
 Previous sync: 2026-10-12, via `/progress-sync`. Re-synced after `072b391`: no commits since 2026-10-07 on any branch (local, `origin/huraira-work`, `origin/main` all at `072b391`; one worktree), so no tests were re-run. The uncommitted D3 docs (`docs/MVP-CUTLINE.md`, CLAUDE.md, HANDOFF, INDEX, this file) were folded in, and the Factory Completion Plan was restructured (closed steps 1, 2, 3, 5, 6, 7 moved to "Closed steps"; a Next action plus a continuation or verification prompt on every open step). CI: the three runs the last sync could not confirm are now settled. `37652704145` (`01f6c9e`) succeeded, including the deploy. `37653665566` (`7cb475a`), `37653814793` (`113276a`) and `37653952730` (`072b391`) passed every test job, but their **Deploy Cockpit to Vercel** job failed with 0 steps and no runner (it never started). Live: Cockpit HTTP 200 (2026-10-12), serving the `01f6c9e` deploy; app code equals `072b391` (`git diff 01f6c9e 072b391 -- apps packages` is empty). Supabase: 24 jobs, last 2026-10-07 17:14 UTC, 0 queued or running; 114 `model_traces` rows; latest migration still `build_recovery` 20261007144150. One live build after the last sync: Track A `b880a7d5` (see Step 4B). Not checked: Agent 37 gateway, signed-in Cockpit, Doppler.
 Previous sync: 2026-10-07 (21:40 +05), via `/progress-sync` — folded in the alignment pass `ec71c89`…`113276a` (docs, plan order, decisions D1/D2; no application code changed). Both branches at `113276a`. Evidence this sync: local re-run typecheck clean for all 10 packages and the Cockpit; tests agent-runtime 39, audit 14, documentation 18, hermes 48, jobs 24, media 8, planning 32, verification 100, workflow 33, frontend-loop 75, Cockpit 67 all pass (rendered-qa not re-run locally). CI: `37651786532` (`fa12bbe`) success and `37651306672` (`122c071`) success; `37652704145`, `37653665566` and `37653814793` (the last three doc commits) were still running at sync, so they are NOT confirmed green. Live: Cockpit HTTP 200; Supabase `mcaxxhgjptwowwrluhra` migrations list ends `0017_model_traces_openai` then `build_recovery` (20261007144150, which is repo file `0018_build_recovery.sql` under a different name; 0016 is absent live too). Not checked: signed-in Cockpit, Doppler, GitHub secrets.
 Previous sync: 2026-10-07 (20:45 +05), via `/progress-sync` — folded in `a3198d8`…`a643d2d` (Step 4D). Both branches at `a643d2d`; CI green `37644039022` (all jobs incl. Rendered QA 14 min, Deploy Cockpit to Vercel success); the first Step 4D CI `37638990031` FAILED on one test of mine (event loop ended before the Agent 37 timeout fired on the runner), fixed in `a643d2d`. Live: Cockpit HTTP 200 and the deployed bundle contains the new recovery copy ("Save the details and continue"); database latest migration `0018_build_recovery` (20261007144150), 0 queued/running jobs, 0 plan_inputs rows, 23 jobs total.
@@ -23,7 +24,14 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-12, evening)**: MVP M5 (launch files for both starters) is built in `9968019`, which makes Step 21 **PARTIAL** (verification pending: CI on push, one live launch-stage build with a real address). Everything else below still holds. **Earlier the same day**: Day 3 of the 5-day MVP window (D3, due Wed 2026-10-14). **No MVP item in `docs/MVP-CUTLINE.md` §2 had started**: Nick's Bennett & Co brief is not in the repo, the cost cap awaits Huraira's yes, and OpenAI has no credits. No code has changed since 2026-10-07. The one new live fact: Track A re-run `b880a7d5` passed every deterministic check but stopped because the Agent 37 design reviewer was unreachable (HTTP 502). Pressing "continue" on it would close the Track A half of 4B M4 and prove Step 4D live. The MVP date is at risk until the brief arrives. Earlier summary (2026-10-07) follows.
+**Status summary (2026-10-13)**: MVP M6 (cost control) is built in `2223856`, which makes Step 12 **PARTIAL**.
+- **Agent 37 priced:** priced as an estimate ($3/$15). The screenshot reviewer is now traced, and builder answers have a 32k output ceiling.
+- **Spend caps:** the per-build and weekly caps are built, but switched OFF until Huraira and Nick agree the amounts.
+- **Cockpit:** the Costs page shows the true total.
+- **Audit (`docs/AI-COST-AUDIT.md`):** real AI spend to date is about **$14.70**, of which the Cockpit showed only $1.33. Agent 37 carries 87% of all tokens.
+- **New blocker:** Agent 37 answers HTTP 402 "AI credits exhausted", so no build can run until it is topped up.
+
+**Earlier (2026-10-12, evening)**: MVP M5 (launch files for both starters) is built in `9968019`, which makes Step 21 **PARTIAL** (verification pending: CI on push, one live launch-stage build with a real address). Everything else below still holds. **Earlier the same day**: Day 3 of the 5-day MVP window (D3, due Wed 2026-10-14). **No MVP item in `docs/MVP-CUTLINE.md` §2 had started**: Nick's Bennett & Co brief is not in the repo, the cost cap awaits Huraira's yes, and OpenAI has no credits. No code has changed since 2026-10-07. The one new live fact: Track A re-run `b880a7d5` passed every deterministic check but stopped because the Agent 37 design reviewer was unreachable (HTTP 502). Pressing "continue" on it would close the Track A half of 4B M4 and prove Step 4D live. The MVP date is at risk until the brief arrives. Earlier summary (2026-10-07) follows.
 
 Step **4D (build recovery) is PARTIAL**: built, migration 0018 applied live (attack test 26/26), pushed and deployed (CI `37644039022` green); the live "continue" button has not been pressed on a real stopped build yet. (Corrected 2026-10-07 in the alignment pass; this line previously said "not applied, not pushed".) On the Factory Completion Plan, Steps 1, 2, 3, 3A, **5, 6 and 7 are DONE** (5 and 7 on 2026-10-07: 5 proven on live
 Cockpit builds, 7 CI `37617845669` green); Step 4 is PARTIAL (preview superseded by 4B M6); **Step 4B is IN PROGRESS**, about 90% through M4:
@@ -35,7 +43,14 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-12 evening, after `/step-close 21`):
+**Next up** (2026-10-13, after `/step-close 12`):
+1. **Huraira**:
+   - Top up Agent 37 (HTTP 402 today).
+   - Agree the cap amounts with Nick ($5 per build and $20 per week proposed).
+   - Say whether to push `2223856`. CI and the Cockpit deploy then prove it. M5 is already pushed: CI `38427074538` is green and the deploy ran.
+2. **Agent, on GO**: Step 27's one-page motion-budget design, or set the agreed caps and run the M6 verification prompt (Step 12).
+3. **Nick**: Bennett & Co brief, logo, colours, live address, CRM target, credits.
+Earlier list (2026-10-12 evening, after `/step-close 21`):
 1. **Huraira**: review the M5 report; say whether to push `9968019` (CI then proves it; the Cockpit deploy job must run this time); give the cost-cap yes so M6 can start; send Nick the cut-line questions, now including the live site address (needed for canonical, sitemap and og:image).
 2. **Agent, on GO**: MVP M6 (per-build cap, Agent 37 priced) if the cap is approved, else Step 27's one-page motion-budget design.
 3. **Nick**: Bennett & Co brief, logo, colours, live address, CRM target, credits.
@@ -46,6 +61,16 @@ Earlier list (2026-10-12 morning):
 After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bundle, Health room). Deferred: Steps 15, 16, 24; e-commerce out of scope.
 
 **Gaps noticed**:
+- **Agent 37 credits are exhausted** (HTTP 402, probe 2026-10-13). No build, and no screenshot review, can run until it is topped up.
+- **Token savings not yet built** (`docs/AI-COST-AUDIT.md` §3B, after the MVP). Each one is measured against the Step 26 calibration set before it ships:
+  - prompt caching;
+  - builder fixes that send only the failing sections;
+  - screenshot review of changed pages only;
+  - a QA evaluator that does not resend the whole HTML;
+  - a Hermes-lite memory summary instead of the full file.
+- **Timeouts still re-billed:** an Agent 37 call that times out after 6 minutes is still retried (the Step 4D reliability fix), so it can be billed twice. Revisit after the MVP.
+- **Thin output headroom:** the Agent 37 output ceiling (32k) is only 6% above the largest real answer, 29,969 tokens. A gateway with credits is needed to test a higher ceiling.
+- **Standalone QA job not covered by the per-build cap:** it runs with no run id (`handlers.ts:288`), so only the weekly cap applies to it.
 - **The live address must be supplied for launch**: without the brief's `siteUrl` (or an owner fact `site_url`) the launch-stage checks tells.canonical, tells.og-image and tells.sitemap fail by design; there is no Cockpit field for it yet. Add it to the Bennett intake.
 - **The share card is a plain colour card** (brand deep colour, accent rule, no text or logo). Replace it with a designed card from the client's own assets when supplied.
 - **No favicon in either starter** (tells.favicon, advisory). Small; could ride with the Bennett logo.
@@ -1033,3 +1058,28 @@ Not yet: a live build with a real address at stage `launch`.
 
 **Exit check** (MVP M5): "Step 7 launch-stage checks pass on the output". **PARTIALLY MET**: they pass on both starters' output in tests with
 an address; not yet on a live build.
+
+## Step 12 — Cost governance per client (PARTIAL 2026-10-13 — MVP M6 slice built in `2223856`; caps off pending amounts)
+
+Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 to the MVP M6 slice (`docs/MVP-CUTLINE.md` §2 M6, §4). Audit and plan: `docs/AI-COST-AUDIT.md`. Huraira 2026-10-13: Agent 37 priced at the $3/$15 estimate; cap amounts to be agreed with Nick; build M6 plus the Cockpit costs page now.
+
+- [x] **Agent 37 priced:** priced as an estimate, recorded as `price_basis 'estimated'` (`model-routing.json` 1.4.0; migration `0020_model_cost_m6`, applied live and confirmed by SQL). Evidence: `hermes/test/routing.test.ts`.
+- [x] **Per-role ceilings count Agent 37:** the builder ceiling went from $1 to $3, because the worst real builder task was $2.75 at the estimate (`agent-runtime/src/registry.ts`).
+- [x] **Screenshot reviewer traced:** every reviewer call writes a `model_traces` row, errors included. Evidence: `rendered-qa/test/reviewerAgent37.test.ts`.
+- [x] **Agent 37 output ceiling:** 32,000 tokens; a cut-off answer throws, and its tokens are still counted. Evidence: `frontend-loop/test/agent37Retry.test.ts`.
+- [x] **Spend caps:** per-build and weekly caps, checked before every model call in a Cockpit job, failing closed. Evidence: `hermes/test/spendCaps.test.ts`, which refuses a seeded over-cap build with no model call.
+- [ ] **Cap amounts set:** both caps are OFF in `config/spend-caps.json` until Huraira and Nick agree them (D5).
+- [x] **Cockpit Costs page:** shows the true total with estimates labelled, the caps, spend by day, client, model and build, and the biggest calls. The Run page shows each build's spend; owners only. Evidence: `apps/cockpit/src/costs.test.tsx`, 8 tests.
+- [ ] **Pushed:** not pushed, so there is no CI and no deploy yet.
+- [ ] **Live build:** none yet. It is blocked: Agent 37 answers HTTP 402.
+
+**Verification**:
+- Local typecheck is clean, and every package suite passes (counts in the sync line).
+- The Cockpit build works.
+- A separate review agent found no defects in the wrapping order, reviewer recording, basis handling, cost arithmetic or SQL. Its one latent issue (a blank env var read as "cap off") is fixed.
+
+**Exit check** (`docs/MVP-CUTLINE.md` M6: "A seeded over-cap run is refused; the cost per build is recorded"): **PARTIALLY MET**.
+- Met in tests: the seeded refusal.
+- Met in the live views: cost per build is recorded (`model_cost_by_run`).
+- Not yet proven live: CI, the deploy, a live build, and the agreed cap amounts.
+

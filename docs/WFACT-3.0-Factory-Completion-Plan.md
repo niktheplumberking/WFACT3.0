@@ -19,8 +19,8 @@ pending, so it stays open with a verification prompt. Step 4 is **PARTIAL** (clo
 Track A re-run `b880a7d5` (plan `b5a45a8e`, 2026-10-07 17:14 UTC) passed every deterministic check, but the required design review could not
 run (Agent 37 HTTP 502, 4 attempts). Track B `4acbde1f` has not been re-run. M5 is blocked on Higgsfield credits and M6 has not started.
 Step 4C is **BUILT AND DEPLOYED**, with the signed-in check pending. Step 4D is **PARTIAL**: deployed, but the live "continue" has not been
-run (`b880a7d5` is the ready candidate). Step 21 is **PARTIAL** (launch files, MVP M5, `9968019`; verification pending). Steps 8–20 and 22–27 are not started. **Decision D3 (MVP on Bennett & Co by 2026-10-14) overrides the order**:
-Nick's brief is not in the repo (no `clients/bennett*`); of the MVP items in `docs/MVP-CUTLINE.md` §2 only M5 (launch files) is built. Each step heading below
+run (`b880a7d5` is the ready candidate). Step 12 is **PARTIAL** (MVP M6 slice `2223856`, 2026-10-13: Agent 37 priced as an estimate, screenshot reviewer traced, caps built but off pending the amounts, Cockpit Costs page; migration 0020 live; not pushed). Step 21 is **PARTIAL** (launch files, MVP M5, `9968019`; verification pending). Steps 8–11, 13–20 and 22–27 are not started. **Decision D3 (MVP on Bennett & Co by 2026-10-14) overrides the order**:
+Nick's brief is not in the repo (no `clients/bennett*`); of the MVP items in `docs/MVP-CUTLINE.md` §2 M5 (launch files) and M6 (cost control) are built. Each step heading below
 carries its status; Part E is the checklist.
 
 ## How to use this file
@@ -664,14 +664,41 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 12 — Cost governance per client (P2) — NOT STARTED
+### STEP 12 — Cost governance per client (P2) — PARTIAL 2026-10-13, MVP M6 slice built in `2223856`, caps off pending amounts
 
 **Realignment note (2026-10-07)**: include a price basis or a token ceiling for Agent 37 calls (`model_traces.cost_usd` is null; ~190k tokens per builder run are invisible to every USD ceiling). Pull ahead of Step 9 if Huraira approves Part F decision D2.
 
 **Depends on**: Steps 10 and 11.
 **Maps to**: Blueprint §3 (cost control), Fuel Gauges / Cost Sentinel "extend into Cost Governance"; goal 4.
 
-**Next action (2026-10-12)**: D3 pulls one slice into the MVP (`docs/MVP-CUTLINE.md` §4, item M6): give Agent 37 a price basis, a $5 hard cap per build across retries, and a $20 weekly cap. **Waits on Huraira's yes on the cap and Nick's sign-off (D5)**. Do that slice with this prompt's per-run budget-guard part only. Everything else in Step 12 waits until after the MVP.
+**Done (2026-10-13, MVP M6 slice, `2223856`; audit in `docs/AI-COST-AUDIT.md`)**:
+- **Agent 37 priced:** `hermes-agent` is priced at the $3/$15 estimate (`model-routing.json` 1.4.0, basis `estimated`, migration 0020 applied live). Every per-role ceiling now counts it, so the builder ceiling went from $1 to $3: the worst real task at the estimate was $2.75.
+- **Screenshot reviewer traced:** each call now writes a `model_traces` row (hooks in `rendered-qa/src/reviewer.ts`, `hermes/src/tracing.ts`).
+- **Agent 37 output ceiling:** `max_tokens` 32,000, and a cut-off answer throws.
+- **Spend caps:** `hermes/src/spendCaps.ts` adds a per-build cap (by run id, so retries and reopens count) and a weekly cap. They are checked before every model call in a Cockpit job and fail closed if spend cannot be read. The seeded over-cap test is refused with no model call (`hermes/test/spendCaps.test.ts`). Both caps are OFF (`config/spend-caps.json`, null) until Huraira and Nick agree the amounts (D5); $5 and $20 are proposed.
+- **Cockpit:** the Costs page shows the true total with estimates labelled, the cap gauges, spend by day, client, model and build, and the biggest calls. The Run page shows each build's spend.
+
+**Left:**
+- Agree the cap amounts, set them in `spend-caps.json`, and bump its version.
+- Push. CI and the Cockpit deploy then prove it.
+- One live build. It must write `estimated` rows and reviewer rows. It is blocked today: Agent 37 answers HTTP 402 "AI credits exhausted" (probe 2026-10-13).
+- The rest of Step 12 (per-client budgets and alerts) waits until after the MVP.
+
+**Next action**: Huraira and Nick set the cap amounts, Huraira tops up Agent 37 and pushes, then verify with the prompt below.
+
+Verification prompt (MVP M6):
+```
+Verify MVP M6 (Step 12 slice, commit 2223856). Do not rebuild it.
+1. CI on the pushed commit: every job green, including the Cockpit deploy.
+2. Signed in as owner, open /costs on the live Cockpit. The total must match a SQL sum over model_traces
+   (priced rows plus unpriced hermes-agent rows at $3/$15). The caps panel must say Off, or show the
+   agreed amounts.
+3. After the next live build: its rows have price_basis 'estimated' for hermes-agent, the screenshot
+   reviewer has rows of its own, and the Run page shows that build's spend.
+4. With the caps set: run one job with WFACT_CAP_PER_BUILD_USD set below the run's recorded spend.
+   It must fail with "Spend cap reached" and write no new model_traces row.
+Fix only the gaps you find, then run /step-close 12.
+```
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
@@ -1436,7 +1463,7 @@ is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler 
 | 9 | Cockpit: status and System room | not started | | |
 | 10 | Cockpit: Agents and Workflows | not started | | |
 | 11 | Model routing and second model | not started | | |
-| 12 | Cost governance per client | not started | | |
+| 12 | Cost governance per client | **PARTIAL** (MVP M6 slice `2223856`, migration 0020 live, tests pass locally; caps built but off until the amounts are agreed; not pushed, no CI; live build blocked by Agent 37 HTTP 402) | 2026-10-13 | |
 | 13 | Remaining core agents (A–E) | not started | | |
 | 14 | Cockpit: Memory and Human Control | not started | | |
 | 15 | Cognee trial write-up | not started | | |
