@@ -19,9 +19,9 @@ Part D; open steps carry a **Next action** line and a continuation or verificati
 and deployed (`3e493f6`, CI `38569635936`; migration 0022 live, attack test 11/11); Package 2 (Track B starter 1.4.0: logo, accent,
 phone action, motion; four new rendered checks) green in CI and deployed (`d112f62`); Package 3 (image slots and labelled
 placeholders, migration 0023 live) built and verified locally (`7e30b09`); Package 4 (Cockpit v2 rebuild to the locked design in
-`docs/design/cockpit-v2/`) phases 1–3 of 9 built: tokens `4a50b22` and components `a8fa3cf` CI-green and deployed (CI `38588413325`),
-shell `8532f4e` verified locally; Package 5 open. A caps conflict and three role conflicts (design vs RLS) wait on Nick
-(`BLOCKED-ON-NICK.md`).
+`docs/design/cockpit-v2/`) phases 1–4 of 9 built: tokens `4a50b22` and components `a8fa3cf` CI-green and deployed (CI `38588413325`),
+shell `8532f4e` and the six-step path `fd020a5` verified locally (the shell's first CI failed on a test race, fixed); Package 5 open.
+A caps conflict, three role conflicts (design vs RLS) and a missing site-approval record wait on Nick (`BLOCKED-ON-NICK.md`).
 
 **Status as of 2026-10-14**: the evidence moved on Steps 4D, 12 and 26, but no status changed:
 - **Step 4D**: the one-press continue is proven live on Summit `63278e56` and Lanternworks `e2a204fb`. The missing-facts form is still unproven live.
@@ -1361,7 +1361,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–3 of 9 built, 1–2 CI-green and deployed
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–4 of 9 built, 1–2 CI-green and deployed
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1413,8 +1413,10 @@ Track A 1.4.0, content `track-b/2` and `track-a/2`, both upgraded from v1 on rea
   workflow 44, jobs 34, planning 42, Cockpit 124 plus build. Screenshots at 1440 and 375.
 - Not done: no live build; an uploaded image's real use in a paid build is proven only in Package 5.
 
-**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–3 of 9 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
-every job and deployed, live Cockpit serves v2, `theme-color #F4F2ED`, HTTP 200; `8532f4e` phase 3, verified locally, not pushed). Source of truth: `docs/design/cockpit-v2/` (locked 2026-10-14); the build prompt is
+**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–4 of 9 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
+every job and deployed, live Cockpit serves v2, `theme-color #F4F2ED`, HTTP 200; `8532f4e` phase 3 pushed in `a87e6db`, whose CI
+`38591851925` FAILED in the Cockpit job on a test race (sign-out test read the button before the lazy Settings page loaded), fixed in
+the test; `fd020a5` phase 4; re-push pending CI). Source of truth: `docs/design/cockpit-v2/` (locked 2026-10-14); the build prompt is
 `docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md` (phases: tokens, components, shell, `path.ts`, then each screen).
 - Phase 1 tokens (`4a50b22`): v2 light/dark values, four accents, density, type scale, motion, reduced motion (device or in-app),
   text-size zoom; `lib/appearance.ts`; Newsreader. `tokens.test.ts` proves the locked values and 4.5:1 for every text, status and
@@ -1439,12 +1441,18 @@ every job and deployed, live Cockpit serves v2, `theme-color #F4F2ED`, HTTP 200;
   375 px `scrollWidth` 375, no target under 44 px; palette by keyboard in the browser; 125% text size zooms the shell.
 - Roles follow RLS where the design disagrees (logged for Nick, then Huraira): PMs get no Activity (`audit_log`/`jobs` owner/admin),
   admins no Costs (`model_traces` owner only), and the PM "cost so far" line has no readable source.
-- Not done: phases 4–9 (`path.ts`, every screen); no Lighthouse run yet (needs the rebuilt rooms); phase 3 not pushed.
+- Phase 4 path (`fd020a5`): `src/lib/path.ts` `derivePath()` gives step, state, tone, waiting on, sentence, next line and one next
+  action for each client from the plan, its details, its jobs and the project stage; Details needed names what is missing with real
+  counts; stops use the design's 8-case fix labels (`fixLabel`), credit and setup wait on Huraira, the spending limit is the owner's;
+  `stripSteps()` gives the six strip cells. Evidence: `path.test.ts` 22 tests (every step, roles, resume, stale, cancelled, spend,
+  banned words), Cockpit 197/197. Not used by a screen yet (phase 5 onward).
+- No source for a recorded site approval: `path.ts` supports "Approved, waiting for launch" but nothing records it (logged).
+- Not done: phases 5–9 (every screen); no Lighthouse run yet (needs the rebuilt rooms).
 
-**Next action**: Huraira reviews the Package 4 phase 3 report and gives GO for phase 4 (`src/lib/path.ts`, the six-step path, with
-tests). Nick answers the caps conflict and the role conflicts. Package 5: see the source doc; prompt unchanged.
+**Next action**: Huraira reviews the Package 4 phase 4 report and gives GO for phase 5 (the Home screen). Confirm CI green on the
+re-push. Nick answers the caps, role and site-approval questions. Package 5: see the source doc; prompt unchanged.
 
-Continuation prompt — updated 2026-10-14, after phase 3 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
+Continuation prompt — updated 2026-10-14, after phase 4 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
 ```
 You are a senior front-end engineer in the WFACT 3.0 monorepo, branch huraira-work. Read CLAUDE.md, then
 docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md (the full brief: hard rules, locked decisions, tokens,
@@ -1465,10 +1473,11 @@ ALREADY DONE (do not redo):
   $20 per rolling 7 days, every call). Until he decides, every money line uses costLine()/buildStopLine(), never a figure.
 - Logged for Nick, then Huraira: role conflicts. The UI follows RLS: no Activity for PMs, no Costs for admins, no PM cost line.
 - The transitional alias block in tokens.css stays until the last pre-v2 page is rebuilt (phase 9); then delete it.
+- Phase 4 path, fd020a5: src/lib/path.ts derivePath() / stripSteps() / fixLabel() / latestBuild() / knownNeeds(), tests in
+  src/lib/path.test.ts. Every screen reads the step, sentence, next line and next action from it; never re-derive them.
+- Logged: no place records a site approval yet; pass siteApprovedAt null until it exists (needed by phase 9).
 
 LEFT, in order (each a separate commit, then /step-close 28 and STOP for GO):
-4. src/lib/path.ts + tests: the six-step path from plan, inputs and job state (brief §5), copy verbatim from
-   Cockpit.dc.html (stripLines, pjNext, client next strings).
 5–9. Screens in the brief's order (§6), each with empty, loading, running, waiting, stopped and success states; the 8 stop
    cases mapped to diagnoseJob().cause; owner-only gates; PM view.
 Every phase: npm test green; screenshots at 1440x900 and 375x812, light and dark, beside the matching frame in
@@ -1649,7 +1658,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | not started | | |
 | 26 | Quality calibration | **PARTIAL**: item 1 built (`67033f7`, Anthropic screenshot reviewer, local live review passed 32 s / $0.071); Cockpit trace row pending | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
-| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09` (+ CI fixes `301e6d6`, `ba3c41c`), CI `38585878100` green and deployed: image slots, placeholder cards, migration 0023 live, attack test 19/19. Package 4 (Cockpit v2 to the locked design): tokens `4a50b22` and components `a8fa3cf`, CI `38588413325` green and deployed (live serves v2); shell `8532f4e` verified locally (175 tests, axe 0 owner/PM, light/dark, 1440/375), not pushed. Phases 4–9 and Package 5 open; caps and role conflicts with Nick) | 2026-10-14 | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09` (+ CI fixes `301e6d6`, `ba3c41c`), CI `38585878100` green and deployed: image slots, placeholder cards, migration 0023 live, attack test 19/19. Package 4 (Cockpit v2 to the locked design): tokens `4a50b22` and components `a8fa3cf`, CI `38588413325` green and deployed (live serves v2); shell `8532f4e` (axe 0 owner/PM, light/dark, 1440/375; its CI `38591851925` failed on a test race, fixed) and path `fd020a5` (22 tests), 197 tests locally, re-push CI pending. Phases 5–9 and Package 5 open; caps, role and site-approval questions with Nick) | 2026-10-14 | |
 
 **Goal tracker (Blueprint §16K)**
 
