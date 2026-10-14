@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-14 (+05), via the Step 25 rehearsal (D4): `67033f7` fixes the design review that halted every build since 2026-10-07 (Node's 300 s fetch header limit, reproduced at 301,008 ms; reviewer moved to Anthropic, `reviewer.json` 1.1.0), the direction-step truncation (2048 to 6144) and the review payload (15 images for 5 pages, was 35). Tests: rendered-qa 70/70, planning 33, frontend-loop 77, hermes 55, jobs 24, workflow 33. Live: Anthropic review on Summit Track A passed in 32 s ($0.071); Lanternworks rehearsal build `83f2841f` and Summit resume `63278e56` stopped on the old reviewer. CI for `67033f7` pending at sync.
+Last synced: 2026-10-14 (00:45 +05), via `/progress-sync`. Re-synced after `67033f7`, `d5129e0`, `a9b271f`, `92fd4ac`. **Push state:** `origin/main` and `origin/huraira-work` are at `d5129e0`; `a9b271f` (test fix) and `92fd4ac` (docs) are local only. **CI:** `38452956084` on `d5129e0` FAILED in Rendered QA only (Node 22 cancelled reviewer tests 35-40), so the Cockpit deploy was skipped. `a9b271f` fixes it: `test/reviewer.test.ts` 18/18 re-run locally on Node 24; not yet proven on Node 22 or CI. **Live** (Supabase `mcaxxhgjptwowwrluhra`, read-only SQL): 30 jobs, 0 queued or running, 141 `model_traces` rows, latest migration 20261013162735 (0020). The Cockpit job runner runs from `main` (`d5129e0` includes `67033f7`), so the new reviewer is live even though the deploy job was skipped. Cockpit "continue" job `e2a204fb` (resume of the Lanternworks Track B build `83f2841f`, run `4c35703b`, GitHub run `38453886170`) ran QA end to end. It wrote 5 successful `anthropic` `agent:qa-evaluator` rows ($0.438) and 0 NOT RUN reviews. The site was reused with no builder call before the first review. It then halted at 19:40 UTC with `failed_verification` after 2 revisions, on named evaluator issues: the supplied logo is never embedded, and colours are outside the brief. `account_requests` and `plan_inputs` both have 0 rows. Not checked: signed-in Cockpit (Run page spend), Doppler, the Agent 37 gateway itself.
+Previous sync: 2026-10-14 (+05), via the Step 25 rehearsal (D4): `67033f7` fixes the design review that halted every build since 2026-10-07 (Node's 300 s fetch header limit, reproduced at 301,008 ms; reviewer moved to Anthropic, `reviewer.json` 1.1.0), the direction-step truncation (2048 to 6144) and the review payload (15 images for 5 pages, was 35). Tests: rendered-qa 70/70, planning 33, frontend-loop 77, hermes 55, jobs 24, workflow 33. Live: Anthropic review on Summit Track A passed in 32 s ($0.071); Lanternworks rehearsal build `83f2841f` and Summit resume `63278e56` stopped on the old reviewer. CI for `67033f7` pending at sync.
 Previous sync: 2026-10-13 (22:45 +05), via `/progress-sync`. Re-synced after `76e9d6c` (graphify and completion notes only, no code); no step changed status. Both branches and `origin/main` at `76e9d6c`. CI: `38437214851` (`c97e329`) and `38438423293` (`76e9d6c`) succeeded, every job including Deploy Cockpit to Vercel. Live: Cockpit HTTP 200; Supabase `mcaxxhgjptwowwrluhra` has 25 jobs, last 2026-10-12 18:01 UTC, 0 queued or running; 117 `model_traces` rows; latest migration 20261013162735 (0020). No build since the last sync, so M6's new trace rows are still unproven live. Nick's Bennett & Co brief is still not in the repo (no `clients/bennett*`) the day before the MVP deadline (2026-10-14). Not checked: signed-in Cockpit, Agent 37 gateway, Doppler.
 Previous sync: 2026-10-13 (+05), via `/step-close 12` (caps on): CI `38433400406` on `17b1526`, every job green, including the Cockpit deploy (smoke check HTTP 200). Caps set to $5 per build and $20 per week (Nick approved). Read-only live check: the real caps allowed current spend ($0.29 this week), and a seeded $0.10 cap was refused. Agent 37 topped up: a probe returned HTTP 200 and accepted the 32k ceiling, but billed 21,182 input tokens for a 5-word message. Tests: Cockpit 75, hermes 55, jobs 24 pass; the Cockpit build works.
 Previous sync: 2026-10-13 (+05), via `/step-close 12` (MVP M6 cost control): `2223856` on `huraira-work`, not pushed, so no CI yet. Local: typecheck clean in 8 packages and the Cockpit; tests hermes 56, audit 14, agent-runtime 39, frontend-loop 77, documentation 18, jobs 24, workflow 33, verification 100, planning 32, rendered-qa 57, Cockpit 75 (incl. 8 new Costs tests), all pass; Cockpit production build OK. Independent review (separate agent) found no defects; its one latent finding (a blank cap variable read as "off") is fixed. Live: migration `0020_model_cost_m6` applied to `mcaxxhgjptwowwrluhra` and confirmed by SQL (new checks, 27 runs in `model_cost_by_run`, RLS on). Agent 37 probe: HTTP 402 "AI credits exhausted".
@@ -26,6 +27,11 @@ restructured to fit the new plan. `docs/WFACT-3.0-Factory-Completion-Plan.md` (c
 revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in place of it: it maps the remaining Blueprint
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
+
+**Status summary (2026-10-14, 00:45 +05, `/progress-sync`)**:
+- **First live build with a working review since 2026-10-07**: the Cockpit continue `e2a204fb` on Lanternworks (Track B, SYNTHETIC rehearsal) reached a real QA verdict. It failed on named evaluator issues, not on a NOT RUN review. That proves Step 26 item 1 in the Cockpit (Anthropic trace rows on run `4c35703b`) and Step 4D's one-press continue live (`63278e56` and `e2a204fb` both reused the saved site). It also proves Step 12's live trace rows (Agent 37 rows `estimated`, reviewer rows present).
+- **Why it failed**: the brief says to use the supplied logo, but intake cannot take a logo file, so no build can pass that check (the gap the rehearsal already found). Fix: the Step 21 intake slice under D4 Tier 2.
+- **CI is red on the pushed head** (`d5129e0`, Rendered QA on Node 22). The fix `a9b271f` is committed but not pushed. No step changed status.
 
 **Status summary (2026-10-14)**:
 - **Why no build succeeded since 2026-10-01 (diagnosed 2026-10-13)**: 0 of 17 builds passed. The main blocker was the design review: Node's fetch cut every Agent 37 review at 300 s, so builds that passed every deterministic check (`b880a7d5`, `456368c5`, `63278e56`, `83f2841f`) halted there. Fixed in `67033f7` (reviewer on Anthropic, 32 s live). Other causes: QA failing after 2 revisions (4 builds), builder schema strictness (2, fixed), checkpoint/resume (4, fixed by 4D), Agent 37 credits or a dropped connection (2).
@@ -56,7 +62,11 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-13, caps on):
+**Next up** (2026-10-14, 00:45 +05):
+1. **Huraira**: push `a9b271f` and `92fd4ac` to both branches. The CI on the new head must be green, including Rendered QA and the Cockpit deploy.
+2. **Agent, on GO**: the D4 Tier 2 intake slice (logo file and live address in intake, the logo passed to the builder as an asset). Without it, every brief that names a logo fails QA, including Bennett & Co. Then press "continue" on Summit Line `63278e56` (Track A) to close Step 26 item 1 and 4B M4's Track A build.
+3. **Nick**: the Bennett & Co brief (logo, colours, live address, CRM target). Step 25 proper still waits on it.
+**Next up** (2026-10-13, caps on, superseded):
 1. **Nick**: the Bennett & Co brief, logo, exact colours, live address and CRM target. Everything else for the build is ready.
 2. **Agent, on GO**: Step 25, the Bennett & Co build, stopping at "awaiting launch approval". It also proves M6 live: estimated rows, reviewer rows, and the cost on the Run page.
 3. **Huraira**: ask Agent 37 whether a plain model route exists without the ~21k-token agent wrapper (`docs/AI-COST-AUDIT.md` 1b).
@@ -71,6 +81,8 @@ Earlier list (2026-10-12 morning):
 After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bundle, Health room). Deferred: Steps 15, 16, 24; e-commerce out of scope.
 
 **Gaps noticed**:
+- **A brief that names a logo cannot pass QA yet** (2026-10-13, `e2a204fb`): intake takes no logo file, so the builder writes a text wordmark. The evaluator then fails the build twice ("no page references any logo asset"). That costs a full revision budget (about $1.50 on run `4c35703b`) for a defect the factory cannot fix on its own. Bennett & Co has a fixed logo, so this blocks Step 25.
+- **Synthetic rehearsal spend is booked to `bennett-co`**: every trace row of the Summit Line resume (run `2dcaacfa`) and the Lanternworks build (run `4c35703b`) carries `entity_slug = 'bennett-co'`, because only DreamSign and Bennett & Co are active entities. Bennett's cost per client (Step 12) therefore includes rehearsal spend. Filter by run, or give synthetic clients their own entity.
 - **Agent 37 adds ~21k hidden input tokens to every call** (probe 2026-10-13: 21,182 tokens for a 5-word message). That is about $0.06 per call before our own prompt. See `docs/AI-COST-AUDIT.md` 1b.
 - **Token savings not yet built** (`docs/AI-COST-AUDIT.md` §3B, after the MVP). Each one is measured against the Step 26 calibration set before it ships:
   - prompt caching;
@@ -173,6 +185,7 @@ After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bund
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
+- **CI red on the pushed head, deploy skipped (2026-10-14).** `d5129e0` (CI `38452956084`) failed Rendered QA: on Node 22 the hung-fetch mock in `test/reviewer.test.ts` left the event loop empty, so tests 35-40 were cancelled. Node 24 (local) did not show it. The test is the problem, not the reviewer. The Cockpit job runner builds from `main`, so live builds already use `67033f7`. Fixed in `a9b271f` (local 18/18, not pushed at this sync).
 - **Step 4D's first CI run failed and skipped the Cockpit deploy (2026-10-07).** `9730d99` (CI `37638990031`): the Frontend loop job failed on my new test of the Agent 37 request timeout ("Promise resolution is still pending but the event loop has already resolved"): `AbortSignal.timeout`'s timer does not keep Node alive, so on the runner the test process ended first; locally other handles hid it. Product code was fine. Fixed in `a643d2d` (test holds the loop open); CI `37644039022` green and the Cockpit deployed. Nothing live was affected: migration 0018 was already applied and the old Cockpit simply did not use it.
 - **A push made a live QA crash possible (2026-10-07).** `8cb26e9` (render.perf on applied throttling) added a second Lighthouse Chrome per
   page; `5c3ae67`'s CI (`37627375120`) then failed Rendered QA with an uncaught `ECONNRESET` from the QA server's error-less CONNECT sockets.
@@ -1015,7 +1028,7 @@ config; existing verification tests pass unchanged."* — **MET** (44 -> 98 test
 gaps above. CI `37617845669` green.
 
 
-## Step 4D — Build recovery (PARTIAL 2026-10-07 — migration 0018 applied and attack-tested live; deployed; live continue not yet run)
+## Step 4D — Build recovery (PARTIAL 2026-10-14 — one-press continue proven live on `63278e56` and `e2a204fb`; missing-facts form not yet proven live)
 
 Governed by `docs/BUILD-RECOVERY-DESIGN.md`. Huraira's request: stop Tracks failing again and again; when a build fails say why, offer a button
 that fixes it and continues from where it left off; when something is missing, ask for it in the Cockpit and continue.
@@ -1035,13 +1048,16 @@ that fixes it and continues from where it left off; when something is missing, a
       newer brief, full rebuild offered for a verified run, "skip" not reaching the builder, panel flash).
 - [x] Migration 0018 applied live 2026-10-07 (version 20261007144150, Huraira's GO) and `scripts/rls_attack_test_recovery.sql` run in a rolled-back transaction: 26/26 as intended (anon/PM/other-user inserts refused, unapproved plan refused, bad key/empty/oversize/unknown kind refused, no edit or delete for anyone, audit row carries no text, duplicate build and continue refused, different run not blocked); afterwards 0 synthetic users, plans, inputs or audit rows remain.
 - [x] Pushed and deployed: `a643d2d`, CI `37644039022` green, Deploy Cockpit to Vercel success; live bundle `/assets/index-DyE0Yzn2.js` contains the new copy; the worker (GitHub Actions) runs the pushed `main` code on its next job.
-- [ ] One live stopped build continued end to end: NOT yet run. A real candidate now exists: Track A `b880a7d5` (run `15ad4086`) stopped 2026-10-07
-      17:40 UTC in the reviewer-outage bucket with a checkpointed site (see Step 4B). Waits on Huraira's press and on the Agent 37 gateway answering.
+- [x] One live stopped build continued from its saved site in one press (2026-10-13, confirmed by SQL 2026-10-14):
+      - Summit Line `63278e56` resumed run `2dcaacfa` with a `workflow.reopen` row (17:53 UTC). Its only model calls were reviewer calls, so there was no rebuild. It halted on the old Agent 37 reviewer (`not_verified_no_evaluator`).
+      - Lanternworks `e2a204fb` resumed run `4c35703b` after the runner crash of `83f2841f`. Its first call was the review (19:24 UTC), with no builder call before it. It reached a real QA verdict (`failed_verification`, see Step 26).
+      - Nothing was published.
+- [ ] Missing facts asked in the Cockpit and passed to the builder, live: not yet run (`plan_inputs` has 0 rows, 2026-10-14).
 - [ ] Not covered: file uploads (photos, logos: Step 4B M5), closing a stale `running` row from the Cockpit, a per-build total spend cap, saving the
       approved content before the site build.
 
-**Verification**: workflow 33/33, jobs 24/24, frontend-loop 75/75, verification 100/100, Cockpit 67/67, all typechecks clean, Cockpit builds. No live run.
-**Exit check**: *"a build that stopped continues from its saved site in one press; missing facts are asked in plain words and reach the builder as sourced facts; nothing is invented; nothing publishes."* — **PARTIALLY MET**: met in tests; migration 0018 is live and the Cockpit is deployed (corrected 2026-10-12: this line said "migration and deploy pending", which was out of date after `9730d99`/`a643d2d`); not yet proven on a live stopped build.
+**Verification**: workflow 33/33, jobs 24/24, frontend-loop 75/75, verification 100/100, Cockpit 67/67, all typechecks clean, Cockpit builds. Live (2026-10-13): continues `63278e56` and `e2a204fb`, above.
+**Exit check**: *"a build that stopped continues from its saved site in one press; missing facts are asked in plain words and reach the builder as sourced facts; nothing is invented; nothing publishes."* — **PARTIALLY MET**: met in tests; migration 0018 is live and the Cockpit is deployed (corrected 2026-10-12: this line said "migration and deploy pending", which was out of date after `9730d99`/`a643d2d`); 2026-10-14: the one-press continue from the saved site is proven live (`63278e56`, `e2a204fb`). Still unproven live: the missing-facts form (0 `plan_inputs` rows).
 
 ## Step 21 — Housekeeping (PARTIAL 2026-10-12 — launch files (MVP M5) built in `9968019`; verification pending)
 
@@ -1069,7 +1085,7 @@ Not yet: a live build with a real address at stage `launch`.
 **Exit check** (MVP M5): "Step 7 launch-stage checks pass on the output". **PARTIALLY MET**: they pass on both starters' output in tests with
 an address; not yet on a live build.
 
-## Step 12 — Cost governance per client (PARTIAL 2026-10-13 — MVP M6 slice deployed (CI `38433400406`), caps on ($5/build, $20/week); live build pending)
+## Step 12 — Cost governance per client (PARTIAL 2026-10-14 — MVP M6 slice live; live trace rows proven on run `4c35703b`; Run page and live cap refusal pending)
 
 Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 to the MVP M6 slice (`docs/MVP-CUTLINE.md` §2 M6, §4). Audit and plan: `docs/AI-COST-AUDIT.md`. Huraira 2026-10-13: Agent 37 priced at the $3/$15 estimate; cap amounts to be agreed with Nick; build M6 plus the Cockpit costs page now.
 
@@ -1081,7 +1097,12 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - [x] **Cap amounts set:** $5 per build and $20 per 7 days, approved by Nick on 2026-10-13 (`spend-caps.json` 1.1.0). A read-only check against live spend allowed the real caps and refused a seeded $0.10 cap.
 - [x] **Cockpit Costs page:** shows the true total with estimates labelled, the caps, spend by day, client, model and build, and the biggest calls. The Run page shows each build's spend; owners only. Evidence: `apps/cockpit/src/costs.test.tsx`, 8 tests.
 - [x] **Pushed and deployed:** CI `38433400406` green, Cockpit smoke check HTTP 200, both branches synced.
-- [ ] **Live build:** none yet. Agent 37 is topped up, so the next Bennett build will prove the new trace rows.
+- [x] **Live trace rows** (SQL, 2026-10-14): the Lanternworks build (run `4c35703b`) and the Summit resume (run `2dcaacfa`) wrote:
+      - Agent 37 builder rows with `price_basis 'estimated'`: 4 rows, $1.021.
+      - Reviewer rows of its own: 5 Anthropic `metered` rows, $0.438.
+      - The only `unpriced` rows are 2 from 2026-10-12, under pricing 1.3.0, before M6.
+- [ ] **Run page spend in the signed-in Cockpit**: not checked (no signed-in session this sync).
+- [ ] **Live cap refusal** (verification prompt item 4: a job with a cap below the run's spend fails with "Spend cap reached" and writes no new row): not run.
 
 **Verification**:
 - Local typecheck is clean, and every package suite passes (counts in the sync line).
@@ -1092,5 +1113,6 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - Met in tests: the seeded refusal.
 - Met in the live views: cost per build is recorded (`model_cost_by_run`).
 - Met live: CI, the deploy, and the cap amounts (checked against real spend).
-- Not yet proven live: a build that writes estimated rows and reviewer rows.
+- Met live 2026-10-14: a build wrote estimated rows and reviewer rows (run `4c35703b`).
+- Not yet proven live: the Run page and a live cap refusal.
 

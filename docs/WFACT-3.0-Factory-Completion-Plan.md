@@ -11,9 +11,15 @@ to a Continuation Stage, that is noted.
 redesign), and the **design-quality rule** in Part C. Both new steps sit between Step 4 and Step 5 in priority order; 4C can run in
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
 **Realigned 2026-10-07**: product-and-solution alignment pass (`docs/HANDOFF.md` is the orientation; `docs/archive/MANIFEST.md` lists what moved). Changes to this plan: closed steps (1, 2, 3, 3A, 4, 4C, 5, 6, 7) keep their heading, status and evidence but their long agent prompts moved to the archived pre-realignment copy; open steps keep full prompts; Steps 12, 20 and 21 gained the verified gaps found in the audit; Part F lists proposed, UNAPPROVED additions (agency scope) and the decisions that gate them. The execution order was re-set on 2026-10-07 (see "Execution order" after Part B); Steps 25 and 26 were added. The step table, headings and Part E remain machine-checked by `scripts/check-trackers.mjs`.
-**Last synced 2026-10-13** via `/progress-sync`: every step re-checked against git (`76e9d6c`, no code since `c97e329`), CI (`38437214851`, `38438423293` green incl. deploy) and the live database (no build since 2026-10-12); no status changed. Previous full re-audit 2026-10-12 (no commits since `072b391`,
+**Last synced 2026-10-14 (00:45 +05)** via `/progress-sync`: every step re-checked against git (`92fd4ac`; `a9b271f` and `92fd4ac` local only, remotes at `d5129e0`), CI (`38452956084` on `d5129e0` FAILED in Rendered QA only, fixed by `a9b271f`, unpushed) and the live database (Cockpit continue `e2a204fb` reached a real QA verdict with the Anthropic reviewer). No status changed. No step newly qualifies for Closed: 3A still lacks its live sign-up (0 `account_requests` rows). The step table row for 4B is fixed (its columns were misaligned) and the Part E rows for 3A, 4B, 4D, 12 and 26 are refreshed. Previous sync 2026-10-13 via `/progress-sync`: every step re-checked against git (`76e9d6c`, no code since `c97e329`), CI (`38437214851`, `38438423293` green incl. deploy) and the live database (no build since 2026-10-12); no status changed. Previous full re-audit 2026-10-12 (no commits since `072b391`,
 2026-10-07), CI and the live database. Closed steps (DONE with citable evidence: 1, 2, 3, 5, 6, 7) moved to **"Closed steps"** at the end of
 Part D; open steps carry a **Next action** line and a continuation or verification prompt.
+**Status as of 2026-10-14**: the evidence moved on Steps 4D, 12 and 26, but no status changed:
+- **Step 4D**: the one-press continue is proven live on Summit `63278e56` and Lanternworks `e2a204fb`. The missing-facts form is still unproven live.
+- **Step 12**: live `estimated` rows and reviewer rows were written on run `4c35703b`. The Run page and a live cap refusal are still unchecked.
+- **Step 26 item 1**: 5 Anthropic reviewer rows from a Cockpit build. Summit Track A and a green CI are still open.
+- **Step 25**: still NOT STARTED. The Lanternworks rehearsal is SYNTHETIC and failed QA because intake cannot take a logo.
+
 **Status as of 2026-10-12**: Steps **1, 2, 3, 5, 6 and 7 are DONE and closed**. Step 3A is **DONE** but its live sign-up proof is still
 pending, so it stays open with a verification prompt. Step 4 is **PARTIAL** (closed by 4B M6). Step 4B is **IN PROGRESS**: M4 still open.
 Track A re-run `b880a7d5` (plan `b5a45a8e`, 2026-10-07 17:14 UTC) passed every deterministic check, but the required design review could not
@@ -74,9 +80,9 @@ the goals · **P3** later or depends on Nick.
 | 1 | Fix Cockpit → GitHub dispatch | Confirms the dispatch token, gets a Cockpit job to run through GitHub Actions | Every Cockpit action depends on it; it has never worked | First successful `Cockpit job` run; queued plan built | P0 |
 | 2 | Write pilot brief and business rules | Drafts a realistic fictional client brief and provisional business rules | Unblocks Stage 7 and the real-memory test | `brief.json` and `memory/context.md`, both flagged provisional | P0 |
 | 3 | Retire plaintext secrets (Huraira acts, agent verifies) | Deletes `.env.local` files, rotates keys, revokes the leaked Doppler token | Stage 1 is unmet and a token is exposed | The plan's `grep` check passes | P0 |
-| 3A | Password sign-in and approval-gated accounts (added 2026-09-30) | Email + password sign-in, account requests, owner/admin approval, forgot-password; fixed an admin-to-owner escalation hole | Huraira asked for it; magic-link-only sign-in was a blocker | Live in the Cockpit; 32/32 attack checks pass | P0 |
+| 3A | Password sign-in and approval-gated accounts (added 2026-09-30) | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove (0 `account_requests` rows, re-checked 2026-10-14), so kept open with a verification prompt | 2026-09-30 | Live in the Cockpit; 32/32 attack checks pass | P0 |
 | 4 | Full run on the pilot brief | Intake → plan → approval → build → verify → human Launch | Proves the factory end to end; measures corrections | Verified live page, correction count, audit and trace rows | P0 |
-| 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done; M4 partial (built, CI `37016971442`; live-build fixes `c64bd0e`…`7c68eb8` on `main`; Track A `b880a7d5` passed every deterministic check 2026-10-07 but the design review did not run (Agent 37 HTTP 502), continue pending; Track B `4acbde1f` re-run pending; screenshot review pending); M5 groundwork `4bbd4bc` (blocked: Higgsfield credits); M6 not started (deferred by D3) | 2026-10-12 (sync) | 2026-10-01 (design) |
+| 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2, M3 done; M4 partial: code and CI `37016971442`; live-build fixes `c64bd0e`…`7c68eb8`; review blocker fixed `67033f7`; Track B Lanternworks `e2a204fb` reached a real verdict but failed QA (logo not embeddable); Track A continue of `63278e56` and the screenshot review pending; M5 blocked (Higgsfield credits); M6 not started (D3) | 2026-10-14 | One live build per track that passes rendered QA, the claims gate and the design rulebook (M4); images (M5); full run with preview (M6) | P0 |
 | 4C | Cockpit UI/UX redesign | Information architecture, navigation, design system, plain copy, every factory action reachable, accessible and responsive | The Cockpit is the control room; today it grew room by room | A redesigned Cockpit verified in the browser at desktop and phone, with a usability walkthrough | P1 |
 | 5 | Stage 6: Documentation agent | Writes structured episodic memory per stage, tied to task IDs | Blueprint wants machine-written memory | Auto-written `memory.md` entries; a passing "what happened" query | P1 |
 | 6 | Enforce agent permissions | Makes each agent's permission scope enforced, not descriptive | Must land before more agents or concurrency | Out-of-scope calls denied and audited | P1 |
@@ -85,7 +91,7 @@ the goals · **P3** later or depends on Nick.
 | 9 | Cockpit: "is everything OK" and System room | Top-level status plus health, queue depth, error rate, backup status | The founder's stated need; System category | One-glance status page | P1 |
 | 10 | Cockpit: Agents room and Workflows drill-down | Agents room; failures show the failed check and link to the trace | Answers "what is happening and why" without logs | Agents room, drill-down, success-rate trend | P1 |
 | 11 | Extend model routing and add a second model | Routes every agent by config; adds one more adapter; starts local-model evaluation | Blueprint Phase 4 acceptance | Same task on two models; cost and quality log | P1 |
-| 12 | Cost governance per client | Rolls traces up per client; adds hard per-run budget ceilings | Goal 4; prevents runaway spend | Per-client cost view; budget guard | P2 |
+| 12 | Cost governance per client | **PARTIAL** (MVP M6 slice `2223856`, CI `38433400406`, migration 0020 live, caps $5/build and $20/week; live `estimated` and reviewer rows proven on run `4c35703b` 2026-10-14; Run page check and live cap refusal pending) | 2026-10-14 | Per-client cost view; budget guard | P2 |
 | 13 | Remaining core agents | Research, Back-end, Content/SEO, Deploy (human-gated), Monitoring, Recovery, Lessons, Memory consolidation | The pipeline needs 14 agents; 4 exist | Registered agents with bounded scopes | P2 |
 | 14 | Cockpit: Memory and Human Control rooms | Memory writes, contradictions, stale warnings; escalations, blocked tasks, intervention history | Two missing categories | Two new rooms | P2 |
 | 15 | Cognee trial write-up | One time-boxed trial ending in adopt / don't adopt | Blueprint says trial, not lock in | Decision note | P2 |
@@ -99,7 +105,7 @@ the goals · **P3** later or depends on Nick.
 | 23 | Product features (Owner's Key port) | Rebuilds Owner's Key, closing reports, care plans on the new stack | Blueprint Phase 10; Business/Product category | Migrated features; re-run attack tests | P3 |
 | 24 | Advanced autonomy and optimization | Earns auto-pass gates from measured runs; local-model migration decision | Blueprint Phases 11–12 need real data first | Evidence-backed autonomy upgrades | P3 |
 | 25 | Real-client proof run (added 2026-10-07) | Runs one real client (Nick's brief, or the real 2.0 DreamSign case if his brief is not ready) through intake, build, verify and human launch; measures corrections, cost, time | Goal 1; the loop has only run on synthetic clients | Measured result against the 40+ baseline, with a failure analysis | P0 |
-| 26 | Quality calibration (added 2026-10-07) | Gets a different-vendor evaluator working live; calibrates the automated reviewer against Nick's blind ratings; builds per-niche reference outputs with visual regression | A passing check must mean a good site; reviewer and builder share a vendor today | Calibration report; reference set in CI | P0 |
+| 26 | Quality calibration (added 2026-10-07) | **PARTIAL**: item 1 built (`67033f7`) and live in the Cockpit (5 `anthropic` reviewer rows, run `4c35703b`, real verdict); Summit Track A continue and CI green on the pushed fix `a9b271f` pending; items 2–4 after the MVP | 2026-10-14 | Calibration report; reference set in CI | P0 |
 | 27 | Track A motion budget (added 2026-10-07, decision D1) | Makes Track A visibly richer within a motion budget (CSS/vanilla only, reduced-motion respected, no framework scripts) with conversion as a hard gate; builds one brief on both tracks for Nick's blind rating | Nick found delivered sites visually flat; Track B's framework cost hurts speed and reliability for local business | Richer Track A passing the existing performance, layout-shift and CTA checks; blind-rating result | P0 |
 
 ### Execution order (approved by Huraira 2026-10-07; supersedes "do them in order of number")
@@ -216,7 +222,7 @@ confirmed by email, approved and signed in (needs Huraira); the Supabase Auth se
 
 **Kept open (2026-10-12 sync)**: approved as DONE by Huraira, but the live end-to-end sign-up is still unproven, so the step is not moved to
 Closed until the verification below has run. Not on the MVP path (D3); do it when Huraira has five minutes.
-**Next action**: Huraira creates one test account in the live Cockpit (sign up → confirm email → approve → sign in); then run the prompt below.
+**Next action**: Huraira creates one test account in the live Cockpit (sign up → confirm email → approve → sign in); then run the prompt below. (Re-checked 2026-10-14: `account_requests` has 0 rows, so the live sign-up has still never run.)
 
 Verification prompt — updated 2026-10-12:
 ```
@@ -284,7 +290,13 @@ evaluator points fixed in `ed07d79`. **Latest (2026-10-07 17:14 UTC, after the l
 fault. **Left for M4**: one passing live build per track (Track A: continue `b880a7d5` once Agent 37 answers; Track B: re-run `4acbde1f`),
 then the human screenshot review at desktop and phone, then `/step-close 4B M4`.
 
-**Next action (2026-10-12)**: Huraira checks that the Agent 37 gateway answers, then presses "continue" on `b880a7d5` in the Cockpit. That
+**Update (2026-10-14 sync)**: the review blocker is fixed (`67033f7`; the reviewer moved to Anthropic after Node's 300 s fetch cut). Track B
+plan `403305ec` (synthetic Lanternworks, the D4 rehearsal) was built and continued (`83f2841f` → `e2a204fb`, run `4c35703b`). It reached a real
+QA verdict, `failed_verification` after 2 revisions, on evaluator issues: the brief's logo was never embedded because intake cannot take a logo
+file, and colours fell outside the brief. That is not an M4 pass. Track A Summit `63278e56` halted on the old reviewer before `67033f7`.
+**Next action (2026-10-14)**: once CI is green on the pushed head, Huraira presses "continue" on Summit Line `63278e56` (Track A). For Track B,
+re-run `4acbde1f`, or Lanternworks once the intake logo slice lands. Then the human screenshot review.
+**Previous next action (2026-10-12)**: Huraira checks that the Agent 37 gateway answers, then presses "continue" on `b880a7d5` in the Cockpit. That
 one press also proves Step 4D live. Then re-run Track B `4acbde1f`. Under D3, M5 and M6 are replaced by the Bennett & Co build (Step 25,
 `docs/MVP-CUTLINE.md`).
 
@@ -445,7 +457,7 @@ room passed signed in; if so, move the Step 4C block into "Closed steps". STOP a
 
 ---
 
-### STEP 4D — Build recovery: why a build stopped, and carry on from where it left off (P0, added 2026-10-07) — PARTIAL 2026-10-07, migration 0018 applied live; pushed; live continue not yet run
+### STEP 4D — Build recovery: why a build stopped, and carry on from where it left off (P0, added 2026-10-07) — PARTIAL 2026-10-14, one-press continue proven live (`63278e56`, `e2a204fb`); missing-facts form not yet proven live
 
 **Added at Huraira's request 2026-10-07** after Track A and B builds kept stopping and every stop meant a new paid build. Design, failure
 catalogue, owner flow and edge cases: `docs/BUILD-RECOVERY-DESIGN.md`. A stopped run can now be reopened by a person (`workflow.reopen`,
@@ -460,8 +472,16 @@ attack script 26/26; CI `37644039022` green and deployed. **Left**: one live con
 `b880a7d5` (run `15ad4086`) stopped 2026-10-07 17:40 UTC in the "reviewer outage" bucket (Agent 37 HTTP 502 after the bounded retries). It
 saved a checkpointed site that passed every deterministic check, so it is the ideal live test. Also not covered (unchanged): file uploads, closing a
 stale `running` row, a per-build total spend cap (pulled into the MVP as `docs/MVP-CUTLINE.md` M6), saving approved content before the site
-build. **Next action**: same press as Step 4B's: Huraira presses "continue" on `b880a7d5` once Agent 37 answers. Waits on Huraira and on
-the Agent 37 gateway.
+build.
+**Live proof (2026-10-13, SQL-checked 2026-10-14)**:
+- Summit `63278e56` resumed run `2dcaacfa`. It wrote a `workflow.reopen` row, and its only model calls were reviewer calls, so the saved site was reused.
+- Lanternworks `e2a204fb` continued run `4c35703b` after the runner crash. Its first call was the review, with no builder call before it, and it reached a real verdict.
+- Nothing was published.
+
+**Left**: the missing-facts half (`plan_inputs` has 0 rows): a stopped build whose missing details are typed into the Cockpit form and reach
+the builder as sourced facts.
+**Next action**: the next build that stops for missing facts. The Lanternworks logo gap is a candidate once intake can take a logo. Fill the form, continue, then run
+`/step-close 4D`.
 
 Continuation prompt — updated 2026-10-12:
 ```
@@ -472,6 +492,10 @@ ALREADY DONE (do not redo): workflow.reopen, owner details, seven-bucket diagnos
 retry, job.run link, one-active-build guard (a3198d8…a643d2d); migration 0018 live; attack test 26/26; CI 37644039022.
 
 LEFT
+0. ALREADY PROVEN LIVE (2026-10-13): one-press continue from the saved site, jobs 63278e56 (run 2dcaacfa) and e2a204fb
+   (run 4c35703b). Steps 1-3 below are only needed again if that evidence is disputed; go to the missing-facts proof:
+   on a build stopped for missing facts, fill the details form in the Cockpit, continue, and confirm by SQL a plan_inputs
+   row, a workflow.reopen row, and the fact reaching the builder as a sourced owner fact.
 1. Check that the Agent 37 gateway answers before asking Huraira to press anything. If it does not, STOP and say so.
 2. Huraira opens job b880a7d5 in the Cockpit. Confirm the page shows the reviewer-outage explanation in plain words
    and offers one button, then he presses it.
@@ -666,7 +690,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 12 — Cost governance per client (P2) — PARTIAL 2026-10-13, MVP M6 slice deployed (CI `38433400406`), caps on ($5/build, $20/week); live build pending
+### STEP 12 — Cost governance per client (P2) — PARTIAL 2026-10-14, MVP M6 slice live; live trace rows proven (run `4c35703b`); Run page and live cap refusal pending
 
 **Realignment note (2026-10-07)**: include a price basis or a token ceiling for Agent 37 calls (`model_traces.cost_usd` is null; ~190k tokens per builder run are invisible to every USD ceiling). Pull ahead of Step 9 if Huraira approves Part F decision D2.
 
@@ -692,7 +716,17 @@ REPORT in the Part C format, then STOP.
 - **Agent 37:** topped up and answering. The 32k output ceiling is accepted.
 - **New leak:** Agent 37 adds about 21k hidden input tokens to every call (`docs/AI-COST-AUDIT.md` 1b).
 
-**Next action**: the next live build (Step 25, Bennett & Co) proves items 3 and 4 of the prompt below. Then run `/step-close 12`.
+**Update (2026-10-14 sync, SQL)**: verification item 3 is mostly met. Run `4c35703b` (Lanternworks) and run `2dcaacfa` (Summit) wrote:
+- Agent 37 builder rows with `price_basis 'estimated'`: 4 rows, $1.021.
+- Reviewer rows of their own: 5 Anthropic `metered` rows, $0.438.
+- The only `unpriced` rows are 2 from 2026-10-12, under pricing 1.3.0, before M6.
+
+**Left**:
+- The Run page spend in the signed-in Cockpit (item 3).
+- The live cap refusal (item 4).
+- New: synthetic rehearsal runs are booked to `entity_slug 'bennett-co'`, so Bennett's cost per client includes rehearsal spend.
+
+**Next action**: Huraira opens the Run page for `4c35703b` signed in, and the agent runs item 4 on GO. Then run `/step-close 12`.
 
 Verification prompt (MVP M6):
 ```
@@ -1281,6 +1315,11 @@ fixed, fonts free, a proper web agency site, websites only). `docs/MVP-CUTLINE.m
 prompt below. Target Wed 2026-10-14. Report slippage on Monday evening 2026-10-12. The dependency on "4B M4 closed" and "Step 26 done" is
 narrowed by D3 to Step 26 item 1 and the cost-cap slice of Step 12.
 **Rehearsal (D4, 2026-10-13)**: GO from Huraira to rehearse Step 25 on the synthetic Lanternworks Studio brief (`clients/lanternworks-studio/`) through the live Cockpit. Gap found before the run: intake cannot take a logo file or the live address (`siteUrl`), so M1 cannot be met by any brief yet. The real run still needs Nick's brief.
+**Rehearsal result (2026-10-13, SQL-checked 2026-10-14)**: Lanternworks Track B plan `403305ec` was built (`83f2841f`; the runner crashed after
+the build) and continued (`e2a204fb`, run `4c35703b`). It halted at QA with `failed_verification` after 2 revisions. The main issue is that the
+brief's logo is never embedded, because intake cannot take one. About $1.53 of AI spend went on the run. Synthetic: this does not count toward
+Step 25. **Next action (2026-10-14)**: the intake logo and live-address slice (D4 Tier 2) before the real run, since Bennett's logo is fixed.
+Then Nick's brief.
 **Next action (2026-10-12)**: blocked on **Nick's brief** (repo name or brief, logo file, exact colors, pages, real case studies, CRM target:
 `docs/MVP-CUTLINE.md` §6). Nothing is in the repo yet. When it lands, record it under `clients/bennett-co/` (entity `bennett-co`) with the
 locked colors and logo as constraints (M1), then run this prompt. Per the cut-line schedule this is already a day behind.
@@ -1307,14 +1346,20 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 26 — Quality calibration (P0, added 2026-10-07) — PARTIAL 2026-10-14, item 1 built (Anthropic screenshot reviewer, `67033f7`), verification pending
+### STEP 26 — Quality calibration (P0, added 2026-10-07) — PARTIAL 2026-10-14, item 1 live in the Cockpit (Anthropic rows on run `4c35703b`); Track A continue and green CI pending
 
 **Item 1 progress (2026-10-14)**: the screenshot reviewer moved from Agent 37 to Anthropic claude-sonnet-5 (`reviewer.json` 1.1.0, Huraira
 approved 2026-10-13), a different vendor from the Agent 37 builder, after every Agent 37 review was cut at Node's 300 s fetch header
 limit (root cause, fixed in the same commit). Local live proof: Summit Line Track A, 5 pages, 15 images, review PASSED in 32 s, $0.071.
 **Left**: a Cockpit build whose review writes an `anthropic` `model_traces` row (press "continue" on `83f2841f` or `63278e56` once CI
 deploys `67033f7`); OpenAI as a third vendor stays blocked on credits; items 2–4 after the MVP.
-**Verification prompt (2026-10-14)**: verify first. Confirm CI is green on the commit after `67033f7`. In the Cockpit, press "continue" on
+**Cockpit proof (2026-10-13 19:24-19:40 UTC, SQL-checked 2026-10-14)**: job `e2a204fb` (continue of Lanternworks `83f2841f`, run
+`4c35703b`) wrote 5 successful `anthropic` `agent:qa-evaluator` rows (claude-sonnet-5, $0.438, 31-63 s each) and reached a real verdict
+(`failed_verification` on named evaluator issues, never "NOT RUN"). **Still left for item 1**:
+- Summit Line `63278e56` (Track A) continued on the new reviewer.
+- CI green on the pushed head. `38452956084` on `d5129e0` failed Rendered QA on Node 22. The fix `a9b271f` passes 18/18 locally on Node 24 but is not pushed.
+
+**Verification prompt (2026-10-14, updated at sync)**: verify first. The Lanternworks half below is already proven (`e2a204fb`), so skip it. Confirm CI is green on the commit after `67033f7`. In the Cockpit, press "continue" on
 the stopped Lanternworks build `83f2841f` (Track B) and on Summit Line `63278e56` (Track A). Each must reach "awaiting launch approval" or
 fail on a named check, never on "design review NOT RUN". Query `model_traces` for `provider='anthropic'` rows from `agent:qa-evaluator` and
 cite them. Fix only the gaps found, then run `/step-close 26` and move to Step 27.
@@ -1323,8 +1368,9 @@ cite them. Fix only the gaps found, then run `/step-close 26` and move to Step 2
 **Maps to**: Blueprint §1 "never trust done"; goal 3.
 
 **MVP scope under D3 (2026-10-12)**: only **item 1** (one live different-vendor call from the evaluator and the screenshot reviewer, with a
-`model_traces` row; `docs/MVP-CUTLINE.md` M7) runs before 2026-10-14. Items 2–4 wait until after the MVP. **Next action**: blocked on
-**OpenAI credits** (HTTP 429 "no credits remaining", last checked 2026-10-07). Huraira or Nick tops up, then run item 1 only.
+`model_traces` row; `docs/MVP-CUTLINE.md` M7) runs before 2026-10-14. Items 2–4 wait until after the MVP. **Next action (2026-10-14)**: push
+`a9b271f`, confirm CI green, then continue Summit `63278e56` and run `/step-close 26` for item 1. (OpenAI credits no longer block item 1: Huraira chose
+Anthropic as the second vendor on 2026-10-13. OpenAI remains a possible third vendor.)
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules in
@@ -1474,7 +1520,7 @@ is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler 
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
 | 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done; M4 partial (`a9f4dcf`…`13ec854`, migration 0014, CI `37016971442` green; live Track B `f696ba43` failures fixed in `c64bd0e`/`8dae180`, not pushed or re-run; screenshot review pending); M5 groundwork `4bbd4bc` (live run blocked: no Higgsfield credits) | 2026-10-06 | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`; redeploy `fb08be3`, CI `36907274448`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
-| 4D | Build recovery | **PARTIAL** (`a3198d8`: engine, Cockpit and tests green locally: workflow 33, jobs 24, frontend-loop 75, verification 100, Cockpit 67; independent review done and its findings fixed; migration 0018 applied live 2026-10-07 and its attack script passed 26/26 rolled back; pushed and deployed, CI `37644039022` green (first run `37638990031` failed on a flaky test of mine, fixed `a643d2d`); one live continued build still to prove; candidate: stopped Track A job `b880a7d5`, checked 2026-10-12) | 2026-10-07 | |
+| 4D | Build recovery | **PARTIAL** (`a3198d8`…`a643d2d`, migration 0018 live, attack 26/26, CI `37644039022`; one-press continue proven live 2026-10-13 on `63278e56` and `e2a204fb`, saved site reused, nothing published; missing-facts form not yet proven live, 0 `plan_inputs` rows) | 2026-10-14 | |
 | 5 | Documentation agent | **DONE** (`08fc069`…`530f4cb`; live Cockpit builds `c775c396` 6 entries / 6 stages and `ad49df57` 1 / 1; backfill 26 = 26 rows; live ask SQL-checked; CI `37614606732`) | 2026-10-07 | |
 | 6 | Enforce agent permissions | **DONE** (`58bf776`…`ee08f9d`; 285 package tests + rendered-qa pass on the merged tree; live attack runs `050c3329`, `ed07cfaf`, `cb7739a2`, `7197fa12`, `9a692a2d`, 7 `agent.deny` rows verified by SQL; CI `37609559746` green; cost ceilings set from live traces 2026-10-07: builder $1, QA $0.50, Planner $0.25, Direction $0.15, Hermes $0.10, Intake $0.05) | 2026-10-06 | |
 | 7 | Evaluation registry | **DONE** (`64222b1`…`0e13e30`, merged `c1e511a`; merged tree verification 98, rendered-qa 52 and all packages pass; migration 0017 applied live; CI `37617845669` green; 78-check and 50-point sources missing from the repo, OpenAI evaluator unproven live) | 2026-10-07 | |
