@@ -506,3 +506,49 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
   .need-cta { grid-column: 2; margin-left: 0; justify-self: start; }
   .home-foot { display: none; }
 }
+
+/* ---------- Projects (v2) ---------- */
+.projects { display: grid; gap: 28px; }
+.projects-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.projects-head > div:first-child { display: grid; gap: 8px; }
+.projects-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.search-field { flex: 1 1 260px; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 0 14px; border: 1px solid var(--line-2); border-radius: var(--r-ctl); background: var(--sheet); }
+.search-field:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+.search-field svg { color: var(--ink-3); width: 18px; height: 18px; }
+.search-field input { flex: 1; min-width: 0; min-height: 44px; border: 0; background: transparent; color: var(--ink); font: 400 16px/1.3 var(--face-text); outline: none; }
+.select-field { display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: var(--r-ctl); background: var(--sheet); font-size: var(--fs-label); }
+.select-field:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+.select-field > span { color: var(--ink-3); }
+.select-field select { min-height: 44px; border: 0; background: transparent; color: var(--ink); font: 600 var(--fs-label)/1.2 var(--face-text); outline: none; cursor: pointer; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: -12px; }
+.filters .spacer { flex: 1; }
+.pill { display: inline-flex; align-items: center; gap: 8px; min-height: var(--target); padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--line-2); background: var(--sheet); color: var(--ink); font: 600 var(--fs-small)/1 var(--face-text); cursor: pointer; }
+.pill[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--inv); }
+.pill-n { font: 600 12px/1 var(--face-figure); opacity: 0.8; }
+.no-match { padding: 40px 0; border-top: 1px solid var(--line); display: grid; gap: 10px; justify-items: start; }
+.project-group { display: grid; gap: 12px; }
+.project-group-h { color: var(--ink-2); }
+.project-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 18px; }
+.project-card { background: var(--sheet); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.project-card-head { display: flex; align-items: flex-start; gap: 8px; }
+.project-card-head > div { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.project-name { font: 500 23px/1.15 var(--face-display); color: var(--ink); text-decoration: none; }
+.project-name:hover { text-decoration: underline; }
+.pin { margin: -8px -8px 0 0; color: var(--ink-2); }
+.project-facts { margin: 0; display: grid; gap: 8px; font-size: var(--fs-label); }
+.project-facts > div { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.project-facts dt { color: var(--ink-3); }
+.project-facts dd { margin: 0; text-align: right; }
+.project-table { border-top: 1px solid var(--line); }
+.project-tr { display: grid; grid-template-columns: 44px minmax(0, 1.4fr) minmax(0, 1.3fr) minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1fr); gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: center; font-size: var(--fs-label); }
+.project-th { font-size: 13px; color: var(--ink-3); }
+.project-td-name a { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; color: var(--ink); text-decoration: none; }
+.project-td-name a:hover { text-decoration: underline; }
+.hand-add { border-top: 1px solid var(--line); padding-top: 4px; }
+.hand-add > summary { min-height: var(--target); display: flex; align-items: center; cursor: pointer; font-weight: 600; color: var(--ink-2); }
+@media (max-width: 900px) {
+  /* headers stay for screen readers (they name every cell); only the eye loses them on a phone */
+  .project-th { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; padding: 0; border: 0; }
+  .project-tr { grid-template-columns: 44px minmax(0, 1fr); gap: 8px 10px; padding: 14px 0; }
+  .project-tr > :nth-child(n + 3) { grid-column: 2; }
+}
