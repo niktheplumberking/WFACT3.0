@@ -46,14 +46,16 @@ describe("Home answers 'is everything OK, and what needs me?'", () => {
     expect(screen.getByRole("link", { name: "Approve or reject the Summit Line Roofing Website plan" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Decide on launching the Summit Line Roofing Website build" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "1 request never started" })).toBeInTheDocument();
-    expect(within(mainNav()).getByRole("link", { name: "Decisions 3 waiting" })).toBeInTheDocument();
+    // v2: the Home nav item carries the count of everything that needs a person (3 decisions + 1 stuck request).
+    expect(within(mainNav()).getByRole("link", { name: "Home 4 waiting" })).toBeInTheDocument();
   });
 
-  it("shows the future rooms honestly, with their step", async () => {
+  it("shows the future rooms honestly, as Coming later", async () => {
     const t = start();
-    const system = await within(mainNav()).findByRole("link", { name: /System\s*Step 9/ }, T);
+    const system = await within(mainNav()).findByRole("link", { name: "System" }, T);
     await t.click(system);
-    expect(await screen.findByText("Coming in Step 9", {}, T)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "System" }, T)).toBeInTheDocument();
+    expect(screen.getAllByText("Coming later").length).toBeGreaterThan(0);
     expect(screen.getByText(/shows nothing rather than made-up numbers/)).toBeInTheDocument();
   });
 
@@ -125,14 +127,13 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(t.clicks()).toBe(2);
   });
 
-  it("start a build of an approved plan (3 clicks)", async () => {
-    const t = start();
-    await t.click(await within(mainNav()).findByRole("link", { name: /Decisions/ }, T));
-    const decided = await screen.findByRole("region", { name: "Recently decided" }, T);
-    await t.click(within(decided).getByRole("link", { name: "Summit Line Roofing Website" }));
+  it("start a build of an approved plan from its proposal (1 click)", async () => {
+    // v2: there is no Decisions room in the menu; Home's client list and the palette open a client's proposal.
+    // The palette's Clients group is checked in shell.test.tsx; here the build itself, from the approved proposal.
+    const t = start(`/decisions/plans/${PLAN_APPROVED}`);
     await t.click(await screen.findByRole("button", { name: "Build it again" }, T));
     expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "build_plan", params: { planId: PLAN_APPROVED } }) }));
-    expect(t.clicks()).toBe(3);
+    expect(t.clicks()).toBe(1);
   });
 
   it("start the first build of a plan approved as Track B", async () => {
@@ -269,7 +270,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
 
   it("sign out (2 clicks)", async () => {
     const t = start();
-    await t.click(await screen.findByRole("button", { name: /Test Owner/ }, T));
+    await t.click(await screen.findByRole("link", { name: /Test Owner/ }, T));
     await t.click(screen.getByRole("button", { name: "Sign out" }));
     expect(t.calls()).toContainEqual({ op: "signOut" });
     expect(t.clicks()).toBe(2);

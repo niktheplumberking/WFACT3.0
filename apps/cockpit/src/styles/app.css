@@ -450,3 +450,7 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
 @media (max-width: 900px) {
   .siteprev-frames { grid-template-columns: minmax(0, 1fr); }
 }
+@media (max-width: 900px) {
+  /* above the phone tab bar */
+  .toasts { left: 16px; right: 16px; width: auto; bottom: calc(88px + env(safe-area-inset-bottom)); }
+}

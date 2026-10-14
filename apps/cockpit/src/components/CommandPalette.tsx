@@ -16,6 +16,8 @@ export interface PaletteItem {
   icon?: Icon;
   /** Extra words the search matches on. */
   keywords?: string;
+  /** Always listed, whatever is typed (e.g. "Ask the factory a question", which takes the typed text as the question). */
+  always?: boolean;
   run: (query: string) => void;
 }
 
@@ -25,7 +27,7 @@ export function matchItems(items: PaletteItem[], q: string): PaletteItem[] {
     const hay = `${i.label} ${i.hint ?? ""} ${i.keywords ?? ""} ${i.group}`.toLowerCase();
     return words.every((w) => hay.includes(w));
   };
-  return ORDER.flatMap((g) => items.filter((i) => i.group === g && (!words.length || hit(i))));
+  return ORDER.flatMap((g) => items.filter((i) => i.group === g && (!words.length || i.always || hit(i))));
 }
 
 export function CommandPalette({ open, onClose, items }: { open: boolean; onClose: () => void; items: PaletteItem[] }) {

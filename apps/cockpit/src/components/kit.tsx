@@ -202,3 +202,16 @@ export function TechDetails({ items = [], children, summary = "Technical details
     </details>
   );
 }
+
+/* ---------------- wordmark ---------------- */
+
+/** WFACT is a typeset wordmark until a real mark exists (locked decision 6): "WFACT" in Newsreader 600, then
+ *  "Cockpit" in Newsreader italic. No glyph tile. */
+export function Wordmark() {
+  return (
+    <span className="wordmark">
+      <span className="wordmark-a">WFACT</span>
+      <span className="wordmark-b">Cockpit</span>
+    </span>
+  );
+}

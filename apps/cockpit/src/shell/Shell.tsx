@@ -1,172 +1,277 @@
 /**
- * The navigation shell (Step 4C IA): five working areas plus honest "Coming in Step N" entries, a
- * "New request" button and an "Ask the factory" box on every screen, a phone tab bar, and the account
- * menu. Controls a role can't use are hidden; RLS still refuses them if anyone tries.
+ * The navigation shell (Cockpit v2, docs/design/cockpit-v2). Desktop: a 236 px rail (typeset wordmark, nav with the
+ * count of things that need you, "Coming later", Simple/Detailed, account) and a 68 px top bar (breadcrumb, "Search or
+ * run a command ⌘K", the bell, New request). Phone: a 60 px header (back, title, search, bell) and a tab bar (Home,
+ * Projects, New, Activity, More). Keyboard: ⌘K / Ctrl+K, /, G then H P A C, N, D, ?, Esc.
+ *
+ * Who sees what follows RLS, not the design where they disagree (BLOCKED-ON-NICK.md, 2026-10-14): Activity and Team are
+ * owner/admin (audit_log, jobs and account_requests are owner/admin only); Costs is owner only (model_traces is owner
+ * only). "Ask the factory a question" is a palette action (locked decision 5), using requestJob("ask", …).
  */
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
-  House, SealCheck, Path, ListChecks, Receipt, Heartbeat, Robot, Brain, Briefcase, UserCircle, Plus,
-  ChatCircleText, DotsThreeOutline, SignOut, GearSix,
+  House, SquaresFour, ListBullets, Coins, UsersThree, Bell, GearSix, Heartbeat, Robot, Brain, Briefcase, Plus,
+  MagnifyingGlass, CaretLeft, DotsThreeOutline, ChatCircleText, SlidersHorizontal, PlayCircle, Moon, Sun, Keyboard,
+  Storefront, X,
 } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
-import { supabase } from "../supabaseClient";
-import { requestJob } from "../jobsClient";
-import { canDecide, useFactory, useMe, useToast } from "../lib/state";
+import { requestJob, isActive } from "../jobsClient";
+import { canDecide, useFactory, useMe, useNotifications, useToast } from "../lib/state";
+import { useDetail } from "../lib/detail";
+import { applyAppearance, isDark, readAppearance, saveAppearance } from "../lib/appearance";
+import { planName } from "../lib/model";
+import { Segmented, Wordmark } from "../components/kit";
+import { CommandPalette, type PaletteItem } from "../components/CommandPalette";
+
+/** Rooms later steps build. Each shows an honest "Coming later" page until then: nothing rather than made-up numbers. */
+export const COMING: { slug: string; label: string; icon: Icon; what: string }[] = [
+  { slug: "system", label: "System", icon: Heartbeat, what: "Factory health in one place: whether the worker, database and AI services are up, how many builds are waiting, and when the last backup ran." },
+  { slug: "agents", label: "Agents", icon: Robot, what: "Every part of the factory, what it is doing now and how often it succeeds, with a path from any stop to the exact check." },
+  { slug: "memory", label: "Memory", icon: Brain, what: "What the factory has learned, facts that contradict each other, and old facts to review." },
+  { slug: "business", label: "Business", icon: Briefcase, what: "Client self-editing, closing reports and care plans." },
+];
+
+/** Title of each route: the h1-level name, the document title and the phone header. `parent` gives the breadcrumb. */
+const ROUTES: { re: RegExp; title: string; parent?: { label: string; to: string } }[] = [
+  { re: /^\/$/, title: "Home" },
+  { re: /^\/projects\/new/, title: "New request", parent: { label: "Projects", to: "/projects" } },
+  { re: /^\/projects\/.+/, title: "Project", parent: { label: "Projects", to: "/projects" } },
+  { re: /^\/projects/, title: "Projects" },
+  { re: /^\/decisions\/plans\//, title: "Proposal", parent: { label: "Projects", to: "/projects" } },
+  { re: /^\/decisions\/accounts/, title: "Team and access" },
+  { re: /^\/decisions/, title: "Decisions", parent: { label: "Home", to: "/" } },
+  { re: /^\/activity\/fixes/, title: "Rounds of fixes", parent: { label: "Activity", to: "/activity" } },
+  { re: /^\/activity\/.+/, title: "Build", parent: { label: "Activity", to: "/activity" } },
+  { re: /^\/activity/, title: "Activity" },
+  { re: /^\/costs/, title: "Costs" },
+  { re: /^\/team/, title: "Team and access" },
+  { re: /^\/notifications/, title: "Notifications" },
+  { re: /^\/settings/, title: "Settings" },
+  { re: /^\/more/, title: "More" },
+];
+
+function routeFor(pathname: string) {
+  if (pathname.startsWith("/soon/")) {
+    const room = COMING.find((c) => `/soon/${c.slug}` === pathname);
+    return { title: room?.label ?? "Coming later" };
+  }
+  return ROUTES.find((r) => r.re.test(pathname)) ?? { title: "Cockpit" };
+}
 
 interface NavEntry {
   to: string;
   label: string;
   icon: Icon;
   end?: boolean;
-  badge?: number;
+  count?: number;
+  /** Other paths that belong to this room (the design keeps Projects lit on a project, a proposal, a build). */
+  also?: RegExp;
 }
 
-/** Rooms later steps build. Each shows an honest "Coming in Step N" page until then (Huraira, 2026-10-01). */
-export const COMING: { slug: string; label: string; icon: Icon; step: number; what: string }[] = [
-  { slug: "system", label: "System", icon: Heartbeat, step: 9, what: "Factory health in one place: whether the worker, database and models are up, how many jobs are waiting, the error rate, and when the last backup ran." },
-  { slug: "agents", label: "Agents", icon: Robot, step: 10, what: "Every agent in the factory, what it is doing now, its success rate over time, and a drill-down from any failure to the exact check and trace." },
-  { slug: "memory", label: "Memory", icon: Brain, step: 14, what: "What the factory has written to memory, contradictions it found, and stale facts to review. Escalations and blocked tasks join Decisions in the same step." },
-  { slug: "business", label: "Business", icon: Briefcase, step: 23, what: "Owner's Key (client self-editing), closing reports and care plans, rebuilt on the new stack." },
-];
-
-const TITLES: [RegExp, string][] = [
-  [/^\/$/, "Home"],
-  [/^\/decisions\/plans\//, "Plan decision"],
-  [/^\/decisions/, "Decisions"],
-  [/^\/projects\/new/, "New request"],
-  [/^\/projects\/.+/, "Project"],
-  [/^\/projects/, "Projects"],
-  [/^\/activity\/.+/, "Run"],
-  [/^\/activity/, "Activity"],
-  [/^\/costs/, "Costs"],
-  [/^\/soon/, "Coming next"],
-  [/^\/settings/, "Settings"],
-  [/^\/more/, "More"],
-];
-
-function crumbsFor(pathname: string): { label: string; to?: string }[] {
-  const seg = pathname.split("/").filter(Boolean);
-  if (seg.length === 0) return [{ label: "Home" }];
-  const areas: Record<string, string> = { decisions: "Decisions", projects: "Projects", activity: "Activity", costs: "Costs", soon: "Coming next", settings: "Settings", more: "More" };
-  const area = areas[seg[0]!] ?? seg[0]!;
-  if (seg.length === 1) return [{ label: area }];
-  const leaf = TITLES.find(([re]) => re.test(pathname))?.[1] ?? "Details";
-  return [{ label: area, to: `/${seg[0]}` }, { label: leaf }];
+function isTyping(t: EventTarget | null): boolean {
+  const el = t as HTMLElement | null;
+  return !!el && (["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) || el.isContentEditable);
 }
 
-function AccountMenu() {
-  const me = useMe();
-  const [open, setOpen] = useState(false);
-  const wrap = useRef<HTMLDivElement>(null);
+const SHORTCUTS: [string, string][] = [
+  ["⌘ K", "Search or run a command"],
+  ["/", "Search"],
+  ["G then H", "Go home"],
+  ["G then P", "Go to projects"],
+  ["G then A", "Go to activity"],
+  ["G then C", "Go to costs"],
+  ["N", "New request"],
+  ["D", "Switch Simple or Detailed"],
+  ["?", "Show these shortcuts"],
+  ["Esc", "Close a panel"],
+];
+
+function ShortcutsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const opener = useRef<Element | null>(null);
   useEffect(() => {
-    if (!open) return;
-    const close = (e: MouseEvent | KeyboardEvent) => {
-      if (e instanceof KeyboardEvent ? e.key === "Escape" : !wrap.current?.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", close);
-    document.addEventListener("keydown", close);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("keydown", close);
-    };
+    const d = ref.current;
+    if (!d) return;
+    if (open && !d.open) {
+      opener.current = document.activeElement;
+      if (typeof d.showModal === "function") d.showModal();
+      else d.setAttribute("open", "");
+    } else if (!open && d.open) {
+      if (typeof d.close === "function") d.close();
+      else d.removeAttribute("open");
+      (opener.current as HTMLElement | null)?.focus?.();
+    }
   }, [open]);
   return (
-    <div className="menu-wrap" ref={wrap}>
-      {open && (
-        <div className="menu" id="account-menu">
-          <Link to="/settings" onClick={() => setOpen(false)}>
-            <GearSix aria-hidden="true" />
-            Settings
-          </Link>
-          <button type="button" onClick={() => supabase.auth.signOut()}>
-            <SignOut aria-hidden="true" />
-            Sign out
-          </button>
-        </div>
-      )}
-      <button className="who" type="button" aria-expanded={open} aria-controls="account-menu" onClick={() => setOpen(!open)}>
-        <UserCircle aria-hidden="true" size={28} />
-        <span>
-          <b>{me.fullName ?? me.email}</b>
-          <small>{me.role ? `${me.role[0]!.toUpperCase()}${me.role.slice(1)}. Account, sign out` : "Account, sign out"}</small>
-        </span>
-      </button>
-    </div>
-  );
-}
-
-function AskBox() {
-  const [q, setQ] = useState("");
-  const [busy, setBusy] = useState(false);
-  const nav = useNavigate();
-  const toast = useToast();
-  const input = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement;
-      if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName) && !t.isContentEditable) {
-        e.preventDefault();
-        input.current?.focus();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, []);
-  return (
-    <form
-      className="ask"
-      role="search"
-      onSubmit={async (e) => {
-        e.preventDefault();
-        if (!q.trim() || busy) return;
-        setBusy(true);
-        const { jobId, error } = await requestJob("ask", { question: q.trim() });
-        setBusy(false);
-        if (error && !jobId) return toast(`Your question wasn't sent: ${error}`);
-        setQ("");
-        if (error) toast(error);
-        if (jobId) nav(`/activity/${jobId}`);
-      }}
-    >
-      <ChatCircleText aria-hidden="true" />
-      <label htmlFor="ask-q" className="sr-only">
-        Ask the factory a question
-      </label>
-      <input id="ask-q" ref={input} placeholder="Ask the factory a question" maxLength={500} value={q} onChange={(e) => setQ(e.target.value)} disabled={busy} />
-      <kbd aria-hidden="true">/</kbd>
-    </form>
+    <dialog ref={ref} className="dialog sheet" aria-labelledby="keys-h" onCancel={(e) => { e.preventDefault(); onClose(); }}>
+      <div className="sheet-head">
+        <h2 id="keys-h">Keyboard shortcuts</h2>
+        <button type="button" className="icon-btn" aria-label="Close" onClick={onClose}>
+          <X aria-hidden="true" />
+        </button>
+      </div>
+      <dl className="keys">
+        {SHORTCUTS.map(([k, d]) => (
+          <div key={k}>
+            <dt>
+              <kbd className="kbd">{k}</kbd>
+            </dt>
+            <dd>{d}</dd>
+          </div>
+        ))}
+      </dl>
+    </dialog>
   );
 }
 
 export function Shell({ children }: { children: ReactNode }) {
   const me = useMe();
-  const { decisions } = useFactory();
+  const { attention, plans, jobs } = useFactory();
+  const { unread } = useNotifications();
+  const { detail, detailed, setDetail, toggle } = useDetail();
+  const toast = useToast();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const decider = canDecide(me.role);
-  const crumbs = crumbsFor(pathname);
+  const owner = me.role === "owner";
+  const route = routeFor(pathname);
   const mainRef = useRef<HTMLElement>(null);
+  const [palette, setPalette] = useState(false);
+  const [keys, setKeys] = useState(false);
 
   // One title per screen, and focus moves to the content on navigation so screen readers hear the new page.
   const first = useRef(true);
   useEffect(() => {
-    const t = TITLES.find(([re]) => re.test(pathname))?.[1] ?? "Cockpit";
-    document.title = `${t} · WFACT Cockpit`;
+    document.title = `${route.title} · WFACT Cockpit`;
     if (first.current) {
       first.current = false;
       return;
     }
     mainRef.current?.focus({ preventScroll: true });
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [pathname, route.title]);
+
+  const go = (to: string) => navigate(to);
+
+  // Global keys. Single letters never fire while typing; ⌘K / Ctrl+K always does.
+  useEffect(() => {
+    let gAt = 0;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPalette(true);
+        return;
+      }
+      if (e.metaKey || e.ctrlKey || e.altKey || isTyping(e.target) || document.querySelector("dialog[open]")) return;
+      const k = e.key.toLowerCase();
+      if (gAt && Date.now() - gAt < 1500) {
+        gAt = 0;
+        const to = { h: "/", p: "/projects", a: decider ? "/activity" : null, c: owner ? "/costs" : null }[k];
+        if (to) {
+          e.preventDefault();
+          navigate(to);
+        }
+        return;
+      }
+      if (k === "g") gAt = Date.now();
+      else if (e.key === "/") {
+        e.preventDefault();
+        setPalette(true);
+      } else if (k === "n" && decider) {
+        e.preventDefault();
+        navigate("/projects/new");
+      } else if (k === "d") {
+        e.preventDefault();
+        toggle();
+      } else if (e.key === "?") {
+        e.preventDefault();
+        setKeys(true);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [decider, owner, navigate, toggle]);
 
   const nav: NavEntry[] = [
-    { to: "/", label: "Home", icon: House, end: true },
-    ...(decider ? [{ to: "/decisions", label: "Decisions", icon: SealCheck, badge: decisions }] : []),
-    { to: "/projects", label: "Projects", icon: Path },
-    ...(decider ? [{ to: "/activity", label: "Activity", icon: ListChecks }] : []),
-    ...(me.role === "owner" ? [{ to: "/costs", label: "Costs", icon: Receipt }] : []),
+    { to: "/", label: "Home", icon: House, end: true, count: attention.length },
+    { to: "/projects", label: "Projects", icon: SquaresFour, also: /^\/(projects|decisions\/plans)/ },
+    ...(decider ? [{ to: "/activity", label: "Activity", icon: ListBullets }] : []),
+    ...(owner ? [{ to: "/costs", label: "Costs", icon: Coins }] : []),
+    ...(decider ? [{ to: "/team", label: "Team", icon: UsersThree, also: /^\/decisions\/accounts/ }] : []),
+    { to: "/notifications", label: "Notifications", icon: Bell },
+    { to: "/settings", label: "Settings", icon: GearSix },
   ];
+  const current = (n: NavEntry) => (n.end ? pathname === n.to : pathname.startsWith(n.to) || !!n.also?.test(pathname));
+
+  // The palette: real clients (latest proposal per client), actions, rooms and settings.
+  const items = useMemo<PaletteItem[]>(() => {
+    const byClient = new Map<string, NonNullable<typeof plans>[number]>();
+    for (const p of [...(plans ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))) if (!byClient.has(p.client_slug)) byClient.set(p.client_slug, p);
+    const running = (jobs ?? []).find((j) => isActive(j) && (j.kind === "build_plan" || j.kind === "resume"));
+    const dark = isDark(readAppearance().theme);
+    const list: PaletteItem[] = [
+      ...[...byClient.values()].map((p) => ({ id: `c-${p.id}`, group: "Clients" as const, label: planName(p), hint: p.status === "pending" ? "Proposal waiting" : "Proposal approved", icon: Storefront, keywords: p.client_slug, run: () => go(`/decisions/plans/${p.id}`) })),
+      ...(decider ? [{ id: "a-new", group: "Actions" as const, label: "New request", hint: "N", icon: Plus, run: () => go("/projects/new") }] : []),
+      ...(decider
+        ? [{
+            id: "a-ask",
+            group: "Actions" as const,
+            label: "Ask the factory a question",
+            hint: "Answered in plain words in Activity",
+            icon: ChatCircleText,
+            keywords: "question help",
+            always: true,
+            run: async (q: string) => {
+              const question = q.trim();
+              if (!question || /^ask( the factory)?( a question)?$/i.test(question)) {
+                toast("Type your question in the search box, then choose “Ask the factory a question”.");
+                return;
+              }
+              const { jobId, error } = await requestJob("ask", { question });
+              if (error && !jobId) return toast(`Your question wasn't sent: ${error}`);
+              toast("Question sent. The answer appears in Activity, usually within a minute.");
+              if (jobId) go(`/activity/${jobId}`);
+            },
+          }]
+        : []),
+      { id: "a-detail", group: "Actions", label: `Switch to ${detailed ? "Simple" : "Detailed"}`, hint: "D", icon: SlidersHorizontal, run: () => toggle() },
+      ...(running ? [{ id: "a-watch", group: "Actions" as const, label: "Watch the running build", icon: PlayCircle, run: () => go(`/activity/${running.id}`) }] : []),
+      {
+        id: "a-theme",
+        group: "Actions",
+        label: `Switch to ${dark ? "light" : "dark"} appearance`,
+        icon: dark ? Sun : Moon,
+        run: () => {
+          const a = { ...readAppearance(), theme: dark ? ("light" as const) : ("dark" as const) };
+          saveAppearance(a);
+          applyAppearance(a);
+        },
+      },
+      { id: "g-home", group: "Go to", label: "Home", hint: "G then H", icon: House, run: () => go("/") },
+      { id: "g-projects", group: "Go to", label: "Projects", hint: "G then P", icon: SquaresFour, run: () => go("/projects") },
+      ...(decider ? [{ id: "g-activity", group: "Go to" as const, label: "Activity", hint: "G then A", icon: ListBullets, run: () => go("/activity") }] : []),
+      ...(owner ? [{ id: "g-costs", group: "Go to" as const, label: "Costs", hint: "G then C", icon: Coins, run: () => go("/costs") }] : []),
+      { id: "g-notifications", group: "Go to", label: "Notifications", icon: Bell, run: () => go("/notifications") },
+      { id: "s-settings", group: "Settings", label: "Appearance and settings", icon: GearSix, run: () => go("/settings") },
+      { id: "s-keys", group: "Settings", label: "Keyboard shortcuts", hint: "?", icon: Keyboard, run: () => setKeys(true) },
+    ];
+    return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plans, jobs, decider, owner, detailed, toggle]);
+
+  const bellLabel = unread.length ? `Notifications, ${unread.length} unread` : "Notifications";
+  const initial = (me.fullName ?? me.email ?? "?").trim().charAt(0).toUpperCase();
+  const roleWord = me.role ? `${me.role[0]!.toUpperCase()}${me.role.slice(1)}` : "No role yet";
+
+  const tabs: NavEntry[] = [
+    { to: "/", label: "Home", icon: House, end: true, count: attention.length },
+    { to: "/projects", label: "Projects", icon: SquaresFour, also: /^\/(projects(?!\/new)|decisions\/plans)/ },
+    ...(decider ? [{ to: "/projects/new", label: "New", icon: Plus }] : []),
+    ...(decider ? [{ to: "/activity", label: "Activity", icon: ListBullets }] : []),
+    { to: "/more", label: "More", icon: DotsThreeOutline, also: /^\/(more|costs|team|settings|notifications|soon|decisions\/accounts)/ },
+  ];
+  const tabCurrent = (t: NavEntry) => (t.end ? pathname === t.to : t.to === "/projects" ? !!t.also?.test(pathname) : pathname.startsWith(t.to) || !!t.also?.test(pathname));
 
   return (
     <>
@@ -175,51 +280,71 @@ export function Shell({ children }: { children: ReactNode }) {
       </a>
       <div className="shell">
         <aside className="rail" aria-label="Main">
-          <Link to="/" className="mark" style={{ textDecoration: "none", color: "inherit" }}>
-            <span className="mark-glyph" aria-hidden="true">WF</span>
-            <span className="mark-name">
-              WFACT<span>Cockpit</span>
-            </span>
+          <Link to="/" className="rail-mark" aria-label="WFACT Cockpit, Home">
+            <Wordmark />
           </Link>
           <nav className="nav" aria-label="Main navigation">
-            {nav.map((n) => (
-              <NavLink key={n.to} to={n.to} end={n.end}>
-                <n.icon aria-hidden="true" />
-                {n.label}{" "}
-                {!!n.badge && (
-                  <span className="count">
-                    {n.badge}
-                    {" "}<span className="sr-only">waiting</span>
-                  </span>
-                )}
-              </NavLink>
-            ))}
-            <div className="nav-group" id="soon-label">
-              Coming next
-            </div>
+            {nav.map((n) => {
+              const on = current(n);
+              return (
+                <NavLink key={n.to} to={n.to} end={n.end} aria-current={on ? "page" : undefined} className={on ? "on" : undefined}>
+                  <n.icon aria-hidden="true" weight={on ? "fill" : "regular"} />
+                  <span className="nav-label">{n.label}</span>{" "}
+                  {!!n.count && (
+                    <span className="count">
+                      {n.count}{" "}
+                      <span className="sr-only">waiting</span>
+                    </span>
+                  )}
+                </NavLink>
+              );
+            })}
+            <p className="nav-group" id="soon-label">
+              Coming later
+            </p>
             {COMING.map((c) => (
               <NavLink key={c.slug} to={`/soon/${c.slug}`} className="soon" aria-describedby="soon-label">
                 <c.icon aria-hidden="true" />
-                {c.label}{" "}
-                <span className="step">Step {c.step}</span>
+                {c.label}
               </NavLink>
             ))}
           </nav>
           <div className="rail-foot">
-            <AccountMenu />
+            <Segmented label="Detail level" value={detail} onChange={setDetail} options={[{ value: "simple", label: "Simple" }, { value: "detailed", label: "Detailed" }]} />
+            <Link to="/settings" className="who">
+              <span className="who-initial" aria-hidden="true">
+                {initial}
+              </span>
+              <span>
+                <b>{me.fullName ?? me.email}</b>
+                <small>{roleWord}</small>
+              </span>
+            </Link>
           </div>
         </aside>
         <div className="main">
           <header className="topbar">
             <nav className="crumbs" aria-label="Breadcrumb">
-              {/* Flat siblings, so the phone layout can hide everything but the current page. */}
-              {crumbs.flatMap((c, i) => [
-                ...(i > 0 ? [<span key={`s${i}`} aria-hidden="true">/</span>] : []),
-                c.to ? <Link key={`c${i}`} to={c.to}>{c.label}</Link> : <span key={`c${i}`} aria-current="page">{c.label}</span>,
-              ])}
+              {"parent" in route && route.parent && (
+                <>
+                  <Link to={route.parent.to}>{route.parent.label}</Link>
+                  <span aria-hidden="true">/</span>
+                </>
+              )}
+              <span aria-current="page">{route.title}</span>
             </nav>
             <span className="spacer" />
-            {decider && <AskBox />}
+            <button type="button" className="search" aria-label="Search or run a command" aria-keyshortcuts="Meta+K Control+K" onClick={() => setPalette(true)}>
+              <MagnifyingGlass aria-hidden="true" />
+              <span className="search-text">Search or run a command</span>
+              <kbd className="kbd" aria-hidden="true">
+                ⌘K
+              </kbd>
+            </button>
+            <Link to="/notifications" className="bell" aria-label={bellLabel}>
+              <Bell aria-hidden="true" />
+              {unread.length > 0 && <span className="dot" aria-hidden="true" />}
+            </Link>
             {decider && (
               <Link className="btn primary" to="/projects/new">
                 <Plus aria-hidden="true" />
@@ -227,37 +352,48 @@ export function Shell({ children }: { children: ReactNode }) {
               </Link>
             )}
           </header>
-          <main id="main" className="page" ref={mainRef} tabIndex={-1} style={{ outline: "none" }}>
+          <header className="phonebar">
+            {"parent" in route && route.parent && (
+              <Link to={route.parent.to} className="icon-btn back" aria-label={`Back to ${route.parent.label}`}>
+                <CaretLeft aria-hidden="true" />
+              </Link>
+            )}
+            <span className="phonebar-title">{route.title}</span>
+            <button type="button" className="icon-btn" aria-label="Search or run a command" onClick={() => setPalette(true)}>
+              <MagnifyingGlass aria-hidden="true" />
+            </button>
+            <Link to="/notifications" className="icon-btn bell-phone" aria-label={bellLabel}>
+              <Bell aria-hidden="true" />
+              {unread.length > 0 && <span className="dot" aria-hidden="true" />}
+            </Link>
+          </header>
+          <main id="main" className="page" ref={mainRef} tabIndex={-1}>
             {children}
           </main>
         </div>
       </div>
-      <nav className="tabbar" aria-label="Phone navigation" style={{ gridTemplateColumns: `repeat(${decider ? 4 : 3}, 1fr)` }}>
-        <NavLink to="/" end>
-          <House aria-hidden="true" />
-          Home
-        </NavLink>
-        {decider && (
-          <NavLink to="/decisions">
-            <SealCheck aria-hidden="true" />
-            Decisions{" "}
-            {!!decisions && (
-              <span className="count">
-                {decisions}
-                {" "}<span className="sr-only">waiting</span>
-              </span>
-            )}
-          </NavLink>
-        )}
-        <NavLink to="/projects">
-          <Path aria-hidden="true" />
-          Projects
-        </NavLink>
-        <NavLink to="/more">
-          <DotsThreeOutline aria-hidden="true" />
-          More
-        </NavLink>
+      <nav className="tabbar" aria-label="Phone navigation" style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}>
+        {tabs.map((t) => {
+          const on = tabCurrent(t);
+          const isNew = t.to === "/projects/new";
+          return (
+            <Link key={t.to} to={t.to} aria-current={on ? "page" : undefined} className={isNew ? "tab-new" : undefined}>
+              <span className="tab-icon">
+                <t.icon aria-hidden="true" weight={on ? "fill" : "regular"} />
+                {!!t.count && (
+                  <span className="count">
+                    {t.count}{" "}
+                    <span className="sr-only">waiting</span>
+                  </span>
+                )}
+              </span>{" "}
+              {t.label}
+            </Link>
+          );
+        })}
       </nav>
+      <CommandPalette open={palette} onClose={() => setPalette(false)} items={items} />
+      <ShortcutsSheet open={keys} onClose={() => setKeys(false)} />
     </>
   );
 }

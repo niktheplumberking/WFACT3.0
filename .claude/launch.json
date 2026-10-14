@@ -45,6 +45,25 @@
         "--strictPort"
       ],
       "port": 5174
+    },
+    {
+      "name": "cockpit-fake",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "COCKPIT_FAKE_DB=1",
+        "VITE_SUPABASE_URL=http://127.0.0.1:9",
+        "VITE_SUPABASE_ANON_KEY=dev-fixture-not-a-key",
+        "npm",
+        "--prefix",
+        "apps/cockpit",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5175",
+        "--strictPort"
+      ],
+      "port": 5175
     }
   ]
 }

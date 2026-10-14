@@ -15,7 +15,8 @@
  */
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "../supabaseClient";
-import { Notice, RouteLine } from "../components/ui";
+import { Notice } from "../components/ui";
+import { Wordmark } from "../components/kit";
 
 export const MIN_PASSWORD_LENGTH = 12;
 
@@ -23,20 +24,12 @@ function AuthFrame({ title, children }: { title: string; children: ReactNode }) 
   return (
     <div className="auth">
       <aside className="auth-side" aria-hidden="true">
-        <div className="mark">
-          <span className="mark-glyph">WF</span>
-          <span className="mark-name">
-            WFACT<span>Cockpit</span>
-          </span>
+        <Wordmark />
+        <div className="auth-thesis">
+          <p className="t-title">A quiet room where every decision is yours.</p>
+          <p className="t-lead">Every request, build and check in one place. Launch and money always stay with a person.</p>
         </div>
-        <div className="stack-tight">
-          <p style={{ font: "700 var(--t-xl)/1.25 var(--face-plate)", color: "var(--ink)", maxWidth: "22ch" }}>A route only lights when every signal along it is proven clear.</p>
-          <p>The control room for the factory: every decision, every build and every check, in one place. Launch and money always stay with a person.</p>
-          <div style={{ maxWidth: 420 }}>
-            <RouteLine stage="6_full_build_owners_key" name="Example route" />
-          </div>
-        </div>
-        <span className="quiet fine">WFACT 3.0</span>
+        <span className="t-eyebrow">WFACT 3.0</span>
       </aside>
       <main className="auth-main">
         <div className="auth-card">

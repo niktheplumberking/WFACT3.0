@@ -1,8 +1,14 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { fileURLToPath } from "node:url";
+
+// DEV ONLY: COCKPIT_FAKE_DB=1 swaps the Supabase client for the synthetic test fake (src/dev/fakeSupabase.ts) so the
+// signed-in rooms can be screenshotted and axe-checked. Only `vite` serve honours it; `vite build` never does.
+const fakeDb = process.env.COCKPIT_FAKE_DB === "1" && process.argv.every((a) => a !== "build");
 
 export default defineConfig({
+  resolve: fakeDb ? { alias: [{ find: /^(\.\.?\/)+supabaseClient$/, replacement: fileURLToPath(new URL("./src/dev/fakeSupabase.ts", import.meta.url)) }] } : undefined,
   // MVP M6: the Costs page reads the factory's one price table and spend caps (packages/hermes/config) at build time.
   server: { fs: { allow: [".", "../../packages/hermes/config"] } },
   plugins: [

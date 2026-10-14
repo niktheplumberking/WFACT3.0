@@ -12,6 +12,7 @@ import { FactoryProvider, MeProvider, ToastProvider, type Me } from "./lib/state
 import type { Role } from "./lib/model";
 import { Shell } from "./shell/Shell";
 import { Loading } from "./components/ui";
+import { DetailProvider } from "./lib/detail";
 
 const Home = lazy(() => import("./pages/Home"));
 const PlansTab = lazy(() => import("./pages/Decisions"));
@@ -29,6 +30,7 @@ const ComingSoon = lazy(() => import("./pages/Misc").then((m) => ({ default: m.C
 const More = lazy(() => import("./pages/Misc").then((m) => ({ default: m.More })));
 const Settings = lazy(() => import("./pages/Misc").then((m) => ({ default: m.Settings })));
 const NotFound = lazy(() => import("./pages/Misc").then((m) => ({ default: m.NotFound })));
+const Notifications = lazy(() => import("./pages/Misc").then((m) => ({ default: m.Notifications })));
 
 interface Profile {
   role: Role | null;
@@ -82,6 +84,9 @@ export function CockpitRoutes() {
         <Route path="/costs" element={<Costs />} />
         <Route path="/soon/:slug" element={<ComingSoon />} />
         <Route path="/more" element={<More />} />
+        {/* Team and access: account requests until the Team room (Cockpit v2 phase 12) adds invites and assignments. */}
+        <Route path="/team" element={<AccountsTab />} />
+        <Route path="/notifications" element={<Notifications />} />
         <Route path="/settings" element={<Settings />} />
         {/* Old room names (before Step 4C) still land somewhere sensible. */}
         <Route path="/pipeline" element={<Navigate to="/projects" replace />} />
@@ -98,13 +103,15 @@ export function CockpitRoutes() {
 export function SignedIn({ me }: { me: Me }) {
   return (
     <MeProvider value={me}>
-      <ToastProvider>
-        <FactoryProvider>
-          <Shell>
-            <CockpitRoutes />
-          </Shell>
-        </FactoryProvider>
-      </ToastProvider>
+      <DetailProvider role={me.role}>
+        <ToastProvider>
+          <FactoryProvider>
+            <Shell>
+              <CockpitRoutes />
+            </Shell>
+          </FactoryProvider>
+        </ToastProvider>
+      </DetailProvider>
     </MeProvider>
   );
 }

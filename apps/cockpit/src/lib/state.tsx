@@ -245,3 +245,42 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 }
 
 export const useToast = () => useContext(ToastContext);
+
+/* ---------------- notifications (v2): the same source as Home attention ---------------- */
+
+const seenKey = (userId: string | null) => `cockpit-notifications-seen:${userId ?? "anon"}`;
+
+/** An item is unread when it is newer than the last "Mark all as read" in this browser (per person). The bell and the
+ *  Notifications inbox read this; nothing here invents an item. */
+export function unreadOf(items: AttentionItem[], seenAt: string | null): AttentionItem[] {
+  return seenAt ? items.filter((i) => i.at > seenAt) : items;
+}
+
+export function useNotifications() {
+  const me = useMe();
+  const { attention } = useFactory();
+  const [seenAt, setSeenAt] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem(seenKey(me.userId));
+    } catch {
+      return null;
+    }
+  });
+  // Every bell and inbox on the page hears "Mark all as read" at once.
+  useEffect(() => {
+    const on = (e: Event) => setSeenAt((e as CustomEvent<string>).detail);
+    window.addEventListener("cockpit-notifications-seen", on);
+    return () => window.removeEventListener("cockpit-notifications-seen", on);
+  }, []);
+  const unread = useMemo(() => unreadOf(attention, seenAt), [attention, seenAt]);
+  const markAllRead = useCallback(() => {
+    const now = new Date().toISOString();
+    try {
+      localStorage.setItem(seenKey(me.userId), now);
+    } catch {
+      /* private mode: lasts for this visit */
+    }
+    window.dispatchEvent(new CustomEvent("cockpit-notifications-seen", { detail: now }));
+  }, [me.userId]);
+  return { items: attention, unread, isUnread: (i: AttentionItem) => unread.includes(i), markAllRead };
+}
