@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1791995774.012484,
-    "seen": 1791995777.812639,
-    "ast_hash": "e4dc65aebe44bd432101485dff3c942f",
+    "mtime": 1791996253.0430346,
+    "seen": 1791996256.893091,
+    "ast_hash": "f88d38627369d0329fdf1ca55c839bc7",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1791995774.0119772,
-    "seen": 1791995777.813079,
-    "ast_hash": "216991eaf9e7bce59d0db14b2220972d",
+    "mtime": 1791996253.0425923,
+    "seen": 1791996256.893495,
+    "ast_hash": "642c29b1cee0dbb10ecbc8e8572469e1",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1656,9 +1656,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/flows.test.tsx": {
-    "mtime": 1791994639.47823,
-    "seen": 1791995213.563937,
-    "ast_hash": "7cadc17f27e44c58f4a2906ba88cf56a",
+    "mtime": 1791996173.1221335,
+    "seen": 1791996256.8881621,
+    "ast_hash": "c2bb2ee4915d42d6425d77f50a873c8c",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/attention.ts": {
@@ -1692,9 +1692,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Decisions.tsx": {
-    "mtime": 1791981870.269583,
-    "seen": 1791982653.709994,
-    "ast_hash": "e9f7194641714d8626e8b4c914f8e600",
+    "mtime": 1791996145.503178,
+    "seen": 1791996256.888559,
+    "ast_hash": "38d53b626d690f09a736880c103f19fd",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Home.tsx": {
@@ -4305,6 +4305,12 @@
     "mtime": 1791995774.0153353,
     "seen": 1791995777.812363,
     "ast_hash": "5c2734b46527ea6f28ecf815c8e0fcfd",
+    "semantic_hash": ""
+  },
+  ".claude/completions/2026-10-15-step-28-package-4-phase-9.md": {
+    "mtime": 1791996253.044441,
+    "seen": 1791996256.89282,
+    "ast_hash": "70ca2f1a8f0bd5ad09a4af3149f6989c",
     "semantic_hash": ""
   }
 }
