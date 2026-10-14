@@ -77,7 +77,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Button({ variant = "secondary", size = "default", icon: Lead, iconAfter: Trail, className, children, type = "button", ...rest }: ButtonProps) {
   return (
-    <button type={type} className={["btn", variant, size === "page" ? "page" : "", className ?? ""].filter(Boolean).join(" ")} {...rest}>
+    <button type={type} className={["btn", variant, size === "page" ? "btn-page" : "", className ?? ""].filter(Boolean).join(" ")} {...rest}>
       {Lead && <Lead aria-hidden="true" />}
       {children}
       {Trail && <Trail aria-hidden="true" />}
@@ -87,7 +87,7 @@ export function Button({ variant = "secondary", size = "default", icon: Lead, ic
 
 export function ButtonLink({ to, variant = "secondary", size = "default", icon: Lead, iconAfter: Trail, children }: { to: string; variant?: ButtonVariant; size?: "default" | "page"; icon?: Icon; iconAfter?: Icon; children: ReactNode }) {
   return (
-    <Link to={to} className={["btn", variant, size === "page" ? "page" : ""].filter(Boolean).join(" ")}>
+    <Link to={to} className={["btn", variant, size === "page" ? "btn-page" : ""].filter(Boolean).join(" ")}>
       {Lead && <Lead aria-hidden="true" />}
       {children}
       {Trail && <Trail aria-hidden="true" />}

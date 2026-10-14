@@ -75,7 +75,7 @@ export function ProgressStrip({ step, tone, steps, nextLine, next, stepWord }: {
         </div>
         {next &&
           (next.href ? (
-            <a className="btn primary page" href={next.href}>
+            <a className="btn primary btn-page" href={next.href}>
               {next.label}
               <ArrowRight aria-hidden="true" />
             </a>

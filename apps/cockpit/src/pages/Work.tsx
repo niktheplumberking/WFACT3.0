@@ -5,15 +5,17 @@
  */
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowRight, BookmarkSimple, MagnifyingGlass, Plus, PushPin, Rows, SquaresFour } from "@phosphor-icons/react";
+import { BookmarkSimple, MagnifyingGlass, Plus, PushPin, Rows, SquaresFour } from "@phosphor-icons/react";
 import { supabase } from "../supabaseClient";
 import { requestJob } from "../jobsClient";
 import { dateTime, type RoundRow } from "../lib/model";
 import { canDecide, useFactory, useLoad, useMe, useToast } from "../lib/state";
 import { stageLabel } from "../stages";
-import { Empty, LoadError, Loading, Notice, PageHead, Plate, RouteLine } from "../components/ui";
+import { ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, Plate, RouteLine } from "../components/ui";
 import { fetchProjects } from "./Home";
-import { Button, ButtonLink, EmptyState, PathSegments, Segmented, StatusChip, TechDetails, type StatusTone } from "../components/kit";
+import { Button, ButtonLink, EmptyState, PathSegments, Segmented, StatusChip, StatusGlyph, TechDetails, type StatusTone } from "../components/kit";
+import { buildStopLine, capped, fetchCostData, fetchRequestCost, money, runSpend } from "../lib/costs";
+import { estimate, formatMs, median } from "../lib/timeline";
 import { STEP_NAMES } from "../lib/path";
 import type { ClientRow } from "../lib/clients";
 import { StageMove } from "./Decisions";
@@ -480,183 +482,234 @@ export function ProjectPage() {
 const PAGE_PATH = /^clients\/[a-z][a-z0-9-]*\/pages\/[a-z0-9-]+\.html$/;
 const KNOWN_PAGE = "clients/dreamsign-pilot/pages/clean-agency.html";
 
+/** The business name has no field of its own in intake (it reads the text); it travels as a labelled first line. */
+export function requestTextWith(text: string, businessName: string): string {
+  const name = businessName.trim();
+  return name ? `Business name: ${name}\n\n${text}` : text;
+}
+
+/**
+ * New request (Cockpit v2): the client's words, their business name, live address and logo; one primary, "Send to the
+ * factory", with the cost beside it. Sending starts paid work, so it confirms the rough cost first (hard rule: money
+ * confirms). Rough cost and times come from past runs only; with none to go on, the words say so instead of a figure.
+ */
 export function NewRequest() {
   const nav = useNavigate();
   const toast = useToast();
+  const me = useMe();
   const f = useFactory();
+  const owner = me.role === "owner";
   const [text, setText] = useState("");
+  const [name, setName] = useState("");
   // What the request text cannot carry: the logo file and the live address (set on the brief by code, never by a model).
   const [logo, setLogo] = useState<LogoRecord | null>(null);
   const [siteUrl, setSiteUrl] = useState("");
   const [siteUrlTouched, setSiteUrlTouched] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [goal, setGoal] = useState("");
-  const [goalTouched, setGoalTouched] = useState(false);
-  const [busy, setBusy] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const requestCost = useLoad(async () => (owner ? fetchRequestCost() : null), [owner]);
+  const buildCosts = useLoad(async () => (owner ? fetchCostData() : null), [owner]);
 
-  // Pages the factory has built (single-page builds), plus the DreamSign pilot page in the repo.
-  const pages = useMemo(() => {
-    const found = (f.jobs ?? [])
-      .map((j) => (j.result?.lastCheckpoint as { path?: string } | null | undefined)?.path)
-      .filter((p): p is string => !!p && PAGE_PATH.test(p));
-    return [...new Set([KNOWN_PAGE, ...found])];
-  }, [f.jobs]);
-  const [page, setPage] = useState(KNOWN_PAGE);
-
-  async function go(kind: "intake" | "ask" | "verify", params: Record<string, unknown>, ok: string) {
-    setBusy(kind);
-    setError(null);
-    const { jobId, error: e } = await requestJob(kind, params);
-    setBusy(null);
-    if (!jobId) return setError(`It didn't start: ${e}. Nothing changed; try again.`);
-    toast(e ?? ok);
-    await f.reload();
-    nav(`/activity/${jobId}`);
-  }
-
-  const goalError = goalTouched && !goal.trim() ? "Say what the page is for, so the checks know what to judge." : null;
   const site = siteUrl.trim() ? checkSiteUrl(siteUrl) : null;
   const siteUrlError = siteUrlTouched && site && !site.ok ? site.reason : null;
   const siteUrlNote = site?.ok && isTestAddress(site.value) ? "That is a test address, so the site is built without search and share tags until the real address is added." : null;
 
+  // Past runs only: how long reading a request and a build usually take, and what a build usually costs.
+  const jobs = f.jobs ?? [];
+  const took = (kinds: string[]) => estimate(jobs.filter((j) => kinds.includes(j.kind) && j.status === "succeeded" && j.started_at && j.finished_at).map((j) => Date.parse(j.finished_at!) - Date.parse(j.started_at!)));
+  const proposalTime = took(["intake"]);
+  const buildTime = took(["build_plan", "resume"]);
+  const runCosts = (buildCosts.data?.runs ?? []).map((r) => capped(runSpend(r))).filter((x) => x > 0);
+  const buildCost = runCosts.length >= 3 ? median(runCosts) : null;
+  const cost = typeof requestCost.data === "number" ? `about ${money(requestCost.data)}` : null;
+  const costWords = cost ? `Costs ${cost} to read and write the proposal.` : "Costs a few cents to read and write the proposal.";
+  const about = (e: ReturnType<typeof estimate>) => (e.kind === "ok" ? `Usually about ${formatMs(e.medianMs)}` : null);
+
+  const sentence = (parts: (string | null)[], joiner: string) => {
+    const p = parts.filter(Boolean).join(joiner);
+    return p ? `${p}.` : "";
+  };
+  const next = [
+    { t: "The factory writes a proposal", d: ["What the site is, its pages, the kind of site it recommends and any open questions.", sentence([about(proposalTime), cost], ", ")].filter(Boolean).join(" ") },
+    { t: "You approve it, or ask for changes", d: "You choose the kind of site. Takes as long as you need." },
+    { t: "You add anything missing", d: "The logo, pictures, contact details. Skip what you do not have; nothing is made up." },
+    { t: "The factory builds and checks it", d: [sentence([about(buildTime), buildCost ? `about ${money(buildCost)}` : null], " and "), buildStopLine()].filter(Boolean).join(" ") },
+    { t: "You approve the finished site", d: "A person launches it, outside the Cockpit." },
+  ];
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!text.trim() || sending) return;
+    if (site && !site.ok) return setSiteUrlTouched(true);
+    setConfirming(true);
+  }
+
+  async function send() {
+    setConfirming(false);
+    setSending(true);
+    setError(null);
+    const { jobId, error: err } = await requestJob("intake", { text: requestTextWith(text, name), ...(site?.ok ? { siteUrl: site.value } : {}), ...(logo ? { logo } : {}) });
+    if (!jobId) {
+      setSending(false);
+      return setError(`It was not sent: ${err}. Nothing changed; try again.`);
+    }
+    toast(err ?? "The factory is reading the request. The proposal shows on Home when it is ready.");
+    await f.reload();
+    nav(`/activity/${jobId}`);
+  }
+
   return (
-    <>
-      <PageHead title="Start work from a client request" lead="Paste the client's email or form. The factory reads it, writes a plan and puts it in Decisions for you, usually within a minute." />
-      {error && (
-        <div style={{ marginBottom: 24 }}>
-          <Notice tone="stop">{error}</Notice>
-        </div>
-      )}
-      <div className="split">
-        <Plate title="Client request">
-          <form
-            className="plate-body stack-tight"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!text.trim()) return;
-              if (site && !site.ok) {
-                setSiteUrlTouched(true);
-                return;
-              }
-              go(
-                "intake",
-                { text, ...(site?.ok ? { siteUrl: site.value } : {}), ...(logo ? { logo } : {}) },
-                "Reading the request. The plan will appear in Decisions.",
-              );
-            }}
-          >
+    <div className="newreq">
+      <header className="newreq-head">
+        <h1 className="t-title">New request</h1>
+        <p className="t-lead muted">Paste what the client asked for. The factory turns it into a proposal for you to approve. Nothing is built or spent on a build until you start one.</p>
+      </header>
+      {error && <Notice tone="stop">{error}</Notice>}
+      <div className="newreq-grid">
+        <form className="newreq-form" onSubmit={submit} aria-describedby="req-next">
+          <div className="field">
+            <label htmlFor="req-text" className="t-label">
+              What did the client ask for?
+            </label>
+            <p id="req-hint" className="t-small muted">
+              Paste the email or your notes as they are. The factory quotes the client's own words back to you, and treats them as information, never as instructions. <span className="fig">{text.length.toLocaleString()} / 20,000</span>
+            </p>
+            <textarea id="req-text" className="textarea" rows={9} maxLength={20000} aria-describedby="req-hint" value={text} onChange={(e) => setText(e.target.value)} />
+          </div>
+          <div className="newreq-pair">
             <div className="field">
-              <label htmlFor="req">Paste it exactly as it came</label>
-              <textarea id="req" className="textarea" rows={10} maxLength={20000} value={text} onChange={(e) => setText(e.target.value)} aria-describedby="req-hint" />
-              <span id="req-hint" className="hint">
-                The request is treated as information, never as instructions. <span className="fig">{text.length.toLocaleString()} / 20,000</span> characters.
-              </span>
+              <label htmlFor="req-name" className="t-label">
+                Client's business name
+              </label>
+              <input id="req-name" className="input" maxLength={120} autoComplete="organization" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
-            <LogoUpload value={logo} onChange={setLogo} disabled={!!busy} />
             <div className="field">
-              <label htmlFor="req-site">Live site address (optional)</label>
+              <label htmlFor="req-url" className="t-label">
+                Their live web address <span className="muted">(if they have one)</span>
+              </label>
               <input
-                id="req-site"
+                id="req-url"
                 className="input"
                 inputMode="url"
                 autoComplete="url"
-                placeholder="https://bennettandco.com"
+                placeholder="https://"
                 maxLength={200}
                 value={siteUrl}
                 onChange={(e) => setSiteUrl(e.target.value)}
                 onBlur={() => setSiteUrlTouched(true)}
                 aria-invalid={!!siteUrlError}
-                aria-describedby="req-site-h"
+                aria-describedby="req-url-h"
               />
-              <span id="req-site-h" className="hint" role={siteUrlError ? "alert" : undefined} style={siteUrlError ? { color: "var(--stop)" } : undefined}>
-                {siteUrlError ?? siteUrlNote ?? "Where the finished site will live. Search engines and share cards need it; you can add it later from the plan."}
+              <span id="req-url-h" className="hint" role={siteUrlError ? "alert" : undefined} style={siteUrlError ? { color: "var(--stop)" } : undefined}>
+                {siteUrlError ?? siteUrlNote ?? "Where the finished site will live. You can add it later."}
               </span>
             </div>
-            <div className="actions">
-              <button className="btn primary" type="submit" disabled={!!busy || !text.trim()}>
-                <ArrowRight aria-hidden="true" />
-                {busy === "intake" ? "Starting…" : "Read request and plan"}
-              </button>
+          </div>
+          <LogoUpload variant="drop" value={logo} onChange={setLogo} disabled={sending} label="The client's logo (you can add it later)" hint="SVG, PNG or WebP, up to 512 KB. It is used exactly as supplied." />
+          <div className="newreq-send">
+            <Button type="submit" variant="primary" size="page" disabled={sending || !text.trim()}>
+              {sending ? "Reading the request…" : "Send to the factory"}
+            </Button>
+            <span className="t-small muted">{costWords}</span>
+          </div>
+          {sending && (
+            <div role="status" aria-live="polite" className="sending">
+              <StatusGlyph tone="run" size={20} />
+              <span>The factory is reading the request. You can leave this page; the proposal shows on Home when it is ready.</span>
             </div>
-            <ol className="after quiet">
-              <li>Read and sorted</li>
-              <li>Plan written</li>
-              <li>Your decision</li>
-              <li>You start the build</li>
-            </ol>
-          </form>
-        </Plate>
-        <div className="stack">
-          <Plate title="Ask the factory">
-            <form
-              className="plate-body stack-tight"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (question.trim()) go("ask", { question: question.trim() }, "Question sent. The answer appears on the next page.");
-              }}
-            >
-              <div className="field">
-                <label htmlFor="ask-page-q">Question</label>
-                <input id="ask-page-q" className="input" maxLength={500} placeholder="What stage is DreamSign in?" value={question} onChange={(e) => setQuestion(e.target.value)} />
-              </div>
-              <div>
-                <button className="btn" type="submit" disabled={!!busy || !question.trim()}>
-                  {busy === "ask" ? "Sending…" : "Ask"}
-                </button>
-              </div>
-            </form>
-          </Plate>
-          <Plate title="Re-check a built page">
-            <form
-              className="plate-body stack-tight"
-              onSubmit={(e) => {
-                e.preventDefault();
-                setGoalTouched(true);
-                if (goal.trim()) go("verify", { path: page, goal: goal.trim() }, "Checks started.");
-              }}
-            >
-              <div className="field">
-                <label htmlFor="pg">Page</label>
-                <select id="pg" className="select" value={page} onChange={(e) => setPage(e.target.value)}>
-                  {pages.map((p) => (
-                    <option key={p} value={p}>
-                      {p.split("/")[1]}: {p.split("/").pop()}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor="goal">What the page must achieve</label>
-                <input
-                  id="goal"
-                  className="input"
-                  maxLength={1000}
-                  value={goal}
-                  onChange={(e) => setGoal(e.target.value)}
-                  onBlur={() => setGoalTouched(true)}
-                  aria-invalid={!!goalError}
-                  aria-describedby={goalError ? "goal-err" : "goal-hint"}
-                />
-                {goalError ? (
-                  <span id="goal-err" className="error" role="alert">
-                    {goalError}
-                  </span>
-                ) : (
-                  <span id="goal-hint" className="hint">
-                    Single pages only. Multi-page Track A sites are checked during their build; a separate re-check arrives with Step 7.
-                  </span>
-                )}
-              </div>
-              <div>
-                <button className="btn" type="submit" disabled={!!busy}>
-                  {busy === "verify" ? "Starting…" : "Run the checks"}
-                </button>
-              </div>
-            </form>
-          </Plate>
-        </div>
+          )}
+        </form>
+        <aside id="req-next" aria-label="What happens next" className="newreq-next">
+          <h2 className="t-item">What happens next</h2>
+          <ol>
+            {next.map((x, i) => (
+              <li key={x.t}>
+                <span className="fig quiet">{String(i + 1).padStart(2, "0")}</span>
+                <span>
+                  <b>{x.t}</b>
+                  {x.d && <span className="t-small muted">{x.d}</span>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </aside>
       </div>
-    </>
+      <RecheckPage />
+      <ConfirmDialog
+        open={confirming}
+        title="Send the request to the factory?"
+        body="The factory reads it and writes a proposal for you to approve. Nothing is built until you start a build."
+        cost={`${costWords} ${buildStopLine()}`}
+        confirmLabel="Send to the factory"
+        onConfirm={() => void send()}
+        onCancel={() => setConfirming(false)}
+      />
+    </div>
+  );
+}
+
+/** Not in the design, kept because it is the only way to start a re-check of a single built page (verify job). */
+function RecheckPage() {
+  const nav = useNavigate();
+  const toast = useToast();
+  const f = useFactory();
+  const [goal, setGoal] = useState("");
+  const [goalTouched, setGoalTouched] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Pages the factory has built (single-page builds), plus the DreamSign pilot page in the repo.
+  const pages = useMemo(() => {
+    const found = (f.jobs ?? []).map((j) => (j.result?.lastCheckpoint as { path?: string } | null | undefined)?.path).filter((p): p is string => !!p && PAGE_PATH.test(p));
+    return [...new Set([KNOWN_PAGE, ...found])];
+  }, [f.jobs]);
+  const [page, setPage] = useState(KNOWN_PAGE);
+  const goalError = goalTouched && !goal.trim() ? "Say what the page is for, so the checks know what to judge." : null;
+  return (
+    <details className="hand-add">
+      <summary>Re-check a built page (single-page sites)</summary>
+      <form
+        className="stack-tight"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setGoalTouched(true);
+          if (!goal.trim()) return;
+          setBusy(true);
+          setError(null);
+          const { jobId, error: err } = await requestJob("verify", { path: page, goal: goal.trim() });
+          setBusy(false);
+          if (!jobId) return setError(`It didn't start: ${err}. Nothing changed; try again.`);
+          toast(err ?? "Checks started.");
+          nav(`/activity/${jobId}`);
+        }}
+      >
+        <p className="t-small muted">Multi-page sites are checked during their build. This re-runs the checks on one built page.</p>
+        <div className="field">
+          <label htmlFor="pg">Page</label>
+          <select id="pg" className="select" value={page} onChange={(e) => setPage(e.target.value)}>
+            {pages.map((p) => (
+              <option key={p} value={p}>
+                {p.split("/")[1]}: {p.split("/").pop()}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="goal">What the page must achieve</label>
+          <input id="goal" className="input" maxLength={1000} value={goal} onChange={(e) => setGoal(e.target.value)} onBlur={() => setGoalTouched(true)} aria-invalid={!!goalError} aria-describedby={goalError ? "goal-err" : undefined} />
+          {goalError && (
+            <span id="goal-err" className="error" role="alert">
+              {goalError}
+            </span>
+          )}
+        </div>
+        {error && <Notice tone="stop">{error}</Notice>}
+        <div>
+          <Button type="submit" disabled={busy}>
+            {busy ? "Starting…" : "Run the checks"}
+          </Button>
+        </div>
+      </form>
+    </details>
   );
 }

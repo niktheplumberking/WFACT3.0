@@ -71,14 +71,20 @@ describe("Home answers 'is everything OK, and what needs me?'", () => {
 });
 
 describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
-  it("start intake from a pasted request (2 clicks)", async () => {
+  it("start intake from a pasted request (3 clicks: open, send, confirm the cost)", async () => {
     const t = start();
     await t.click(await screen.findByRole("link", { name: "New request" }, T));
-    await t.user.type(await screen.findByLabelText("Paste it exactly as it came", {}, T), "Hi, we're a small bakery and need a site.");
-    await t.click(screen.getByRole("button", { name: "Read request and plan" }));
-    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "intake", params: { text: "Hi, we're a small bakery and need a site." } }) }));
+    await t.user.type(await screen.findByLabelText("What did the client ask for?", {}, T), "Hi, we're a small bakery and need a site.");
+    await t.user.type(screen.getByLabelText("Client's business name"), "Harbor Street Bakery");
+    await t.click(screen.getByRole("button", { name: "Send to the factory" }));
+    // v2: sending starts paid work, so it confirms the rough cost and the per-build stop first.
+    const dialog = await screen.findByRole("alertdialog", { name: "Send the request to the factory?" }, T);
+    expect(dialog).toHaveAccessibleDescription(/to read and write the proposal\. Each build stops itself at/);
+    expect(t.calls().some((c) => c.op === "insert" && c.table === "jobs")).toBe(false);
+    await t.click(within(dialog).getByRole("button", { name: "Send to the factory" }));
+    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "intake", params: { text: "Business name: Harbor Street Bakery\n\nHi, we're a small bakery and need a site." } }) }));
     expect(t.calls()).toContainEqual(expect.objectContaining({ op: "invoke", name: "dispatch-job" }));
-    expect(t.clicks()).toBe(2);
+    expect(t.clicks()).toBe(3);
   });
 
   it("approve a plan as the recommended track (2 clicks)", async () => {

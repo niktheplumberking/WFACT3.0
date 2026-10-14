@@ -13,12 +13,15 @@ export function LogoUpload({
   disabled,
   label = "Client's logo (optional)",
   hint = "SVG, PNG or WebP, up to 512 KB. It goes in the site's header, footer and browser tab exactly as supplied; the factory never redraws it.",
+  variant = "field",
 }: {
   value: LogoRecord | null;
   onChange: (record: LogoRecord | null) => void;
   disabled?: boolean;
   label?: string;
   hint?: string;
+  /** "drop": the Cockpit v2 drop zone (New request). The file input stays a real, focusable control inside the zone. */
+  variant?: "field" | "drop";
 }) {
   const id = useId();
   const [busy, setBusy] = useState(false);
@@ -45,6 +48,76 @@ export function LogoUpload({
     }
     setPreview({ url: URL.createObjectURL(file), name: file.name });
     onChange(res.record);
+  }
+
+  const [over, setOver] = useState(false);
+  if (variant === "drop") {
+    return (
+      <div className="field">
+        <span className="t-label" id={`${id}-cap`}>
+          {label}
+        </span>
+        {value ? (
+          <div className="logo-added">
+            {preview ? <img src={preview.url} alt={`Chosen logo: ${preview.name}`} /> : <span className="logo-added-blank" aria-hidden="true" />}
+            <span className="logo-added-text">
+              <b>{preview?.name ?? "Logo added"}</b>
+              <span className="t-small muted">
+                {value.width}×{value.height} · checked: used exactly as supplied
+              </span>
+            </span>
+            <button
+              type="button"
+              className="btn quiet"
+              disabled={disabled}
+              onClick={() => {
+                onChange(null);
+                setPreview(null);
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        ) : (
+          <label
+            className={over ? "dropzone over" : "dropzone"}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setOver(true);
+            }}
+            onDragLeave={() => setOver(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setOver(false);
+              if (!disabled && !busy) void choose(e.dataTransfer.files?.[0]);
+            }}
+          >
+            <UploadSimple aria-hidden="true" />
+            <span className="dropzone-text">
+              <b>{busy ? "Checking and uploading…" : "Drop the logo here, or choose a file"}</b>
+              <span className="t-small muted">{hint}</span>
+            </span>
+            <input
+              id={id}
+              type="file"
+              className="dropzone-input"
+              accept=".svg,.png,.webp,image/svg+xml,image/png,image/webp"
+              disabled={disabled || busy}
+              aria-describedby={`${id}-cap`}
+              onChange={(e) => {
+                void choose(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </label>
+        )}
+        {error && (
+          <span className="hint" role="alert" style={{ color: "var(--stop)" }}>
+            {error}
+          </span>
+        )}
+      </div>
+    );
   }
 
   return (

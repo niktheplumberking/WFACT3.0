@@ -204,10 +204,10 @@ export function ConfirmDialog({
         )}
         {error && <Notice tone="stop">{error}</Notice>}
         <div className="actions dialog-actions">
-          <button className="btn secondary page" type="button" onClick={onCancel}>
+          <button className="btn secondary btn-page" type="button" onClick={onCancel}>
             {cancelLabel}
           </button>
-          <button ref={primary} className={`btn page ${danger ? "danger" : "primary"}`} type="submit" disabled={busy || (!!reasonLabel && reason.trim().length < 3)}>
+          <button ref={primary} className={`btn btn-page ${danger ? "danger" : "primary"}`} type="submit" disabled={busy || (!!reasonLabel && reason.trim().length < 3)}>
             {busy ? "Working…" : confirmLabel}
           </button>
         </div>

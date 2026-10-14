@@ -184,3 +184,24 @@ export async function fetchRunSpend(runId: string): Promise<Spend | null> {
 
 export const money = (n: number) => (n >= 100 ? `$${n.toFixed(0)}` : n >= 1 ? `$${n.toFixed(2)}` : n === 0 ? "$0" : `$${n.toFixed(3)}`);
 export const tokens = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${Math.round(n / 1e3)}k` : String(n));
+
+/** What reading a request and writing its proposal usually costs: the average per run of each step (intake, planner,
+ *  direction), added up, from metered traces. Owner-only under RLS; null when there are fewer than 3 runs of the
+ *  planner to go on, or the viewer cannot read the traces (the words then say "a few cents", never a made-up figure). */
+export async function fetchRequestCost(): Promise<number | null> {
+  try {
+    const res = await supabase.from("model_traces").select("actor,run_id,cost_usd").in("actor", ["agent:intake", "agent:planner", "agent:direction"]).limit(1000);
+    if (res.error || !res.data) return null;
+    const rows = res.data as { actor: string; run_id: string | null; cost_usd: number | null }[];
+    const per = (actor: string) => {
+      const mine = rows.filter((r) => r.actor === actor);
+      const runs = new Set(mine.map((r) => r.run_id ?? "")).size;
+      return { runs, avg: runs ? mine.reduce((a, r) => a + (r.cost_usd ?? 0), 0) / runs : 0 };
+    };
+    const planner = per("agent:planner");
+    if (planner.runs < 3) return null;
+    return per("agent:intake").avg + planner.avg + per("agent:direction").avg;
+  } catch {
+    return null;
+  }
+}
