@@ -271,7 +271,8 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
   it("sign out (2 clicks)", async () => {
     const t = start();
     await t.click(await screen.findByRole("link", { name: /Test Owner/ }, T));
-    await t.click(screen.getByRole("button", { name: "Sign out" }));
+    // v2: the account link opens Settings (loaded on demand), where Sign out lives.
+    await t.click(await screen.findByRole("button", { name: "Sign out" }, T));
     expect(t.calls()).toContainEqual({ op: "signOut" });
     expect(t.clicks()).toBe(2);
   });
