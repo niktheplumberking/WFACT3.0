@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1791993327.9403765,
-    "seen": 1791993340.787269,
-    "ast_hash": "c2fef3b33aeacf205f71024ee9a6c536",
+    "mtime": 1791994037.5236425,
+    "seen": 1791994041.7689118,
+    "ast_hash": "21672d0ccccf9a5921a252d8c08bf8b8",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1791993327.9398654,
-    "seen": 1791993340.7877471,
-    "ast_hash": "8f26626b5bb942d612c3ea200864d33a",
+    "mtime": 1791994037.5230994,
+    "seen": 1791994041.76937,
+    "ast_hash": "4559932d4122fdd88b2593b8ec82c35a",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1656,21 +1656,21 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/flows.test.tsx": {
-    "mtime": 1791993278.9792619,
-    "seen": 1791993340.7816389,
-    "ast_hash": "db5b0269b3a6dda83c38cd805455597a",
+    "mtime": 1791993818.0673406,
+    "seen": 1791994041.763756,
+    "ast_hash": "c07b103b32c70acbe30513e31ebf929f",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/attention.ts": {
-    "mtime": 1791383096.670684,
-    "seen": 1791829942.125581,
-    "ast_hash": "12423319ee9b93a5fe169fad7e4f718d",
+    "mtime": 1791993582.488081,
+    "seen": 1791994041.7638001,
+    "ast_hash": "6c8648cb1393c7bf88463c7ae30de1e3",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/lib.test.ts": {
-    "mtime": 1791022052.8480706,
-    "seen": 1791291214.582714,
-    "ast_hash": "e08ef65ff97d14723779427d1ff21579",
+    "mtime": 1791993742.0762603,
+    "seen": 1791994041.7638872,
+    "ast_hash": "e2571acf439ed333141d41feeb40014e",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/model.ts": {
@@ -1680,9 +1680,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/state.tsx": {
-    "mtime": 1791992031.1658616,
-    "seen": 1791992605.501428,
-    "ast_hash": "449bed69ef128e789b2e6572035525f1",
+    "mtime": 1791993904.4043062,
+    "seen": 1791994041.7639732,
+    "ast_hash": "b10a9a96ff6a61f9ca83eb55f0ebe9b7",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Activity.tsx": {
@@ -1698,9 +1698,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Home.tsx": {
-    "mtime": 1790877973.293991,
-    "seen": 1790949140.358979,
-    "ast_hash": "1642a5e31a5669ce78ba946de2b3ebe6",
+    "mtime": 1791993981.2737777,
+    "seen": 1791994041.76409,
+    "ast_hash": "64e10cab03b13138d9d8de4bae47fa01",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Misc.tsx": {
@@ -1716,15 +1716,15 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/shell/Shell.tsx": {
-    "mtime": 1791992264.7241933,
-    "seen": 1791992605.501608,
-    "ast_hash": "199ee2ea369897e22eae8bc2e54c0b7c",
+    "mtime": 1791993798.096473,
+    "seen": 1791994041.7641332,
+    "ast_hash": "ef0a0dda78d9f6b5709a0cf85505752a",
     "semantic_hash": ""
   },
   "apps/cockpit/src/test/fake.ts": {
-    "mtime": 1791972315.8548894,
-    "seen": 1791982653.710054,
-    "ast_hash": "239289fd0cc3a8cfdbc8d86ec4b7a8b9",
+    "mtime": 1791993717.097504,
+    "seen": 1791994041.764176,
+    "ast_hash": "1aad9480ded6737bdccef7e529c3ee1f",
     "semantic_hash": ""
   },
   "apps/cockpit/src/test/setup.ts": {
@@ -2898,9 +2898,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/recovery.test.ts": {
-    "mtime": 1791383109.8601148,
-    "seen": 1791829942.125599,
-    "ast_hash": "f1ddeeef38467300bc43eea21e7194f9",
+    "mtime": 1791993742.0770574,
+    "seen": 1791994041.763916,
+    "ast_hash": "28a43f919167229dd6e3d3267cc742cd",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/recovery.ts": {
@@ -4212,15 +4212,15 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/dev/fakeSupabase.ts": {
-    "mtime": 1791992371.4228156,
-    "seen": 1791992605.5011442,
-    "ast_hash": "f2f04e22908e73f862774b03e31ddccb",
+    "mtime": 1791993904.404191,
+    "seen": 1791994041.763755,
+    "ast_hash": "d1121e4c0bf1c520828344dd1dbe453a",
     "semantic_hash": ""
   },
   "apps/cockpit/src/shell/shell.test.tsx": {
-    "mtime": 1791992331.5659795,
-    "seen": 1791992605.5016088,
-    "ast_hash": "07bae7585496983dd6817eed33323869",
+    "mtime": 1791993818.0681434,
+    "seen": 1791994041.7641332,
+    "ast_hash": "7a86bcab18c07d51d47e9541f2b3669f",
     "semantic_hash": ""
   },
   ".claude/completions/2026-10-14-step-28-package-4-phase-3.md": {
@@ -4236,15 +4236,33 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/path.ts": {
-    "mtime": 1791993217.9510248,
-    "seen": 1791993340.781834,
-    "ast_hash": "a969a8723d42632c7b0cbdae88c81c86",
+    "mtime": 1791993531.7502093,
+    "seen": 1791994041.763916,
+    "ast_hash": "8d31c4f8c2b4b3f62fd832eeb24e9680",
     "semantic_hash": ""
   },
   ".claude/completions/2026-10-14-step-28-package-4-phase-4.md": {
     "mtime": 1791993336.7477367,
     "seen": 1791993340.786844,
     "ast_hash": "c28f11473771b377a93ecede5f42c50a",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/lib/clients.ts": {
+    "mtime": 1791993522.077168,
+    "seen": 1791994041.763844,
+    "ast_hash": "09906c18786c2ab7466581611e058ebc",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/pages/home.test.tsx": {
+    "mtime": 1791993916.6318963,
+    "seen": 1791994041.7641191,
+    "ast_hash": "e24d393e9b301e50d0f8d9736b6e8631",
+    "semantic_hash": ""
+  },
+  ".claude/completions/2026-10-14-step-28-package-4-phase-5.md": {
+    "mtime": 1791994037.5267503,
+    "seen": 1791994041.768598,
+    "ast_hash": "85309d0b8779eec5cc61ef9b714c3255",
     "semantic_hash": ""
   }
 }
