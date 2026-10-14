@@ -287,3 +287,126 @@ export const SCROLL_SAMPLE = String.raw`async () => {
   });
   return [...new Set(seen)];
 }`;
+
+// ---- Build-quality Package 2 (2026-10-14): brand and motion-coverage probes (Track B) ----
+
+/** The header logo's rendered box at the current scroll (render.logo-visible). The first image in the header row. */
+export const LOGO_PROBE = String.raw`() => {
+  window.scrollTo(0, 0);
+  const img = document.querySelector("header img, header svg");
+  if (!img) return { found: false };
+  const r = img.getBoundingClientRect();
+  const cs = getComputedStyle(img);
+  return {
+    found: true,
+    width: Math.round(r.width), height: Math.round(r.height),
+    shown: cs.display !== "none" && cs.visibility !== "hidden" && Number(cs.opacity) > 0.1,
+    inView: r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth,
+  };
+}`;
+
+/**
+ * Is a control labelled exactly like the primary action visible and on top at three scroll positions (top, 60%, bottom)
+ * (render.mobile-action-visible)? Also: the focused skip link is not covered, and the footer's last line is not covered
+ * at the bottom of the page (a fixed bar must never hide content).
+ */
+export const ACTION_PROBE = String.raw`async (label) => {
+  const norm = (s) => (s || "").replace(/\s+/g, " ").trim().toLowerCase();
+  const want = norm(label);
+  const onTop = (el) => {
+    const r = el.getBoundingClientRect();
+    if (r.width < 1 || r.height < 1 || r.bottom <= 0 || r.top >= innerHeight || r.right <= 0 || r.left >= innerWidth) return false;
+    const x = Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), y = Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2));
+    const hit = document.elementFromPoint(x, y);
+    return !!hit && (hit === el || el.contains(hit));
+  };
+  const visibleAction = () => [...document.querySelectorAll("a, button")].some((el) => norm(el.textContent) === want && onTop(el));
+  const wait = () => new Promise((r) => setTimeout(r, 350));
+  const H = document.documentElement.scrollHeight;
+  const out = { positions: {}, skipCovered: false, footerCovered: false };
+  for (const [name, y] of [["top", 0], ["middle", Math.round(H * 0.6 - innerHeight / 2)], ["bottom", H]]) {
+    window.scrollTo(0, Math.max(0, y));
+    await wait();
+    out.positions[name] = visibleAction();
+  }
+  const lines = [...document.querySelectorAll("footer p, footer a, footer li")].filter((el) => el.getBoundingClientRect().height > 0);
+  const last = lines[lines.length - 1];
+  if (last) {
+    last.scrollIntoView({ block: "end" });
+    window.scrollBy(0, 0);
+    await wait();
+    out.footerCovered = !onTop(last);
+  }
+  window.scrollTo(0, 0);
+  await wait();
+  const skip = document.querySelector('a[href="#main"]');
+  if (skip) {
+    skip.focus();
+    await wait();
+    out.skipCovered = !onTop(skip);
+    skip.blur();
+  }
+  return out;
+}`;
+
+/**
+ * Elements filled with the brand accent (or a tint/shade derived from it) that are not a control or inside one
+ * (render.accent-usage), and the fill of every control labelled like the primary action.
+ */
+export const ACCENT_PROBE = String.raw`(opts) => {
+  const hex = (rgb) => {
+    const m = /rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)(?:[ ,/]+([\d.]+))?/.exec(rgb || "");
+    if (!m || (m[4] !== undefined && Number(m[4]) < 0.5)) return null;
+    return "#" + [m[1], m[2], m[3]].map((n) => Number(n).toString(16).padStart(2, "0")).join("").toUpperCase();
+  };
+  const family = new Set(opts.colors.map((c) => c.toUpperCase()));
+  const CONTROL = "a, button, summary, input, select, textarea, [role=button], label";
+  const name = (el) => el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") + (el.classList.length ? "." + [...el.classList].slice(0, 2).join(".") : "");
+  const panels = [];
+  for (const el of document.querySelectorAll("body *")) {
+    const r = el.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4) continue;
+    const bg = hex(getComputedStyle(el).backgroundColor);
+    if (!bg || !family.has(bg)) continue;
+    if (el.matches(CONTROL) || el.closest(CONTROL)) continue;
+    panels.push(name(el) + " " + bg);
+  }
+  const norm = (s) => (s || "").replace(/\s+/g, " ").trim().toLowerCase();
+  const fills = [...document.querySelectorAll("a, button")]
+    .filter((el) => norm(el.textContent) === norm(opts.label) && el.getBoundingClientRect().width > 0)
+    .map((el) => hex(getComputedStyle(el).backgroundColor))
+    .filter(Boolean);
+  return { panels: [...new Set(panels)].slice(0, 20), fills: [...new Set(fills)] };
+}`;
+
+/**
+ * Installed with addInitScript (render.motion-coverage): marks each section of <main> that showed any motion while the
+ * page loaded and was scrolled: a CSS or Web Animations animation (including scroll-driven ones), a transition, or a
+ * script changing an inline style. Read back with MOTION_COVERAGE_REPORT.
+ */
+export const MOTION_COVERAGE_WATCH = String.raw`(() => {
+  const touched = new Set();
+  window.__wfactCoverage = touched;
+  const mark = (el) => {
+    const s = el && el.closest ? el.closest("main section") : null;
+    if (s) touched.add(s);
+  };
+  addEventListener("animationstart", (e) => mark(e.target), true);
+  addEventListener("transitionstart", (e) => mark(e.target), true);
+  new MutationObserver((list) => { for (const m of list) mark(m.target); })
+    .observe(document, { attributes: true, attributeFilter: ["style"], subtree: true });
+  const poll = () => {
+    for (const a of document.getAnimations()) mark(a.effect && a.effect.target);
+    setTimeout(poll, 100);
+  };
+  poll();
+})()`;
+
+/** The sections of <main> (outermost only) that never moved, by id or position. */
+export const MOTION_COVERAGE_REPORT = String.raw`() => {
+  const touched = window.__wfactCoverage || new Set();
+  const sections = [...document.querySelectorAll("main section")].filter((s) => !s.parentElement.closest("main section"));
+  const moved = (s) => [...touched].some((t) => t === s || s.contains(t));
+  const label = (s, i) => (s.id ? "#" + s.id : "section " + (i + 1)) + (s.className ? " (" + String(s.className).split(" ")[0] + ")" : "");
+  return { total: sections.length, still: sections.map((s, i) => (moved(s) ? null : label(s, i))).filter(Boolean) };
+}`;

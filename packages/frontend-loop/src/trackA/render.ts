@@ -12,9 +12,11 @@ import path from "node:path";
 import type { Fact, Page, Section, SiteContent } from "./content.js";
 import { buildPalette, type Palette } from "./palette.js";
 import { OG_IMAGE_FILE, absoluteUrl, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
-import { logoDisplaySize, type LogoAsset } from "../brandAsset.js";
+import { logoDisplaySize, servedLogoData, type LogoAsset } from "../brandAsset.js";
 
-export const STARTER_VERSION = "track-a-starter/1.2.0"; // 1.1.0: launch files (404, robots, llms, sitemap, share card, canonical); 1.2.0: client logo + favicon
+// 1.1.0: launch files (404, robots, llms, sitemap, share card, canonical); 1.2.0: client logo + favicon; 1.3.0 (Build-quality
+// Package 2): the logo has an explicit display size and an SVG without one gets it from its viewBox (it collapsed to 0x0).
+export const STARTER_VERSION = "track-a-starter/1.3.0";
 const STARTER_DIR = path.join(import.meta.dirname, "..", "..", "starters", "track-a");
 const STARTER_CSS = readFileSync(path.join(STARTER_DIR, "styles.css"), "utf-8");
 const STARTER_JS = readFileSync(path.join(STARTER_DIR, "site.js"), "utf-8");
@@ -140,7 +142,7 @@ interface Ctx {
 /** The client's logo as an image: intrinsic size reserved (no layout shift), the business name as its text. */
 function logoImg(logo: LogoAsset, name: string, cls: string): string {
   const { width, height } = logoDisplaySize(logo);
-  return `<img class="${cls}" src="${logo.file}" alt="${esc(name)}" width="${width}" height="${height}" decoding="async">`;
+  return `<img class="${cls}" src="${logo.file}" alt="${esc(name)}" width="${width}" height="${height}" style="width:${width}px;height:${height}px" decoding="async">`;
 }
 
 function faviconLink(logo: LogoAsset | null | undefined): string {
@@ -455,7 +457,7 @@ export function renderSite(content: SiteContent, opts: RenderOptions = {}): Rend
   const binary = [OG_IMAGE_FILE];
   if (logo) {
     // An SVG is text (the artifact store keeps it as text); a PNG or WebP is base64 like the share card.
-    if (logo.mime === "image/svg+xml") files[logo.file] = logo.data.toString("utf-8");
+    if (logo.mime === "image/svg+xml") files[logo.file] = servedLogoData(logo).toString("utf-8");
     else {
       files[logo.file] = logo.data.toString("base64");
       binary.push(logo.file);

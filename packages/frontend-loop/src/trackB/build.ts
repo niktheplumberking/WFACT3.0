@@ -21,11 +21,14 @@ import { TRACK_B_STARTER_DIR } from "../paths.js";
 import { buildTrackBPalette } from "./palette.js";
 import { probeIsolation, runIsolated, type IsolationMethod, type IsolationProbe } from "./isolate.js";
 import type { SiteContent } from "./content.js";
-import { logoDisplaySize, type LogoAsset } from "../brandAsset.js";
+import { logoDisplaySize, servedLogoData, type LogoAsset } from "../brandAsset.js";
 import { OG_IMAGE_FILE, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
 
 // 1.1.0: contact form variants (enquiry | signup), "Location" label. 1.2.0: launch files (robots, llms, sitemap, share card, canonical)
-export const STARTER_VERSION = "track-b-starter/1.3.0"; // 1.3.0: the client's logo (header, footer, favicon)
+// 1.3.0: the client's logo (header, footer, favicon). 1.4.0 (Build-quality Package 2): the logo has an explicit display size
+// (it collapsed to 0x0), the accent fills buttons and never panels, a phone action bar, an entrance for every section type,
+// a swipeable work reel on phones, no empty band under the phone hero.
+export const STARTER_VERSION = "track-b-starter/1.4.0";
 
 /** Extensions read back as text; everything else in the export is binary (base64). */
 const TEXT_EXT = new Set([".html", ".txt", ".js", ".css", ".json", ".svg", ".xml", ".webmanifest", ".map"]);
@@ -98,6 +101,8 @@ export interface TrackBBuildOptions {
   siteUrl?: string | null;
   /** The client's verified logo (brandAsset.ts), written to public/; absent = the text wordmark. */
   logo?: LogoAsset | null;
+  /** The brief reserves the accent for buttons and links (brand.ts accentForActionsOnly): no decorative accent anywhere. */
+  accentActionsOnly?: boolean;
 }
 
 export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOptions = {}): Promise<TrackBBuild> {
@@ -109,7 +114,7 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
   // Two simultaneous builds of the same content would share this folder; each runner builds one site at a time.
   const siteUrl = opts.siteUrl ?? null;
   const logo = opts.logo ?? null;
-  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").update(logo?.sha256 ?? "").digest("hex").slice(0, 16);
+  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").update(logo?.sha256 ?? "").update(opts.accentActionsOnly ? "actions" : "").digest("hex").slice(0, 16);
   const work = path.join(tmpdir(), "wfact-track-b", key);
   rmSync(work, { recursive: true, force: true });
   mkdirSync(work, { recursive: true });
@@ -120,7 +125,7 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
     }
     mkdirSync(path.join(work, "content"));
     writeFileSync(path.join(work, "content/site.json"), `${JSON.stringify(content, null, 2)}\n`);
-    writeFileSync(path.join(work, "content/theme.json"), `${JSON.stringify(palette, null, 2)}\n`);
+    writeFileSync(path.join(work, "content/theme.json"), `${JSON.stringify({ ...palette, accentActionsOnly: opts.accentActionsOnly === true }, null, 2)}\n`);
     const logoInfo = logo ? { src: `/${logo.file}`, mime: logo.mime, ...logoDisplaySize(logo) } : null;
     writeFileSync(path.join(work, "content/launch.json"), `${JSON.stringify({ siteUrl, ...(logoInfo ? { logo: logoInfo } : {}) }, null, 2)}\n`);
     // Launch files (MVP M5): Next copies public/ into the export as is.
@@ -132,7 +137,7 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
     );
     if (siteUrl) writeFileSync(path.join(work, "public/sitemap.xml"), sitemapXml(siteUrl, content.pages.map((p) => urlPath(p.slug))));
     writeFileSync(path.join(work, "public", OG_IMAGE_FILE), ogImagePng({ deep: palette.deep, accent: palette.accent }));
-    if (logo) writeFileSync(path.join(work, "public", logo.file), logo.data);
+    if (logo) writeFileSync(path.join(work, "public", logo.file), servedLogoData(logo));
 
     const isolation = await probeIsolation(work, opts.method);
     if (isolation.network !== "blocked") throw new TrackBBuildError(`refusing to build: the isolated build could reach the network (${isolation.attempts.join("; ")})`, "");

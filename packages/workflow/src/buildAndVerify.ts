@@ -39,6 +39,8 @@ import {
 import type { FrontendBuildInput } from "@wfact/frontend-loop/agent";
 import type { FrontendLoopResult } from "@wfact/frontend-loop/loop";
 import { briefFactSources, type PilotBrief } from "@wfact/frontend-loop/brief";
+import { trackBBrand } from "@wfact/frontend-loop/trackB/brand";
+import { CONTENT_SCHEMA_VERSION as TRACK_B_SCHEMA, type SiteContent as TrackBContent } from "@wfact/frontend-loop/trackB/content";
 import { briefRequiresLogo, loadLogoAsset, LogoError, provideLogoAsset } from "@wfact/frontend-loop/brandAsset";
 import type { QaInput } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
@@ -121,6 +123,19 @@ const isSiteManifest = (artifact: StoredArtifact) => artifact.path.endsWith(`/${
  * Writes every site file, then the manifest that pins their hashes. The manifest is the checkpoint.
  * Track B (M4) adds the built project under _source/ and stores fonts as bytes, not base64 text.
  */
+/** The brand promise for a Track B site's saved content (Build-quality Package 2); nothing for any other content. */
+export function brandPromiseFor(contentJson: string, brief: PilotBrief): { brand: ReturnType<typeof trackBBrand> } | Record<string, never> {
+  let content: unknown;
+  try {
+    content = JSON.parse(contentJson);
+  } catch {
+    return {};
+  }
+  const c = content as Partial<TrackBContent>;
+  if (c?.schemaVersion !== TRACK_B_SCHEMA || !c.brand?.colors || !c.primaryAction?.label) return {};
+  return { brand: trackBBrand(c as TrackBContent, brief, !!brief.logo) };
+}
+
 export async function writeSite(store: ArtifactStore, dir: string, site: NonNullable<FrontendLoopResult["site"]>): Promise<StoredArtifact> {
   const binary = new Set(site.binary ?? []);
   if (binary.size && !store.writeBytes) throw new CheckpointIntegrityError("this artifact store cannot hold binary files, so the site cannot be checkpointed");
@@ -759,6 +774,8 @@ class Workflow {
             // Step 4B M1 claims gate: the approved brief is the only place a page fact may come from.
             factSources: briefFactSources(this.brief),
             ...(site ? { site: { files: site.files, pages: site.pages, ...(site.binary ? { binary: site.binary } : {}) } } : {}),
+            // Build-quality Package 2: a Track B site's brand promise, from the brief and the saved content (also on a resume).
+            ...(site ? brandPromiseFor(site.contentJson, this.brief) : {}),
           },
         },
         { registry: this.deps.registry, audit: { sink: this.deps.audit }, runId: this.runId },

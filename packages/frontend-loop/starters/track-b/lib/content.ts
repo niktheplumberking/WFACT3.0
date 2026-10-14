@@ -127,6 +127,11 @@ export interface Theme {
   deepPanel: string;
   /** Faintest readable text on the paper (>= 4.5:1); where the scroll-reading effect starts. */
   dim: string;
+  /** Button fill: the brand accent itself when a text colour reads on it, else accentInk (track-b-starter 1.4.0). */
+  action: string;
+  onAction: string;
+  /** The brief reserves the accent for buttons and links: no decorative accent (rules, numbers, panels). */
+  accentActionsOnly: boolean;
 }
 
 export const content = site as SiteContent;

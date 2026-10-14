@@ -9,7 +9,7 @@
  * agent did its job. The workflow (Stage 3) routes on `output.status`.
  */
 import { AgentInputError, currentPermissionGate, guardModelClient, requirePermission, type Agent } from "@wfact/agent-runtime";
-import { SITE_FILE_RE, type AsyncCheckSuite, type Check, type VerificationContext } from "./checks/types.js";
+import { SITE_FILE_RE, type AsyncCheckSuite, type BrandPromise, type Check, type VerificationContext } from "./checks/types.js";
 import type { ModelClient } from "./modelClient.js";
 import { VerificationLoop, type VerificationResult } from "./verificationLoop.js";
 
@@ -86,6 +86,21 @@ function gatedSuite(suite: AsyncCheckSuite, kind: "browser" | "review"): AsyncCh
   };
 }
 
+const HEX = /^#[0-9a-f]{6}$/i;
+/** Build-quality Package 2: the brand promise the workflow computed (types.ts BrandPromise), shape-checked. */
+function parseBrand(raw: unknown): BrandPromise {
+  const b = (raw ?? {}) as Record<string, unknown>;
+  const derived = Array.isArray(b.accentDerived) ? b.accentDerived : null;
+  if (
+    typeof b.logo !== "boolean" || typeof b.accentActionsOnly !== "boolean" ||
+    typeof b.primaryActionLabel !== "string" || !b.primaryActionLabel.trim() || b.primaryActionLabel.length > 60 ||
+    typeof b.accent !== "string" || !HEX.test(b.accent) || !derived || derived.length > 4 || derived.some((c) => typeof c !== "string" || !HEX.test(c))
+  ) {
+    throw new AgentInputError("brand must be { logo, primaryActionLabel, accent, accentDerived, accentActionsOnly } with hex colours");
+  }
+  return { logo: b.logo, primaryActionLabel: b.primaryActionLabel, accent: b.accent, accentDerived: derived as string[], accentActionsOnly: b.accentActionsOnly };
+}
+
 export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaInput, VerificationResult> {
   // Guarded here, not at composition: every QA agent's evaluator calls ask the run's gate first.
   const evaluatorModel = opts.evaluatorModel ? guardModelClient(opts.evaluatorModel, "evaluator") : null;
@@ -110,6 +125,7 @@ export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaI
           ...(r.factSources !== undefined ? { factSources: stringArray(r.factSources, "factSources") } : {}),
           ...(r.site !== undefined ? { site: parseSite(r.site) } : {}),
           ...(r.stage !== undefined ? { stage: parseStage(r.stage) } : {}),
+          ...(r.brand !== undefined ? { brand: parseBrand(r.brand) } : {}),
         },
         goal: r.goal,
       };

@@ -25,7 +25,9 @@ test("registry and rendered.ts agree: every rendered result id has an entry and 
   const dir = mkdtempSync(path.join(tmpdir(), "rqa-registry-ids-"));
   copyFileSync(path.join(repo, "packages/frontend-loop/design/fixtures/clean.html"), path.join(dir, "index.html"));
   const r = await runRenderedQa(dir, { outDir: out(), lighthouse: false });
-  const emitted = new Set([...r.results.map((x) => x.checkId), "render.perf", "render.motion-budget"]);
+  // Track B-only checks run only with a motion budget or a brand promise (Build-quality Package 2); their fixtures are
+  // held by trackB.test.ts and trackBBrand.test.ts.
+  const emitted = new Set([...r.results.map((x) => x.checkId), "render.perf", "render.motion-budget", "render.motion-coverage", "render.logo-visible", "render.mobile-action-visible", "render.accent-usage"]);
   const registered = new Set(entriesFor("rendered").map((e) => e.id));
   assert.deepEqual([...registered].sort(), [...emitted].sort());
   assert.ok(entriesFor("review").some((e) => e.id === "render.design-review"));

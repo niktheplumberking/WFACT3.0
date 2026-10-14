@@ -17,6 +17,15 @@
  *   render.motion-budget   (budgets with a motion part, i.e. Track B) what scrolling the page costs: no
  *                          layout properties animated, no long CSS/WAAPI entrances, main-thread blocking
  *                          during a scroll-through within the budget (Step 4B M4)
+ *   render.motion-coverage (Track B) every section of the page shows a motion moment while loading or scrolling
+ *                          (reduced motion not counted; Build-quality Package 2)
+ *   render.logo-visible    (when the client supplied a logo) the header logo is shown, in view and >= 24 px tall at
+ *                          1440 and 375 (Lanternworks 55ddba7c: the SVG logo collapsed to nothing)
+ *   render.mobile-action-visible  (when the primary action is known) at 375 a control labelled like the primary action
+ *                          is visible and on top at the top, middle and bottom of the page, the focused skip link is not
+ *                          covered and the footer's last line is not covered
+ *   render.accent-usage    (when the brief reserves the accent for actions) no non-control element is filled with the
+ *                          accent or a colour derived from it, and the primary action is filled with the brand accent itself
  *
  * render.reduced-motion also watches script-driven motion (GSAP, Motion, Lenis) since Step 4B M4: with
  * prefers-reduced-motion: reduce, no element may keep changing its transform or opacity while the page is
@@ -33,6 +42,7 @@ import { AxeBuilder } from "@axe-core/playwright";
 import { SITE_FILE_RE, type AsyncCheckSuite, type CheckResult, type VerificationContext } from "@wfact/verification/checks/types";
 import { serveDirectory, siteFileFor } from "./server.js";
 import { checkExternalLink, confinedBrowserArgs, type EgressOptions } from "./egress.js";
+import { ACCENT_PROBE, ACTION_PROBE, LOGO_PROBE, MOTION_COVERAGE_REPORT, MOTION_COVERAGE_WATCH } from "./browserScripts.js";
 import { DESIGN_DETECTORS, INLINE_JS_BYTES, SCRIPT_RESOURCE_BYTES, LAYOUT_PROBE, LINK_PROBE, MOTION_MARK, MOTION_PROBE, MOTION_REPORT, MOTION_WATCH, SCROLL_SAMPLE, SCROLL_THROUGH } from "./browserScripts.js";
 import { loadRulebook, type Rulebook } from "./rulebook.js";
 
@@ -141,6 +151,24 @@ export interface RenderedRun {
   metrics: Record<string, RenderedMetrics>;
 }
 
+/**
+ * What the brand promises, from code-owned data (never the page itself): the owner's logo record, the palette the
+ * engine computed (theme.json) and the brief's colour rule. Set by the Track B workflow (Build-quality Package 2);
+ * absent = the brand checks do not run (Track A, single pages, fixtures).
+ */
+export interface BrandExpectations {
+  /** The client's logo is on the site (launch.json logo). */
+  logo: boolean;
+  /** The primary action's label, exactly as the content states it. */
+  primaryActionLabel: string;
+  /** The brand accent (brief colour). */
+  accent: string;
+  /** Colours derived from the accent by the palette engine (e.g. a darkened accent for text). */
+  accentDerived: string[];
+  /** The brief reserves the accent for actions (buttons and links). */
+  accentActionsOnly: boolean;
+}
+
 export interface RenderedQaOptions {
   /** Where screenshots are written. */
   outDir: string;
@@ -156,7 +184,12 @@ export interface RenderedQaOptions {
   minFontPx?: number;
   minTargetPx?: number;
   rulebook?: Rulebook;
+  /** Build-quality Package 2: the brand checks (logo, phone action, accent usage). */
+  brand?: BrandExpectations;
 }
+
+/** Smallest header logo that still reads as a logo, CSS px tall (render.logo-visible). */
+export const MIN_LOGO_PX = 24;
 
 /**
  * Screenshot slices per viewport the reviewer gets for each page after the first (the first page gets
@@ -336,8 +369,12 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
   const details: Record<string, string[]> = {
     "render.load": [], "render.console": [], "render.links": [], "render.a11y": [], "render.layout": [],
     "render.js-budget": [], "render.reduced-motion": [], "render.design-rules": [], "render.perf": [],
-    ...(budget.motion ? { "render.motion-budget": [] as string[] } : {}),
+    ...(budget.motion ? { "render.motion-budget": [] as string[], "render.motion-coverage": [] as string[] } : {}),
+    ...(opts.brand?.logo ? { "render.logo-visible": [] as string[] } : {}),
+    ...(opts.brand ? { "render.mobile-action-visible": [] as string[] } : {}),
+    ...(opts.brand?.accentActionsOnly ? { "render.accent-usage": [] as string[] } : {}),
   };
+  const brand = opts.brand;
   const shots: Shot[] = [];
   const metrics: Record<string, RenderedMetrics> = {};
   const server = await serveDirectory(siteDir);
@@ -399,6 +436,31 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
           await page.waitForTimeout(300);
         }
 
+        // Build-quality Package 2: the brand checks, at the desktop and phone widths.
+        if (brand && vp.name !== "tablet") {
+          if (brand.logo) {
+            const l = await evaluate<{ found: boolean; width?: number; height?: number; shown?: boolean; inView?: boolean }>(page, LOGO_PROBE);
+            if (!l.found) details["render.logo-visible"]!.push(`${where}${vp.width}px: no logo image in the header`);
+            else if (!l.shown || !l.inView || (l.height ?? 0) < MIN_LOGO_PX || (l.width ?? 0) < MIN_LOGO_PX) {
+              details["render.logo-visible"]!.push(`${where}${vp.width}px: the header logo is ${l.width}x${l.height} px${l.shown ? "" : ", hidden"}${l.inView ? "" : ", out of view"}; it must show at least ${MIN_LOGO_PX} px tall`);
+            }
+          }
+          if (brand.accentActionsOnly) {
+            const a = await evaluate<{ panels: string[]; fills: string[] }>(page, ACCENT_PROBE, { colors: [brand.accent, ...brand.accentDerived], label: brand.primaryActionLabel });
+            for (const p of a.panels) details["render.accent-usage"]!.push(`${where}${vp.width}px: ${p} is filled with the accent, which the brief reserves for buttons and links`);
+            for (const f of a.fills.filter((f) => f.toUpperCase() !== brand.accent.toUpperCase())) {
+              details["render.accent-usage"]!.push(`${where}${vp.width}px: the primary action "${brand.primaryActionLabel}" is filled with ${f}, not the brand accent ${brand.accent.toUpperCase()}`);
+            }
+          }
+          if (vp.name === "phone") {
+            const r = await evaluate<{ positions: Record<string, boolean>; skipCovered: boolean; footerCovered: boolean }>(page, ACTION_PROBE, brand.primaryActionLabel);
+            const missing = Object.entries(r.positions).filter(([, ok]) => !ok).map(([k]) => k);
+            if (missing.length) details["render.mobile-action-visible"]!.push(`${where}${vp.width}px: no visible "${brand.primaryActionLabel}" control at the ${missing.join(", ")} of the page`);
+            if (r.skipCovered) details["render.mobile-action-visible"]!.push(`${where}${vp.width}px: the focused skip link is covered`);
+            if (r.footerCovered) details["render.mobile-action-visible"]!.push(`${where}${vp.width}px: the footer's last line is covered at the bottom of the page`);
+          }
+        }
+
         if (vp.name !== "tablet") {
           const axe = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
           for (const v of axe.violations) {
@@ -451,6 +513,7 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
         const mb = budget.motion;
         const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
         await ctx.addInitScript(MOTION_WATCH);
+        await ctx.addInitScript(MOTION_COVERAGE_WATCH);
         const mp = await ctx.newPage();
         if (await mp.goto(url, { waitUntil: "load" }).catch(() => null)) {
           await mp.waitForTimeout(1200);
@@ -472,8 +535,16 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
           else if (scroll && scroll.blockingMs > mb.maxBlockingMs) {
             out.push(`${where}scrolling the page blocked the main thread for ${scroll.blockingMs} ms over ${scroll.longFrames} long frame(s) (worst ${scroll.worstFrameMs} ms); the budget is ${mb.maxBlockingMs} ms`);
           }
+          // Build-quality Package 2: every section shows a motion moment (Lanternworks: most sections were still).
+          const cov = await evaluate<{ total: number; still: string[] }>(mp, MOTION_COVERAGE_REPORT);
+          if (cov.still.length) {
+            details["render.motion-coverage"]!.push(`${where}${cov.still.length} of ${cov.total} section(s) show no motion while the page loads and scrolls: ${cov.still.slice(0, 8).join(", ")}`);
+          }
           m.motion = { blockingMs: scroll?.blockingMs ?? null, longFrames: scroll?.longFrames ?? null, animations: (load?.anims.length ?? 0) + (scroll?.anims.length ?? 0) };
-        } else details["render.motion-budget"]!.push(`${where}page did not load for the motion pass`);
+        } else {
+          details["render.motion-budget"]!.push(`${where}page did not load for the motion pass`);
+          details["render.motion-coverage"]!.push(`${where}page did not load for the motion pass`);
+        }
         await ctx.close();
       }
 
@@ -545,7 +616,8 @@ export function createRenderedSuite(opts: RenderedQaOptions): RenderedSuite {
             mkdirSync(path.dirname(target), { recursive: true });
             writeFileSync(target, binary.has(name) ? Buffer.from(content, "base64") : Buffer.from(content, "utf-8"));
           }
-          suite.lastRun = await runRenderedQa(dir, { ...opts, pages: ctx.site.pages });
+          // Build-quality Package 2: the brand checks run when the workflow passed the brand promise (Track B).
+          suite.lastRun = await runRenderedQa(dir, { ...opts, pages: ctx.site.pages, ...(ctx.brand ? { brand: ctx.brand } : {}) });
         } else {
           writeFileSync(path.join(dir, "index.html"), ctx.html, "utf-8");
           suite.lastRun = await runRenderedQa(dir, opts);

@@ -25,6 +25,7 @@ import { buildTrackBSite, STARTER_VERSION, TrackBBuildError, type TrackBBuild } 
 import { siteUrlOf } from "../launch.js";
 import { CONTENT_FLOORS } from "../request.js";
 import { logoAssetFor } from "../brandAsset.js";
+import { accentForActionsOnly } from "./brand.js";
 
 export const TRACK_B_TEMPLATE: PageTemplate = {
   id: "track-b",
@@ -128,7 +129,7 @@ export class TrackBLoop {
     this.maxRounds = opts.maxRounds ?? 3;
     this.maxValidation = opts.maxValidationAttempts ?? 3;
     this.nowIso = opts.nowIso ?? (() => new Date().toISOString());
-    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b), logo: logoAssetFor(b) }));
+    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b), logo: logoAssetFor(b), accentActionsOnly: accentForActionsOnly(b) }));
   }
 
   async run(brief: PilotBrief): Promise<FrontendLoopResult> {

@@ -14,6 +14,13 @@
  *   prose      reading column with an aside, still
  *   cta        the closing band; the action leans toward the pointer
  *
+ * track-b-starter 1.4.0 (Build-quality Package 2): every section type also gets an authored entrance, chosen per type so
+ * no two read the same: headings rise, list items (services, steps, questions, quotes) arrive one by one, prose
+ * paragraphs follow the reader, work panels settle (and swipe on phones), the closing heading lifts. They are CSS
+ * scroll-driven animations on `[data-reveal]` (globals.css), transform only, with an IntersectionObserver fallback
+ * (RevealFallback) and nothing at all under reduced motion. A page's first section enters on load instead ("load"),
+ * so its h1 is painted in place from the first frame.
+ *
  * Anything that is SAMPLE content (fictional work, quotes, contact details) carries a visible SAMPLE
  * label where it appears.
  */
@@ -59,7 +66,11 @@ function ActionLink({ className = "btn btn-accent" }: { className?: string }) {
   );
 }
 
-const TONES = ["tone-deep", "tone-accent", "tone-surface", "tone-panel"] as const;
+// The accent is for actions only (buttons and links), never a panel's fill (track-b-starter 1.4.0; Lanternworks showed a
+// darkened accent as a project panel).
+const TONES = ["tone-deep", "tone-surface", "tone-panel"] as const;
+/** Entrance hook for a section's heading block: the first section of a page enters on load, the rest as they scroll in. */
+const headReveal = (first: boolean) => (first ? "load" : "rise");
 
 export function SectionView({ section, first }: { section: Section; first: boolean }) {
   const s = section;
@@ -104,13 +115,13 @@ export function SectionView({ section, first }: { section: Section; first: boole
     case "work":
       return (
         <section id={s.id} className="work">
-          <div className="container work-head">
+          <div className="container work-head" data-reveal={headReveal(first)}>
             <h2 className="h2">{s.heading}</h2>
             {s.intro && <p className="body-lg muted">{s.intro}</p>}
           </div>
           <WorkReel pan={content.brand.motion === "expressive"}>
             {s.items.map((item, i) => (
-              <article key={item.title} className={`reel-panel ${TONES[i % TONES.length]}`}>
+              <article key={item.title} className={`reel-panel ${TONES[i % TONES.length]}`} data-reveal="panel">
                 <div className="panel-top">
                   <p className="panel-client">{item.client}</p>
                   {item.source === "sample" && <Sample text="SAMPLE project, not real client work" />}
@@ -133,13 +144,13 @@ export function SectionView({ section, first }: { section: Section; first: boole
       return (
         <section id={s.id} className="services">
           <div className="container services-grid">
-            <div className="services-head">
+            <div className="services-head" data-reveal={headReveal(first)}>
               <h2 className="h2">{s.heading}</h2>
               {s.intro && <p className="body-lg muted">{s.intro}</p>}
             </div>
             <ul className="services-list">
               {s.items.map((it) => (
-                <li key={it.name} className="service">
+                <li key={it.name} className="service" data-reveal="item">
                   <h3 className="h3">{it.name}</h3>
                   <p>{it.summary}</p>
                   {it.details.length > 0 && <p className="service-details">{it.details.join(" / ")}</p>}
@@ -153,14 +164,14 @@ export function SectionView({ section, first }: { section: Section; first: boole
       return (
         <section id={s.id} className="process">
           <div className="container process-grid">
-            <div className="process-head">
+            <div className="process-head" data-reveal={headReveal(first)}>
               <h2 className="h2">{s.heading}</h2>
               {s.intro && <p className="body-lg muted">{s.intro}</p>}
             </div>
             <ol className="steps">
               <ProgressRule />
               {s.steps.map((st, i) => (
-                <li key={st.title} className="step">
+                <li key={st.title} className="step" data-reveal="item">
                   <span className="step-num" aria-hidden="true">
                     {String(i + 1).padStart(2, "0")}
                   </span>
@@ -178,8 +189,10 @@ export function SectionView({ section, first }: { section: Section; first: boole
       return (
         <section id={s.id} className="quotes">
           <div className="container quotes-grid">
-            <h2 className="h2 quotes-heading">{s.heading}</h2>
-            <figure className="quote quote-lead">
+            <h2 className="h2 quotes-heading" data-reveal={headReveal(first)}>
+              {s.heading}
+            </h2>
+            <figure className="quote quote-lead" data-reveal="item">
               <blockquote>
                 <p>{lead!.text}</p>
               </blockquote>
@@ -196,7 +209,7 @@ export function SectionView({ section, first }: { section: Section; first: boole
             {rest.length > 0 && (
               <div className="quotes-rest">
                 {rest.map((q) => (
-                  <figure key={q.text} className="quote">
+                  <figure key={q.text} className="quote" data-reveal="item">
                     <blockquote>
                       <p>{q.text}</p>
                     </blockquote>
@@ -221,10 +234,12 @@ export function SectionView({ section, first }: { section: Section; first: boole
       return (
         <section id={s.id} className="faq">
           <div className="container faq-grid">
-            <h2 className="h2">{s.heading}</h2>
+            <h2 className="h2" data-reveal={headReveal(first)}>
+              {s.heading}
+            </h2>
             <div className="faq-list">
               {s.items.map((it) => (
-                <details key={it.q} className="faq-item">
+                <details key={it.q} className="faq-item" data-reveal="item">
                   <summary>
                     <span>{it.q}</span>
                     <Plus className="faq-icon" size={20} strokeWidth={1.75} aria-hidden="true" />
@@ -242,7 +257,7 @@ export function SectionView({ section, first }: { section: Section; first: boole
       return (
         <section id={s.id} className="contact">
           <div className="container contact-grid">
-            <div className="contact-head">
+            <div className="contact-head" data-reveal={headReveal(first)}>
               {first ? <h1 className="h2">{s.heading}</h1> : <h2 className="h2">{s.heading}</h2>}
               <p className="body-lg">{s.intro}</p>
               {s.showDetails && (
@@ -283,14 +298,24 @@ export function SectionView({ section, first }: { section: Section; first: boole
       return (
         <section id={s.id} className="prose">
           <div className="container prose-grid">
-            {first ? <h1 className="display prose-heading">{s.heading}</h1> : <h2 className="h2 prose-heading">{s.heading}</h2>}
+            {first ? (
+              <h1 className="display prose-heading" data-reveal="load">
+                {s.heading}
+              </h1>
+            ) : (
+              <h2 className="h2 prose-heading" data-reveal="rise">
+                {s.heading}
+              </h2>
+            )}
             <div className="prose-body">
               {s.paragraphs.map((p) => (
-                <p key={p}>{p}</p>
+                <p key={p} data-reveal="line">
+                  {p}
+                </p>
               ))}
             </div>
             {s.aside && (
-              <aside className="prose-aside">
+              <aside className="prose-aside" data-reveal="item">
                 <h3 className="h4">{s.aside.heading}</h3>
                 <p>{s.aside.text}</p>
               </aside>
@@ -302,8 +327,10 @@ export function SectionView({ section, first }: { section: Section; first: boole
       return (
         <section id={s.id} className="cta">
           <div className="container cta-grid">
-            <h2 className="display cta-heading">{s.heading}</h2>
-            <div className="cta-aside">
+            <h2 className="display cta-heading" data-reveal="lift">
+              {s.heading}
+            </h2>
+            <div className="cta-aside" data-reveal="rise">
               <p className="body-lg">{s.text}</p>
               <MagneticAction href={actionHref()} label={content.primaryAction.label} />
             </div>

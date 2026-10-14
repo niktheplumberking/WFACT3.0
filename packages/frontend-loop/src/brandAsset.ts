@@ -136,6 +136,27 @@ export function loadLogoAsset(logo: BriefLogo, data: Buffer): LogoAsset {
   return { ...logo, ...checked, file: logoFileName(logo.mime), data };
 }
 
+/**
+ * The logo file as the site serves it (Build-quality Package 2): an SVG with only a viewBox has no intrinsic size, and
+ * browsers then size it to nothing in a flex header (Lanternworks 55ddba7c: the header logo rendered 0x0 at every width).
+ * Adds width and height from the viewBox to the root <svg> when either is missing; every other byte is kept, and the
+ * result is checked against the same SVG policy. The fingerprint is always checked on the uploaded bytes, before this.
+ */
+export function servedLogoData(logo: Pick<LogoAsset, "mime" | "data" | "width" | "height">): Buffer {
+  if (logo.mime !== "image/svg+xml") return logo.data;
+  const text = logo.data.toString("utf-8");
+  const m = /<svg\b[^>]*>/i.exec(text);
+  if (!m) return logo.data;
+  const tag = m[0];
+  const has = (a: string) => new RegExp(`\\s${a}\\s*=`, "i").test(tag);
+  if (has("width") && has("height")) return logo.data;
+  const add = `${has("width") ? "" : ` width="${logo.width}"`}${has("height") ? "" : ` height="${logo.height}"`}`;
+  const out = text.slice(0, m.index) + tag.replace(/^<svg\b/i, `<svg${add}`) + text.slice(m.index + tag.length);
+  const problem = svgProblem(out);
+  if (problem) throw new LogoError(`The sized SVG logo contains ${problem}.`);
+  return Buffer.from(out, "utf-8");
+}
+
 /** The logo's display size in the header: 40 px tall (32 px for a wide mark), width kept in proportion. */
 export function logoDisplaySize(logo: Pick<BriefLogo, "width" | "height">): { width: number; height: number } {
   const ratio = logo.width / logo.height;

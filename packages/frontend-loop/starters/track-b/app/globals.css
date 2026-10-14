@@ -108,8 +108,8 @@ html.lenis body {
   z-index: 60;
   padding: 0.75rem 1.25rem;
   border-radius: 999px;
-  background: var(--accent-ink);
-  color: var(--on-accent);
+  background: var(--action);
+  color: var(--on-action);
   font-weight: 600;
 }
 .skip-link:focus {
@@ -215,9 +215,10 @@ p {
   font-size: 1.125rem;
   padding-left: 1.75rem;
 }
+/* track-b-starter 1.4.0: buttons are the client's own accent (theme --action), not a darkened shade of it. */
 .btn-accent {
-  background: var(--accent-ink);
-  color: var(--on-accent);
+  background: var(--action);
+  color: var(--on-action);
 }
 .btn-on-deep {
   background: var(--on-deep);
@@ -252,16 +253,20 @@ p {
   min-height: var(--header);
 }
 .wordmark {
+  flex-shrink: 0;
   font-size: 1.3125rem;
   font-weight: var(--display-weight);
   letter-spacing: -0.02em;
   text-decoration: none;
 }
+/* The display size comes from the build (inline width/height, launch.json); auto sizes let an SVG with only a viewBox
+   collapse to 0x0 (Lanternworks 55ddba7c). object-fit keeps the proportions if the width cap ever bites. */
 .brand-logo {
   display: block;
-  width: auto;
-  height: auto;
+  flex-shrink: 0;
   max-width: min(15rem, 52vw);
+  object-fit: contain;
+  object-position: left center;
 }
 .brand-logo-footer {
   margin: 0;
@@ -386,8 +391,13 @@ html:has(.menu-panel[open]) {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: var(--gutter);
   row-gap: clamp(2rem, 5vw, 4.5rem);
-  min-height: min(calc(88dvh - var(--header)), 860px);
-  align-content: space-between;
+}
+/* The poster-height hero only where there is width for it; on phones it left a large empty band (1.4.0). */
+@media (min-width: 900px) {
+  .hero-grid {
+    min-height: min(calc(88dvh - var(--header)), 860px);
+    align-content: space-between;
+  }
 }
 .hero-heading-wrap {
   grid-column: 1 / -1;
@@ -511,6 +521,25 @@ html:has(.menu-panel[open]) {
   border-radius: 999px;
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
+}
+/* Phones and small tablets: the projects swipe sideways with scroll snap instead of stacking (1.4.0). */
+@media (max-width: 959px) {
+  .reel-track {
+    display: flex;
+    gap: 0.875rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .reel-track::-webkit-scrollbar {
+    display: none;
+  }
+  .reel-panel {
+    flex: 0 0 min(86%, 34rem);
+    scroll-snap-align: start;
+  }
 }
 @media (min-width: 900px) {
   .panel-foot {
@@ -993,5 +1022,140 @@ html:has(.menu-panel[open]) {
   .nav-link,
   .faq-icon {
     transition: none;
+  }
+}
+
+/* ---- track-b-starter 1.4.0 (Build-quality Package 2) ---- */
+
+/* When the brief reserves the accent for actions, nothing decorative wears it: rules, numbers and the closing band's
+   button follow the ink or the action fill instead. */
+[data-accent="actions"] .hero-rule,
+[data-accent="actions"] .progress-rule {
+  background: var(--ink);
+}
+[data-accent="actions"] .step-num {
+  color: var(--ink);
+}
+[data-accent="actions"] .btn-on-deep {
+  background: var(--action);
+  color: var(--on-action);
+}
+[data-accent="actions"] ::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* The phone action bar: always in reach under 960px, its height reserved so it never covers the page's last line. */
+.action-bar {
+  display: none;
+}
+@media (max-width: 959px) {
+  :root {
+    --action-bar: calc(48px + 1.5rem + 1px + env(safe-area-inset-bottom, 0px));
+  }
+  html {
+    scroll-padding-bottom: var(--action-bar);
+  }
+  body {
+    padding-bottom: var(--action-bar);
+  }
+  .action-bar {
+    display: block;
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 30;
+    padding: 0.75rem var(--gutter) calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    background: var(--paper);
+    border-top: 1px solid var(--hairline);
+  }
+  .action-bar .btn {
+    width: 100%;
+    justify-content: space-between;
+  }
+  html:has(.menu-panel[open]) .action-bar {
+    display: none;
+  }
+}
+
+/* Section entrances: one authored moment per section type, transform only (text never fades, so contrast holds at every
+   frame), scroll-driven where the browser supports it, an IntersectionObserver fallback elsewhere, none with reduced motion.
+   A page's first section ("load") settles in place on load, painted from the first frame. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="load"] {
+    animation: reveal-load 720ms var(--ease-out) 60ms both;
+  }
+  @supports (animation-timeline: view()) {
+    [data-reveal]:not([data-reveal="load"]) {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+      animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    [data-reveal="item"] {
+      animation-name: reveal-item;
+      animation-range: entry 10% entry 100%;
+    }
+    [data-reveal="line"] {
+      animation-name: reveal-line;
+    }
+    [data-reveal="lift"] {
+      animation-name: reveal-lift;
+      animation-range: entry 0% cover 40%;
+    }
+    [data-reveal="panel"] {
+      animation-name: reveal-panel;
+      animation-range: entry 0% cover 30%;
+    }
+    .reel.is-panning [data-reveal="panel"] {
+      animation: none;
+    }
+    @media (max-width: 959px) {
+      [data-reveal="panel"] {
+        animation-timeline: view(inline);
+        animation-range: entry 0% contain 0%;
+      }
+    }
+  }
+  html.reveal-io [data-reveal]:not([data-reveal="load"]) {
+    transition: transform 760ms var(--ease-out);
+  }
+  html.reveal-io [data-reveal]:not([data-reveal="load"]):not(.is-in) {
+    transform: translateY(44px);
+  }
+  html.reveal-io [data-reveal="item"]:not(.is-in) {
+    transform: translateY(22px);
+  }
+  html.reveal-io [data-reveal="panel"]:not(.is-in) {
+    transform: scale(0.94);
+  }
+  @keyframes reveal-load {
+    from {
+      transform: translateY(0.35em);
+    }
+  }
+  @keyframes reveal-rise {
+    from {
+      transform: translateY(44px);
+    }
+  }
+  @keyframes reveal-item {
+    from {
+      transform: translateY(22px);
+    }
+  }
+  @keyframes reveal-line {
+    from {
+      transform: translateY(28px);
+    }
+  }
+  @keyframes reveal-lift {
+    from {
+      transform: translateY(64px) scale(0.96);
+    }
+  }
+  @keyframes reveal-panel {
+    from {
+      transform: scale(0.94);
+    }
   }
 }

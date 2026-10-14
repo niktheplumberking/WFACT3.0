@@ -9,6 +9,9 @@ export function BrandMark({ name, footer = false }: { name: string; footer?: boo
   if (!logo) return footer ? null : <>{name}</>;
   // A plain <img>: a static export has no image server, and the intrinsic size is reserved.
   // eslint-disable-next-line @next/next/no-img-element
-  const img = <img className="brand-logo" src={logo.src} alt={name} width={logo.width} height={logo.height} decoding="async" />;
+  // Explicit display size (track-b-starter 1.4.0): CSS width/height auto let an SVG with only a viewBox collapse to 0x0.
+  const img = (
+    <img className="brand-logo" src={logo.src} alt={name} width={logo.width} height={logo.height} style={{ width: logo.width, height: logo.height }} decoding="async" />
+  );
   return footer ? <p className="brand-logo-footer">{img}</p> : img;
 }

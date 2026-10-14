@@ -7,6 +7,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { content, logo, palette, siteUrl } from "@/lib/content";
 import { displayFace, textFace } from "@/lib/type.generated";
+import { RevealFallback } from "@/components/motion/RevealFallback";
 import { MotionRoot } from "@/components/motion/MotionRoot";
 
 export const metadata: Metadata = {
@@ -38,6 +39,8 @@ const vars = {
   "--surface": palette.surface,
   "--deep-panel": palette.deepPanel,
   "--dim": palette.dim,
+  "--action": palette.action,
+  "--on-action": palette.onAction,
 } as React.CSSProperties;
 
 function jsonLd() {
@@ -50,10 +53,11 @@ function jsonLd() {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" style={vars} className={`${displayFace.variable} ${textFace.variable}`} data-motion={content.brand.motion} data-pairing={content.brand.typePairing} data-scheme={scheme}>
+    <html lang="en" style={vars} className={`${displayFace.variable} ${textFace.variable}`} data-motion={content.brand.motion} data-pairing={content.brand.typePairing} data-scheme={scheme} data-accent={palette.accentActionsOnly ? "actions" : "free"}>
       <body>
         {children}
         <MotionRoot smooth={content.brand.motion === "expressive"} />
+        <RevealFallback />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd() }} />
       </body>
     </html>

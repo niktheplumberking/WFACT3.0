@@ -135,7 +135,8 @@ test("Track A places the logo in the header, the footer chip and the favicon, on
   const content = validateSiteContent(fixture, brief).content!;
   const asset = loadLogoAsset(record(), LOGO);
   const site = renderSite(content, { logo: asset });
-  assert.equal(site.files["logo.svg"], LOGO.toString("utf-8"), "the file ships with the site, as text");
+  // Track A 1.3.0: the uploaded bytes plus width/height from the viewBox (servedLogoData), so the SVG cannot collapse.
+  assert.equal(site.files["logo.svg"], LOGO.toString("utf-8").replace("<svg ", '<svg width="240" height="48" '), "the file ships with the site, as text, sized");
   assert.ok(!site.binary.includes("logo.svg"));
   for (const page of site.pages) {
     const html = site.files[page]!;

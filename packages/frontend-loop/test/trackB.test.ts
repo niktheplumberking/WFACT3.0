@@ -86,7 +86,11 @@ test("isolation: the build sandbox cannot reach the network and sees no variable
 });
 
 let built: TrackBBuild | null = null;
-const realBuild = async () => (built ??= await buildTrackBSite(valid()));
+// A failed build throws with its log attached; print the end of it, or CI says only "next build failed" (CI 38569635936).
+const withLog = (e: unknown): never => {
+  throw new Error(`${e instanceof Error ? e.message : String(e)}\n--- build log (end) ---\n${(e as { log?: string }).log?.slice(-4000) ?? "(none)"}`);
+};
+const realBuild = async () => (built ??= await buildTrackBSite(valid()).catch(withLog));
 
 test("real isolated build: a static multi-page export, fonts as binary, the built source kept, the isolation recorded", { timeout: 300_000 }, async () => {
   const b = await realBuild();
@@ -250,10 +254,45 @@ test("the client's logo ships in the export and is placed by the starter (header
   const r = inspectLogo(svg, "image/svg+xml");
   const logo = loadLogoAsset({ ...r, path: `uploads/0b7c3f7e-1d2a-4c55-9e8f-2a1b3c4d5e6f/${r.sha256}.svg` }, svg);
   const b = await buildTrackBSite(valid(), { logo });
-  assert.equal(b.files["logo.svg"], svg.toString("utf-8"), "the exact uploaded bytes");
+  // Starter 1.4.0: the uploaded bytes plus width/height from the viewBox (servedLogoData), so the SVG cannot collapse.
+  assert.equal(b.files["logo.svg"], svg.toString("utf-8").replace("<svg ", '<svg width="240" height="48" '), "the uploaded bytes, sized");
   const home = b.files["index.html"]!;
-  assert.match(home, /<img class="brand-logo" src="\/logo.svg" alt="[^"]+" width="160" height="32"/, "header logo with its space reserved");
+  assert.match(home, /<img class="brand-logo" src="\/logo.svg" alt="[^"]+" width="160" height="32" style="width:160px;height:32px"/, "header logo with an explicit display size");
   assert.match(home, /class="brand-logo-footer"/, "footer logo");
   assert.match(home, /<link rel="icon" href="\/logo.svg" type="image\/svg\+xml"\/?>/, "favicon");
   assert.notEqual(b.record.outputHash, (await realBuild()).record.outputHash, "a different logo is a different build");
+});
+
+// ---- Build-quality Package 2 (2026-10-14): starter 1.4.0 helpers ----
+
+test("Package 2: the brand accent fills buttons when a text colour reads on it (Lanternworks: ink on #F26B38)", async () => {
+  const { contrast: c } = await import("../src/trackA/palette.js");
+  const { palette } = buildTrackBPalette({ ink: "#14213D", paper: "#FAF7F2", accent: "#F26B38", deep: "#14213D" });
+  assert.equal(palette!.action, "#F26B38");
+  assert.equal(palette!.onAction, "#14213D");
+  assert.ok(c(palette!.onAction, palette!.action) >= 4.5);
+  assert.notEqual(palette!.accentInk, "#F26B38", "text links still use the darkened, text-safe accent");
+  // An accent nothing reads on falls back to the text-safe shade, as before.
+  const grey = buildTrackBPalette({ ink: "#111111", paper: "#FFFFFF", accent: "#888888", deep: "#111111" }).palette!;
+  assert.ok(c(grey.onAction, grey.action) >= 4.5);
+});
+
+test("Package 2: 'accent for buttons and links only' is read from the request or the brand notes", async () => {
+  const { accentForActionsOnly } = await import("../src/trackB/brand.js");
+  assert.equal(accentForActionsOnly({ brandNotes: "x", requestText: "one signal orange #F26B38 for buttons and links only." }), true);
+  assert.equal(accentForActionsOnly({ brandNotes: "signal orange #F26B38 reserved for interactive elements" }), true);
+  assert.equal(accentForActionsOnly({ brandNotes: "Warm orange accent, used generously." }), false);
+  assert.equal(accentForActionsOnly({ brandNotes: "We only do buttons for kiosks." }), false, "no colour named: not a colour rule");
+});
+
+test("Package 2: an SVG logo with only a viewBox is served with width and height (it rendered 0x0)", async () => {
+  const { servedLogoData } = await import("../src/brandAsset.js");
+  const svg = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 48"><path d="M0 0h10v10z"/></svg>');
+  const out = servedLogoData({ mime: "image/svg+xml", data: svg, width: 240, height: 48 }).toString("utf-8");
+  assert.match(out, /^<svg width="240" height="48" xmlns=/);
+  assert.equal(out.replace(' width="240" height="48"', ""), svg.toString("utf-8"), "nothing else changes");
+  const sized = Buffer.from('<svg width="10" height="5" viewBox="0 0 2 1"></svg>');
+  assert.equal(servedLogoData({ mime: "image/svg+xml", data: sized, width: 2, height: 1 }), sized);
+  const png = Buffer.from([1, 2, 3]);
+  assert.equal(servedLogoData({ mime: "image/png", data: png, width: 1, height: 1 }), png);
 });

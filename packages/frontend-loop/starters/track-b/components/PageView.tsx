@@ -7,6 +7,8 @@ import { content, href, actionHref, pageBySlug, siteUrl, OG_IMAGE } from "@/lib/
 import { SiteHeader } from "./SiteHeader";
 import { SiteFooter } from "./SiteFooter";
 import { SectionView } from "./Sections";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 /** Title, description and share tags. Canonical, og:url and og:image only once the live address is known. */
 export function pageMetadata(slug: string): Metadata {
@@ -42,6 +44,16 @@ export function PageView({ slug }: { slug: string }) {
         ))}
       </main>
       <SiteFooter current={slug} />
+      {/* Phones and small tablets (under 960px, where the header has no room for it): the one action stays in reach.
+          The page reserves its height (body padding, scroll padding), so it never covers content or the skip link. */}
+      <div className="action-bar">
+        <Link href={actionHref()} className="btn btn-accent">
+          <span>{content.primaryAction.label}</span>
+          <span className="btn-icon" aria-hidden="true">
+            <ArrowUpRight size={18} strokeWidth={1.75} />
+          </span>
+        </Link>
+      </div>
     </>
   );
 }

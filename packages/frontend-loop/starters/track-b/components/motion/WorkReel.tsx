@@ -2,8 +2,9 @@
 /**
  * Selected work as a reel: on wide screens, with expressive motion allowed, the section pins and the
  * vertical scroll pans the projects past horizontally, one at a time (the scroll relationship is the
- * point: each project gets the whole stage). Everywhere else, including reduced motion and phones, the
- * same panels are a plain vertical stack. The server renders the stack, so nothing depends on scripts.
+ * point: each project gets the whole stage). Below 960px the panels are a sideways swipe with scroll snap (track-b-starter
+ * 1.4.0; it was a plain stack); with reduced motion on a wide screen they stay a vertical stack. The server renders the
+ * markup, so nothing depends on scripts.
  */
 import { useEffect, useRef, type ReactNode } from "react";
 import { MOTION_OK_QUERY, WIDE_QUERY, motionTokens } from "@/lib/motion";
@@ -29,7 +30,7 @@ export function WorkReel({ children, pan }: { children: ReactNode; pan: boolean 
   }, [pan]);
   return (
     <div ref={wrap} className="reel">
-      <div ref={track} className="reel-track">
+      <div ref={track} className="reel-track" tabIndex={0} role="group" aria-label="Projects; swipe or scroll sideways on small screens">
         {children}
       </div>
     </div>

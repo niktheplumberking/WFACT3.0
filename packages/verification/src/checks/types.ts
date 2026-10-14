@@ -43,6 +43,19 @@ export interface VerificationContext {
    * production domain and run before a human launch decision. A launch-only check at preview reports N/A.
    */
   stage?: "preview" | "launch";
+  /**
+   * Build-quality Package 2: what the brand promises (Track B), computed by code from the brief, the content and the palette
+   * engine, never read from the page. Drives the rendered brand checks (logo, phone action, accent usage).
+   */
+  brand?: BrandPromise;
+}
+
+export interface BrandPromise {
+  logo: boolean;
+  primaryActionLabel: string;
+  accent: string;
+  accentDerived: string[];
+  accentActionsOnly: boolean;
 }
 
 /**
