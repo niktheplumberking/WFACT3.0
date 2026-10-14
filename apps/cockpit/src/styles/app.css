@@ -605,3 +605,32 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
 .timeline li::before { content: ""; position: absolute; left: -19px; top: 7px; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); }
 .tech-extra { display: grid; gap: 12px; margin-top: 12px; }
 .tech-rounds { margin: 0; padding-left: 18px; font-size: var(--fs-small); color: var(--ink-2); display: grid; gap: 6px; }
+
+/* ---------- Proposal review (v2) ---------- */
+.proposal { display: grid; gap: 36px; padding-bottom: 20px; }
+.proposal-head { display: grid; gap: 10px; max-width: 800px; }
+.client-words { margin: 0; padding: 24px 28px; border-left: 3px solid var(--ink); background: var(--sheet); border-radius: 0 var(--r-card) var(--r-card) 0; display: grid; gap: 10px; max-width: 860px; }
+.client-words blockquote { margin: 0; white-space: pre-line; }
+.kind-section { display: grid; gap: 16px; }
+.kind-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.kind-card { display: grid; gap: 10px; align-content: start; padding: 22px; border-radius: var(--r-panel); border: 1px solid var(--line-2); background: var(--sheet); color: var(--ink); text-align: left; font: inherit; cursor: pointer; }
+.kind-card.on { border: 2px solid var(--ink); padding: 21px; }
+.kind-card:disabled { cursor: default; }
+.kind-top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.kind-top svg { width: 22px; height: 22px; }
+.tag-recommended { padding: 4px 10px; border-radius: var(--r-pill); background: var(--done-w); color: var(--done); font: 600 var(--fs-chip)/1.2 var(--face-text); }
+.kind-what { color: var(--ink-2); }
+.kind-reasons { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: var(--fs-label); color: var(--ink-2); }
+.no-direction { display: grid; gap: 12px; }
+.proposal-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 32px; align-items: start; }
+.proposal-pages { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.proposal-pages li { display: grid; grid-template-columns: 32px 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); }
+.open-qs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.open-qs li { display: flex; gap: 10px; padding: 12px 14px; border-radius: var(--r-ctl); background: var(--need-w); }
+.open-qs svg { color: var(--need); margin-top: 4px; flex-shrink: 0; width: 14px; height: 14px; }
+.sticky-bar { position: sticky; bottom: 0; z-index: 4; display: grid; gap: 14px; padding: 16px 0 8px; background: var(--paper); border-top: 1px solid var(--line); }
+.changes { display: grid; gap: 8px; max-width: 720px; }
+.changes .textarea { min-height: 0; background: var(--sheet); }
+@media (max-width: 900px) {
+  .sticky-bar { bottom: calc(76px + env(safe-area-inset-bottom)); }
+}

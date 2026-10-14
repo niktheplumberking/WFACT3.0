@@ -5,14 +5,16 @@
  * the caller's role; projects updates are owner/admin by RLS. This UI collects decisions and says plainly
  * what each one does and doesn't do. Launch is never moved from here (Step 4C decision D3).
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
-import { Check, ArrowRight, ArrowClockwise } from "@phosphor-icons/react";
+import { ArrowRight, ArrowClockwise, Circle, Diamond, RadioButton, SealCheck } from "@phosphor-icons/react";
+import { Button, TechDetails } from "../components/kit";
+import { buildStopLine } from "../lib/costs";
 import { supabase } from "../supabaseClient";
 import { isActive, requestJob } from "../jobsClient";
 import { planIdOfJob } from "../lib/attention";
 import {
-  GOAL_LABEL, KIND_LABEL, LEAD_LABEL, TRACKS, dateTime, jobState, planName, shortDate,
+  GOAL_LABEL, KIND_LABEL, LEAD_LABEL, dateTime, jobState, planName, shortDate,
   type AccountRequestRow, type Direction, type PlanRow, type ProjectRow, type Role, type Track,
 } from "../lib/model";
 import { canDecide, fetchPlan, useFactory, useLoad, useMe, useToast } from "../lib/state";
@@ -157,30 +159,33 @@ function RerunDirection({ row }: { row: PlanRow }) {
   const nav = useNavigate();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const running = (f.jobs ?? []).find((j) => j.kind === "direction" && j.params?.planId === row.id && isActive(j));
   if (row.status !== "pending" || !canDecide(me.role)) return null;
-  if (running) return <Link className="btn" to={`/activity/${running.id}`}>Direction is being prepared again; see progress</Link>;
+  if (running) return <Link className="btn" to={`/activity/${running.id}`}>The recommendation is being prepared again; see progress</Link>;
   async function go() {
+    setConfirming(false);
     setBusy(true);
     setError(null);
     const { jobId, error: e } = await requestJob("direction", { planId: row.id });
     setBusy(false);
     if (!jobId) return setError(`It didn't start: ${e}. Nothing changed; try again.`);
-    toast(e ?? "Preparing the direction again. The updated plan appears in Decisions in a minute or two.");
+    toast(e ?? "Preparing the recommendation again. The updated proposal appears in a minute or two.");
     await f.reload();
     nav(`/activity/${jobId}`);
   }
   return (
     <div className="stack-tight">
       <div>
-        <button className="btn" type="button" disabled={busy} onClick={go}>
+        <button className="btn" type="button" disabled={busy} onClick={() => setConfirming(true)}>
           <ArrowClockwise aria-hidden="true" />
           {busy ? "Starting…" : "Prepare the direction again"}
         </button>
       </div>
-      <p className="quiet fine">Reads the client's request again and suggests which kind of site to build. The plan itself does not change.</p>
+      <p className="quiet fine">Reads the client's request again and suggests which kind of site to build. The proposal itself does not change.</p>
       {error && <Notice tone="stop">{error}</Notice>}
+      <ConfirmDialog open={confirming} title="Prepare the direction again?" body="The factory reads the request again and recommends a kind of site." cost={`Costs a few cents. ${buildStopLine()}`} confirmLabel="Prepare it again" onConfirm={() => void go()} onCancel={() => setConfirming(false)} />
     </div>
   );
 }
@@ -325,102 +330,6 @@ function PlanDetails({ row }: { row: PlanRow }) {
   );
 }
 
-function DecisionPanel({ row, onDone }: { row: PlanRow; onDone: () => void }) {
-  const rec = row.plan.direction?.recommendation;
-  const [track, setTrack] = useState<Track | undefined>(rec?.track ?? undefined);
-  const [note, setNote] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const toast = useToast();
-  const f = useFactory();
-  const overriding = Boolean(rec?.track && track && track !== rec.track);
-
-  async function decide(status: "approved" | "rejected") {
-    const n = note.trim();
-    if (status === "rejected" && !n) return setError("Write a note before rejecting: the planner writes the new plan from it.");
-    if (status === "approved" && !track) return setError("Choose Track A or Track B before approving.");
-    setBusy(true);
-    setError(null);
-    const { data, error: e } = await supabase
-      .from("plan_approvals")
-      .update(status === "approved" ? { status, decision_note: n || null, build_track: track } : { status, decision_note: n || null })
-      .eq("id", row.id)
-      .eq("status", "pending")
-      .select("id");
-    setBusy(false);
-    if (e) return setError(`Your decision wasn't recorded: ${e.message}. Nothing changed; try again.`);
-    if (!data || data.length === 0) {
-      // RLS filtered it out (not owner/admin) or someone else decided first: never pretend it worked.
-      return setError("Your decision wasn't recorded: this plan is no longer waiting, or your role can't decide plans. Reload to see its state.");
-    }
-    toast(status === "approved" ? `Plan approved as Track ${track}. Start the build when you're ready.` : "Plan rejected. You can re-plan it from your note.");
-    await f.reload();
-    onDone();
-  }
-
-  return (
-    <section className="plate sticky" aria-labelledby="decide-h">
-      <div className="plate-head">
-        <h2 id="decide-h">Your decision</h2>
-      </div>
-      <form className="plate-body stack-tight" onSubmit={(e) => { e.preventDefault(); decide("approved"); }}>
-        <fieldset className="tracks">
-          <legend>How should it be built?</legend>
-          {!rec?.track && <p className="muted" style={{ fontSize: "var(--t-sm)" }}>No recommendation{rec?.withheldReason ? `: ${rec.withheldReason}` : ""}. Choose the track yourself.</p>}
-          {TRACKS.map((t) => (
-            <div key={t.id} style={{ display: "grid", gap: 12 }}>
-              <label className={`track${track === t.id ? " is-chosen" : ""}`}>
-                <input type="radio" name={`track-${row.id}`} value={t.id} checked={track === t.id} onChange={() => setTrack(t.id)} />
-                <span>
-                  <b>{t.name}</b>
-                  {rec?.track === t.id && (
-                    <span className="aspect clear" style={{ marginLeft: 8 }}>
-                      Recommended, {Math.round(rec.confidence * 100)}% sure
-                    </span>
-                  )}
-                  <span className="muted">{t.summary}</span>
-                </span>
-              </label>
-              {rec?.track === t.id && rec.reasons.length > 0 && (
-                <details className="raw">
-                  <summary>Why Track {t.id} is recommended ({rec.reasons.length} reasons)</summary>
-                  <ul className="reasons" style={{ marginTop: 8 }}>
-                    {rec.reasons.map((r, i) => (
-                      <li key={i}>{r}</li>
-                    ))}
-                  </ul>
-                </details>
-              )}
-            </div>
-          ))}
-          {overriding && <Notice tone="caution">You're choosing against the recommendation. That is recorded with the approval.</Notice>}
-        </fieldset>
-        {/* Approve sits right under the choice it confirms; Reject sits with the note it needs. */}
-        <div className="actions">
-          <button className="btn go" type="submit" disabled={busy || !track}>
-            <Check aria-hidden="true" />
-            {busy ? "Saving…" : track ? `Approve as Track ${track}` : "Choose a track to approve"}
-          </button>
-        </div>
-        <p className="quiet fine" style={{ marginTop: -8 }}>Recorded with your name and the time, and can't be changed afterwards. Approving doesn't build or publish anything: you start the build next.</p>
-        {error && <Notice tone="stop">{error}</Notice>}
-        <div className="field" style={{ borderTop: "1px solid var(--seam)", paddingTop: 16 }}>
-          <label htmlFor="plan-note">Or reject it with a note for the planner</label>
-          <textarea id="plan-note" className="textarea" style={{ minHeight: 80 }} value={note} maxLength={2000} onChange={(e) => setNote(e.target.value)} aria-describedby="plan-note-hint" />
-          <span id="plan-note-hint" className="hint">
-            The planner writes a new plan from your note.
-          </span>
-        </div>
-        <div className="actions">
-          <button className="btn danger" type="button" disabled={busy} onClick={() => decide("rejected")}>
-            Reject with note
-          </button>
-        </div>
-      </form>
-    </section>
-  );
-}
-
 function AfterDecision({ row }: { row: PlanRow }) {
   const f = useFactory();
   const me = useMe();
@@ -517,25 +426,272 @@ function AfterDecision({ row }: { row: PlanRow }) {
   );
 }
 
+/**
+ * Proposal review (Cockpit v2): what the factory proposes, in the client's own words; the kind of site as a radiogroup
+ * with the recommendation and its real reasons; pages; open questions; and a sticky bar. Approving is the owner's
+ * (locked rule; admins cannot approve proposals) and confirms first. "Ask for changes" records the note on this
+ * proposal and requests a new one (the re-plan job, paid work, so it confirms the cost first).
+ */
+function ProposalReview({ row, onDone }: { row: PlanRow; onDone: () => void }) {
+  const me = useMe();
+  const f = useFactory();
+  const toast = useToast();
+  const nav = useNavigate();
+  const owner = me.role === "owner";
+  const decider = canDecide(me.role);
+  const p = row.plan.plan;
+  const brief = p.brief as typeof p.brief & { requestText?: string; requested?: { pages?: string[] } };
+  const rec = row.plan.direction?.recommendation;
+  const [kind, setKind] = useState<Track | undefined>(rec?.track ?? undefined);
+  const [asking, setAsking] = useState(false);
+  const [note, setNote] = useState("");
+  const [confirm, setConfirm] = useState<"approve" | "changes" | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const client = p.intake?.clientName ?? row.client_slug;
+  const questions = [...p.openQuestions, ...(row.plan.direction?.openQuestions ?? [])];
+  const pages = brief.requested?.pages ?? [];
+  const words = brief.requestText?.trim();
+  const quote = words ? (words.length > 600 ? `${words.slice(0, 597)}…` : words) : null;
+  const KINDS: { t: Track; name: string; what: string }[] = [
+    { t: "A", name: "Fast local site", what: "Quick to load, simple to use. Hours, directions and the call button come first." },
+    { t: "B", name: "Showcase site with motion", what: "Large pictures and gentle motion between sections. Best when the work itself is the reason to visit." },
+  ];
+  const chosen = KINDS.find((k) => k.t === kind);
+  const overriding = !!rec?.track && !!kind && kind !== rec.track;
+
+  async function approve() {
+    setConfirm(null);
+    if (!kind) return setError("Choose the kind of site first.");
+    setBusy(true);
+    setError(null);
+    const { data, error: e } = await supabase.from("plan_approvals").update({ status: "approved", decision_note: null, build_track: kind }).eq("id", row.id).eq("status", "pending").select("id");
+    setBusy(false);
+    if (e) return setError(`It wasn't approved: ${e.message}. Nothing changed; try again.`);
+    if (!data || data.length === 0) return setError("It wasn't approved: this proposal is no longer waiting, or your role can't approve it. Reload to see where it stands.");
+    toast(`Approved as a ${chosen!.name}. Add anything missing, then start the build.`);
+    await f.reload();
+    onDone();
+  }
+
+  async function askForChanges() {
+    setConfirm(null);
+    const n = note.trim();
+    if (!n) return setError("Write what should change first: the factory writes the new proposal from it.");
+    setBusy(true);
+    setError(null);
+    const { data, error: e } = await supabase.from("plan_approvals").update({ status: "rejected", decision_note: n }).eq("id", row.id).eq("status", "pending").select("id");
+    if (e || !data || data.length === 0) {
+      setBusy(false);
+      return setError(e ? `Your note wasn't saved: ${e.message}. Nothing changed; try again.` : "Your note wasn't saved: this proposal is no longer waiting. Reload to see where it stands.");
+    }
+    if (row.revision >= 2) {
+      setBusy(false);
+      toast("Your note is saved. This client has had two new proposals already, the limit; start a fresh request with a clearer brief.");
+      await f.reload();
+      return onDone();
+    }
+    const { jobId, error: je } = await requestJob("replan", { planId: row.id });
+    setBusy(false);
+    await f.reload();
+    if (!jobId) return setError(`Your note is saved, but the new proposal didn't start: ${je}. Start it again from this page.`);
+    toast(je ?? `The factory is writing proposal ${row.revision + 1} from your note.`);
+    nav(`/activity/${jobId}`);
+  }
+
+  const pick = (i: number) => {
+    const n = (i + KINDS.length) % KINDS.length;
+    setKind(KINDS[n]!.t);
+    refs.current[n]?.focus();
+  };
+
+  return (
+    <div className="proposal">
+      <header className="proposal-head">
+        <p className="t-eyebrow">
+          Proposal {row.revision} · written {dateTime(row.created_at)}
+        </p>
+        <h1 className="t-title">A site for {client}</h1>
+        <p className="t-lead muted">{brief.goal}</p>
+      </header>
+      {quote && (
+        <figure className="client-words">
+          <figcaption className="t-small quiet">What the client wrote, in their own words</figcaption>
+          <blockquote className="t-quote">“{quote}”</blockquote>
+          <p className="t-small muted">{client}</p>
+        </figure>
+      )}
+      <section aria-labelledby="kind-h" className="kind-section">
+        <div>
+          <h2 id="kind-h" className="t-section">
+            Choose the kind of site
+          </h2>
+          <p className="muted">{rec?.track ? `The factory recommends a ${KINDS.find((k) => k.t === rec.track)!.name}. You can choose either.` : `The factory did not recommend one${rec?.withheldReason ? `: ${rec.withheldReason}` : ""}. You choose.`}</p>
+        </div>
+        <div role="radiogroup" aria-labelledby="kind-h" className="kind-cards">
+          {KINDS.map((k, i) => {
+            const on = kind === k.t;
+            const recommended = rec?.track === k.t;
+            return (
+              <button
+                key={k.t}
+                ref={(el) => {
+                  refs.current[i] = el;
+                }}
+                type="button"
+                role="radio"
+                aria-checked={on}
+                tabIndex={on || (!kind && i === 0) ? 0 : -1}
+                className={on ? "kind-card on" : "kind-card"}
+                disabled={!decider}
+                onClick={() => setKind(k.t)}
+                onKeyDown={(e) => {
+                  if (["ArrowRight", "ArrowDown"].includes(e.key)) {
+                    e.preventDefault();
+                    pick(i + 1);
+                  } else if (["ArrowLeft", "ArrowUp"].includes(e.key)) {
+                    e.preventDefault();
+                    pick(i - 1);
+                  }
+                }}
+              >
+                <span className="kind-top">
+                  {on ? <RadioButton weight="fill" aria-hidden="true" /> : <Circle aria-hidden="true" />}
+                  <span className="t-item">{k.name}</span>
+                  {recommended && <span className="tag-recommended">Recommended</span>}
+                </span>
+                <span className="kind-what">{k.what}</span>
+                {recommended && rec?.reasons?.length ? (
+                  <ul className="kind-reasons">
+                    {rec.reasons.map((r) => (
+                      <li key={r}>{r}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+        {overriding && <p className="t-small muted">You are choosing against the recommendation. That choice is recorded with the approval.</p>}
+        {!row.plan.direction && (
+          <div className="no-direction">
+            <p className="muted">The factory could not prepare its recommendation for this proposal. You can still choose, or ask it to try again.</p>
+            <RerunDirection row={row} />
+            {row.plan.directionNote && (
+              <TechDetails>
+                <pre className="tech-log">{row.plan.directionNote}</pre>
+              </TechDetails>
+            )}
+          </div>
+        )}
+      </section>
+      <div className="proposal-cols">
+        {pages.length > 0 && (
+          <section aria-labelledby="pages-h" className="client-section">
+            <h2 id="pages-h" className="t-section">
+              Pages
+            </h2>
+            <ol className="proposal-pages">
+              {pages.map((pg, i) => (
+                <li key={pg}>
+                  <span className="fig quiet">{String(i + 1).padStart(2, "0")}</span>
+                  <b>{pg}</b>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+        {questions.length > 0 && (
+          <section aria-labelledby="oq-h" className="client-section">
+            <h2 id="oq-h" className="t-section">
+              Questions still open
+            </h2>
+            <p className="muted">The factory could not answer these from the request. After you approve, they go on the details list, where you or the client can answer or skip them.</p>
+            <ul className="open-qs">
+              {questions.map((q) => (
+                <li key={q}>
+                  <Diamond weight="fill" aria-hidden="true" />
+                  <span>{q}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+      {error && <Notice tone="stop">{error}</Notice>}
+      {decider && (
+        <div className="sticky-bar">
+          {asking && (
+            <div className="changes">
+              <label htmlFor="chg" className="t-label">
+                What should change?
+              </label>
+              <textarea id="chg" className="textarea" rows={3} maxLength={2000} placeholder="For example: add a page for wholesale orders." value={note} onChange={(e) => setNote(e.target.value)} />
+              <div className="row-actions">
+                <Button disabled={busy || !note.trim()} onClick={() => setConfirm("changes")}>
+                  Send for a new proposal
+                </Button>
+                <span className="t-small muted">The factory writes proposal {row.revision + 1} from your note.</span>
+              </div>
+            </div>
+          )}
+          <div className="row-actions">
+            {owner ? (
+              <Button variant="primary" size="page" icon={SealCheck} disabled={busy || !kind} onClick={() => setConfirm("approve")}>
+                {chosen ? `Approve as a ${chosen.name}` : "Choose the kind of site to approve"}
+              </Button>
+            ) : (
+              <span className="t-small muted">{f.decider} approves proposals.</span>
+            )}
+            <Button size="page" aria-expanded={asking} onClick={() => setAsking(!asking)}>
+              Ask for changes
+            </Button>
+          </div>
+        </div>
+      )}
+      <ConfirmDialog
+        open={confirm === "approve"}
+        title={`Approve as a ${chosen?.name ?? "kind of site"}?`}
+        body={`The proposal for ${client} is approved${overriding ? ", against the recommendation" : ""}. Nothing is built or spent until you start a build.`}
+        confirmLabel="Approve"
+        onConfirm={() => void approve()}
+        onCancel={() => setConfirm(null)}
+      />
+      <ConfirmDialog
+        open={confirm === "changes"}
+        title="Send for a new proposal?"
+        body={`Your note is saved on proposal ${row.revision} and the factory writes proposal ${row.revision + 1} from it.`}
+        cost={`Costs a few cents to read the note and write the proposal. ${buildStopLine()}`}
+        confirmLabel="Send for a new proposal"
+        onConfirm={() => void askForChanges()}
+        onCancel={() => setConfirm(null)}
+      />
+    </div>
+  );
+}
+
 export function PlanPage() {
   const { id = "" } = useParams();
-  const me = useMe();
   const plan = useLoad(() => fetchPlan(id), [id]);
   const row = plan.data;
   if (plan.error) return <LoadError what="this plan" error={plan.error} onRetry={plan.reload} />;
   if (plan.loading && !row) return <Loading rows={4} label="Loading the plan" />;
   if (!row) return <Empty title="This plan doesn't exist, or your role can't see it.">Plans are visible to owners and admins. <Link to="/decisions">Back to Decisions</Link></Empty>;
+  // Cockpit v2: a proposal waiting for a decision is reviewed here; decided ones keep the pre-v2 page until the
+  // details-list screen replaces it.
+  if (row.status === "pending") return <ProposalReview row={row} onDone={plan.reload} />;
   const p = row.plan.plan;
   return (
     <>
       <PageHead
-        kicker={row.status === "pending" ? "Plan decision" : `Plan, ${row.status}`}
+        kicker={`Plan, ${row.status}`}
         title={planName(row)}
         lead={`${LEAD_LABEL[p.intake?.leadType] ?? "Request"} for ${p.intake?.clientName ?? row.client_slug} (${row.entity_slug}). The planner wrote it from the client's request on ${dateTime(row.created_at)}${row.revision > 1 ? ", as a re-plan from your note" : ""}.`}
       />
       <div className="split">
         <PlanDetails row={row} />
-        {row.status === "pending" && canDecide(me.role) ? <DecisionPanel row={row} onDone={plan.reload} /> : <AfterDecision row={row} />}
+        <AfterDecision row={row} />
       </div>
     </>
   );

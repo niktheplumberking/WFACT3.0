@@ -87,52 +87,65 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(t.clicks()).toBe(3);
   });
 
-  it("approve a plan as the recommended track (2 clicks)", async () => {
+  it("approve a proposal as the recommended kind of site (3 clicks: open, approve, confirm)", async () => {
     const t = start();
     await t.click(await screen.findByRole("link", { name: "Review the proposal: Summit Line Roofing" }, T));
-    await t.click(await screen.findByRole("button", { name: "Approve as Track A" }, T));
+    const kinds = await screen.findByRole("radiogroup", { name: "Choose the kind of site" }, T);
+    expect(within(kinds).getByRole("radio", { name: /Fast local site\s*Recommended/ })).toHaveAttribute("aria-checked", "true");
+    await t.click(screen.getByRole("button", { name: "Approve as a Fast local site" }));
+    const dialog = await screen.findByRole("alertdialog", { name: "Approve as a Fast local site?" }, T);
+    await t.click(within(dialog).getByRole("button", { name: "Approve" }));
     const update = t.calls().find((c) => c.op === "update" && c.table === "plan_approvals");
     expect(update?.values).toEqual({ status: "approved", decision_note: null, build_track: "A" });
     expect(update?.filters).toEqual([["id", PLAN_PENDING], ["status", "pending"]]);
-    expect(t.clicks()).toBe(2);
+    expect(t.clicks()).toBe(3);
   });
 
-  it("a plan whose direction step failed can prepare it again before deciding (Build-quality Package 1)", async () => {
+  it("a proposal whose direction step failed can prepare it again before deciding (Build-quality Package 1)", async () => {
     const fx = fixtures();
     const pending = fx.plan_approvals!.find((p) => p.id === PLAN_PENDING)!;
     pending.plan = { ...(pending.plan as object), direction: null, directionNote: "direction step escalated: output truncated" };
     const t = start(`/decisions/plans/${PLAN_PENDING}`, "owner", fx);
-    expect(await screen.findByText(/No direction summary for this plan: direction step escalated/, undefined, T)).toBeInTheDocument();
+    expect(await screen.findByText(/could not prepare its recommendation/, undefined, T)).toBeInTheDocument();
     await t.click(await screen.findByRole("button", { name: "Prepare the direction again" }, T));
+    await t.click(within(await screen.findByRole("alertdialog", {}, T)).getByRole("button", { name: "Prepare it again" }));
     expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "direction", params: { planId: PLAN_PENDING } }) }));
   });
 
-  it("a plan with a direction, or a decided plan, offers no direction re-run", async () => {
+  it("a proposal with a direction offers no direction re-run", async () => {
     start(`/decisions/plans/${PLAN_PENDING}`);
-    await screen.findByRole("button", { name: "Approve as Track A" }, T);
+    await screen.findByRole("radiogroup", { name: "Choose the kind of site" }, T);
     expect(screen.queryByRole("button", { name: "Prepare the direction again" })).toBeNull();
   });
 
-  it("approve on the other track (3 clicks), and it says the override is recorded", async () => {
-    const t = start();
-    await t.click(await screen.findByRole("link", { name: "Review the proposal: Summit Line Roofing" }, T));
-    await t.click(await screen.findByRole("radio", { name: /Track B/ }, T));
-    expect(screen.getByText(/against the recommendation/)).toBeInTheDocument();
-    await t.click(screen.getByRole("button", { name: "Approve as Track B" }));
+  it("approve the other kind (it says the override is recorded)", async () => {
+    const t = start(`/decisions/plans/${PLAN_PENDING}`);
+    await t.click(await screen.findByRole("radio", { name: /Showcase site with motion/ }, T));
+    expect(screen.getByText("You are choosing against the recommendation. That choice is recorded with the approval.")).toBeInTheDocument();
+    await t.click(screen.getByRole("button", { name: "Approve as a Showcase site with motion" }));
+    await t.click(within(await screen.findByRole("alertdialog", {}, T)).getByRole("button", { name: "Approve" }));
     expect(t.calls().find((c) => c.op === "update")?.values).toEqual({ status: "approved", decision_note: null, build_track: "B" });
-    expect(t.clicks()).toBe(3);
   });
 
-  it("refuses to reject without a note, then rejects with one (2 clicks)", async () => {
-    const t = start();
-    await t.click(await screen.findByRole("link", { name: "Review the proposal: Summit Line Roofing" }, T));
-    await t.user.click(await screen.findByRole("button", { name: "Reject with note" }, T));
-    expect(screen.getByText(/Write a note before rejecting/)).toBeInTheDocument();
-    expect(t.calls().some((c) => c.op === "update")).toBe(false);
-    await t.user.type(screen.getByLabelText("Or reject it with a note for the planner"), "Warmer tone, add prices");
-    await t.click(screen.getByRole("button", { name: "Reject with note" }));
+  it("ask for changes: a note is required, then it saves the note and asks for a new proposal after confirming", async () => {
+    const t = start(`/decisions/plans/${PLAN_PENDING}`);
+    await t.click(await screen.findByRole("button", { name: "Ask for changes" }, T));
+    expect(screen.getByRole("button", { name: "Send for a new proposal" })).toBeDisabled();
+    await t.user.type(screen.getByLabelText("What should change?"), "Warmer tone, add prices");
+    await t.click(screen.getByRole("button", { name: "Send for a new proposal" }));
+    const dialog = await screen.findByRole("alertdialog", { name: "Send for a new proposal?" }, T);
+    expect(dialog).toHaveAccessibleDescription(/Costs a few cents/);
+    await t.click(within(dialog).getByRole("button", { name: "Send for a new proposal" }));
     expect(t.calls().find((c) => c.op === "update")?.values).toEqual({ status: "rejected", decision_note: "Warmer tone, add prices" });
-    expect(t.clicks()).toBe(2);
+    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "replan", params: { planId: PLAN_PENDING } }) }));
+  });
+
+  it("only an owner approves; an admin sees who does", async () => {
+    start(`/decisions/plans/${PLAN_PENDING}`, "admin");
+    await screen.findByRole("radiogroup", { name: "Choose the kind of site" }, T);
+    expect(screen.queryByRole("button", { name: /^Approve as/ })).toBeNull();
+    expect(screen.getByText("Test approves proposals.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ask for changes" })).toBeInTheDocument();
   });
 
   it("start a build of an approved plan from its proposal (1 click)", async () => {
