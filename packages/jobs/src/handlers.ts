@@ -13,7 +13,10 @@ import { createSeedRegistry, fileClientEntityResolver, permissionGateFor, Permis
 import type { QaInput } from "@wfact/verification/agent";
 import { QA_EVALUATOR_ROLE } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
-import { intakeAndPlan, replan, type PlanningDeps, type PlanningResult } from "@wfact/planning/pipeline";
+import { intakeAndPlan, replan, rerunDirection, type PlanningDeps, type PlanningResult } from "@wfact/planning/pipeline";
+import { canonicalSections } from "@wfact/planning/planner";
+import { REQUEST_TEXT_MAX } from "@wfact/frontend-loop/request";
+import type { RequestTextLookup } from "./requestLookup.js";
 import type { PlanStore } from "@wfact/planning/planStore";
 import type { Plan } from "@wfact/planning/planner";
 import type { PilotBrief } from "@wfact/frontend-loop/brief";
@@ -53,6 +56,11 @@ export interface HandlerDeps {
    */
   autoHeal?: { delaysMs: number[]; maxElapsedMs: number };
   sleep?: (ms: number) => Promise<void>;
+  /**
+   * Build-quality Package 1: finds the client's request for a plan written before the request was carried on the brief
+   * (the intake job's text). Absent in older tests: such plans then build from the summary only, and say so.
+   */
+  requests?: RequestTextLookup;
   /** Hermes-lite status answer — injected so tests don't need a model or Supabase. */
   ask: (question: string) => Promise<{ answer: string; sourcesUsed: string[]; needsHuman: boolean; escalationReason: string | null }>;
 }
@@ -227,6 +235,14 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
     case "replan":
       return planningOutcome(await replan(uuid(p, "planId"), deps.planning));
 
+    case "direction": {
+      // Re-run the direction step alone for a pending plan whose direction failed (rehearsal log #3, #9).
+      const planId = uuid(p, "planId");
+      const stored = await deps.planStore.get(planId);
+      const fallback = stored && !stored.intake.requestText && !stored.plan.brief.requestText ? await requestFor(planId, deps) : null;
+      return planningOutcome(await rerunDirection(planId, deps.planning, fallback));
+    }
+
     case "build_plan": {
       const planId = uuid(p, "planId");
       const stored = await deps.planStore.get(planId);
@@ -246,10 +262,11 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       }
       const wf = linkRun(stored.buildTrack === "B" ? deps.trackBWorkflow! : deps.trackAWorkflow ?? deps.workflow, job, deps);
       const inputs = (await deps.inputs?.current(planId)) ?? [];
-      const extra = { planId, buildTrack: stored.buildTrack, inputsUsed: inputs.filter((i) => !i.waived).length, inputsWaived: inputs.filter((i) => i.waived).length };
+      const brief = briefForBuild(stored.plan, inputs, stored.plan.brief.requestText ? null : await requestFor(planId, deps));
+      const extra = { planId, buildTrack: stored.buildTrack, inputsUsed: inputs.filter((i) => !i.waived).length, inputsWaived: inputs.filter((i) => i.waived).length, briefBasis: brief.briefBasis };
       let runId: string | null = null;
       try {
-        const first = await buildAndVerify(briefForBuild(stored.plan, inputs), wf);
+        const first = await buildAndVerify(brief, wf);
         runId = first.workflowRunId;
         return await autoHeal(await finishWorkflow(first, wf, extra), wf, extra, deps, startedAt);
       } catch (err) {
@@ -273,7 +290,11 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
         if (planId) {
           const stored = await deps.planStore.get(planId);
           const inputs = (await deps.inputs?.current(planId)) ?? [];
-          if (stored && inputs.length > 0) brief = briefForBuild(stored.plan, inputs);
+          if (stored && inputs.length > 0) {
+            const b = briefForBuild(stored.plan, inputs, stored.plan.brief.requestText ? null : await requestFor(planId, deps));
+            brief = b;
+            extra.briefBasis = b.briefBasis;
+          }
           extra.inputsUsed = inputs.filter((i) => !i.waived).length;
           extra.inputsWaived = inputs.filter((i) => i.waived).length;
         }
@@ -371,13 +392,33 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
   }
 }
 
+/** The request behind an older plan, if the runner can look it up. A failed lookup is not a failed build: summary only. */
+async function requestFor(planId: string, deps: HandlerDeps): Promise<string | null> {
+  if (!deps.requests) return null;
+  try {
+    return await deps.requests.requestTextFor(planId);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * The brief a plan is built from. Plans approved before 2026-10-06 carry no page scope; their lead type says it.
  * Two owner details are not facts for the copy but settings the starters use: `asset.logo` (the uploaded logo record,
  * checked by the database when it was added and by the build when it runs) and `site_url` (the live address).
  */
-export function briefForBuild(plan: Pick<Plan, "brief" | "intake">, inputs: PlanInput[] = []): PilotBrief {
-  const base: PilotBrief = plan.brief.pageScope ? plan.brief : { ...plan.brief, pageScope: plan.intake.leadType === "landing_page" ? "single" : "multi" };
+export function briefForBuild(plan: Pick<Plan, "brief" | "intake">, inputs: PlanInput[] = [], requestText: string | null = null): PilotBrief {
+  const scoped: PilotBrief = plan.brief.pageScope ? plan.brief : { ...plan.brief, pageScope: plan.intake.leadType === "landing_page" ? "single" : "multi" };
+  // Build-quality Package 1: plans stored before 2026-10-14 carry no request. Use the intake job's text when it is on file
+  // (the requested list stays empty: it was never checked), otherwise build from the summary and say so. Synonym sections
+  // ("hero" and "home") are collapsed for those plans too (rehearsal log #4).
+  const fallback = !scoped.requestText && requestText && requestText.length <= REQUEST_TEXT_MAX ? requestText : null;
+  const base: PilotBrief = {
+    ...scoped,
+    requiredSections: canonicalSections(scoped.requiredSections),
+    ...(fallback ? { requestText: fallback } : {}),
+    briefBasis: scoped.requestText || fallback ? "request" : "summary-only",
+  };
   const ownerFacts = ownerFactsFrom(inputs);
   const ownerSkipped = inputs.filter((i) => i.waived).map((i) => i.label);
   const logoInput = inputs.find((i) => i.key === LOGO_INPUT_KEY && !i.waived && i.value);

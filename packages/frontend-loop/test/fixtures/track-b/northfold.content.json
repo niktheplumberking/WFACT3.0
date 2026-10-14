@@ -3,14 +3,25 @@
   "business": {
     "name": "Northfold",
     "tagline": "Brand and digital design studio.",
-    "email": { "value": "studio@northfold.example", "source": "sample" }
+    "email": {
+      "value": "studio@northfold.example",
+      "source": "sample"
+    }
   },
   "brand": {
-    "colors": { "ink": "#ECEEE9", "paper": "#0F1211", "accent": "#FF4F1A", "deep": "#1D2B27" },
+    "colors": {
+      "ink": "#ECEEE9",
+      "paper": "#0F1211",
+      "accent": "#FF4F1A",
+      "deep": "#1D2B27"
+    },
     "typePairing": "studio",
     "motion": "expressive"
   },
-  "primaryAction": { "label": "Start a project", "page": "contact" },
+  "primaryAction": {
+    "label": "Start a project",
+    "page": "contact"
+  },
   "pages": [
     {
       "slug": "index",
@@ -41,21 +52,32 @@
               "title": "Tidewater Ferries",
               "client": "Passenger ferry operator",
               "summary": "A timetable you can read at a glance on a windy pier, and a wordmark cut from the shapes of harbour signage.",
-              "disciplines": ["Identity", "Wayfinding", "Website"],
+              "disciplines": [
+                "Identity",
+                "Wayfinding",
+                "Website"
+              ],
               "source": "sample"
             },
             {
               "title": "Loam & Ash",
               "client": "Ceramics workshop",
               "summary": "An identity built from glaze tests, with a shop where each piece turns slowly as you scroll.",
-              "disciplines": ["Identity", "Art direction", "Online shop"],
+              "disciplines": [
+                "Identity",
+                "Art direction",
+                "Online shop"
+              ],
               "source": "sample"
             },
             {
               "title": "Field Notes Radio",
               "client": "Independent radio station",
               "summary": "A moving logo that follows the live audio level, and a schedule that reads like a printed listing.",
-              "disciplines": ["Motion identity", "Website"],
+              "disciplines": [
+                "Motion identity",
+                "Website"
+              ],
               "source": "sample"
             }
           ]
@@ -93,10 +115,41 @@
           "heading": "Services",
           "intro": "Most projects combine two or three of these.",
           "items": [
-            { "name": "Brand identity", "summary": "Name, wordmark, type, colour and the rules that hold them together.", "details": ["Positioning workshop", "Wordmark and type system", "Guidelines"] },
-            { "name": "Motion identity", "summary": "How the brand moves: logo animation, transitions and the timing behind them.", "details": ["Motion principles", "Animated logo", "Social templates"] },
-            { "name": "Websites", "summary": "Designed and built in house, with motion that respects the people who prefer less of it.", "details": ["Art direction", "Design and build", "Accessibility review"] },
-            { "name": "Art direction", "summary": "Photography and illustration briefs that keep everything the brand makes recognisable.", "details": ["Shoot briefs", "Image guidelines"] }
+            {
+              "name": "Brand identity",
+              "summary": "Name, wordmark, type, colour and the rules that hold them together.",
+              "details": [
+                "Positioning workshop",
+                "Wordmark and type system",
+                "Guidelines"
+              ]
+            },
+            {
+              "name": "Motion identity",
+              "summary": "How the brand moves: logo animation, transitions and the timing behind them.",
+              "details": [
+                "Motion principles",
+                "Animated logo",
+                "Social templates"
+              ]
+            },
+            {
+              "name": "Websites",
+              "summary": "Designed and built in house, with motion that respects the people who prefer less of it.",
+              "details": [
+                "Art direction",
+                "Design and build",
+                "Accessibility review"
+              ]
+            },
+            {
+              "name": "Art direction",
+              "summary": "Photography and illustration briefs that keep everything the brand makes recognisable.",
+              "details": [
+                "Shoot briefs",
+                "Image guidelines"
+              ]
+            }
           ]
         },
         {
@@ -105,10 +158,22 @@
           "heading": "How a project runs",
           "intro": "Every project follows the same four steps, at a pace set together at the start.",
           "steps": [
-            { "title": "Listen", "text": "We read everything you have, talk to the people who use it, and agree what the work has to change." },
-            { "title": "Shape", "text": "We design two or three directions at full size, with type and motion, so you can judge them as they will be seen." },
-            { "title": "Build", "text": "The chosen direction becomes the identity system and the website, built and reviewed in stages." },
-            { "title": "Hand over", "text": "You get the files, the guidelines and a walk-through, so your team can keep it going." }
+            {
+              "title": "Listen",
+              "text": "We read everything you have, talk to the people who use it, and agree what the work has to change."
+            },
+            {
+              "title": "Shape",
+              "text": "We design two or three directions at full size, with type and motion, so you can judge them as they will be seen."
+            },
+            {
+              "title": "Build",
+              "text": "The chosen direction becomes the identity system and the website, built and reviewed in stages."
+            },
+            {
+              "title": "Hand over",
+              "text": "You get the files, the guidelines and a walk-through, so your team can keep it going."
+            }
           ]
         },
         {
@@ -138,10 +203,25 @@
           "id": "questions",
           "heading": "Before you write",
           "items": [
-            { "q": "What should I include?", "a": "A few lines on what you are making, who it is for, and any dates that matter. Links to what you have now help." },
-            { "q": "Do you only take full brand and website projects?", "a": "No. Some projects are a website for an existing identity, or a motion system for a brand that already exists." },
-            { "q": "How do you reply?", "a": "By email, from one of the people who would work on the project." }
+            {
+              "q": "What should I include?",
+              "a": "A few lines on what you are making, who it is for, and any dates that matter. Links to what you have now help."
+            },
+            {
+              "q": "Do you only take full brand and website projects?",
+              "a": "No. Some projects are a website for an existing identity, or a motion system for a brand that already exists."
+            },
+            {
+              "q": "How do you reply?",
+              "a": "By email, from one of the people who would work on the project."
+            }
           ]
+        },
+        {
+          "type": "cta",
+          "id": "contact-next",
+          "heading": "Not ready to write yet?",
+          "text": "Read how we work first, then come back when the project has a shape."
         }
       ]
     }

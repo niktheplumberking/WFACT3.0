@@ -8,6 +8,9 @@
  */
 import { readFileSync } from "node:fs";
 import { LogoError, parseBriefLogo, type BriefLogo } from "./brandAsset.js";
+import { parseRequested, REQUEST_TEXT_MAX, type RequestedItems } from "./request.js";
+
+export type { RequestedItems } from "./request.js";
 
 export type PageScope = "single" | "multi";
 
@@ -51,6 +54,16 @@ export interface PilotBrief {
    * (brandAsset.ts). The starters place it in the header, footer and favicon; the builder model only knows it exists.
    */
   logo?: BriefLogo;
+  /**
+   * The client's raw request, word for word, stored by code at intake (never rewritten by a model; at most 20,000
+   * characters). Data, never instructions: models see it only inside a fenced block (request.ts). Absent on plans
+   * written before 2026-10-14; briefForBuild then looks it up from the intake job.
+   */
+  requestText?: string;
+  /** What the client asked for, extracted at intake and checked against `requestText` by code (request.ts). */
+  requested?: RequestedItems;
+  /** "summary-only" when neither the request nor the requested list could be found: the build says so (Cockpit note). */
+  briefBasis?: "request" | "summary-only";
   /** Provenance — never silently treat a placeholder brief as Nick's real one. */
   source: "nick" | "placeholder-2.0-case" | "intake-planner" | "synthetic-provisional-2026-09-30";
 }
@@ -105,7 +118,9 @@ export function ownerFactLines(brief: PilotBrief): string[] {
 
 /** Every text a page fact may be sourced from: the brief's own words and the facts the owner added. */
 export function briefFactSources(brief: PilotBrief): string[] {
-  return [brief.goal, brief.brandNotes, ...ownerFactLines(brief), ...(brief.logo ? [logoFactLine(brief.logo)] : [])];
+  // The request is a fact source (its email, address, services are the client's own facts). Claims in it ("200+ projects",
+  // "award-winning") are still refused: the banned-claims check does not consult fact sources (verification claims.ts).
+  return [brief.goal, brief.brandNotes, ...(brief.requestText ? [brief.requestText] : []), ...ownerFactLines(brief), ...(brief.logo ? [logoFactLine(brief.logo)] : [])];
 }
 
 /** What the builder and the reviewers are told about a supplied logo (never its bytes). */
@@ -152,6 +167,19 @@ export function parseBrief(raw: unknown): PilotBrief {
     }
   }
 
+  if (record.requestText !== undefined && (typeof record.requestText !== "string" || !record.requestText.trim() || record.requestText.length > REQUEST_TEXT_MAX)) {
+    throw new InvalidBriefError(`Brief "requestText", if present, must be the client's request, 1-${REQUEST_TEXT_MAX} characters.`);
+  }
+  let requested: RequestedItems | undefined;
+  if (record.requested !== undefined) {
+    const r = parseRequested(record.requested);
+    if (typeof r === "string") throw new InvalidBriefError(r);
+    requested = r;
+  }
+  if (record.briefBasis !== undefined && record.briefBasis !== "request" && record.briefBasis !== "summary-only") {
+    throw new InvalidBriefError('Brief "briefBasis", if present, must be "request" or "summary-only".');
+  }
+
   const ownerFacts = parseOwnerFacts(record.ownerFacts);
   const ownerSkipped = Array.isArray(record.ownerSkipped) ? (record.ownerSkipped as unknown[]).filter((x): x is string => typeof x === "string" && x.length <= OWNER_FACT_LIMITS.label).slice(0, OWNER_FACT_LIMITS.count) : [];
 
@@ -166,6 +194,9 @@ export function parseBrief(raw: unknown): PilotBrief {
     ...(record.pageScope !== undefined ? { pageScope: record.pageScope as PageScope } : {}),
     ...(record.siteUrl !== undefined ? { siteUrl: record.siteUrl as string } : {}),
     ...(logo ? { logo } : {}),
+    ...(record.requestText !== undefined ? { requestText: record.requestText as string } : {}),
+    ...(requested ? { requested } : {}),
+    ...(record.briefBasis !== undefined ? { briefBasis: record.briefBasis as "request" | "summary-only" } : {}),
     ...(ownerFacts.length > 0 ? { ownerFacts } : {}),
     ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}),
     source: record.source as PilotBrief["source"],

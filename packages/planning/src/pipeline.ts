@@ -51,7 +51,8 @@ export type PlanningStatus =
   | "intake_escalated" // e.g. entity ambiguous after the one allowed re-classification
   | "intake_rejected" // raw request failed validation (empty, oversized)
   | "plan_failed" // planner rejected/escalated (unexecutable plan twice, API down)
-  | "replan_limit_reached"; // owner rejected a re-plan: escalate to a human, don't plan a third time
+  | "replan_limit_reached" // owner rejected a re-plan: escalate to a human, don't plan a third time
+  | "direction_failed"; // a direction re-run did not produce a recommendation; the plan is unchanged
 
 export interface PlanningResult {
   status: PlanningStatus;
@@ -101,6 +102,11 @@ export interface OwnerAssets {
   logo?: unknown;
 }
 
+function withoutRequestText(intake: IntakeResult): IntakeResult {
+  const { requestText: _raw, ...rest } = intake;
+  return rest;
+}
+
 function withOwnerAssets(plan: Plan, assets: OwnerAssets | null): Plan {
   if (!assets || (assets.siteUrl === undefined && assets.logo === undefined)) return plan;
   return {
@@ -111,6 +117,12 @@ function withOwnerAssets(plan: Plan, assets: OwnerAssets | null): Plan {
       ...(assets.logo !== undefined ? { logo: assets.logo } : {}),
     }),
   };
+}
+
+/** Build-quality Package 1: the client's request, word for word, set on the brief by code after the Planner ran. */
+function withRequest(plan: Plan, requestText: string | undefined): Plan {
+  if (!requestText) return plan;
+  return { ...plan, brief: parseBrief({ ...plan.brief, requestText, briefBasis: "request" }) };
 }
 
 async function planFrom(
@@ -129,7 +141,8 @@ async function planFrom(
     {
       taskId: plannerTaskId,
       role: PLANNER_ROLE,
-      input: { intake, ownerFeedback: replanOf?.note },
+      // The raw request stays off the Planner's input (it never needs it); code puts it on the brief below.
+      input: { intake: withoutRequestText(intake), ownerFeedback: replanOf?.note },
       entitySlug: intake.entitySlug,
       // Step 6: the plan is for this client folder only; a client of another entity is refused before the run.
       clientSlug: intake.clientSlug,
@@ -143,7 +156,7 @@ async function planFrom(
   }
   let plan: Plan;
   try {
-    plan = withOwnerAssets(plannerRun.output, assets);
+    plan = withRequest(withOwnerAssets(plannerRun.output, assets), intake.requestText);
   } catch (err) {
     return { status: "plan_failed", runId, planId: null, plan: null, intake, ...d, reason: `the attached logo or live address is not usable: ${err instanceof Error ? err.message : String(err)}`, runs };
   }
@@ -217,4 +230,49 @@ export async function replan(rejectedPlanId: string, deps: PlanningDeps): Promis
   // What the owner attached to the request (live address, logo) is kept: a re-plan changes the plan, not the client's assets.
   const kept: OwnerAssets = { ...(prev.plan.brief.siteUrl ? { siteUrl: prev.plan.brief.siteUrl } : {}), ...(prev.plan.brief.logo ? { logo: prev.plan.brief.logo } : {}) };
   return planFrom(prev.intake, deps, registry, runId, null, { id: prev.id, note: prev.decisionNote ?? "" }, dir, kept);
+}
+
+/**
+ * Re-run the direction step alone for a pending plan whose direction failed (rehearsal log #3/#9: plan 403305ec was built with
+ * no track recommendation because direction truncated twice). The plan itself does not change: on success the pipeline
+ * writes the same plan with the new direction as a new pending row that supersedes the old one (plan_approvals rows are
+ * immutable; superseding a pending plan is the pipeline's one allowed move, migration 0011), at the same revision, so the
+ * owner's one re-plan is not used up. On failure nothing is written. `requestText` is the fallback for plans stored before
+ * the request was carried on the intake (the jobs handler looks it up from the intake job).
+ */
+export async function rerunDirection(planId: string, deps: PlanningDeps, requestText: string | null = null): Promise<PlanningResult> {
+  const registry = deps.registry ?? registryWithPlanningAndDirection();
+  const runId = randomUUID();
+  const prev = await deps.store.get(planId);
+  if (!prev) throw new Error(`plan ${planId} not found`);
+  const keep = { status: "direction_failed" as const, runId, planId, plan: prev.plan, intake: prev.intake, runs: { intake: null, planner: null } };
+  if (prev.status !== "pending") {
+    return { ...keep, direction: prev.direction, directionNote: prev.directionNote, reason: `plan ${planId} is "${prev.status}"; direction is only re-run before the owner decides` };
+  }
+  const rawText = prev.intake.requestText ?? prev.plan.brief.requestText ?? requestText;
+  if (!rawText) {
+    return { ...keep, direction: prev.direction, directionNote: prev.directionNote, reason: "the client's original request is not on file for this plan, so direction cannot be re-run; re-plan it from a new request" };
+  }
+  const dir = await directionFor(prev.intake, rawText, deps, registry, runId);
+  if (!dir.direction) {
+    return { ...keep, direction: null, directionNote: dir.note, reason: dir.note, runs: { intake: null, planner: null, direction: dir.run } };
+  }
+  const gate = permissionGateFor(registry, PLANNER_ROLE, { taskId: randomUUID(), runId, entitySlug: prev.plan.brief.entitySlug, clientSlug: prev.plan.brief.clientSlug, audit: deps.audit });
+  try {
+    await gate.authorize({ kind: "db", table: "plan_approvals", op: "insert", entitySlug: prev.plan.brief.entitySlug });
+    await gate.authorize({ kind: "db", table: "plan_approvals", op: "update", entitySlug: prev.plan.brief.entitySlug });
+  } catch (err) {
+    if (!(err instanceof PermissionDeniedError)) throw err;
+    return { ...keep, direction: prev.direction, directionNote: prev.directionNote, reason: err.message };
+  }
+  const newId = await deps.store.insertPending({
+    plan: prev.plan,
+    intake: prev.intake,
+    revision: prev.revision === 2 ? 2 : 1,
+    supersedes: prev.id,
+    intakeRunId: null,
+    direction: dir.direction,
+    directionNote: null,
+  });
+  return { status: "awaiting_owner_approval", runId, planId: newId, plan: prev.plan, intake: prev.intake, direction: dir.direction, directionNote: null, reason: null, runs: { intake: null, planner: null, direction: dir.run } };
 }

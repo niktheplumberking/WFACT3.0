@@ -162,6 +162,7 @@ const NOUN: Record<JobRow["kind"], string> = {
   resume: "Build",
   intake: "Planning",
   replan: "Re-plan",
+  direction: "Direction",
   verify: "Page check",
   ask: "Question",
 };
@@ -183,6 +184,7 @@ function title(j: JobRow, plan: PlanRow | undefined): string {
     case "succeeded":
       if (build) return `${name ?? "The"} build passed every check`;
       if (j.kind === "intake" || j.kind === "replan") return "A plan is ready for your decision";
+      if (j.kind === "direction") return "The direction is ready; the plan is waiting for your decision";
       if (j.kind === "verify") return "The page passed its checks";
       return "Answered";
   }
@@ -269,7 +271,10 @@ function Results({ j }: { j: JobRow }) {
           </div>
         </Plate>
       )}
-      {(j.kind === "intake" || j.kind === "replan") && typeof r.planId === "string" && (
+      {r.briefBasis === "summary-only" && (
+        <Notice tone="caution">Built from a summary only: the client's original request was not on file for this plan, so the builder could not check the site against the client's own words.</Notice>
+      )}
+      {(j.kind === "intake" || j.kind === "replan" || j.kind === "direction") && typeof r.planId === "string" && (
         <Plate title="The plan">
           <div className="plate-body">
             <Link className="btn primary" to={`/decisions/plans/${r.planId}`}>

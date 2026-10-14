@@ -147,12 +147,51 @@ function Said({ quote }: { quote: string | null | undefined }) {
   return quote ? <span className="said">“{quote}”</span> : null;
 }
 
-function WhatTheClientWants({ p, d, note }: { p: PlanRow["plan"]["plan"]; d: Direction | null | undefined; note: string | null | undefined }) {
+/**
+ * Build-quality Package 1: a plan whose direction step failed can have it run again on its own, before the owner decides,
+ * instead of being built without a recommendation (Lanternworks plan 403305ec). The new plan row replaces this one.
+ */
+function RerunDirection({ row }: { row: PlanRow }) {
+  const f = useFactory();
+  const me = useMe();
+  const nav = useNavigate();
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const running = (f.jobs ?? []).find((j) => j.kind === "direction" && j.params?.planId === row.id && isActive(j));
+  if (row.status !== "pending" || !canDecide(me.role)) return null;
+  if (running) return <Link className="btn" to={`/activity/${running.id}`}>Direction is being prepared again; see progress</Link>;
+  async function go() {
+    setBusy(true);
+    setError(null);
+    const { jobId, error: e } = await requestJob("direction", { planId: row.id });
+    setBusy(false);
+    if (!jobId) return setError(`It didn't start: ${e}. Nothing changed; try again.`);
+    toast(e ?? "Preparing the direction again. The updated plan appears in Decisions in a minute or two.");
+    await f.reload();
+    nav(`/activity/${jobId}`);
+  }
+  return (
+    <div className="stack-tight">
+      <div>
+        <button className="btn" type="button" disabled={busy} onClick={go}>
+          <ArrowClockwise aria-hidden="true" />
+          {busy ? "Starting…" : "Prepare the direction again"}
+        </button>
+      </div>
+      <p className="quiet fine">Reads the client's request again and suggests which kind of site to build. The plan itself does not change.</p>
+      {error && <Notice tone="stop">{error}</Notice>}
+    </div>
+  );
+}
+
+function WhatTheClientWants({ p, d, note, row }: { p: PlanRow["plan"]["plan"]; d: Direction | null | undefined; note: string | null | undefined; row?: PlanRow }) {
   return (
     <Plate title="What the client wants">
       <div className="plate-body stack-tight">
         <p className="lede">{p.brief.goal}</p>
         {!d && <Notice tone="info">No direction summary for this plan{note ? `: ${note}` : " (it was written before the direction step existed)"}.</Notice>}
+        {!d && row && <RerunDirection row={row} />}
         {d && (
           <dl className="facts">
             <div>
@@ -226,7 +265,7 @@ function PlanDetails({ row }: { row: PlanRow }) {
   const [allQ, setAllQ] = useState(false);
   return (
     <div className="stack">
-      <WhatTheClientWants p={p} d={d} note={row.plan.directionNote} />
+      <WhatTheClientWants p={p} d={d} note={row.plan.directionNote} row={row} />
       {questions.length > 0 && (
         <Plate title="Settle these before building" note={`${allQ ? questions.length : Math.min(questions.length, 5)} of ${questions.length}`}>
           <div className="plate-body stack-tight">

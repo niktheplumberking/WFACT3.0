@@ -6,7 +6,7 @@
  */
 import { supabase } from "./supabaseClient";
 
-export type JobKind = "intake" | "replan" | "build_plan" | "resume" | "verify" | "ask";
+export type JobKind = "intake" | "replan" | "direction" | "build_plan" | "resume" | "verify" | "ask";
 /** `cancelled` arrived with migration 0013 (a queued job that never started, closed by an owner/admin). */
 export type JobStatus = "queued" | "dispatched" | "running" | "succeeded" | "failed" | "cancelled";
 

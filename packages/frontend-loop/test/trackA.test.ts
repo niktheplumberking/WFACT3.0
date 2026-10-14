@@ -185,7 +185,8 @@ test("validation enforces page structure: home page size, thin pages, one cta, n
   assert.match(all, /pages\[0\] \(index\) has 7 sections; keep the home page to 6/);
   assert.match(all, /pages\[0\] \(index\) has more than one "cta"/);
   assert.match(all, /pages\[1\] \(services\): sections 0-2 \(services, packages, steps\) are three list-like layouts in a row/);
-  assert.match(all, /pages\[2\] \(faq\) has one section/);
+  // Build-quality Package 1: the old "at least two sections" rule is now the content floor (3 sections, 120 words).
+  assert.match(all, /pages\[2\] \(faq\): 1 section\(s\); every other page needs at least 3/);
 });
 
 test("palette: the tinted section background really differs from the paper (regression: it silently fell back to paper)", () => {

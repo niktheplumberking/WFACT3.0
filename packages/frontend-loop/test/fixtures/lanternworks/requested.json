@@ -1,0 +1,11 @@
+{
+  "services": ["Brand identity", "Websites", "Ongoing care (monthly updates and small changes)"],
+  "processSteps": ["discovery call", "proposal", "design", "build", "launch", "care"],
+  "primaryActionLabel": "Book a discovery call",
+  "audience": "small service businesses (clinics, trades, local professional firms)",
+  "teamSize": 3,
+  "teamNotes": "a three-person brand and web design studio",
+  "formFields": ["name", "email", "company", "what you need", "rough budget"],
+  "tone": "calm and confident, with some tasteful motion, not a template",
+  "pages": ["Home", "Services", "How we work", "Work", "About", "Contact"]
+}

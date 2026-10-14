@@ -1,0 +1,283 @@
+{
+  "schemaVersion": "track-b/1",
+  "business": {
+    "name": "Lanternworks Studio",
+    "tagline": "A design and web studio that builds the site your campaigns run on.",
+    "email": {
+      "value": "hello@lanternworks.example",
+      "source": "brief"
+    }
+  },
+  "brand": {
+    "colors": {
+      "ink": "#14213D",
+      "paper": "#FAF7F2",
+      "accent": "#F26B38",
+      "deep": "#14213D"
+    },
+    "typePairing": "studio",
+    "motion": "expressive"
+  },
+  "primaryAction": {
+    "label": "Start a Project",
+    "page": "contact"
+  },
+  "pages": [
+    {
+      "slug": "index",
+      "navLabel": "Home",
+      "title": "Lanternworks Studio",
+      "description": "A design and web studio in six pages, built to show what we hand clients and to run paid campaigns against.",
+      "sections": [
+        {
+          "type": "hero",
+          "id": "hero",
+          "heading": "Design and web work built to run ads against",
+          "intro": "Lanternworks Studio designs and builds the six-page site itself: the work, the process, and the pages that turn a campaign click into a conversation.",
+          "showAction": true
+        },
+        {
+          "type": "statement",
+          "id": "home",
+          "label": "Studio",
+          "text": "Lanternworks is a design and web studio. We replaced our own single page site with six, built to prove what we can build for you. Every page here is the work."
+        },
+        {
+          "type": "cta",
+          "id": "closing-cta",
+          "heading": "Start a project with Lanternworks",
+          "text": "Tell us what you're planning and we'll tell you if we're the right fit."
+        }
+      ]
+    },
+    {
+      "slug": "about",
+      "navLabel": "About",
+      "title": "About Lanternworks",
+      "description": "Who Lanternworks Studio is and how we approach brand and web work.",
+      "sections": [
+        {
+          "type": "prose",
+          "id": "about",
+          "heading": "About Lanternworks",
+          "paragraphs": [
+            "Lanternworks Studio designs and builds websites for teams who need their site to do real work: carry a brand, support paid campaigns, and convert a click into an enquiry.",
+            "This six-page site replaces our previous single page at lanternworks.com. Every section you see here, from the homepage hero to this page, runs on the same system we hand off to clients."
+          ],
+          "aside": {
+            "heading": "What we do",
+            "text": "Brand design, web design, and the build to ship it, all under one roof."
+          }
+        },
+        {
+          "type": "statement",
+          "id": "approach",
+          "label": "Approach",
+          "text": "We design in the open. Decisions about type, color, and motion get made in front of the client, not behind one. What ships is what we agreed to."
+        }
+      ]
+    },
+    {
+      "slug": "services",
+      "navLabel": "Services",
+      "title": "Services",
+      "description": "Brand identity, web design, and web build, as separate or combined engagements.",
+      "sections": [
+        {
+          "type": "prose",
+          "id": "services-intro",
+          "heading": "What we offer",
+          "paragraphs": [
+            "Lanternworks works across three disciplines: brand identity, web design, and web build. Most projects use all three; some need just one."
+          ]
+        },
+        {
+          "type": "services",
+          "id": "services",
+          "heading": "Services",
+          "intro": "Pick a starting point. Most engagements combine more than one.",
+          "items": [
+            {
+              "name": "Brand Identity",
+              "summary": "Logo, color, type, and the rules that keep them consistent across every surface.",
+              "details": [
+                "Logo and mark",
+                "Color and type system",
+                "Brand guidelines"
+              ]
+            },
+            {
+              "name": "Web Design",
+              "summary": "Page-by-page design for marketing sites, product sites, and campaign landing pages.",
+              "details": [
+                "Information architecture",
+                "Page design",
+                "Motion direction"
+              ]
+            },
+            {
+              "name": "Web Build",
+              "summary": "A built, deployed site, not just a file. We hand off code we also maintain.",
+              "details": [
+                "Static site build",
+                "CMS integration",
+                "Launch and handoff"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "faq",
+          "id": "services-faq",
+          "heading": "Questions about scope",
+          "items": [
+            {
+              "q": "Do you design or build, or both?",
+              "a": "Both. We design the pages and we build the site that ships, so nothing gets lost moving from file to site."
+            },
+            {
+              "q": "Can you take on just one piece, like the logo?",
+              "a": "Yes. Brand identity, web design, and web build are each their own engagement if that's what you need."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "how-we-work",
+      "navLabel": "How We Work",
+      "title": "How We Work",
+      "description": "The four-step sequence every Lanternworks project runs through.",
+      "sections": [
+        {
+          "type": "prose",
+          "id": "how-we-work",
+          "heading": "How we work",
+          "paragraphs": [
+            "Every project runs through the same sequence, whether it's a logo or a six-page build. The steps don't change; the scope does."
+          ]
+        },
+        {
+          "type": "process",
+          "id": "process",
+          "heading": "The process",
+          "intro": "Four steps, in order.",
+          "steps": [
+            {
+              "title": "Brief",
+              "text": "We start with what you're trying to do and who the site has to convince."
+            },
+            {
+              "title": "Design",
+              "text": "Pages get designed in sequence, starting with the one visitors land on first."
+            },
+            {
+              "title": "Build",
+              "text": "The approved design becomes a real, deployed site, not a set of static images."
+            },
+            {
+              "title": "Launch",
+              "text": "The site goes live and we hand off what you need to keep running it."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "work",
+      "navLabel": "Work",
+      "title": "Work",
+      "description": "Recent brand and web projects from Lanternworks Studio.",
+      "sections": [
+        {
+          "type": "prose",
+          "id": "work-intro",
+          "heading": "Selected work",
+          "paragraphs": [
+            "A look at recent brand and web projects. Names and details here are sample placeholders until real case studies are added."
+          ]
+        },
+        {
+          "type": "work",
+          "id": "work",
+          "heading": "Work",
+          "intro": "Projects spanning brand identity and web build.",
+          "items": [
+            {
+              "title": "Market Street Rebrand",
+              "client": "Independent Grocer",
+              "summary": "A new identity and site for a neighborhood grocer, built to work on a hand painted sign and a phone screen alike.",
+              "disciplines": [
+                "Brand Identity",
+                "Web Design"
+              ],
+              "source": "sample"
+            },
+            {
+              "title": "Studio Line Launch",
+              "client": "Furniture Maker",
+              "summary": "A product focused site built to carry a paid launch campaign from first click to order.",
+              "disciplines": [
+                "Web Design",
+                "Web Build"
+              ],
+              "source": "sample"
+            },
+            {
+              "title": "Civic Archive",
+              "client": "Community Archive",
+              "summary": "An archive site designed to be browsed on a council chamber projector and a library tablet alike.",
+              "disciplines": [
+                "Web Design",
+                "Web Build"
+              ],
+              "source": "sample"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "contact",
+      "navLabel": "Contact",
+      "title": "Contact Lanternworks",
+      "description": "Start a project enquiry with Lanternworks Studio.",
+      "sections": [
+        {
+          "type": "contact",
+          "id": "contact",
+          "heading": "Start a project",
+          "intro": "Tell us what you're planning and when. We'll reply with next steps.",
+          "formNote": "This form isn't connected yet. Email the address below and we'll reply directly.",
+          "showDetails": false,
+          "form": "enquiry"
+        },
+        {
+          "type": "faq",
+          "id": "contact-faq",
+          "heading": "Before you write",
+          "items": [
+            {
+              "q": "What happens after I submit the form?",
+              "a": "Right now, nothing, the form isn't wired up yet. Email us directly and we'll reply."
+            },
+            {
+              "q": "What should I include in an enquiry?",
+              "a": "What you're planning, a rough timeline, and your organisation. That's enough for us to tell you if we're a fit."
+            },
+            {
+              "q": "How can I reach you directly?",
+              "a": "Email hello@lanternworks.example or call ."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "openQuestions": [
+    "Can you supply real, word for word client testimonials or reviews? None were in the brief, so the required social proof section was left out rather than filled with invented quotes.",
+    "Can you supply real past project names, client names (with permission to publish), and project details for the Work page? The current entries are labelled SAMPLE placeholders.",
+    "The brief references a provided logo.svg to be used as-is; the build pipeline must embed that exact file in the header and footer rather than text or styled type, and should also use it as the favicon. Please confirm usage rules (minimum size, clear space) to encode.",
+    "Are there particular ad campaigns or landing-page variants this site needs to support, so copy and calls to action can be tailored to them?"
+  ]
+}

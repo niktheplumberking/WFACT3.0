@@ -38,6 +38,7 @@ import { TRACK_B_BUDGET } from "@wfact/rendered-qa/rendered";
 import { SupabaseJobStore } from "./jobStore.js";
 import { SupabasePlanInputStore } from "./inputStore.js";
 import { handleJob, type HandlerDeps } from "./handlers.js";
+import { SupabaseRequestLookup } from "./requestLookup.js";
 import { askHermesGated } from "./hermesAsk.js";
 import { providerProbes } from "./providerProbes.js";
 import { readFileSync } from "node:fs";
@@ -128,6 +129,8 @@ function buildDeps(): HandlerDeps {
     planStore,
     // Step 4D: the details the owner added to the approved plan since approval (migration 0018).
     inputs: new SupabasePlanInputStore(url, serviceKey),
+    // Build-quality Package 1: the client's request behind a plan stored before it was carried on the brief.
+    requests: new SupabaseRequestLookup(url, serviceKey, planStore),
     // Step 4B M3: Track A plans are built by the Track A builder (Agent 37 fills the starter's content).
     trackAWorkflow: {
       ...workflow,

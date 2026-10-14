@@ -4,15 +4,29 @@
   "business": {
     "name": "Summit Line Roofing",
     "tagline": "Roof and gutter repair, replacement and care for local homes.",
-    "phone": { "value": "555-0142", "source": "sample" },
-    "email": { "value": "hello@summitlineroofing.example", "source": "sample" }
+    "phone": {
+      "value": "555-0142",
+      "source": "sample"
+    },
+    "email": {
+      "value": "hello@summitlineroofing.example",
+      "source": "sample"
+    }
   },
   "brand": {
-    "colors": { "ink": "#1B2622", "paper": "#F6F1E7", "accent": "#B5642A", "deep": "#1F3D36" },
+    "colors": {
+      "ink": "#1B2622",
+      "paper": "#F6F1E7",
+      "accent": "#B5642A",
+      "deep": "#1F3D36"
+    },
     "typePairing": "workshop",
     "corners": "square"
   },
-  "primaryAction": { "label": "Request a free roof inspection", "page": "contact" },
+  "primaryAction": {
+    "label": "Request a free roof inspection",
+    "page": "contact"
+  },
   "pages": [
     {
       "slug": "index",
@@ -45,19 +59,31 @@
             {
               "name": "Roof repair",
               "summary": "Leaks, slipped or broken tiles, worn flashing and storm damage, fixed at the source rather than patched over.",
-              "details": ["Leak tracing", "Tile and flashing work", "Storm damage"],
+              "details": [
+                "Leak tracing",
+                "Tile and flashing work",
+                "Storm damage"
+              ],
               "page": "services"
             },
             {
               "name": "Roof replacement",
               "summary": "When repairs stop making sense, we explain why and plan the replacement with you before any work starts.",
-              "details": ["Old roof removed", "New roof fitted", "Site cleaned up after"],
+              "details": [
+                "Old roof removed",
+                "New roof fitted",
+                "Site cleaned up after"
+              ],
               "page": "services"
             },
             {
               "name": "Gutters",
               "summary": "Cleaning, repairs and new runs, so water leaves the roof where it should.",
-              "details": ["Cleaning", "Repairs", "New gutter runs"],
+              "details": [
+                "Cleaning",
+                "Repairs",
+                "New gutter runs"
+              ],
               "page": "services"
             }
           ]
@@ -68,10 +94,22 @@
           "heading": "How a job runs",
           "intro": "The same steps every time, so you know what happens next.",
           "steps": [
-            { "title": "You ask for an inspection", "text": "Fill in the short form or call in the morning. We arrange a time that suits you." },
-            { "title": "We look and explain", "text": "We check the roof and gutters, take photos and talk you through what we found." },
-            { "title": "You get a written scope", "text": "A plain description of the work, which package it falls under, and what it does not cover." },
-            { "title": "We do the work", "text": "On the agreed day, tidily, and we show you the finished job before we leave." }
+            {
+              "title": "You ask for an inspection",
+              "text": "Fill in the short form or call in the morning. We arrange a time that suits you."
+            },
+            {
+              "title": "We look and explain",
+              "text": "We check the roof and gutters, take photos and talk you through what we found."
+            },
+            {
+              "title": "You get a written scope",
+              "text": "A plain description of the work, which package it falls under, and what it does not cover."
+            },
+            {
+              "title": "We do the work",
+              "text": "On the agreed day, tidily, and we show you the finished job before we leave."
+            }
           ]
         },
         {
@@ -97,22 +135,40 @@
             {
               "name": "Roof repair",
               "summary": "We find where water is getting in and fix that point, whether it is a tile, flashing around a chimney, or a valley.",
-              "details": ["Leak tracing from inside and out", "Broken or slipped tiles", "Flashing and valleys", "Storm damage"]
+              "details": [
+                "Leak tracing from inside and out",
+                "Broken or slipped tiles",
+                "Flashing and valleys",
+                "Storm damage"
+              ]
             },
             {
               "name": "Roof replacement",
               "summary": "If the roof is past repair, we show you why, then agree the materials, the dates and the clean-up before starting.",
-              "details": ["Old roof stripped", "New roof fitted", "Gutters checked at the same time", "Site cleaned up after"]
+              "details": [
+                "Old roof stripped",
+                "New roof fitted",
+                "Gutters checked at the same time",
+                "Site cleaned up after"
+              ]
             },
             {
               "name": "Gutters",
               "summary": "Blocked or sagging gutters send water into walls and foundations. We clean, repair or replace them.",
-              "details": ["Cleaning and flushing", "Joint and bracket repairs", "New gutter runs and downpipes"]
+              "details": [
+                "Cleaning and flushing",
+                "Joint and bracket repairs",
+                "New gutter runs and downpipes"
+              ]
             },
             {
               "name": "Routine checks",
               "summary": "A look at the roof and gutters on a regular basis, so small problems are caught while they are small.",
-              "details": ["Visual roof check", "Gutter clean", "Photos and a short note"]
+              "details": [
+                "Visual roof check",
+                "Gutter clean",
+                "Photos and a short note"
+              ]
             }
           ]
         },
@@ -122,9 +178,37 @@
           "heading": "Three packages",
           "intro": "Every job falls under one of these. The inspection tells you which one, and the written scope says exactly what it covers.",
           "tiers": [
-            { "name": "Repair", "goodFor": "A leak, damaged tiles or worn flashing on a roof that is otherwise sound.", "scope": "We fix the problem at its source and check the surrounding area.", "includes": ["Inspection photos", "The repair itself", "A check of nearby tiles and flashing"] },
-            { "name": "Replace", "goodFor": "A roof that is past repair or failing in several places.", "scope": "We remove the old roof and fit a new one, planned with you before work starts.", "includes": ["Written scope and dates", "Removal and new roof", "Gutter check", "Clean-up"] },
-            { "name": "Care", "goodFor": "Homes that want small problems caught early.", "scope": "Regular checks of the roof and gutters, with photos and a short note after each visit.", "includes": ["Roof check", "Gutter clean", "Photos and notes"] }
+            {
+              "name": "Repair",
+              "goodFor": "A leak, damaged tiles or worn flashing on a roof that is otherwise sound.",
+              "scope": "We fix the problem at its source and check the surrounding area.",
+              "includes": [
+                "Inspection photos",
+                "The repair itself",
+                "A check of nearby tiles and flashing"
+              ]
+            },
+            {
+              "name": "Replace",
+              "goodFor": "A roof that is past repair or failing in several places.",
+              "scope": "We remove the old roof and fit a new one, planned with you before work starts.",
+              "includes": [
+                "Written scope and dates",
+                "Removal and new roof",
+                "Gutter check",
+                "Clean-up"
+              ]
+            },
+            {
+              "name": "Care",
+              "goodFor": "Homes that want small problems caught early.",
+              "scope": "Regular checks of the roof and gutters, with photos and a short note after each visit.",
+              "includes": [
+                "Roof check",
+                "Gutter clean",
+                "Photos and notes"
+              ]
+            }
           ],
           "note": "Prices are agreed after the inspection, once the scope is written down."
         },
@@ -147,11 +231,34 @@
           "id": "faq",
           "heading": "Common questions",
           "items": [
-            { "q": "What happens at the free inspection?", "a": "We look at the roof and gutters, take photos of anything that needs attention, and explain what we found. You get a plain list of what can wait and what cannot." },
-            { "q": "Do I have to book work after the inspection?", "a": "No. The inspection is free and you decide afterwards." },
-            { "q": "How do I book?", "a": "Use the request form or call. The phone is answered in the mornings; if you use the form, we call you back to arrange a time." },
-            { "q": "How is the price worked out?", "a": "After the inspection we write down the scope of the work, and the price is agreed against that scope before anything starts." },
-            { "q": "Which package do I need?", "a": "Repair for a specific problem on a sound roof, Replace when the roof is past repair, and Care for regular checks. The inspection tells you which one fits." }
+            {
+              "q": "What happens at the free inspection?",
+              "a": "We look at the roof and gutters, take photos of anything that needs attention, and explain what we found. You get a plain list of what can wait and what cannot."
+            },
+            {
+              "q": "Do I have to book work after the inspection?",
+              "a": "No. The inspection is free and you decide afterwards."
+            },
+            {
+              "q": "How do I book?",
+              "a": "Use the request form or call. The phone is answered in the mornings; if you use the form, we call you back to arrange a time."
+            },
+            {
+              "q": "How is the price worked out?",
+              "a": "After the inspection we write down the scope of the work, and the price is agreed against that scope before anything starts."
+            },
+            {
+              "q": "Which package do I need?",
+              "a": "Repair for a specific problem on a sound roof, Replace when the roof is past repair, and Care for regular checks. The inspection tells you which one fits."
+            }
+          ]
+        },
+        {
+          "type": "prose",
+          "id": "faq-intro",
+          "heading": "Still unsure?",
+          "paragraphs": [
+            "These are the questions people ask us most when a roof starts to worry them. If yours is not here, ask us on the phone or through the request form."
           ]
         },
         {
@@ -184,7 +291,16 @@
             "We call you back to agree a time for the inspection. On the day we look at the roof and gutters with you and take photos.",
             "Afterwards you get a written scope of any work we suggest. Nothing starts until you have read it and agreed."
           ],
-          "aside": { "heading": "Calling instead?", "text": "The phone is answered in the mornings. Outside those hours, the form is the quickest way to reach us." }
+          "aside": {
+            "heading": "Calling instead?",
+            "text": "The phone is answered in the mornings. Outside those hours, the form is the quickest way to reach us."
+          }
+        },
+        {
+          "type": "cta",
+          "id": "contact-next",
+          "heading": "Rather talk it through first?",
+          "text": "Call us and describe what you can see. We will tell you plainly what we think it needs."
         }
       ]
     }

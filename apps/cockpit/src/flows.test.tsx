@@ -87,6 +87,22 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(t.clicks()).toBe(2);
   });
 
+  it("a plan whose direction step failed can prepare it again before deciding (Build-quality Package 1)", async () => {
+    const fx = fixtures();
+    const pending = fx.plan_approvals!.find((p) => p.id === PLAN_PENDING)!;
+    pending.plan = { ...(pending.plan as object), direction: null, directionNote: "direction step escalated: output truncated" };
+    const t = start(`/decisions/plans/${PLAN_PENDING}`, "owner", fx);
+    expect(await screen.findByText(/No direction summary for this plan: direction step escalated/, undefined, T)).toBeInTheDocument();
+    await t.click(await screen.findByRole("button", { name: "Prepare the direction again" }, T));
+    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "direction", params: { planId: PLAN_PENDING } }) }));
+  });
+
+  it("a plan with a direction, or a decided plan, offers no direction re-run", async () => {
+    start(`/decisions/plans/${PLAN_PENDING}`);
+    await screen.findByRole("button", { name: "Approve as Track A" }, T);
+    expect(screen.queryByRole("button", { name: "Prepare the direction again" })).toBeNull();
+  });
+
   it("approve on the other track (3 clicks), and it says the override is recorded", async () => {
     const t = start();
     await t.click(await screen.findByRole("link", { name: "Approve or reject the Summit Line Roofing Website plan" }, T));

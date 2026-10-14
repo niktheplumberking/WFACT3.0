@@ -20,6 +20,7 @@ import { z } from "zod";
 import { pageScopeOf, type PilotBrief } from "../brief.js";
 import { briefFactText, extractJson, inBrief, missingRequiredMessage, waivedSocialProof } from "../trackA/content.js";
 import { buildTrackBPalette } from "./palette.js";
+import { collectStrings, floorErrors, metaCopyErrors, requestCoverageErrors } from "../request.js";
 
 export { extractJson };
 
@@ -194,7 +195,6 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
       if (types.filter((t) => t === once).length > 1) errors.push(`${where}: more than one "${once}" section; one per page.`);
     }
     if (pi === 0 && !single && types.length > MAX_HOME_SECTIONS) errors.push(`${where}: ${types.length} sections; keep the home page to ${MAX_HOME_SECTIONS} and move the rest to their own pages.`);
-    if (pi > 0 && types.length < 2) errors.push(`${where}: one section; give every page at least two, or fold it into another page.`);
     for (let i = 1; i < types.length; i += 1) {
       if (types[i] === types[i - 1]) errors.push(`${where}: sections ${i - 1} and ${i} are both "${types[i]}" (DR-REPEATED-RHYTHM); put a different section between them.`);
       if (i >= 2 && LISTLIKE.has(types[i]!) && LISTLIKE.has(types[i - 1]!) && LISTLIKE.has(types[i - 2]!)) {
@@ -228,5 +228,32 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
   if (contactForms === 0) errors.push(`No page has a "contact" section; the primary action needs a form to land on.`);
   const target = c.pages.find((p) => p.slug === c.primaryAction.page);
   if (target && !target.sections.some((s) => s.type === "contact")) errors.push(`primaryAction.page "${c.primaryAction.page}" has no "contact" section for the action to land on.`);
+  errors.push(...requestChecks(c, brief, single));
   return { content: errors.length ? null : c, errors };
+}
+
+/** Form fields each Track B form holds (starters/track-b ContactForm): kinds as in request.ts. */
+const FORM_FIELDS: Record<"enquiry" | "signup", string[]> = { enquiry: ["name", "email", "organisation", "plans", "timing"], signup: ["email", "name"] };
+
+/** Build-quality Package 1: content floors, copy about the site itself, and coverage of what the client asked for. */
+function requestChecks(c: SiteContent, brief: PilotBrief, single: boolean): string[] {
+  const sections = c.pages.flatMap((p) => p.sections);
+  const textOf = (types: string[]) => collectStrings(sections.filter((s) => types.includes(s.type)), "", []).map((x) => x.text).join("\n");
+  const forms = sections.flatMap((s) => (s.type === "contact" ? [s.form] : []));
+  const copy = collectStrings(c.pages.map((p) => ({ ...p, sections: p.sections.map((s) => (s.type === "contact" ? { ...s, formNote: undefined } : s)) })), "pages", []);
+  copy.push(...collectStrings(c.business, "business", []), { path: "primaryAction.label", text: c.primaryAction.label });
+  return [
+    ...floorErrors(c.pages, single),
+    ...metaCopyErrors(copy, brief.requestText, c.business.name),
+    ...requestCoverageErrors({
+      requested: brief.requested,
+      servicesText: textOf(["services"]),
+      stepsText: textOf(["process"]),
+      primaryActionLabel: c.primaryAction.label,
+      pages: c.pages,
+      heldFormFields: new Set(forms.flatMap((f) => FORM_FIELDS[f])),
+      formName: `Track B ${[...new Set(forms)].join(" / ") || "enquiry"}`,
+      openQuestions: c.openQuestions,
+    }),
+  ];
 }

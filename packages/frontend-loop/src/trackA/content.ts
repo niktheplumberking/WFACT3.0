@@ -17,6 +17,7 @@
 import { z } from "zod";
 import { briefFactSources, pageScopeOf, type PilotBrief } from "../brief.js";
 import { buildPalette } from "./palette.js";
+import { collectStrings, floorErrors, metaCopyErrors, requestCoverageErrors } from "../request.js";
 
 export const CONTENT_SCHEMA_VERSION = "track-a/1";
 
@@ -265,7 +266,6 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
     if (pi === 0 && !single && types.length > MAX_HOME_SECTIONS) {
       errors.push(`pages[0] (index) has ${types.length} sections; keep the home page to ${MAX_HOME_SECTIONS} and move the rest to their own pages.`);
     }
-    if (pi > 0 && types.length < 2) errors.push(`pages[${pi}] (${page.slug}) has one section; give every page at least two, or fold it into another page.`);
     if (types.filter((t) => t === "cta").length > 1) errors.push(`pages[${pi}] (${page.slug}) has more than one "cta" section; one per page.`);
     for (let i = 2; i < types.length; i += 1) {
       if (LISTLIKE.has(types[i]!) && LISTLIKE.has(types[i - 1]!) && LISTLIKE.has(types[i - 2]!)) {
@@ -283,7 +283,34 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
   if (target && !target.sections.some((s) => s.type === "contact")) {
     errors.push(`primaryAction.page "${c.primaryAction.page}" has no "contact" section for the action to land on.`);
   }
+  errors.push(...requestChecks(c, brief, single));
   return { content: errors.length ? null : c, errors };
+}
+
+/** Form fields the Track A request form holds (render.ts: name, phone, address or suburb, what you need, preferred time). */
+const FORM_FIELDS = ["name", "phone", "address", "plans", "timing"];
+
+/** Build-quality Package 1: content floors, copy about the site itself, and coverage of what the client asked for. */
+function requestChecks(c: SiteContent, brief: PilotBrief, single: boolean): string[] {
+  const sections = c.pages.flatMap((p) => p.sections);
+  const textOf = (types: string[]) => collectStrings(sections.filter((s) => types.includes(s.type)), "", []).map((x) => x.text).join("\n");
+  const copy = collectStrings(c.pages.map((p) => ({ ...p, sections: p.sections.map((s) => (s.type === "contact" ? { ...s, formNote: undefined } : s)) })), "pages", []);
+  copy.push({ path: "primaryAction.label", text: c.primaryAction.label });
+  if (c.business.tagline) copy.push({ path: "business.tagline", text: c.business.tagline });
+  return [
+    ...floorErrors(c.pages, single),
+    ...metaCopyErrors(copy, brief.requestText, c.business.name),
+    ...requestCoverageErrors({
+      requested: brief.requested,
+      servicesText: textOf(["services", "packages"]),
+      stepsText: textOf(["steps"]),
+      primaryActionLabel: c.primaryAction.label,
+      pages: c.pages,
+      heldFormFields: new Set(FORM_FIELDS),
+      formName: "Track A request",
+      openQuestions: c.openQuestions,
+    }),
+  ];
 }
 
 /** The home page leads; detail lives on the other pages. */

@@ -426,3 +426,68 @@ test("readiness probes: credits, refused keys and silence stop the run; busy pro
   const noKey = await providerProbes({ anthropicModel: "claude-sonnet-5" })();
   assert.deepEqual(noKey.map((c) => [c.id, c.ok]), [["provider.anthropic", false]], "no Agent 37 configured: only Anthropic is probed");
 });
+
+// ---- Build-quality Package 1: the request reaches the build ----
+
+import { rootPlanId } from "../src/requestLookup.js";
+
+test("briefForBuild: an old plan with no request uses the intake job's text when found, else says 'summary only'; synonym sections collapse", () => {
+  const brief = { clientSlug: "lanternworks-studio", entitySlug: "bennett-co", projectName: "x", goal: "x", requiredSections: ["hero", "home", "process", "how-we-work", "work"], brandNotes: "x", source: "intake-planner" as const, pageScope: "multi" as const };
+  const intake = { entitySlug: "bennett-co", leadType: "new_website", requestSource: "intake-raw", clientName: "Lanternworks Studio" };
+  const none = briefForBuild({ brief, intake });
+  assert.equal(none.briefBasis, "summary-only");
+  assert.equal(none.requestText, undefined);
+  assert.deepEqual(none.requiredSections, ["hero", "process", "work"]);
+  const found = briefForBuild({ brief, intake }, [], "Pages we'd like: Home, Services.");
+  assert.equal(found.briefBasis, "request");
+  assert.equal(found.requestText, "Pages we'd like: Home, Services.");
+  assert.equal(found.requested, undefined, "the requested list was never checked for an old plan, so it stays empty");
+  const carried = briefForBuild({ brief: { ...brief, requestText: "the stored request" }, intake }, [], "ignored");
+  assert.equal(carried.requestText, "the stored request");
+});
+
+test("build_plan on an old plan: the runner looks the request up and the result says what the build was based on", async () => {
+  const { d, planStore } = deps(CLEAN);
+  const planId = await approvedPlan(d, planStore);
+  const row = planStore.rows.get(planId)!;
+  delete row.plan.brief.requestText;
+  delete row.intake.requestText;
+  const asked: string[] = [];
+  const withLookup = { ...d, requests: { requestTextFor: async (id: string) => (asked.push(id), "Hi DreamSign, Northlight Signs needs a homepage.") } };
+  const r = await handleJob(job("build_plan", { planId }), withLookup);
+  assert.equal(r.result.briefBasis, "request");
+  assert.deepEqual(asked, [planId]);
+  const summaryOnly = await handleJob(job("build_plan", { planId }), d);
+  assert.equal(summaryOnly.result.briefBasis, "summary-only");
+});
+
+test("build_plan on a new plan: the request was carried from intake, no lookup needed", async () => {
+  const { d, planStore } = deps(CLEAN);
+  const planId = await approvedPlan(d, planStore);
+  assert.equal(planStore.rows.get(planId)!.plan.brief.requestText, "Hi DreamSign, Northlight Signs needs a homepage.");
+  const r = await handleJob(job("build_plan", { planId }), { ...d, requests: { requestTextFor: async () => { throw new Error("must not be called"); } } });
+  assert.equal(r.result.briefBasis, "request");
+});
+
+test("direction job: re-runs direction alone for a pending plan and returns the superseding plan id", async () => {
+  const { d, planStore } = deps(CLEAN);
+  const intake = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage." }), d);
+  const planId = intake.result.planId as string;
+  assert.equal(intake.result.directionNote, "no direction model configured for this run");
+  const direction = {
+    niche: "local-trade", nicheQuote: "Northlight Signs", audience: { point: "Locals", quote: "Northlight Signs" }, primaryGoal: "call", goalQuote: "needs a homepage",
+    requirements: [], constraints: [], brandDirection: [], recommendedTrack: "A", confidence: 0.9, reasons: ["A local sign shop."], openQuestions: [],
+  };
+  const r = await handleJob(job("direction", { planId }), { ...d, planning: { ...d.planning, directionModel: new MockJsonClient(() => direction) } });
+  assert.equal(r.ok, true, r.reason ?? "");
+  assert.notEqual(r.result.planId, planId);
+  assert.equal((r.result.direction as { recommendedTrack: string }).recommendedTrack, "A");
+  assert.equal((await planStore.get(planId))!.status, "superseded");
+  await assert.rejects(handleJob(job("direction", { planId: "nope" }), d), /params\.planId must be a UUID/);
+});
+
+test("request lookup follows a re-plan back to the first plan (the one the intake job names)", async () => {
+  const plans = new Map<string, { supersedes: string | null }>([["c", { supersedes: "b" }], ["b", { supersedes: "a" }], ["a", { supersedes: null }]]);
+  const store = { get: async (id: string) => (plans.get(id) ?? null) as never, insertPending: async () => "" };
+  assert.equal(await rootPlanId("c", store), "a");
+});

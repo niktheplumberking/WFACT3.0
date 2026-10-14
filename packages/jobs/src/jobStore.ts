@@ -3,7 +3,7 @@
  * trigger enforces the rules (request immutable, status forward-only, no deletes) — this class only
  * reads a job and records progress/results.
  */
-export type JobKind = "intake" | "replan" | "build_plan" | "resume" | "verify" | "ask";
+export type JobKind = "intake" | "replan" | "direction" | "build_plan" | "resume" | "verify" | "ask";
 export type JobStatus = "queued" | "dispatched" | "running" | "succeeded" | "failed";
 
 export interface Job {

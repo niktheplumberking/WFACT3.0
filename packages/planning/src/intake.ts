@@ -17,6 +17,7 @@ import { z } from "zod";
 import { AgentInputError, defineScope, guardModelClient, type Agent, type AgentDefinition } from "@wfact/agent-runtime";
 import { KNOWN_ENTITIES, detectEntitySlug } from "@wfact/hermes-lite/entities";
 import { toApiSchema, type JsonModelClient } from "./modelClient.js";
+import { verifyRequested, type RequestedItems } from "@wfact/frontend-loop/request";
 
 export const INTAKE_ROLE = "intake";
 
@@ -41,8 +42,22 @@ const ModelIntakeSchema = z.object({
   brandNotes: z.string(),
   requestedSections: z.array(z.string()),
   ambiguities: z.array(z.string()),
+  /** Build-quality Package 1: what the client asked for, in their words. Code checks every item against the request. */
+  requested: z.object({
+    services: z.array(z.string()),
+    processSteps: z.array(z.string()),
+    primaryActionLabel: z.string().nullable(),
+    audience: z.string().nullable(),
+    teamSize: z.number().int().nullable(),
+    teamNotes: z.string().nullable(),
+    formFields: z.array(z.string()),
+    tone: z.string().nullable(),
+    pages: z.array(z.string()),
+  }),
 });
 const MODEL_INTAKE_JSON_SCHEMA = toApiSchema(z.toJSONSchema(ModelIntakeSchema) as Record<string, unknown>);
+/** What is parsed back: the requested list is asked for (required in the API schema) but a reply without it still parses (empty list). */
+const ModelIntakeReply = ModelIntakeSchema.extend({ requested: ModelIntakeSchema.shape.requested.optional() });
 
 /** The validated handoff to the Planner. */
 export const IntakeResultSchema = ModelIntakeSchema.extend({
@@ -51,6 +66,14 @@ export const IntakeResultSchema = ModelIntakeSchema.extend({
   /** Provenance of the raw request, carried through to the brief. */
   requestSource: z.enum(["nick", "placeholder-2.0-case", "intake-raw"]),
   classificationAttempts: z.number().int().min(1),
+  /**
+   * The raw request, word for word, set by code from what Intake read (never by the model). Optional so intake results
+   * stored before 2026-10-14 still parse; those plans fall back to the intake job's text at build time.
+   */
+  requestText: z.string().max(20_000).optional(),
+}).extend({
+  // After code's check (verifyRequested): only items whose words are in the request, never claims. Optional for old rows.
+  requested: z.custom<RequestedItems>((v) => typeof v === "object" && v !== null).optional(),
 });
 export type IntakeResult = z.infer<typeof IntakeResultSchema>;
 
@@ -78,6 +101,10 @@ function systemPrompt(): string {
     "requestedSections: page sections the client explicitly asks for, as short lowercase-hyphen ids (e.g. hero, services, contact). Empty if none stated.",
     "goal / brandNotes: one or two plain sentences each, in your words, no invented facts, no invented numbers or client names.",
     "ambiguities: anything missing or unclear that a human should confirm. Do not guess to fill gaps.",
+    "requested: what the client explicitly asked for, COPIED in the client's own words (code rejects anything not in the request):",
+    "  services (each service name), processSteps (each step, in order), primaryActionLabel (the button text they asked for, else null),",
+    "  audience (who they serve), teamSize (a number only if stated) and teamNotes, formFields (each field they listed), tone (the feel",
+    "  they asked for), pages (each page they named). Leave out claims about themselves (counts, awards, years) and anything they did not say.",
   ].join("\n");
 }
 
@@ -124,20 +151,26 @@ export function createIntakeAgent(opts: { model: JsonModelClient }): Agent<RawRe
     async execute(raw): Promise<IntakeResult> {
       let ambiguity: string | null = null;
       for (let attempt = 1; ; attempt += 1) {
-        const out = ModelIntakeSchema.parse(
+        const out = ModelIntakeReply.parse(
           await model.completeJson({
             system: systemPrompt(),
             user: userPrompt(raw, ambiguity),
             schema: MODEL_INTAKE_JSON_SCHEMA,
-            maxTokens: 1024,
+            // 2048 since Package 1 (the requested list): a full agency request needs ~700 output tokens (Lanternworks).
+            maxTokens: 2048,
           }),
         );
         ambiguity = entityAmbiguity(raw.text, out.entitySlug);
         if (!ambiguity || attempt >= 2) {
+          // The model's list is checked by code against the request; dropped items are recorded, never silent.
+          const { requested, dropped } = verifyRequested(out.requested, raw.text);
+          const ambiguities = [...out.ambiguities, ...dropped.map((d) => `requested list: ${d}`)];
           return IntakeResultSchema.parse({
             ...out,
+            requested,
+            requestText: raw.text,
             entityConfidence: ambiguity ? "ambiguous" : "certain",
-            ambiguities: ambiguity ? [...out.ambiguities, `entity: ${ambiguity}`] : out.ambiguities,
+            ambiguities: ambiguity ? [...ambiguities, `entity: ${ambiguity}`] : ambiguities,
             clientSlug: slugify(out.clientName),
             requestSource: raw.source,
             classificationAttempts: attempt,

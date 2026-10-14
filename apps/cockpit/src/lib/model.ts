@@ -96,6 +96,7 @@ export interface RoundRow {
 export const KIND_LABEL: Record<JobKind, string> = {
   intake: "Read request and plan",
   replan: "Re-plan from note",
+  direction: "Prepare the direction again",
   build_plan: "Build and check",
   resume: "Resume build",
   verify: "Re-check a page",
