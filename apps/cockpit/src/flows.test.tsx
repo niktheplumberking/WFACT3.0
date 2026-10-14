@@ -282,7 +282,7 @@ describe("gates and tidying", () => {
     expect(await screen.findByText(/Launch is Nick's decision and is recorded outside the Cockpit/, {}, T)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Move to Launch/ })).toBeNull();
     await t.click(screen.getByRole("button", { name: "Move to QA and security" }));
-    const dialog = await screen.findByRole("dialog", {}, T);
+    const dialog = await screen.findByRole("alertdialog", {}, T);
     expect(within(dialog).getByText(/doesn't build, publish or bill anything/)).toBeInTheDocument();
     await t.click(within(dialog).getByRole("button", { name: "Move to QA and security" }));
     const update = t.calls().find((c) => c.op === "update" && c.table === "projects");
@@ -294,7 +294,7 @@ describe("gates and tidying", () => {
     const t = start(`/activity/${JOB_STUCK}`);
     expect(await screen.findByRole("heading", { level: 1, name: "This request never started" }, T)).toBeInTheDocument();
     await t.click(screen.getByRole("button", { name: "Close it" }));
-    const dialog = await screen.findByRole("dialog", {}, T);
+    const dialog = await screen.findByRole("alertdialog", {}, T);
     await t.user.type(within(dialog).getByLabelText("Reason"), "Never reached GitHub");
     await t.click(within(dialog).getByRole("button", { name: "Close request" }));
     expect(t.calls()).toContainEqual({ op: "rpc", name: "cancel_job", args: { p_job_id: JOB_STUCK, p_reason: "Never reached GitHub" } });

@@ -1,4 +1,5 @@
-/** Core components of the signal-box panel design system (docs/step-4c/PHASE-1-PROPOSAL.md §4). */
+/** Core components. Pre-v2 pieces (Aspect, Notice, Plate, RouteLine) are replaced screen by screen in Cockpit v2;
+ *  the v2 primitives live in kit.tsx and flow.tsx. ConfirmDialog and SitePreview here are v2. */
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { WarningOctagon, Info, CheckCircle, Warning, ArrowsOut, ArrowsIn, X, Eye } from "@phosphor-icons/react";
 import { previewHtml } from "../jobsClient";
@@ -124,14 +125,18 @@ export function RouteLine({ stage, name, waitingAt }: { stage: string; name: str
 }
 
 /**
- * Confirmation for moves that can't be undone (native <dialog>: focus trap, Escape and focus return are
- * the browser's). With `reasonLabel` it also asks for a short reason, required before Confirm.
+ * Confirmation (Cockpit v2): a native modal <dialog> with role="alertdialog". Newsreader title, a body, and for paid
+ * work the money line (rough cost plus the per-build stop, from lib/costs.ts costLine). "Not now" + one primary.
+ * Focus goes to the primary on open and back to the opener on close. With `reasonLabel` it also asks for a short
+ * reason, required before the primary.
  */
 export function ConfirmDialog({
   open,
   title,
   body,
+  cost,
   confirmLabel,
+  cancelLabel = "Not now",
   reasonLabel,
   danger,
   busy,
@@ -142,7 +147,10 @@ export function ConfirmDialog({
   open: boolean;
   title: string;
   body: ReactNode;
+  /** The money sentence for anything that starts paid work. */
+  cost?: string;
   confirmLabel: string;
+  cancelLabel?: string;
   reasonLabel?: string;
   danger?: boolean;
   busy?: boolean;
@@ -151,23 +159,30 @@ export function ConfirmDialog({
   onCancel: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const primary = useRef<HTMLButtonElement>(null);
+  const reasonRef = useRef<HTMLInputElement>(null);
+  const opener = useRef<Element | null>(null);
   const [reason, setReason] = useState("");
   const rid = useId();
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
     if (open && !d.open) {
+      opener.current = document.activeElement;
       setReason("");
       if (typeof d.showModal === "function") d.showModal();
       else d.setAttribute("open", "");
+      (reasonLabel ? reasonRef.current : primary.current)?.focus();
     } else if (!open && d.open) {
       if (typeof d.close === "function") d.close();
       else d.removeAttribute("open");
+      (opener.current as HTMLElement | null)?.focus?.();
     }
-  }, [open]);
+  }, [open, reasonLabel]);
   const tid = `${rid}-t`;
+  const bid = `${rid}-b`;
   return (
-    <dialog ref={ref} className="dialog" aria-labelledby={tid} onCancel={(e) => { e.preventDefault(); onCancel(); }}>
+    <dialog ref={ref} className="dialog" role="alertdialog" aria-modal="true" aria-labelledby={tid} aria-describedby={bid} onCancel={(e) => { e.preventDefault(); onCancel(); }}>
       <form
         method="dialog"
         onSubmit={(e) => {
@@ -177,24 +192,131 @@ export function ConfirmDialog({
         }}
       >
         <h2 id={tid}>{title}</h2>
-        <div className="muted">{body}</div>
+        <div id={bid} className="dialog-body">
+          <div className="muted">{body}</div>
+          {cost && <p className="dialog-cost">{cost}</p>}
+        </div>
         {reasonLabel && (
           <div className="field">
             <label htmlFor={`${rid}-r`}>{reasonLabel}</label>
-            <input id={`${rid}-r`} className="input" value={reason} maxLength={300} onChange={(e) => setReason(e.target.value)} required minLength={3} />
+            <input ref={reasonRef} id={`${rid}-r`} className="input" value={reason} maxLength={300} onChange={(e) => setReason(e.target.value)} required minLength={3} />
           </div>
         )}
         {error && <Notice tone="stop">{error}</Notice>}
-        <div className="actions">
-          <button className="btn ghost" type="button" onClick={onCancel}>
-            Cancel
+        <div className="actions dialog-actions">
+          <button className="btn secondary page" type="button" onClick={onCancel}>
+            {cancelLabel}
           </button>
-          <button className={`btn ${danger ? "danger" : "primary"}`} type="submit" disabled={busy || (!!reasonLabel && reason.trim().length < 3)}>
+          <button ref={primary} className={`btn page ${danger ? "danger" : "primary"}`} type="submit" disabled={busy || (!!reasonLabel && reason.trim().length < 3)}>
             {busy ? "Working…" : confirmLabel}
           </button>
         </div>
       </form>
     </dialog>
+  );
+}
+
+/**
+ * The finished site, side by side (Cockpit v2): desktop and phone frames load the same page of the real built site
+ * (lib/sitePreview.ts); the page switcher is a tablist. On phones the two stack. Frames are sandboxed WITHOUT
+ * allow-same-origin: built pages are model output and can never read the Cockpit's session.
+ */
+export function SitePreview({ manifestPath, onPage }: { manifestPath: string; onPage?: (page: string) => void }) {
+  const [site, setSite] = useState<SitePreviewData | null>(null);
+  const [page, setPage] = useState<string | null>(null);
+  const [html, setHtml] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  const pid = useId();
+
+  async function show(s: SitePreviewData, p: string) {
+    setError(null);
+    try {
+      setHtml(await s.render(p));
+      setPage(p);
+      onPage?.(p);
+    } catch (e) {
+      setError(`Couldn't load ${pageLabel(p)}: ${e instanceof Error ? e.message : String(e)}. Nothing was changed; try again.`);
+    }
+  }
+
+  useEffect(() => {
+    let live = true;
+    void loadSitePreview(manifestPath).then((res) => {
+      if (!live) return;
+      if (!res.data) return setError(`Couldn't load the built site: ${res.error}. Nothing was changed; try again.`);
+      setSite(res.data);
+      void show(res.data, res.data.pages[0]!);
+    });
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manifestPath]);
+
+  if (error && !site) return <Notice tone="stop">{error}</Notice>;
+  if (!site) return <Loading rows={2} label="Loading the built site" />;
+  const i = Math.max(0, site.pages.indexOf(page ?? ""));
+  const pick = (n: number) => {
+    const p = site.pages[(n + site.pages.length) % site.pages.length]!;
+    void show(site, p);
+    tabs.current[(n + site.pages.length) % site.pages.length]?.focus();
+  };
+  return (
+    <div className="siteprev">
+      <div role="tablist" aria-label="Pages" className="page-tabs">
+        {site.pages.map((p, n) => (
+          <button
+            key={p}
+            ref={(el) => {
+              tabs.current[n] = el;
+            }}
+            role="tab"
+            type="button"
+            id={`${pid}-t${n}`}
+            aria-selected={p === page}
+            aria-controls={`${pid}-panel`}
+            tabIndex={p === page ? 0 : -1}
+            onClick={() => void show(site, p)}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowRight") pick(i + 1);
+              else if (e.key === "ArrowLeft") pick(i - 1);
+            }}
+          >
+            {pageLabel(p)}
+          </button>
+        ))}
+      </div>
+      {error && <Notice tone="stop">{error}</Notice>}
+      <div id={`${pid}-panel`} role="tabpanel" aria-labelledby={`${pid}-t${i}`} className="siteprev-frames">
+        <figure className="frame-desk">
+          <ScaledFrame html={html ?? ""} width={1280} height={800} title={`${page ? pageLabel(page) : ""} on a desktop screen`} />
+          <figcaption>Desktop · {page ? pageLabel(page) : ""}</figcaption>
+        </figure>
+        <figure className="frame-phone">
+          <ScaledFrame html={html ?? ""} width={390} height={844} title={`${page ? pageLabel(page) : ""} on a phone`} />
+          <figcaption>Phone · {page ? pageLabel(page) : ""}</figcaption>
+        </figure>
+      </div>
+    </div>
+  );
+}
+
+/** An iframe laid out at a real device width and scaled to fit its box, so the page sees desktop or phone CSS. */
+function ScaledFrame({ html, width, height, title }: { html: string; width: number; height: number; title: string }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setScale(el.clientWidth / width || 1));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [width]);
+  return (
+    <div ref={box} className="scaled" style={{ aspectRatio: `${width} / ${height}` }}>
+      <iframe title={title} sandbox="allow-scripts" srcDoc={html} style={{ width, height, transform: `scale(${scale})` }} />
+    </div>
   );
 }
 
@@ -205,11 +327,11 @@ export function ConfirmDialog({
  */
 export function PagePreview({ path }: { path: string }) {
   // A multi-page site (Track A or B) is checkpointed as its manifest: preview the site itself, never the file list.
-  if (path.endsWith("/site.manifest.json")) return <SitePreview manifestPath={path} />;
+  if (path.endsWith("/site.manifest.json")) return <SinglePageSitePreview manifestPath={path} />;
   return <SinglePagePreview path={path} />;
 }
 
-function SitePreview({ manifestPath }: { manifestPath: string }) {
+function SinglePageSitePreview({ manifestPath }: { manifestPath: string }) {
   const [site, setSite] = useState<SitePreviewData | null>(null);
   const [page, setPage] = useState<string | null>(null);
   const [html, setHtml] = useState<string | null>(null);

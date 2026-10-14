@@ -191,28 +191,52 @@ export function readThemePref(): ThemePref {
   return readAppearance().theme;
 }
 
-/* ---------------- toasts ---------------- */
+/* ---------------- toasts (v2: inverse ink, polite live region, 9 s, optional Undo / Changed my mind) ---------------- */
 
+export interface ToastAction {
+  label: string;
+  run: () => void;
+}
 interface Toast {
   id: number;
   text: string;
+  action?: ToastAction;
 }
-const ToastContext = createContext<(text: string) => void>(() => {});
+export const TOAST_MS = 9000;
+type ShowToast = (text: string, action?: ToastAction) => void;
+const ToastContext = createContext<ShowToast>(() => {});
 
+/** A toast is never the only place information appears: the screen it came from shows the same state. */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const show = useCallback((text: string) => {
-    const id = Date.now() + Math.random();
-    setToasts((t) => [...t, { id, text }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 6000);
-  }, []);
+  const drop = useCallback((id: number) => setToasts((t) => t.filter((x) => x.id !== id)), []);
+  const show = useCallback<ShowToast>(
+    (text, action) => {
+      const id = Date.now() + Math.random();
+      setToasts((t) => [...t.slice(-2), { id, text, action }]);
+      setTimeout(() => drop(id), TOAST_MS);
+    },
+    [drop],
+  );
   return (
     <ToastContext.Provider value={show}>
       {children}
       <div className="toasts" role="status" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} className="toast">
-            {t.text}
+          <div key={t.id} className="toast enter">
+            <span className="toast-text">{t.text}</span>
+            {t.action && (
+              <button
+                type="button"
+                className="toast-act"
+                onClick={() => {
+                  drop(t.id);
+                  t.action!.run();
+                }}
+              >
+                {t.action.label}
+              </button>
+            )}
           </div>
         ))}
       </div>

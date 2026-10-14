@@ -23,6 +23,16 @@ export const CAPS = {
   status: capsFile.status,
 };
 
+/** The per-build stop, in words, from spend-caps.json (never hard-coded: see BLOCKED-ON-NICK.md, caps conflict). */
+export function buildStopLine(caps: { perBuildUsd: number | null } = CAPS): string {
+  return caps.perBuildUsd == null ? "There is no per-build spending limit switched on." : `Each build stops itself at $${caps.perBuildUsd.toFixed(2)}.`;
+}
+
+/** The money sentence every paid confirm carries: the rough cost, then the per-build stop. */
+export function costLine(about: string, caps: { perBuildUsd: number | null } = CAPS): string {
+  return `Costs about ${about}. ${buildStopLine(caps)}`;
+}
+
 /** Tokens x the price table; null when the model has no price at all. */
 export function priceTokens(model: string, inputTokens: number, outputTokens: number): number | null {
   const p = prices[model]?.usdPerMTok;
