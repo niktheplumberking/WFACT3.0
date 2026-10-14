@@ -167,7 +167,7 @@ describe("a worker that never reported back", () => {
     const { asStopped } = await import("./recovery");
     const d = diagnoseJob(asStopped(j), [j], { planId: PLAN });
     expect(d.cause).toBe("temporary");
-    const item = buildAttention({ plans: [], jobs: [{ ...j, params: { planId: PLAN } }], accounts: [], myId: null, canDecide: true }).find((i) => i.kind === "failed");
+    const item = buildAttention({ clients: [], jobs: [{ ...j, params: { planId: PLAN } }], accounts: [], myId: null, canDecide: true }).find((i) => i.kind === "failed");
     expect(item?.title).toMatch(/stopped/);
   });
   it("a build that is merely recent is still running", async () => {

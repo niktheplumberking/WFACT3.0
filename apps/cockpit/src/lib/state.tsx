@@ -8,7 +8,9 @@ import { supabase } from "../supabaseClient";
 import { JOB_COLUMNS, isActive, type JobRow } from "../jobsClient";
 import { applyAppearance, readAppearance, saveAppearance, type Theme } from "./appearance";
 import { buildAttention, type AttentionItem } from "./attention";
-import { PLAN_COLUMNS, type AccountRequestRow, type PlanRow, type Role } from "./model";
+import { PLAN_COLUMNS, type AccountRequestRow, type PlanRow, type ProjectRow, type Role } from "./model";
+import { clientsOf, type ClientRow } from "./clients";
+import type { PlanInputRow } from "./inputs";
 
 /* ---------------- session ---------------- */
 
@@ -122,14 +124,44 @@ export async function fetchAccounts(): Promise<AccountRequestRow[]> {
   ) as AccountRequestRow[];
 }
 
-/* ---------------- shared factory state (Home + Decisions badge) ---------------- */
+export async function fetchProjects(): Promise<ProjectRow[]> {
+  const res = await supabase.from("projects").select("id,name,stage,status,created_at,client_id,clients(name,entities(name))").order("created_at", { ascending: false });
+  if (res.error) throw new Error(res.error.message);
+  return (res.data ?? []) as unknown as ProjectRow[];
+}
+
+/** Every current detail row (owner/admin under RLS). Missing table (before migration 0018) reads as none. */
+export async function fetchAllPlanInputs(): Promise<PlanInputRow[]> {
+  const res = await supabase.from("plan_inputs").select("id,created_at,plan_id,kind,key,label,value,waived").order("created_at", { ascending: true }).limit(2000);
+  if (res.error) return [];
+  return (res.data ?? []) as PlanInputRow[];
+}
+
+/** The owner's first name: the person who decides proposals, the finished site and money ("Nick decides this"). */
+export async function fetchDeciderName(): Promise<string | null> {
+  // A name is a nicety: if it cannot be read, the words fall back to "the owner" and nothing else fails.
+  try {
+    const res = await supabase.from("profiles").select("full_name").eq("role", "owner").order("created_at", { ascending: true }).limit(1);
+    const name = (res.data?.[0] as { full_name?: string | null } | undefined)?.full_name?.trim();
+    return name ? name.split(/\s+/)[0]! : null;
+  } catch {
+    return null;
+  }
+}
+
+/* ---------------- shared factory state (Home, Projects, Notifications, the shell's counts) ---------------- */
 
 interface Factory {
   jobs: JobRow[] | null;
   plans: PlanRow[] | null;
   accounts: AccountRequestRow[] | null;
+  projects: ProjectRow[] | null;
+  /** Every client with its six-step path (lib/clients.ts). */
+  clients: ClientRow[] | null;
   attention: AttentionItem[];
   decisions: number;
+  /** The owner's first name, or "the owner" when it cannot be read. */
+  decider: string;
   error: string | null;
   reload: () => Promise<void>;
 }
@@ -141,9 +173,10 @@ export function FactoryProvider({ children }: { children: ReactNode }) {
   const decider = canDecide(me.role);
   const load = useLoad(
     async () => {
-      if (!decider) return { jobs: [] as JobRow[], plans: [] as PlanRow[], accounts: [] as AccountRequestRow[] };
-      const [jobs, plans, accounts] = await Promise.all([fetchJobs(), fetchPlans(), fetchAccounts()]);
-      return { jobs, plans, accounts };
+      // PMs read only their assigned projects (RLS); plans, jobs and details are owner/admin.
+      if (!decider) return { jobs: [] as JobRow[], plans: [] as PlanRow[], accounts: [] as AccountRequestRow[], projects: await fetchProjects(), inputs: [] as PlanInputRow[], deciderName: null as string | null };
+      const [jobs, plans, accounts, projects, inputs, deciderName] = await Promise.all([fetchJobs(), fetchPlans(), fetchAccounts(), fetchProjects(), fetchAllPlanInputs(), fetchDeciderName()]);
+      return { jobs, plans, accounts, projects, inputs, deciderName };
     },
     [me.userId, decider],
     { pollMs: 5000, pollWhile: (d) => d.jobs.some((j) => isActive(j)) },
@@ -156,17 +189,22 @@ export function FactoryProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<Factory>(() => {
     const d = load.data;
-    const attention = d ? buildAttention({ plans: d.plans, jobs: d.jobs, accounts: d.accounts, myId: me.userId, canDecide: decider }) : [];
+    const deciderName = me.role === "owner" ? (me.fullName?.trim().split(/\s+/)[0] ?? "you") : (d?.deciderName ?? "the owner");
+    const clients = d ? clientsOf({ plans: d.plans, projects: d.projects, jobs: d.jobs, inputs: d.inputs, viewer: { role: me.role, name: me.fullName }, decider: deciderName }) : null;
+    const attention = d && clients ? buildAttention({ clients, jobs: d.jobs, accounts: d.accounts, myId: me.userId, canDecide: decider }) : [];
     return {
       jobs: d?.jobs ?? null,
       plans: d?.plans ?? null,
       accounts: d?.accounts ?? null,
+      projects: d?.projects ?? null,
+      clients,
       attention,
       decisions: attention.filter((i) => i.isDecision).length,
+      decider: deciderName,
       error: load.error,
       reload: load.reload,
     };
-  }, [load.data, load.error, load.reload, me.userId, decider]);
+  }, [load.data, load.error, load.reload, me.userId, me.role, me.fullName, decider]);
 
   return <FactoryContext.Provider value={value}>{children}</FactoryContext.Provider>;
 }

@@ -163,6 +163,12 @@ function plan(id: string, status: string, extra: Row = {}): Row {
   };
 }
 
+/** The same proposal, filed under another client (slug and the client's name as intake recorded it). */
+function asClient(p: Row, slug: string, clientName: string): Row {
+  const body = p.plan as { plan: { intake: Row } };
+  return { ...p, client_slug: slug, plan: { ...body, plan: { ...body.plan, intake: { ...body.plan.intake, clientName } } } };
+}
+
 function job(id: string, kind: string, status: string, extra: Row = {}): Row {
   return { id, created_at: ago(240), kind, params: {}, status, started_at: null, finished_at: null, result: null, error: null, gh_run_url: null, archived_at: null, ...extra };
 }
@@ -170,7 +176,8 @@ function job(id: string, kind: string, status: string, extra: Row = {}): Row {
 export function fixtures(): Record<string, Row[]> {
   return {
     profiles: [{ id: OWNER_ID, role: "owner", full_name: "Test Owner" }],
-    plan_approvals: [plan(PLAN_PENDING, "pending"), plan(PLAN_APPROVED, "approved", { build_track: "A", track_overridden: false })],
+    // Two clients: one with a proposal waiting, one approved with a passing build (Cockpit v2 groups proposals by client).
+    plan_approvals: [plan(PLAN_PENDING, "pending"), asClient(plan(PLAN_APPROVED, "approved", { build_track: "A", track_overridden: false }), "northlight-signs", "Northlight Signs")],
     jobs: [
       job(JOB_STUCK, "build_plan", "queued", { params: { planId: PLAN_APPROVED }, created_at: ago(3000) }),
       job(JOB_VERIFIED, "build_plan", "succeeded", {

@@ -6,8 +6,11 @@
  */
 import { createFake, fixtures } from "../test/fake";
 
-const fake = createFake(fixtures());
 const role = new URLSearchParams(location.search).get("fake-role");
+const rows = fixtures();
+// ?fake-role=pm|admin signs in the synthetic user with that role instead of owner.
+if (role === "pm" || role === "admin") rows.profiles = rows.profiles.map((p) => ({ ...p, role }));
+const fake = createFake(rows);
 
 const signedIn = {
   user: { id: "00000000-0000-4000-8000-0000000000aa", email: "owner@example.test" },
@@ -22,15 +25,4 @@ const auth = {
   onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
 };
 
-const from = (table: string) => {
-  if (table === "profiles") {
-    return {
-      select: () => ({
-        eq: () => ({ maybeSingle: async () => ({ data: { id: signedIn.user.id, role: role === "pm" || role === "admin" ? role : "owner", full_name: "Test Owner" }, error: null }) }),
-      }),
-    };
-  }
-  return fake.client.from(table);
-};
-
-export const supabase = { ...fake.client, auth, from } as unknown as typeof import("../supabaseClient").supabase;
+export const supabase = { ...fake.client, auth } as unknown as typeof import("../supabaseClient").supabase;

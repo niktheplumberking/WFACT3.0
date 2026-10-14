@@ -105,7 +105,9 @@ describe("command palette", () => {
     const input = await screen.findByRole("combobox", { name: "Search clients, builds, actions and settings" }, T);
     expect(input).toHaveFocus();
     for (const g of ["Clients", "Actions", "Go to", "Settings"]) expect(screen.getByRole("group", { name: g })).toBeInTheDocument();
-    expect(within(screen.getByRole("group", { name: "Clients" })).getByRole("option", { name: /Summit Line Roofing Website/ })).toBeInTheDocument();
+    const clients = within(screen.getByRole("group", { name: "Clients" }));
+    expect(clients.getByRole("option", { name: /Summit Line Roofing\s*Proposal · Approve the proposal/ })).toBeInTheDocument();
+    expect(clients.getByRole("option", { name: /Northlight Signs\s*Ready for approval · Approve the finished site/ })).toBeInTheDocument();
   });
 
   it("asks the factory the typed question through requestJob('ask')", async () => {
@@ -133,7 +135,7 @@ describe("notifications", () => {
   it("lists what needs you from the Home source; Mark all as read clears the bell", async () => {
     const t = start("/notifications");
     expect(await screen.findByRole("heading", { level: 1, name: "Notifications" }, T)).toBeInTheDocument();
-    expect(await screen.findByText("Approve or reject the Summit Line Roofing Website plan", {}, T)).toBeInTheDocument();
+    expect(await screen.findByText("Approve the proposal", {}, T)).toBeInTheDocument();
     await t.user.click(screen.getByRole("button", { name: "Mark all as read" }));
     expect((await screen.findAllByRole("link", { name: "Notifications" }, T)).length).toBeGreaterThan(0);
   });

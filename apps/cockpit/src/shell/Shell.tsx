@@ -20,7 +20,7 @@ import { requestJob, isActive } from "../jobsClient";
 import { canDecide, useFactory, useMe, useNotifications, useToast } from "../lib/state";
 import { useDetail } from "../lib/detail";
 import { applyAppearance, isDark, readAppearance, saveAppearance } from "../lib/appearance";
-import { planName } from "../lib/model";
+import { STEP_NAMES } from "../lib/path";
 import { Segmented, Wordmark } from "../components/kit";
 import { CommandPalette, type PaletteItem } from "../components/CommandPalette";
 
@@ -127,7 +127,7 @@ function ShortcutsSheet({ open, onClose }: { open: boolean; onClose: () => void 
 
 export function Shell({ children }: { children: ReactNode }) {
   const me = useMe();
-  const { attention, plans, jobs } = useFactory();
+  const { attention, clients, jobs } = useFactory();
   const { unread } = useNotifications();
   const { detail, detailed, setDetail, toggle } = useDetail();
   const toast = useToast();
@@ -206,12 +206,10 @@ export function Shell({ children }: { children: ReactNode }) {
 
   // The palette: real clients (latest proposal per client), actions, rooms and settings.
   const items = useMemo<PaletteItem[]>(() => {
-    const byClient = new Map<string, NonNullable<typeof plans>[number]>();
-    for (const p of [...(plans ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at))) if (!byClient.has(p.client_slug)) byClient.set(p.client_slug, p);
     const running = (jobs ?? []).find((j) => isActive(j) && (j.kind === "build_plan" || j.kind === "resume"));
     const dark = isDark(readAppearance().theme);
     const list: PaletteItem[] = [
-      ...[...byClient.values()].map((p) => ({ id: `c-${p.id}`, group: "Clients" as const, label: planName(p), hint: p.status === "pending" ? "Proposal waiting" : "Proposal approved", icon: Storefront, keywords: p.client_slug, run: () => go(`/decisions/plans/${p.id}`) })),
+      ...(clients ?? []).map((c) => ({ id: `c-${c.key}`, group: "Clients" as const, label: c.name, hint: c.path ? `${STEP_NAMES[c.path.step]} · ${c.path.clientNext}` : undefined, icon: Storefront, run: () => go(c.path?.nextAction.href ?? c.href) })),
       ...(decider ? [{ id: "a-new", group: "Actions" as const, label: "New request", hint: "N", icon: Plus, run: () => go("/projects/new") }] : []),
       ...(decider
         ? [{
@@ -258,7 +256,7 @@ export function Shell({ children }: { children: ReactNode }) {
     ];
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plans, jobs, decider, owner, detailed, toggle]);
+  }, [clients, jobs, decider, owner, detailed, toggle]);
 
   const bellLabel = unread.length ? `Notifications, ${unread.length} unread` : "Notifications";
   const initial = (me.fullName ?? me.email ?? "?").trim().charAt(0).toUpperCase();

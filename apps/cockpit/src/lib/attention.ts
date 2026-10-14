@@ -1,23 +1,36 @@
 /**
- * "Is everything OK, and what needs me?" (Blueprint §9, Step 4C Home). A pure function over rows the
- * Cockpit already reads, so it is unit-tested without a database. It never invents state: every item
- * points at a real row, and an item disappears only when the rows say it was dealt with.
+ * "What needs you" (Cockpit v2 Home) and the Notifications inbox: one list, from one source. A pure function over rows
+ * the Cockpit already reads, so it is unit-tested without a database. Client items come from each client's six-step
+ * path (lib/clients.ts, lib/path.ts); the rest are account requests, requests that never started, and other stopped
+ * work. It never invents state: every item points at a real row and disappears only when the rows say it was dealt
+ * with. Order: stopped first, then approvals, then missing details; oldest first within each.
  */
 import { isActive, isStaleQueued, isStaleRunning, type JobRow } from "../jobsClient";
-import { KIND_LABEL, LEAD_LABEL, planName, shortDate, dateTime, type AccountRequestRow, type PlanRow } from "./model";
+import { KIND_LABEL, shortDate, dateTime, type AccountRequestRow } from "./model";
 import { asStopped, diagnoseJob } from "./recovery";
+import type { ClientRow } from "./clients";
+import { KIND_OF_SITE } from "./path";
 
-export type AttentionKind = "plan" | "account" | "launch" | "ready" | "failed" | "stuck";
+export type AttentionKind = "plan" | "account" | "launch" | "ready" | "details" | "failed" | "stuck";
+export type AttentionGroup = "stopped" | "approval" | "details";
 
 export interface AttentionItem {
   key: string;
   kind: AttentionKind;
+  group: AttentionGroup;
   tone: "caution" | "stop";
-  /** A decision only a person can make (counted on the Decisions badge). */
+  /** A decision only a person can make. */
   isDecision: boolean;
+  /** Only the owner may act (proposals, the finished site, money); everyone else sees "<owner> decides this". */
+  ownerOnly: boolean;
+  /** The chip word: "Stopped", "Your approval", "Waiting for the logo". */
   label: string;
+  /** The client it is about; empty for account requests and factory housekeeping. */
+  client: string;
   title: string;
   why: string;
+  /** The one button. */
+  cta: string;
   href: string;
   at: string;
 }
@@ -50,7 +63,7 @@ export function latestBuildByPlan(jobs: JobRow[]): Map<string, JobRow> {
 }
 
 export interface AttentionInput {
-  plans: PlanRow[];
+  clients: ClientRow[];
   jobs: JobRow[];
   accounts: AccountRequestRow[];
   myId: string | null;
@@ -59,106 +72,64 @@ export interface AttentionInput {
   now?: number;
 }
 
-export function buildAttention({ plans, jobs, accounts, myId, canDecide, now = Date.now() }: AttentionInput): AttentionItem[] {
+const GROUP_ORDER: Record<AttentionGroup, number> = { stopped: 0, approval: 1, details: 2 };
+
+export function buildAttention({ clients, jobs, accounts, myId, canDecide, now = Date.now() }: AttentionInput): AttentionItem[] {
   if (!canDecide) return [];
   // An archived run was dealt with by a person (migration 0015); it never asks for attention again.
   jobs = jobs.filter((j) => !j.archived_at);
   const items: AttentionItem[] = [];
-  const planById = new Map(plans.map((p) => [p.id, p]));
-  const latest = latestBuildByPlan(jobs);
 
-  for (const p of plans.filter((x) => x.status === "pending")) {
-    const rec = p.plan.direction?.recommendation;
-    const lead = LEAD_LABEL[p.plan.plan.intake?.leadType] ?? "Request";
-    const recText = rec?.track ? `Track ${rec.track} recommended (${Math.round(rec.confidence * 100)}% sure)` : "No track recommended, you choose";
-    items.push({
-      key: `plan:${p.id}`,
-      kind: "plan",
-      tone: "caution",
-      isDecision: true,
-      label: "Your decision",
-      title: `Approve or reject the ${planName(p)} plan`,
-      why: `${lead}, ${p.entity_slug}. ${recText}. Written ${dateTime(p.created_at)}.`,
-      href: `/decisions/plans/${p.id}`,
-      at: p.created_at,
-    });
+  for (const c of clients) {
+    const p = c.path;
+    if (!p || !c.plan) continue;
+    const at = p.build?.finished_at ?? p.build?.created_at ?? c.plan.decided_at ?? c.plan.created_at;
+    if (p.state === "stopped" || (p.state === "request" && p.tone === "stop")) {
+      items.push({ key: `failed:${p.build?.id ?? c.key}`, kind: "failed", group: "stopped", tone: "stop", isDecision: false, ownerOnly: p.nextLine.startsWith("Raise the limit"), label: "Stopped", client: c.name, title: `A build stopped: ${p.diagnosis?.headline ?? "it needs a look"}`, why: `${p.nextLine}.`, cta: "See the fix", href: p.nextAction.href ?? c.href, at });
+    } else if (p.state === "proposal" && p.tone === "need") {
+      const rec = c.plan.plan.direction?.recommendation?.track;
+      const open = (c.plan.plan.plan.openQuestions?.length ?? 0) + (c.plan.plan.direction?.openQuestions?.length ?? 0);
+      const why = [rec ? `Recommended: ${KIND_OF_SITE[rec] ?? "a kind of site"}.` : "No kind of site recommended; you choose.", open ? `${open} ${open === 1 ? "question is" : "questions are"} still open.` : null].filter(Boolean).join(" ");
+      items.push({ key: `plan:${c.plan.id}`, kind: "plan", group: "approval", tone: "caution", isDecision: true, ownerOnly: true, label: "Your approval", client: c.name, title: "Approve the proposal", why, cta: "Review the proposal", href: p.nextAction.href ?? c.href, at: c.plan.created_at });
+    } else if (p.state === "ready") {
+      const ph = Array.isArray(p.build?.result?.placeholders) ? (p.build!.result!.placeholders as unknown[]).length : 0;
+      const why = `Every check passed.${ph ? ` ${ph} placeholder ${ph === 1 ? "picture is" : "pictures are"} still on the site.` : ""}`;
+      items.push({ key: `launch:${c.plan.id}`, kind: "launch", group: "approval", tone: "caution", isDecision: true, ownerOnly: true, label: "Your approval", client: c.name, title: "Approve the finished site", why, cta: "Review the site", href: p.nextAction.href ?? c.href, at });
+    } else if (p.state === "needs") {
+      const missing = p.missing.length > 0;
+      items.push({
+        key: `details:${c.plan.id}`,
+        kind: missing ? "details" : "ready",
+        group: "details",
+        tone: "caution",
+        isDecision: false,
+        ownerOnly: false,
+        label: missing ? `Waiting for ${p.missing[0]!.kind === "answer" ? "an answer" : `the ${p.missing[0]!.label.charAt(0).toLowerCase()}${p.missing[0]!.label.slice(1)}`}` : "Ready to build",
+        client: c.name,
+        title: missing ? p.clientNext : "Start the build",
+        why: p.sentence,
+        cta: missing ? "Add them" : "Start the build",
+        href: p.nextAction.href ?? c.href,
+        at,
+      });
+    }
   }
 
   for (const a of accounts.filter((x) => x.status === "pending" && x.user_id !== myId)) {
-    items.push({
-      key: `account:${a.user_id}`,
-      kind: "account",
-      tone: "caution",
-      isDecision: true,
-      label: "Your decision",
-      title: `Review the account request from ${a.full_name ?? a.email}`,
-      why: `${a.email} asked for access on ${dateTime(a.requested_at)}.`,
-      href: "/decisions/accounts",
-      at: a.requested_at,
-    });
+    items.push({ key: `account:${a.user_id}`, kind: "account", group: "approval", tone: "caution", isDecision: true, ownerOnly: false, label: "Your approval", client: "", title: `Let ${a.full_name ?? a.email} in`, why: `${a.email} asked for access on ${dateTime(a.requested_at)}.`, cta: "Review the request", href: "/team", at: a.requested_at });
   }
 
-  for (const [planId, j] of latest) {
-    const name = planName(planById.get(planId));
-    if (j.status === "succeeded" && j.result?.status === "awaiting_launch_approval") {
-      items.push({
-        key: `launch:${planId}`,
-        kind: "launch",
-        tone: "caution",
-        isDecision: true,
-        label: "Your decision",
-        title: `Decide on launching the ${name} build`,
-        why: `Passed every check on ${dateTime(j.finished_at ?? j.created_at)}. Nothing is published until you launch it outside the Cockpit.`,
-        href: `/activity/${j.id}`,
-        at: j.finished_at ?? j.created_at,
-      });
-    } else if (j.status === "failed" || isStaleRunning(j, now)) {
-      const dg = diagnoseJob(asStopped(j, now), jobs.filter((x) => planIdOfJob(x, jobs) === planId), { planId });
-      items.push({
-        key: `failed:${j.id}`,
-        kind: "failed",
-        tone: "stop",
-        isDecision: false,
-        label: dg.cause === "info" ? "Needs your input" : dg.actor === "huraira" ? "With the technical team" : "Needs fixing",
-        title: dg.cause === "info" ? `The ${name} build needs a few details from you` : `The ${name} build stopped: ${dg.headline}`,
-        why: `${KIND_LABEL[j.kind]}, ${dateTime(j.created_at)}. ${dg.carryOn === "continue" ? "Open it: one button carries on from the saved step." : "Open it to see what to do."}`,
-        href: `/activity/${j.id}`,
-        at: j.created_at,
-      });
-    }
+  // Builds of a proposal the viewer has no client row for (an old or superseded proposal), and other work that stopped.
+  const known = new Set(clients.map((c) => c.plan?.id).filter(Boolean) as string[]);
+  for (const [planId, j] of latestBuildByPlan(jobs)) {
+    if (known.has(planId) || !(j.status === "failed" || isStaleRunning(j, now))) continue;
+    const dg = diagnoseJob(asStopped(j, now), jobs.filter((x) => planIdOfJob(x, jobs) === planId), { planId });
+    items.push({ key: `failed:${j.id}`, kind: "failed", group: "stopped", tone: "stop", isDecision: false, ownerOnly: false, label: "Stopped", client: "", title: `A build stopped: ${dg.headline}`, why: `${dateTime(j.created_at)}. Open it to see what to do.`, cta: "See the fix", href: `/activity/${j.id}`, at: j.created_at });
   }
-
-  for (const p of plans.filter((x) => x.status === "approved" && x.build_track)) {
-    const everBuilt = jobs.some((j) => BUILD_KINDS.has(j.kind) && j.status !== "cancelled" && planIdOfJob(j, jobs) === p.id);
-    if (!everBuilt) {
-      items.push({
-        key: `ready:${p.id}`,
-        kind: "ready",
-        tone: "caution",
-        isDecision: false,
-        label: "Ready to build",
-        title: `Start the build for ${planName(p)}`,
-        why: `Approved as Track ${p.build_track}${p.decided_at ? ` on ${shortDate(p.decided_at)}` : ""}. Building and checking takes a few minutes; nothing is published.`,
-        href: `/decisions/plans/${p.id}`,
-        at: p.decided_at ?? p.created_at,
-      });
-    }
-  }
-
   for (const j of jobs) {
     if (BUILD_KINDS.has(j.kind) || j.status !== "failed") continue;
     if (now - new Date(j.created_at).getTime() > RECENT_FAILURE_MS) continue;
-    items.push({
-      key: `failed:${j.id}`,
-      kind: "failed",
-      tone: "stop",
-      isDecision: false,
-      label: "Needs fixing",
-      title: `${KIND_LABEL[j.kind]} failed: ${diagnoseJob(j).headline}`,
-      why: `${dateTime(j.created_at)}. Open it to see what to do.`,
-      href: `/activity/${j.id}`,
-      at: j.created_at,
-    });
+    items.push({ key: `failed:${j.id}`, kind: "failed", group: "stopped", tone: "stop", isDecision: false, ownerOnly: false, label: "Stopped", client: "", title: `${KIND_LABEL[j.kind]} stopped: ${diagnoseJob(j).headline}`, why: `${dateTime(j.created_at)}. Open it to see what to do.`, cta: "See the fix", href: `/activity/${j.id}`, at: j.created_at });
   }
 
   const stuck = jobs.filter((j) => isStaleQueued(j, now));
@@ -168,31 +139,21 @@ export function buildAttention({ plans, jobs, accounts, myId, canDecide, now = D
     items.push({
       key: "stuck",
       kind: "stuck",
+      group: "stopped",
       tone: "stop",
       isDecision: false,
-      label: "Needs tidying",
+      ownerOnly: false,
+      label: "Stopped",
+      client: "",
       title: stuck.length === 1 ? "1 request never started" : `${stuck.length} requests never started`,
-      why: `Created ${shortDate(oldest.created_at)}, never reached GitHub. Start ${them} again or close ${them}.`,
+      why: `Sent ${shortDate(oldest.created_at)}, but it never started. Start ${them} again or close ${them}.`,
+      cta: stuck.length === 1 ? "Open it" : "Open them",
       href: stuck.length === 1 ? `/activity/${stuck[0]!.id}` : "/activity?show=stuck",
       at: oldest.created_at,
     });
   }
 
-  return items.sort((a, b) => a.at.localeCompare(b.at));
-}
-
-/** The Home status line: one sentence that answers "is everything OK?". */
-export function statusLine(items: AttentionItem[]): string {
-  const decisions = items.filter((i) => i.isDecision).length;
-  const problems = items.filter((i) => i.tone === "stop").length;
-  const ready = items.filter((i) => i.kind === "ready").length;
-  const d = decisions === 1 ? "1 decision is waiting for you" : `${decisions} decisions are waiting for you`;
-  const p = problems === 1 ? "1 thing needs fixing" : `${problems} things need fixing`;
-  if (decisions && problems) return `${d}, and ${p}.`;
-  if (decisions) return `${d}.`;
-  if (problems) return `${p}.`;
-  if (ready) return ready === 1 ? "1 build is ready to start." : `${ready} builds are ready to start.`;
-  return "Nothing needs you right now.";
+  return items.sort((a, b) => GROUP_ORDER[a.group] - GROUP_ORDER[b.group] || a.at.localeCompare(b.at));
 }
 
 export function runningJobs(jobs: JobRow[], now = Date.now()): JobRow[] {

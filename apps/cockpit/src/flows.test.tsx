@@ -42,10 +42,12 @@ const mainNav = () => screen.getAllByRole("navigation", { name: "Main navigation
 describe("Home answers 'is everything OK, and what needs me?'", () => {
   it("leads with one sentence and lists what needs a person", async () => {
     start();
-    expect(await screen.findByRole("heading", { level: 1, name: "3 decisions are waiting for you, and 1 thing needs fixing." }, T)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Approve or reject the Summit Line Roofing Website plan" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Decide on launching the Summit Line Roofing Website build" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "1 request never started" })).toBeInTheDocument();
+    // v2: a greeting and the count, then "What needs you" in order: stopped, then approvals, each with one button.
+    expect(await screen.findByRole("heading", { level: 1, name: /^Good (morning|afternoon|evening), Test\. Four things need you\.$/ }, T)).toBeInTheDocument();
+    const list = within(screen.getByRole("region", { name: "What needs you" })).getAllByRole("listitem");
+    expect(list.map((li) => li.querySelector(".t-item")?.textContent)).toEqual(["1 request never started", "Approve the proposal", "Approve the finished site", "Let Sample Applicant in"]);
+    expect(screen.getByRole("link", { name: "Review the proposal: Summit Line Roofing" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Review the site: Northlight Signs" })).toBeInTheDocument();
     // v2: the Home nav item carries the count of everything that needs a person (3 decisions + 1 stuck request).
     expect(within(mainNav()).getByRole("link", { name: "Home 4 waiting" })).toBeInTheDocument();
   });
@@ -61,7 +63,7 @@ describe("Home answers 'is everything OK, and what needs me?'", () => {
 
   it("hides owner/admin controls from a PM", async () => {
     start("/", "pm");
-    expect(await screen.findByRole("heading", { level: 1, name: "Your projects" }, T)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Welcome, Test." }, T)).toBeInTheDocument();
     expect(within(mainNav()).queryByRole("link", { name: /Decisions/ })).toBeNull();
     expect(screen.queryByRole("link", { name: /New request/ })).toBeNull();
     expect(within(mainNav()).queryByRole("link", { name: /Costs/ })).toBeNull();
@@ -81,7 +83,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
 
   it("approve a plan as the recommended track (2 clicks)", async () => {
     const t = start();
-    await t.click(await screen.findByRole("link", { name: "Approve or reject the Summit Line Roofing Website plan" }, T));
+    await t.click(await screen.findByRole("link", { name: "Review the proposal: Summit Line Roofing" }, T));
     await t.click(await screen.findByRole("button", { name: "Approve as Track A" }, T));
     const update = t.calls().find((c) => c.op === "update" && c.table === "plan_approvals");
     expect(update?.values).toEqual({ status: "approved", decision_note: null, build_track: "A" });
@@ -107,7 +109,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
 
   it("approve on the other track (3 clicks), and it says the override is recorded", async () => {
     const t = start();
-    await t.click(await screen.findByRole("link", { name: "Approve or reject the Summit Line Roofing Website plan" }, T));
+    await t.click(await screen.findByRole("link", { name: "Review the proposal: Summit Line Roofing" }, T));
     await t.click(await screen.findByRole("radio", { name: /Track B/ }, T));
     expect(screen.getByText(/against the recommendation/)).toBeInTheDocument();
     await t.click(screen.getByRole("button", { name: "Approve as Track B" }));
@@ -117,7 +119,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
 
   it("refuses to reject without a note, then rejects with one (2 clicks)", async () => {
     const t = start();
-    await t.click(await screen.findByRole("link", { name: "Approve or reject the Summit Line Roofing Website plan" }, T));
+    await t.click(await screen.findByRole("link", { name: "Review the proposal: Summit Line Roofing" }, T));
     await t.user.click(await screen.findByRole("button", { name: "Reject with note" }, T));
     expect(screen.getByText(/Write a note before rejecting/)).toBeInTheDocument();
     expect(t.calls().some((c) => c.op === "update")).toBe(false);
@@ -261,7 +263,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
 
   it("approve an account request with a role (2 clicks and a role choice)", async () => {
     const t = start();
-    await t.click(await screen.findByRole("link", { name: "Review the account request from Sample Applicant" }, T));
+    await t.click(await screen.findByRole("link", { name: "Review the request" }, T));
     await t.user.selectOptions(await screen.findByLabelText("Role", {}, T), "admin");
     await t.click(screen.getByRole("button", { name: "Approve" }));
     expect(t.calls()).toContainEqual({ op: "rpc", name: "decide_account_request", args: { p_user_id: "00000000-0000-4000-8000-0000000000bb", p_decision: "approve", p_role: "admin", p_note: null } });

@@ -131,6 +131,12 @@ export function derivePath(input: PathInput): PathResult {
     chipWord: r.tone === "need" ? `Waiting on ${r.waitingOn === "you" ? me : r.waitingOn}` : r.tone === "run" ? "Running" : r.tone === "stop" ? "Stopped" : r.tone === "done" ? "Done" : "Waiting",
   });
 
+  // 5 Live: an owner recorded it live (the project reached the launch stage; only that action sets it). Checked first:
+  // it holds even when the viewer cannot read the proposal.
+  const build = plan ? latestBuild(plan.id, jobs) : null;
+  if (project && STAGES.indexOf(project.stage as (typeof STAGES)[number]) >= LIVE_FROM)
+    return done({ step: 5, state: "live", tone: "done", waitingOn: "nobody", sentence: "Launched by a person, outside the Cockpit.", nextLine: "Nothing. The site is live.", nextAction: { label: "See activity", href: "/activity" }, clientNext: "Live", build });
+
   // 0 Request: nothing written yet.
   if (!plan) {
     if (intake && isActive(intake, now))
@@ -143,11 +149,6 @@ export function derivePath(input: PathInput): PathResult {
   }
 
   const planHref = `/decisions/plans/${plan.id}`;
-  const build = latestBuild(plan.id, jobs);
-
-  // 5 Live: an owner recorded it live (the project reached the launch stage; only that action sets it).
-  if (project && STAGES.indexOf(project.stage as (typeof STAGES)[number]) >= LIVE_FROM)
-    return done({ step: 5, state: "live", tone: "done", waitingOn: "nobody", sentence: "Launched by a person, outside the Cockpit.", nextLine: "Nothing. The site is live.", nextAction: { label: "See activity", href: "/activity" }, clientNext: "Live", build });
 
   // 1 Proposal: waiting for a decision, or a new one is being written.
   const writing = jobs.find((j) => PROPOSAL_KINDS.has(j.kind) && planIdOf(j) === plan.id && isActive(j, now));

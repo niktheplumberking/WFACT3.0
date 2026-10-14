@@ -454,3 +454,55 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
   /* above the phone tab bar */
   .toasts { left: 16px; right: 16px; width: auto; bottom: calc(88px + env(safe-area-inset-bottom)); }
 }
+
+/* ---------- Home (v2) ---------- */
+.home { display: grid; gap: 44px; }
+.home-head { display: grid; gap: 12px; max-width: 780px; }
+.home-head .t-display { text-wrap: balance; }
+.home-head .t-lead { max-width: 60ch; }
+.home-foot { margin: 0; }
+.home-foot a { color: var(--ink-2); }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.quiet-link { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; color: var(--ink); text-underline-offset: 3px; }
+.need-list { list-style: none; margin: 0; padding: 0; }
+.need { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; padding: var(--row) 0; border-bottom: 1px solid var(--line); }
+.need-n { width: 20px; align-self: flex-start; padding-top: 6px; font: 600 13px/1 var(--face-figure); color: var(--ink-3); }
+.need-main { flex: 1 1 300px; min-width: 0; display: grid; gap: 6px; }
+.need-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.need-why { font-size: var(--fs-label); text-wrap: pretty; }
+.need-cta { margin-left: 44px; }
+.need-cta.btn { min-height: 46px; white-space: nowrap; }
+.home-clear { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; padding: 28px; border-radius: 16px; background: var(--done-w); }
+.home-clear > svg { width: 34px; height: 34px; color: var(--done); flex-shrink: 0; }
+.home-clear > div { flex: 1 1 280px; display: grid; gap: 4px; }
+.home-empty { display: grid; gap: 16px; justify-items: start; padding: 40px 0; border-top: 1px solid var(--line); max-width: 620px; }
+.home-empty .empty-title { font: 400 28px/1.2 var(--face-display); }
+.overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+.card { background: var(--sheet); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.running { display: grid; gap: 14px; }
+.running + .running { border-top: 1px solid var(--line); padding-top: 14px; }
+.running .btn { justify-self: start; }
+.figures { margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+.figures dt { font-size: 13px; color: var(--ink-3); }
+.figures dd { margin: 0; }
+.spend-line { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.spend-big { font: 400 44px/1 var(--face-display); }
+.meter { position: relative; height: 10px; border-radius: var(--r-pill); background: var(--sunk); overflow: hidden; }
+.meter > span { position: absolute; inset: 0 auto 0 0; background: var(--ink); border-radius: var(--r-pill); transition: width var(--d-bar) var(--ease-out); }
+.client-list { list-style: none; margin: 0; padding: 0; }
+.client-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px; padding: var(--row) 0; border-top: 1px solid var(--line); }
+.client-name { flex: 1 1 220px; min-width: 0; }
+.client-name a { display: inline-flex; align-items: center; min-height: var(--target); font-weight: 600; font-size: 17px; color: var(--ink); text-decoration: none; }
+.client-name a:hover { text-decoration: underline; }
+.client-step { flex: 2 1 260px; display: grid; gap: 7px; }
+.client-next { flex: 1 1 200px; display: flex; align-items: center; gap: 10px; justify-content: space-between; flex-wrap: wrap; }
+.skel-list { display: grid; gap: 14px; }
+.skel-row { display: grid; gap: 10px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+.skel { border-radius: 6px; background: var(--sunk); } /* no shimmer: nothing decorative loops */
+@media (max-width: 900px) {
+  /* phone: number beside the words, the one button under them; the layout note is desktop-only (design) */
+  .need { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 10px 14px; }
+  .need-cta { grid-column: 2; margin-left: 0; justify-self: start; }
+  .home-foot { display: none; }
+}
