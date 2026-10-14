@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-15 (00:30 +05), via `/step-close 28` (Package 4 phase 7): `9513166` New request. CI `38593657465` (`b3a3707`, phases 3–4) green on every job incl. the deploy: the new shell and the six-step path are live. CI `38595375699` (`c02d125`, Home) and `38596185659` (`32d1e91`, Projects) still running at sync. Cockpit 217/217 locally.
+Last synced: 2026-10-15 (01:20 +05), via `/step-close 28` (Package 4 phase 8): `fd7a08a` the client's page. Cockpit 224/224 locally; CI for the latest pushes not re-checked at this sync.
+Previous sync: 2026-10-15 (00:30 +05), via `/step-close 28` (Package 4 phase 7): `9513166` New request. CI `38593657465` (`b3a3707`, phases 3–4) green on every job incl. the deploy: the new shell and the six-step path are live. CI `38595375699` (`c02d125`, Home) and `38596185659` (`32d1e91`, Projects) still running at sync. Cockpit 217/217 locally.
 Previous sync: 2026-10-14 (23:40 +05), via `/step-close 28` (Package 4 phase 6): Projects. CI for `b3a3707` (`38593657465`) and `c02d125` (`38595375699`) still running at sync (Rendered QA); the deploy of phases 3–5 is not yet confirmed. Cockpit 212/212 locally.
 Previous sync: 2026-10-14 (23:00 +05), via `/step-close 28` (Package 4 phase 5): `00ec210` (Home). CI `38593657465` on `b3a3707`: the Cockpit job passed (the sign-out race fix works on CI); Rendered QA still running at sync, so the deploy of phases 3–4 is not yet confirmed. Cockpit 205/205 locally.
 Previous sync: 2026-10-14 (22:20 +05), via `/step-close 28` (Package 4 phase 4): `fd020a5` (`lib/path.ts`) and a test fix. CI `38591851925` on `a87e6db` (phase 3) FAILED in the Cockpit job: the sign-out test read the button before the lazily loaded Settings page appeared; fixed by waiting for it (197/197 three runs locally). Phase 3 therefore did not deploy; the live Cockpit still serves phases 1–2. Re-push CI pending.
@@ -37,7 +38,10 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-15, 00:30 +05, `/step-close 28`)**:
+**Status summary (2026-10-15, 01:20 +05, `/step-close 28`)**:
+- **Step 28 IN PROGRESS**: Package 4 is 8 phases in. The client's page is rebuilt: the six-step strip with one next action, the proposal, details and files, every build, cost so far (owner), and a decisions timeline from the real audit trail in plain words. Next: Proposal review. Waiting on Nick: caps, three role rules, where a site approval is recorded.
+
+**Status summary (2026-10-15, 00:30 +05, `/step-close 28`, superseded)**:
 - **Step 28 IN PROGRESS**: Package 4 is 7 phases in; the new shell is live. New request is rebuilt: the client's words, business name, live address, logo drop zone, and a send button that confirms the rough cost first. Next: the Project page. Waiting on Nick: caps, three role rules, and where a site approval is recorded.
 
 **Status summary (2026-10-14, 23:40 +05, `/step-close 28`, superseded)**:
@@ -100,7 +104,12 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-15, 00:30 +05):
+**Next up** (2026-10-15, 01:20 +05):
+1. **Huraira**: review the Step 28 Package 4 phase 8 report (the client's page); GO for Proposal review. Confirm CI green on the latest pushes.
+2. **Nick**: the caps conflict, three role conflicts, and the missing site-approval record, `BLOCKED-ON-NICK.md`.
+3. **Nick**: the Bennett & Co brief (Step 25).
+
+**Next up** (2026-10-15, 00:30 +05, superseded):
 1. **Huraira**: review the Step 28 Package 4 phase 7 report (New request); GO for the Project page. Confirm the two running CI runs end green.
 2. **Nick**: the caps conflict, three role conflicts, and the missing site-approval record, `BLOCKED-ON-NICK.md`.
 3. **Nick**: the Bennett & Co brief (Step 25).
@@ -168,6 +177,7 @@ Earlier list (2026-10-12 morning):
 After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bundle, Health room). Deferred: Steps 15, 16, 24; e-commerce out of scope.
 
 **Gaps noticed**:
+- Cockpit v2 (Step 28 P4): the design's "Test client" badge has no data source (no test flag on clients or projects); not shown until one exists.
 - Cockpit v2 (Step 28 P4): no table or column records a site approval, so "Approved, waiting for launch" cannot be reached; logged for Nick, then Huraira (needed by phase 9).
 - Cockpit v2 (Step 28 P4): three role rules in the design are wider than RLS allows (PM Activity, admin Costs, PM cost so far on project pages); the UI follows RLS; logged for Nick, then Huraira (policies plus attack tests).
 - Cockpit v2 (Step 28 P4): the design's caps ($2.00 per build, $20 a month, monthly cap stops new builds only) disagree with the live caps ($5 per build, $20 per rolling 7 days, checked before every call); logged for Nick. Until he decides the Cockpit reads `spend-caps.json`.
@@ -1244,7 +1254,8 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 - [x] P4 phase 7, New request (`9513166`): `newrequest.test.tsx` 5; intake flow test confirms the cost; 217/217; axe 0 light/dark 1440/375 and with the confirm open; keyboard run. Money confirm added (hard rule). Deviation kept: "Re-check a built page". Fixed: button class `page` collided with the main wrapper.
 - [ ] P4 phases 5–6 CI: `38595375699` (`c02d125`) and `38596185659` (`32d1e91`) running at sync.
 - [x] P4 phase 6, Projects (`2cd7f6b`): `pages/Work.tsx` Projects; `projects.test.tsx` 7 tests, Cockpit 212/212; axe 0 grid/list, light/dark, 1440/375; `scrollWidth` 375. Deviation kept with reason: the hand-add client/project form (needed before "Record that it is live").
-- [ ] P4 remaining screens: Project page, Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications preferences (Home, Projects, New request, Project, Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications); Lighthouse a11y ≥ 95 per room; banned-word DOM grep.
+- [x] P4 phase 8, the client's page (`fd7a08a`): `client.test.tsx` 7; 224/224; axe 0 light/dark 1440/375; decisions timeline from the audit trail via `lib/phrases.ts`. Not shown: "Test client" badge (no data source).
+- [ ] P4 remaining screens: Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications preferences (Home, Projects, New request, Project, Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications); Lighthouse a11y ≥ 95 per room; banned-word DOM grep.
 - [ ] Package 5 (paid Lanternworks proof).
 
 **Verification**: suites green locally (frontend-loop 115, planning 42, jobs 33, workflow 42, verification 113, agent-runtime 39, hermes 55, rendered-qa 79, Cockpit 123); typecheck clean. Independent agent review: 6 defects in the new checks, all fixed with tests that failed first. Not pushed, so no CI run; no live build (Package 1 forbids one).
