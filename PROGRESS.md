@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-15 (04:10 +05), via `/step-close 28` (Package 4 phase 12): `a94eb6f` Stopped build. Cockpit 243/243 locally; CI for the latest pushes not re-checked at this sync.
+Last synced: 2026-10-15 (04:50 +05), via `/step-close 28` (Package 4 phase 13): `a01dbbf` Finished site review. Cockpit 248/248 locally; CI for the latest pushes not re-checked at this sync.
+Previous sync: 2026-10-15 (04:10 +05), via `/step-close 28` (Package 4 phase 12): `a94eb6f` Stopped build. Cockpit 243/243 locally; CI for the latest pushes not re-checked at this sync.
 Previous sync: 2026-10-15 (03:20 +05), via `/step-close 28` (Package 4 phase 11): `99ba999` Live build. Cockpit 227/227 locally; CI for the latest pushes not re-checked at this sync.
 Previous sync: 2026-10-15 (02:40 +05), via `/step-close 28` (Package 4 phase 10): `5a96bb2` What the site still needs. Cockpit 227/227 locally; CI for the latest pushes not re-checked at this sync.
 Previous sync: 2026-10-15 (02:00 +05), via `/step-close 28` (Package 4 phase 9): `74e1384` Proposal review. CI `38595375699` (Home) and `38596185659` (Projects) green incl. the deploy: phases 5–6 are live. Cockpit 225/225 locally.
@@ -42,7 +43,10 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-15, 04:10 +05, `/step-close 28`)**:
+**Status summary (2026-10-15, 04:50 +05, `/step-close 28`)**:
+- **Step 28 IN PROGRESS**: Package 4 is 13 phases in. A passing build now opens as the finished site review (the site, placeholder pictures, the owner's launch tick, readiness); approving is switched off until there is somewhere to record it. Next: Activity. Waiting on Nick: caps, role rules, the site-approval record, the logo rule, the stop-view actions, Ask for changes.
+
+**Status summary (2026-10-15, 04:10 +05, `/step-close 28`, superseded)**:
 - **Step 28 IN PROGRESS**: Package 4 is 12 phases in. A stopped build now says which of the 8 cases it is, what was spent, what the factory tried and the one fix, with every paid move confirmed. Next: Finished site review. Waiting on Nick: caps, three role rules, the site-approval record, the logo rule, the stop-view actions.
 
 **Status summary (2026-10-15, 03:20 +05, `/step-close 28`, superseded)**:
@@ -120,7 +124,12 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-15, 04:10 +05):
+**Next up** (2026-10-15, 04:50 +05):
+1. **Huraira**: review the Step 28 Package 4 phase 13 report; GO for Activity. Also: an owner check on `launch.placeholders_ok` in the database (BLOCKED-ON-NICK).
+2. **Nick**: caps, role conflicts, the site-approval record, the logo-before-build rule, the stop-view actions, Ask for changes (`BLOCKED-ON-NICK.md`).
+3. **Nick**: the Bennett & Co brief (Step 25).
+
+**Next up** (2026-10-15, 04:10 +05, superseded):
 1. **Huraira**: review the Step 28 Package 4 phase 12 report; GO for Finished site review.
 2. **Nick**: caps, three role conflicts, the site-approval record, the logo-before-build rule, the stop-view actions (`BLOCKED-ON-NICK.md`).
 3. **Nick**: the Bennett & Co brief (Step 25).
@@ -1295,6 +1304,7 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 - [x] P4 phase 10, What the site still needs (`5a96bb2`): 227/227; axe 0 light/dark 1440/375; logo gate, money confirm, owner-only launch tick.
 - [x] P4 phase 11, Live build (`99ba999`): 227/227; axe 0 at 1440 and 375. Not done here: Spent so far, phone toggle.
 - [x] P4 phase 12, Stopped build, 8 cases (`a94eb6f`): 243/243; axe 0 at 1440 and 375. Not done here: see BLOCKED-ON-NICK (stop-view actions).
+- [x] P4 phase 13, Finished site review (`a01dbbf`): 248/248; axe 0 at 1440 and 375. Approve is off (no record); Ask for changes not offered.
 - [ ] P4 remaining screens: Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications preferences (Home, Projects, New request, Project, Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications); Lighthouse a11y ≥ 95 per room; banned-word DOM grep.
 - [ ] Package 5 (paid Lanternworks proof).
 

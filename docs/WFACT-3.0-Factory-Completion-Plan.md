@@ -1363,7 +1363,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–12 built, 1–6 CI-green and deployed
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–13 built, 1–6 CI-green and deployed
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1415,7 +1415,7 @@ Track A 1.4.0, content `track-b/2` and `track-a/2`, both upgraded from v1 on rea
   workflow 44, jobs 34, planning 42, Cockpit 124 plus build. Screenshots at 1440 and 375.
 - Not done: no live build; an uploaded image's real use in a paid build is proven only in Package 5.
 
-**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–12 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
+**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–13 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
 every job and deployed, live Cockpit serves v2, `theme-color #F4F2ED`, HTTP 200; `8532f4e` phase 3 pushed in `a87e6db`, whose CI
 `38591851925` FAILED in the Cockpit job on a test race (sign-out test read the button before the lazy Settings page loaded), fixed in
 the test; `fd020a5` phase 4, pushed in `b3a3707`, CI `38593657465` green on every job and deployed (phases 3–4 live); `00ec210`
@@ -1486,13 +1486,17 @@ phase 5 and `2cd7f6b` phase 6 pushed, CI `38595375699` and `38596185659` running
   mapped from diagnoseJob(), facts (money only from records, owners only), checks that still fail, who acts, The fix, Why?.
   Every paid move confirms its cost. Not done (BLOCKED-ON-NICK): sending Nick a note (it is copied), the owner's per-build
   limit raise, quiet options with nothing behind them, a screenshot per stop. 243 tests; axe 0.
+- Phase 13 Finished site review (`a01dbbf`): `components/SiteReview.tsx` on the newest passing build: chips, title, the
+  site, placeholder pictures, owner-only launch tick, readiness line, Technical details, sticky bar. Not done
+  (BLOCKED-ON-NICK): "Approve the site" is off (no approval record); "Ask for changes" not offered (no runner input);
+  the tick is owner-only in the UI but not in the database. 248 tests; axe 0.
 - Not done: the remaining screens ( Project page, Proposal, Needs, Live build, Stopped, Finished site, Activity,
   Costs, Team, Settings, Notifications preferences); no Lighthouse run yet.
 
-**Next action**: Huraira reviews the Package 4 phase 12 report (Stopped build) and gives GO for the next screen (Finished site review).
+**Next action**: Huraira reviews the Package 4 phase 13 report (Finished site review) and gives GO for the next screen (Activity).
 Confirm CI green on the latest push. Nick answers the caps, role and site-approval questions. Package 5: see the source doc.
 
-Continuation prompt — updated 2026-10-15, after phase 12 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
+Continuation prompt — updated 2026-10-15, after phase 13 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
 ```
 You are a senior front-end engineer in the WFACT 3.0 monorepo, branch huraira-work. Read CLAUDE.md, then
 docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md (the full brief: hard rules, locked decisions, tokens,
@@ -1526,7 +1530,7 @@ ALREADY DONE (do not redo):
   of site; rejected and pre-track proposals still use the pre-v2 AfterDecision.
 
 LEFT, in order (each a separate commit, then /step-close 28 and STOP for GO):
-5–9. Screens in the brief's order (§6), starting at 9. Finished site review (Home, Projects, New request, the client's page,
+5–9. Screens in the brief's order (§6), starting at 10. Activity (Finished site review a01dbbf,  Home, Projects, New request, the client's page,
    Proposal review, Needs, Stopped build a94eb6f, Live build 99ba999 done; the site approval has no record yet, see BLOCKED-ON-NICK), each with empty, loading, running, waiting, stopped and success states; the 8 stop
    cases mapped to diagnoseJob().cause; owner-only gates; PM view.
 Every phase: npm test green; screenshots at 1440x900 and 375x812, light and dark, beside the matching frame in
