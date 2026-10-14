@@ -8,7 +8,6 @@
  * No technical words on the surface; the raw error and run ids stay in Technical details on the run page.
  */
 import { useEffect, useId, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { ArrowClockwise, Check, ClipboardText, Warning } from "@phosphor-icons/react";
 import { requestJob, type JobRow } from "../jobsClient";
 import { SLOTS, fetchPlanInputs, savePlanInputs, type NewInput, type PlanInputRow } from "../lib/inputs";
@@ -28,6 +27,27 @@ interface FieldState {
   /** A file need (the logo): the uploaded record, saved as the input's value. */
   logo?: LogoRecord | null;
 }
+
+/** The logo record saved as a plan input's value (JSON), or null when it is not one. */
+function savedLogo(value: string | null): LogoRecord | null {
+  if (!value) return null;
+  try {
+    const v = JSON.parse(value) as LogoRecord;
+    return typeof v?.path === "string" && typeof v?.sha256 === "string" ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The logo as a detail the owner can add (plan_inputs key asset.logo, migration 0021). */
+export const LOGO_NEED: Need = {
+  key: "asset.logo",
+  label: "Client's logo",
+  hint: "SVG, PNG or WebP, up to 512 KB. It goes in the header, footer and browser tab exactly as supplied.",
+  multiline: false,
+  why: "",
+  kind: "file",
+};
 
 export function slotAsNeed(key: string): Need | null {
   const s = SLOTS.find((x) => x.key === key);
@@ -68,7 +88,12 @@ export function DetailsForm({
       const next: Record<string, FieldState> = {};
       for (const n of needs) {
         const c = byKey.get(n.key);
-        next[n.key] = prev[n.key] ?? { value: c && !c.waived ? (c.value ?? "") : "", skip: !!c?.waived };
+        next[n.key] = prev[n.key] ?? {
+          value: c && !c.waived && n.kind !== "file" ? (c.value ?? "") : "",
+          skip: !!c?.waived,
+          // A logo already added to this plan shows as added (not as an empty upload asking for it again).
+          ...(n.kind === "file" ? { logo: c && !c.waived ? savedLogo(c.value) : null } : {}),
+        };
       }
       return next;
     });
@@ -90,7 +115,9 @@ export function DetailsForm({
         if (!was?.waived) rows.push({ kind: n.kind === "answer" ? "answer" : "fact", key: n.key, label: n.label, value: null, waived: true });
       } else if (n.kind === "file") {
         // The uploaded record (path and fingerprint), checked again by the database and by the build.
-        if (f.logo) rows.push({ kind: "fact", key: n.key, label: n.label, value: JSON.stringify(f.logo), waived: false });
+        if (f.logo && (was?.waived || savedLogo(was?.value ?? null)?.sha256 !== f.logo.sha256)) {
+          rows.push({ kind: "fact", key: n.key, label: n.label, value: JSON.stringify(f.logo), waived: false });
+        }
       } else if (value) {
         if (was?.waived || (was?.value ?? "") !== value) rows.push({ kind: n.kind === "answer" ? "answer" : "fact", key: n.key, label: n.label, value, waived: false });
       }
@@ -208,7 +235,6 @@ export function RecoveryPanel({
   const open = d.cause === "info" && planId ? unansweredNeeds(d.needs, current) : [];
   // The logo is uploaded in the same form now, so every need, file or text, is answered in one place.
   const formNeeds = open;
-  const fileNeeds = d.cause === "info" && !planId ? d.needs.filter((n) => n.kind === "file") : [];
   const resultStatus = typeof job.result?.status === "string" ? (job.result.status as string) : null;
   const options = continueOptions({
     haltStatus: timeline.haltStatus ?? resultStatus,
@@ -289,11 +315,6 @@ export function RecoveryPanel({
         </Notice>
       )}
 
-      {fileNeeds.length > 0 && (
-        <Notice tone="caution" title={`${fileNeeds.map((n) => n.label).join(", ")} needed.`}>
-          Files are added on the plan page. {planId ? <Link to={`/decisions/plans/${planId}`}>Open the plan to add it</Link> : "Open the plan to add it"}, then come back here and continue.
-        </Notice>
-      )}
 
       {askFirst && (
         <div className="stack-tight">
@@ -320,7 +341,7 @@ export function RecoveryPanel({
       )}
 
       {d.cause === "info" && !planId && (
-        <Notice tone="caution">The factory needs details, but this run isn't linked to a plan, so they can't be saved here. Open the plan and add them there.</Notice>
+        <Notice tone="caution">The factory needs details (or the logo), but this run isn't linked to a plan, so they can't be saved here. Open the plan, add them under "Details you can add before building", then start the build from there.</Notice>
       )}
 
       {err && (
@@ -448,6 +469,7 @@ export function BeforeBuild({ planId, questions, onChanged }: { planId: string; 
   const inputs = useLoad(() => fetchPlanInputs(planId), [planId]);
   const needs: Need[] = useMemo(
     () => [
+      LOGO_NEED,
       ...SLOTS.map((s) => ({ key: s.key, label: s.label, hint: s.hint, multiline: s.multiline, why: "", kind: "fact" as const })),
       ...questions.map((q, i) => ({
         key: questionKey(i),

@@ -27,6 +27,24 @@
         "packages/frontend-loop/starters/track-b/out"
       ],
       "port": 4321
+    },
+    {
+      "name": "cockpit-fixtures",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "VITE_SUPABASE_URL=http://127.0.0.1:9",
+        "VITE_SUPABASE_ANON_KEY=dev-fixture-not-a-key",
+        "npm",
+        "--prefix",
+        "apps/cockpit",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "5174",
+        "--strictPort"
+      ],
+      "port": 5174
     }
   ]
 }
