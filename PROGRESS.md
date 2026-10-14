@@ -1064,7 +1064,7 @@ that fixes it and continues from where it left off; when something is missing, a
 
 ## Step 21 — Housekeeping (PARTIAL 2026-10-12 — launch files (MVP M5) built in `9968019`; verification pending)
 
-- [ ] **Intake logo and live address (D4 Tier 2 slice, 2026-10-14)**: built in `8b3caed` and `a444a3d` (local, not pushed). Evidence: brandAsset tests 10, workflow readiness/continue tests 8, jobs 4, planning 1, Cockpit logo checks 9; a real isolated Track B build with the logo passes; migration 0021 dry run 28/28 on the live database, rolled back, nothing persisted (SQL-checked). Not done: 0021 applied, CI, a live build with a logo.
+- [ ] **Intake logo and live address (D4 Tier 2 slice, 2026-10-14)**: built in `8b3caed` and `a444a3d` (local, not pushed). Evidence: brandAsset tests 10, workflow readiness/continue tests 8, jobs 4, planning 1, Cockpit logo checks 9; a real isolated Track B build with the logo passes; migration 0021 dry run 28/28 on the live database, rolled back, nothing persisted (SQL-checked). Independent review: 1 HIGH (SVG `<x:script>` bypass) and 5 MEDIUM, fixed in `9597103`. Not done: 0021 applied, CI, a live build with a logo.
 
 Governed by the Factory Completion Plan Step 21 sub-item I (second half), pulled forward as MVP item M5 by Decision D3
 (`docs/MVP-CUTLINE.md` §2). The other sub-items stay deferred until the MVP ships; A and G were done in the 2026-10-07 alignment pass.
