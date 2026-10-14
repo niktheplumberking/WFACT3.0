@@ -1363,7 +1363,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–10 built, 1–6 CI-green and deployed
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–11 built, 1–6 CI-green and deployed
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1415,7 +1415,7 @@ Track A 1.4.0, content `track-b/2` and `track-a/2`, both upgraded from v1 on rea
   workflow 44, jobs 34, planning 42, Cockpit 124 plus build. Screenshots at 1440 and 375.
 - Not done: no live build; an uploaded image's real use in a paid build is proven only in Package 5.
 
-**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–10 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
+**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–11 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
 every job and deployed, live Cockpit serves v2, `theme-color #F4F2ED`, HTTP 200; `8532f4e` phase 3 pushed in `a87e6db`, whose CI
 `38591851925` FAILED in the Cockpit job on a test race (sign-out test read the button before the lazy Settings page loaded), fixed in
 the test; `fd020a5` phase 4, pushed in `b3a3707`, CI `38593657465` green on every job and deployed (phases 3–4 live); `00ec210`
@@ -1479,13 +1479,16 @@ phase 5 and `2cd7f6b` phase 6 pushed, CI `38595375699` and `38596185659` running
   Build without it; placeholders with the owner-only launch tick; sticky Start the build, disabled until the logo is in, with the
   money confirm). Same plan_inputs rows as before. Logged: the design's logo rule is stricter than the factory's. Evidence: 227
   tests; axe 0 light/dark at 1440 and 375.
+- Phase 11 Live build (`99ba999`): `components/LiveBuild.tsx` on the build page: Now headline, step-change announcements, bar, figures,
+  stall note, the ten steps mapped from deriveTimeline (unrecorded steps say so, never invented), rounds of fixes with each
+  recheck's result. Not done: "Spent so far" on this page and the design's phone toggle (no push channel). 227 tests; axe 0.
 - Not done: the remaining screens ( Project page, Proposal, Needs, Live build, Stopped, Finished site, Activity,
   Costs, Team, Settings, Notifications preferences); no Lighthouse run yet.
 
-**Next action**: Huraira reviews the Package 4 phase 10 report (What the site still needs) and gives GO for the next screen (Live build).
+**Next action**: Huraira reviews the Package 4 phase 11 report (Live build) and gives GO for the next screen (Stopped build, 8 cases).
 Confirm CI green on the latest push. Nick answers the caps, role and site-approval questions. Package 5: see the source doc.
 
-Continuation prompt — updated 2026-10-15, after phase 10 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
+Continuation prompt — updated 2026-10-15, after phase 11 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
 ```
 You are a senior front-end engineer in the WFACT 3.0 monorepo, branch huraira-work. Read CLAUDE.md, then
 docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md (the full brief: hard rules, locked decisions, tokens,
@@ -1519,8 +1522,8 @@ ALREADY DONE (do not redo):
   of site; rejected and pre-track proposals still use the pre-v2 AfterDecision.
 
 LEFT, in order (each a separate commit, then /step-close 28 and STOP for GO):
-5–9. Screens in the brief's order (§6), starting at 7. Live build (Home, Projects, New request, the client's page, Proposal
-   review, Needs done), each with empty, loading, running, waiting, stopped and success states; the 8 stop
+5–9. Screens in the brief's order (§6), starting at 8. Stopped build, 8 cases (Home, Projects, New request, the client's page,
+   Proposal review, Needs, Live build 99ba999 done; the stop view is still the pre-v2 RecoveryPanel in pages/Activity.tsx), each with empty, loading, running, waiting, stopped and success states; the 8 stop
    cases mapped to diagnoseJob().cause; owner-only gates; PM view.
 Every phase: npm test green; screenshots at 1440x900 and 375x812, light and dark, beside the matching frame in
 Cockpit Screens*.dc.html; axe 0 per room; at 375 px scrollWidth === 375; banned-word grep of the DOM outside <details>;
