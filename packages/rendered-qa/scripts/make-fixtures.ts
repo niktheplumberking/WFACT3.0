@@ -321,6 +321,13 @@ const REGISTRY_SITES: Record<string, Record<string, string>> = {
   "fail/tells.sitemap": siteVariant((f) => (f["sitemap.xml"] = f["sitemap.xml"]!.replace(`  <url><loc>${SITE_URL}/privacy.html</loc></url>\n`, ""))),
   "fail/tells.robots": siteVariant((f) => (f["robots.txt"] = "# SYNTHETIC TEST FIXTURE (Step 7 registry), planted: blocks every crawler\nUser-agent: *\nDisallow: /\n")),
   "fail/tells.llms-txt": siteVariant((f) => delete f["llms.txt"]),
+  // Build-quality Package 3: an "Image to come" placeholder card left on the site at launch.
+  "fail/content.placeholders-launch": siteVariant(
+    (f) =>
+      (f["index.html"] = reg("clean site home page; planted: a labelled placeholder picture left on the site", {
+        extraMain: `<figure class="media media-placeholder" data-placeholder="index.hero" role="img" aria-label="Image to come: a photo of a recent roof"><figcaption>Image to come: a photo of a recent roof</figcaption></figure>`,
+      })),
+  ),
 };
 rmSync(registryDir, { recursive: true, force: true });
 for (const [name, html] of Object.entries(REGISTRY_PAGES)) {
