@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1791994037.5236425,
-    "seen": 1791994041.7689118,
-    "ast_hash": "21672d0ccccf9a5921a252d8c08bf8b8",
+    "mtime": 1791994375.8163772,
+    "seen": 1791994379.905011,
+    "ast_hash": "a46cfdef88b19b688b4047d3656371ef",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1791994037.5230994,
-    "seen": 1791994041.76937,
-    "ast_hash": "4559932d4122fdd88b2593b8ec82c35a",
+    "mtime": 1791994367.8062088,
+    "seen": 1791994379.905665,
+    "ast_hash": "c3bf20981cdba0950b0a78048f06e5ec",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1710,9 +1710,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Work.tsx": {
-    "mtime": 1791972389.2309413,
-    "seen": 1791982653.7100239,
-    "ast_hash": "a30c2a83f44b81374883e6ab9ff58b6a",
+    "mtime": 1791994318.6874561,
+    "seen": 1791994379.899714,
+    "ast_hash": "492e96fafb4fb4d6248415fd2dc91f1c",
     "semantic_hash": ""
   },
   "apps/cockpit/src/shell/Shell.tsx": {
@@ -4263,6 +4263,18 @@
     "mtime": 1791994037.5267503,
     "seen": 1791994041.768598,
     "ast_hash": "85309d0b8779eec5cc61ef9b714c3255",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/pages/projects.test.tsx": {
+    "mtime": 1791994265.202377,
+    "seen": 1791994379.89973,
+    "ast_hash": "40b6ff8b6c4630ed9db578cf4a5477e2",
+    "semantic_hash": ""
+  },
+  ".claude/completions/2026-10-14-step-28-package-4-phase-6.md": {
+    "mtime": 1791994375.818286,
+    "seen": 1791994379.904652,
+    "ast_hash": "a4493b7dc1f4abba75c188dbac0b7c1e",
     "semantic_hash": ""
   }
 }
