@@ -1363,7 +1363,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–8 built, 1–4 CI-green and deployed
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–9 built, 1–6 CI-green and deployed
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1415,7 +1415,7 @@ Track A 1.4.0, content `track-b/2` and `track-a/2`, both upgraded from v1 on rea
   workflow 44, jobs 34, planning 42, Cockpit 124 plus build. Screenshots at 1440 and 375.
 - Not done: no live build; an uploaded image's real use in a paid build is proven only in Package 5.
 
-**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–8 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
+**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–9 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
 every job and deployed, live Cockpit serves v2, `theme-color #F4F2ED`, HTTP 200; `8532f4e` phase 3 pushed in `a87e6db`, whose CI
 `38591851925` FAILED in the Cockpit job on a test race (sign-out test read the button before the lazy Settings page loaded), fixed in
 the test; `fd020a5` phase 4, pushed in `b3a3707`, CI `38593657465` green on every job and deployed (phases 3–4 live); `00ec210`
@@ -1471,13 +1471,17 @@ phase 5 and `2cd7f6b` phase 6 pushed, CI `38595375699` and `38596185659` running
   files with a real count, every build, cost so far (owner), the decisions timeline from the audit trail through one phrase table
   (`lib/phrases.ts`, reused by Activity), Technical details (ids; the internal stage move and fix rounds kept there). The design's
   "Test client" badge is not shown: no data source. Evidence: 224 tests (`client.test.tsx` 7); axe 0 light/dark at 1440 and 375.
+- Phase 9 Proposal review (`74e1384`): pending proposals get the v2 review (client's words, kind of site as a radiogroup with the real
+  reasons, pages, open questions, sticky bar). Approve is owner-only (locked rule) and confirms; Ask for changes saves the note and
+  requests a new proposal, with the money confirm; "Prepare the direction again" kept with a money confirm. Decided proposals keep
+  the pre-v2 page until the details-list screen. Evidence: 225 tests; axe 0 light/dark at 1440 and 375.
 - Not done: the remaining screens ( Project page, Proposal, Needs, Live build, Stopped, Finished site, Activity,
   Costs, Team, Settings, Notifications preferences); no Lighthouse run yet.
 
-**Next action**: Huraira reviews the Package 4 phase 8 report (the client's page) and gives GO for the next screen (Proposal review).
+**Next action**: Huraira reviews the Package 4 phase 9 report (Proposal review) and gives GO for the next screen (Needs from the client).
 Confirm CI green on the latest push. Nick answers the caps, role and site-approval questions. Package 5: see the source doc.
 
-Continuation prompt — updated 2026-10-15, after phase 8 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
+Continuation prompt — updated 2026-10-15, after phase 9 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
 ```
 You are a senior front-end engineer in the WFACT 3.0 monorepo, branch huraira-work. Read CLAUDE.md, then
 docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md (the full brief: hard rules, locked decisions, tokens,
@@ -1506,10 +1510,12 @@ ALREADY DONE (do not redo):
   Next screens read useFactory().clients and .attention; never re-derive.
 - Phase 6 Projects: default export Projects in pages/Work.tsx. Phase 7 New request: NewRequest in pages/Work.tsx
   Large buttons use size="page" -> class btn-page (never "page"). Phase 8 the client's page: ProjectPage in pages/Work.tsx
-  (fd7a08a); lib/phrases.ts translates audit actions (reuse it in Activity).
+  (fd7a08a); lib/phrases.ts translates audit actions (reuse it in Activity). Phase 9 Proposal review: ProposalReview in
+  pages/Decisions.tsx (pending only); PlanPage still renders the pre-v2 page for decided proposals.
 
 LEFT, in order (each a separate commit, then /step-close 28 and STOP for GO):
-5–9. Screens in the brief's order (§6), starting at 5. Proposal review (Home, Projects, New request, the client's page done), each with empty, loading, running, waiting, stopped and success states; the 8 stop
+5–9. Screens in the brief's order (§6), starting at 6. Needs from the client (Home, Projects, New request, the client's page,
+   Proposal review done), each with empty, loading, running, waiting, stopped and success states; the 8 stop
    cases mapped to diagnoseJob().cause; owner-only gates; PM view.
 Every phase: npm test green; screenshots at 1440x900 and 375x812, light and dark, beside the matching frame in
 Cockpit Screens*.dc.html; axe 0 per room; at 375 px scrollWidth === 375; banned-word grep of the DOM outside <details>;
