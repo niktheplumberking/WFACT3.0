@@ -22,6 +22,7 @@ import { stageLabel } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
 import { ClientNeedsPanel } from "../components/Recovery";
 import { StoppedBuild } from "../components/StoppedBuild";
+import { SiteReview } from "../components/SiteReview";
 import { clientNameOf } from "../lib/clients";
 import { buildsOf } from "../lib/path";
 import { PlaceholdersPanel } from "../components/Placeholders";
@@ -429,6 +430,16 @@ export function RunPage() {
     if (e) return setActionError(e);
     toast(ok);
     await Promise.all([job.reload(), f.reload()]);
+  }
+
+  // Cockpit v2: the newest passing build, waiting for approval, is the finished site review.
+  const reviewing = build && j.status === "succeeded" && j.result?.status === "awaiting_launch_approval" && !j.archived_at && latest?.id === j.id;
+  if (reviewing) {
+    return (
+      <SiteReview job={j} planId={planId} clientName={plan ? clientNameOf(plan) : "The site"} onStarted={(id) => nav(`/activity/${id}`)}>
+        <ClientNeedsPanel job={j} planId={planId} onStarted={(id) => nav(`/activity/${id}`)} />
+      </SiteReview>
+    );
   }
 
   // Cockpit v2: a stopped build is its own view (chip, headline, facts, the fix, Why?).

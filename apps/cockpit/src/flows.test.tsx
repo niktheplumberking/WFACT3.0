@@ -372,7 +372,7 @@ describe("gates and tidying", () => {
       launchWithPlaceholders: false,
     };
     const t = start(`/activity/${JOB_VERIFIED}`, "owner", fx);
-    expect(await screen.findByText("Not ready to launch: 2 pictures are still needed.", undefined, T)).toBeInTheDocument();
+    expect(await screen.findByText("Not ready to launch: 2 placeholder pictures are still on the site.", undefined, T)).toBeInTheDocument();
     expect(screen.getByLabelText("Add the picture for Home page: A photo of a recent roof")).toBeInTheDocument();
     await t.click(screen.getByRole("checkbox", { name: /Launch with placeholders/ }));
     expect(t.calls()).toContainEqual(

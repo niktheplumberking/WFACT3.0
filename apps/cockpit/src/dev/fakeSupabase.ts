@@ -23,6 +23,14 @@ if (stop) {
     .filter((j) => j.id !== "44444444-4444-4444-8444-444444444444")
     .map((j) => (j.id === "33333333-3333-4333-8333-333333333333" ? { ...j, error: stop.error, result: { planId: "22222222-2222-4222-8222-222222222222", workflowRunId: "66666666-6666-4666-8666-666666666666", ...stop.result } } : j));
 }
+// ?fake-ph=1 gives the passing build a placeholder picture and two check results (the finished site review).
+if (new URLSearchParams(location.search).get("fake-ph") === "1") {
+  rows.jobs = rows.jobs.map((j) =>
+    j.id === "44444444-4444-4444-8444-444444444444"
+      ? { ...j, result: { ...(j.result as object), checks: [{ checkId: "render.perf", passed: true }, { checkId: "render.a11y", passed: true }], placeholders: [{ slot: "index.hero", page: "index", section: "hero", note: "A photo of a recent sign install" }] } }
+      : j,
+  );
+}
 const fake = createFake(rows);
 
 const signedIn = {

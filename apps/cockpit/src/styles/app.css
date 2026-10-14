@@ -661,3 +661,21 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
 .stopped-head { display: grid; gap: 12px; }
 .stopped-meta { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: var(--fs-small); color: var(--ink-3); }
 .stopped-head h1 { font-size: clamp(30px, 3.8cqi, 46px); line-height: 1.1; text-wrap: balance; }
+
+/* ---------- Finished site review (v2) ---------- */
+.review { display: grid; gap: 28px; }
+.review .stopped-head h1 { font-size: clamp(30px, 3.8cqi, 50px); line-height: 1.06; text-wrap: balance; }
+.review-ph { display: grid; gap: 12px; }
+.ph-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.ph-row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; padding: 16px; border-radius: 14px; background: var(--need-w); }
+.ph-thumb { width: 64px; height: 48px; border-radius: 8px; background: repeating-linear-gradient(135deg, var(--line) 0 5px, transparent 5px 10px); flex-shrink: 0; }
+.ph-what { flex: 1 1 240px; display: grid; gap: 2px; }
+.ph-what > span { font-size: var(--fs-label); color: var(--ink-2); }
+.ph-added { font-weight: 600; color: var(--ink) !important; }
+.review-ready { font-weight: 600; }
+.review-checks { margin: 8px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 6px 20px; }
+.review-checks li { display: flex; gap: 8px; align-items: center; font-size: var(--fs-small); padding: 6px 0; border-bottom: 1px solid var(--line); }
+.review-bar { position: sticky; bottom: 0; z-index: 4; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 16px 0 4px; background: var(--paper); border-top: 1px solid var(--line); }
+.review-bar .btn { flex: 1 1 auto; max-width: 360px; }
+.review-bar p { flex: 1 1 280px; }
+@media (max-width: 767px) { .review-bar { bottom: var(--tabbar-h, 72px); } }
