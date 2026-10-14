@@ -18,7 +18,9 @@ Part D; open steps carry a **Next action** line and a continuation or verificati
 `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md`) is **IN PROGRESS**: Package 1 (the builder sees the whole request) built and verified
 and deployed (`3e493f6`, CI `38569635936`; migration 0022 live, attack test 11/11); Package 2 (Track B starter 1.4.0: logo, accent,
 phone action, motion; four new rendered checks) green in CI and deployed (`d112f62`); Package 3 (image slots and labelled
-placeholders, migration 0023 live) built and verified locally (`7e30b09`); Packages 4–5 open, each waiting for GO.
+placeholders, migration 0023 live) built and verified locally (`7e30b09`); Package 4 (Cockpit v2 rebuild to the locked design in
+`docs/design/cockpit-v2/`) phases 1–2 of 9 built and verified locally (`4a50b22` tokens, `a8fa3cf` components; not pushed);
+Package 5 open. A caps conflict between the design and the live caps waits on Nick (`BLOCKED-ON-NICK.md`).
 
 **Status as of 2026-10-14**: the evidence moved on Steps 4D, 12 and 26, but no status changed:
 - **Step 4D**: the one-press continue is proven live on Summit `63278e56` and Lanternworks `e2a204fb`. The missing-facts form is still unproven live.
@@ -1358,7 +1360,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–2 of 9 built and verified locally
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1410,8 +1412,26 @@ Track A 1.4.0, content `track-b/2` and `track-a/2`, both upgraded from v1 on rea
   workflow 44, jobs 34, planning 42, Cockpit 124 plus build. Screenshots at 1440 and 375.
 - Not done: no live build; an uploaded image's real use in a paid build is proven only in Package 5.
 
-**Next action**: Huraira reviews the Package 3 report and gives GO for Package 4 (Cockpit plain-language UX; the Claude Design
-prompt `docs/COCKPIT-CLAUDE-DESIGN-PROMPT.md` may feed it). Packages 4–5: see the source doc; prompt unchanged.
+**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–2 of 9 built and verified locally** (`4a50b22`, `a8fa3cf`; not
+pushed). Source of truth: `docs/design/cockpit-v2/` (locked 2026-10-14); the build prompt is
+`docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md` (phases: tokens, components, shell, `path.ts`, then each screen).
+- Phase 1 tokens (`4a50b22`): v2 light/dark values, four accents, density, type scale, motion, reduced motion (device or in-app),
+  text-size zoom; `lib/appearance.ts`; Newsreader. `tokens.test.ts` proves the locked values and 4.5:1 for every text, status and
+  accent pair in both themes. Pre-v2 rules render through a temporary alias block until phases 2–3 replace them.
+- Phase 2 components (`a8fa3cf`): `kit.tsx` (Button, StatusChip, PathSegments, Segmented, EmptyState, ComingLater, TechDetails),
+  `flow.tsx` (ProgressStrip, StepRow, StopFacts, FixCard, WhyDisclosure, NeedRow), `CommandPalette.tsx`, v2 ConfirmDialog
+  (alertdialog, money line, focus to primary and back) and side-by-side SitePreview in `ui.tsx`, 9 s toast with Undo,
+  `lib/detail.tsx` (Simple/Detailed by role). Money lines read `spend-caps.json` (`costLine`), never a hard-coded figure.
+- Evidence: Cockpit 164/164 (26 new), typecheck and build clean; dev gallery `dev-components.html?axe=1` (axe-core 4.13.0, pinned):
+  0 violations light and dark at 1440 and 375, also with the confirm and palette open; 375 px `scrollWidth` 375; no target under
+  44 px; keyboard: palette filter, Enter runs, Esc and focus return checked in the browser.
+- Deviation (accessibility over the design): waiting step rows are dimmed by colour, not 82% opacity (opacity failed 4.5:1).
+- Conflict logged, not guessed: the design's "$2.00 per build, $20 a month, monthly cap stops new builds only" vs live caps $5 per
+  build and $20 per rolling 7 days checked before every call (`BLOCKED-ON-NICK.md`, Nick).
+- Not done: phases 3–9 (shell, `path.ts`, every screen); no Lighthouse run yet (needs the rebuilt rooms); not pushed, no CI.
+
+**Next action**: Huraira reviews the Package 4 phase 1–2 report and gives GO for phase 3 (shell: rail, top bar, palette wiring,
+phone tab bar, keyboard). Nick answers the caps conflict. Package 5: see the source doc; prompt unchanged.
 
 ### STEP 27 — Track A motion budget (P0, added 2026-10-07, decision D1) — NOT STARTED
 
@@ -1582,7 +1602,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | not started | | |
 | 26 | Quality calibration | **PARTIAL**: item 1 built (`67033f7`, Anthropic screenshot reviewer, local live review passed 32 s / $0.071); Cockpit trace row pending | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
-| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09`, verified locally: image slots, placeholder cards, migration 0023 live, attack test 19/19. Packages 4–5 open) | 2026-10-14 | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09`, verified locally: image slots, placeholder cards, migration 0023 live, attack test 19/19. Package 4 (Cockpit v2 to the locked design) phases 1–2 of 9 verified locally: tokens `4a50b22`, components `a8fa3cf`, Cockpit 164/164, axe 0 at 1440 and 375 light and dark; not pushed. Phases 3–9 and Package 5 open; caps conflict with Nick) | 2026-10-14 | |
 
 **Goal tracker (Blueprint §16K)**
 

@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-14 (18:30 +05), via `/step-close 28` (Package 1): `cf2f04b..3e493f6`, not pushed, no CI run. Migration 0022 applied live (attack test 11/11, recovery 25/25, advisors unchanged).
+Last synced: 2026-10-14 (21:05 +05), via `/step-close 28` (Package 4 phases 1–2): `4a50b22..a8fa3cf`, not pushed, no CI run. Cockpit 164/164, typecheck and build clean, axe 0 (dev gallery, light and dark, 1440 and 375).
+Previous sync: 2026-10-14 (18:30 +05), via `/step-close 28` (Package 1): `cf2f04b..3e493f6`, not pushed, no CI run. Migration 0022 applied live (attack test 11/11, recovery 25/25, advisors unchanged).
 Previous sync: 2026-10-14 (17:00 +05), via `/progress-sync`. Re-synced after `caf42bc` (head of both branches). Step 4D closed: its last open item (owner details reaching the builder live) is met by job `55ddba7c` (SQL-checked: reopen brief `ownerFacts`, built `site.json` facts `source: "brief"`). CI `38554457540` (`8271858`) green incl. deploy; `38557714567` (`caf42bc`) all jobs green except Rendered QA, still running at sync. Live: 31 jobs, 0 active; 151 `model_traces`; latest migration 20261014110708 (0021); 1 uploaded logo; 8 `plan_inputs`; 0 `account_requests` (Step 3A still unproven). Not checked: the new Cockpit site preview on the deployed app (needs a signed-in look).
 Previous sync: 2026-10-14, via `/step-close` (Steps 21 and 4D): `8b3caed` and `a444a3d` built locally (intake logo and live address, readiness check, continue from a chosen step, build timeline); migration 0021 not applied; not pushed.
 Previous sync: 2026-10-14 (00:45 +05), via `/progress-sync`. Re-synced after `67033f7`, `d5129e0`, `a9b271f`, `92fd4ac`. **Push state:** `origin/main` and `origin/huraira-work` are at `d5129e0`; `a9b271f` (test fix) and `92fd4ac` (docs) are local only. **CI:** `38452956084` on `d5129e0` FAILED in Rendered QA only (Node 22 cancelled reviewer tests 35-40), so the Cockpit deploy was skipped. `a9b271f` fixes it: `test/reviewer.test.ts` 18/18 re-run locally on Node 24; not yet proven on Node 22 or CI. **Live** (Supabase `mcaxxhgjptwowwrluhra`, read-only SQL): 30 jobs, 0 queued or running, 141 `model_traces` rows, latest migration 20261013162735 (0020). The Cockpit job runner runs from `main` (`d5129e0` includes `67033f7`), so the new reviewer is live even though the deploy job was skipped. Cockpit "continue" job `e2a204fb` (resume of the Lanternworks Track B build `83f2841f`, run `4c35703b`, GitHub run `38453886170`) ran QA end to end. It wrote 5 successful `anthropic` `agent:qa-evaluator` rows ($0.438) and 0 NOT RUN reviews. The site was reused with no builder call before the first review. It then halted at 19:40 UTC with `failed_verification` after 2 revisions, on named evaluator issues: the supplied logo is never embedded, and colours are outside the brief. `account_requests` and `plan_inputs` both have 0 rows. Not checked: signed-in Cockpit (Run page spend), Doppler, the Agent 37 gateway itself.
@@ -79,7 +80,12 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-14, 23:30 +05):
+**Next up** (2026-10-14, 21:05 +05):
+1. **Huraira**: review the Step 28 Package 4 phase 1–2 report (Cockpit v2 tokens and components); GO for phase 3 (shell).
+2. **Nick**: the caps conflict (design "$2.00 per build, $20 a month, new builds only" vs live "$5 per build, $20 per 7 days, every call"), `BLOCKED-ON-NICK.md`.
+3. **Nick**: the Bennett & Co brief (Step 25).
+
+**Next up** (2026-10-14, 23:30 +05, superseded):
 1. **Huraira**: review the Step 28 Package 3 report and screenshots; GO for Package 4 (Cockpit plain-language UX), optionally after a Claude Design pass with `docs/COCKPIT-CLAUDE-DESIGN-PROMPT.md`.
 2. **Huraira**: the 4B M4 screenshot review (unchanged).
 3. **Nick**: the Bennett & Co brief (Step 25).
@@ -117,6 +123,8 @@ Earlier list (2026-10-12 morning):
 After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bundle, Health room). Deferred: Steps 15, 16, 24; e-commerce out of scope.
 
 **Gaps noticed**:
+- Cockpit v2 (Step 28 P4): the design's caps ($2.00 per build, $20 a month, monthly cap stops new builds only) disagree with the live caps ($5 per build, $20 per rolling 7 days, checked before every call); logged for Nick. Until he decides the Cockpit reads `spend-caps.json`.
+- Cockpit v2: pre-v2 rules still render through a temporary alias block in `tokens.css`; the old breathing lamp in the build timeline still loops and the app icon is still the signal-lamp tile; all go in phases 3–7.
 - **Request text now supports prices on the site** (Step 28 review, 2026-10-14): the request is a fact source, so a price or phone the client mentions (even about a competitor) counts as sourced for `claims.unsourced-fact`. Banned claims are unaffected (that check ignores fact sources).
 - **`public.rls_auto_enable()` is executable by anon** (security advisor, seen 2026-10-14; pre-existing, not from 0022).
 - **Lanternworks owner facts are test values** (a phone number, "Testing Address"): correct them before Package 5 (redacted from the committed fixture).
@@ -1159,7 +1167,7 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - Met live 2026-10-14: a build wrote estimated rows and reviewer rows (run `4c35703b`).
 - Not yet proven live: the Run page and a live cap refusal.
 
-## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-14 — Packages 1–3 of 5 built and verified)
+## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-14 — Packages 1–3 of 5 built and verified; Package 4 phases 1–2 of 9 verified locally)
 
 Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one at a time, GO between) and Part D Step 28 of the plan.
 
@@ -1179,7 +1187,10 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 - [x] P3.3 Supplied images via Cockpit upload, verified like the logo: migration 0023 live, `scripts/rls_attack_test_images.sql` 19/19 (7 wrong before), 0021 suite 29/29.
 - [x] P3.4 Placeholders listed at the gate and in the Cockpit; `content.placeholders-launch` refuses them unless the owner ticks "launch with placeholders" (registry 1.3.0; Cockpit flow test).
 - [x] P3.5 GeneratedImageProvider seam, interface only.
-- [ ] Packages 4–5 (Cockpit UX, paid Lanternworks proof).
+- [x] P4 phase 1, tokens (`4a50b22`): locked v2 values light/dark, accents, density, type scale, motion, reduced motion, text-size zoom; `lib/appearance.ts`; Newsreader. `src/styles/tokens.test.ts`: exact values and 4.5:1 for every text/status/accent pair; browser: 125% zoom and no horizontal scroll at 375, in-app reduced motion stops all animations.
+- [x] P4 phase 2, components (`a8fa3cf`): `kit.tsx`, `flow.tsx`, `CommandPalette.tsx`, v2 ConfirmDialog and SitePreview, 9 s toast with Undo, `lib/detail.tsx`. `src/components/v2.test.tsx` 26 tests; dev gallery axe 0 light/dark at 1440 and 375 (also with confirm and palette open); money lines from `spend-caps.json`.
+- [ ] P4 phases 3–9: shell, `lib/path.ts`, every screen (Home, Projects, New request, Project, Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications); Lighthouse a11y ≥ 95 per room; banned-word DOM grep.
+- [ ] Package 5 (paid Lanternworks proof).
 
 **Verification**: suites green locally (frontend-loop 115, planning 42, jobs 33, workflow 42, verification 113, agent-runtime 39, hermes 55, rendered-qa 79, Cockpit 123); typecheck clean. Independent agent review: 6 defects in the new checks, all fixed with tests that failed first. Not pushed, so no CI run; no live build (Package 1 forbids one).
 
