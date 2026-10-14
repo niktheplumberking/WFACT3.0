@@ -133,7 +133,7 @@ export function checkLabel(id: string): string {
 }
 
 /** "[claims.unsourced-fact] The phone number…" → its plain label; anything else is kept, trimmed. */
-function issueLabel(issue: string): string {
+export function issueLabel(issue: string): string {
   const m = /^\s*\[([a-z0-9.:_-]+)\]/i.exec(issue);
   if (m) return checkLabel(m[1]!);
   return issue.length > 140 ? `${issue.slice(0, 137)}...` : issue;

@@ -655,3 +655,9 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
 .leave { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 18px 20px; border-radius: 14px; background: var(--sunk); }
 .leave svg { width: 22px; height: 22px; }
 .leave p { flex: 1 1 260px; }
+
+/* ---------- Stopped build (v2) ---------- */
+.stopped { display: grid; gap: 28px; max-width: 900px; padding-bottom: 20px; }
+.stopped-head { display: grid; gap: 12px; }
+.stopped-meta { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: var(--fs-small); color: var(--ink-3); }
+.stopped-head h1 { font-size: clamp(30px, 3.8cqi, 46px); line-height: 1.1; text-wrap: balance; }

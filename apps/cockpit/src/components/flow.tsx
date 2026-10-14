@@ -131,14 +131,15 @@ export function StepRow({ n, title, time, tone, word, sentence, checks, showSlug
 /* ---------------- stop: facts, fix, why ---------------- */
 
 /** The facts that always come before a fix: was money spent, and what the factory already tried. */
-export function StopFacts({ spent, money, tried, failed, who }: { spent: boolean; money: string; tried: ReactNode; failed?: string[]; who?: ReactNode }) {
+/** `spent`: null when the viewer cannot read the cost, or nothing was recorded (never guessed). */
+export function StopFacts({ spent, money, tried, failed, who }: { spent: boolean | null; money: string; tried: ReactNode; failed?: string[]; who?: ReactNode }) {
   return (
     <>
       <dl className="stop-facts">
         <div className="fact-money">
           <dt>Was money spent?</dt>
           <dd>
-            <StatusChip tone={spent ? "need" : "done"}>{spent ? "Money was spent" : "Nothing spent"}</StatusChip>
+            <StatusChip tone={spent === null ? "wait" : spent ? "need" : "done"}>{spent === null ? "Not shown" : spent ? "Money was spent" : "Nothing spent"}</StatusChip>
             <span className="t-label">{money}</span>
           </dd>
         </div>
@@ -190,7 +191,8 @@ export interface FixInput {
 }
 
 /** "The fix": one primary (continueOptions()[0]), an optional secondary (owner-only actions), quiet alternatives. */
-export function FixCard({ primary, secondary, others = [], input, note, children }: { primary: FixChoice; secondary?: FixChoice; others?: FixChoice[]; input?: FixInput; note?: ReactNode; children?: ReactNode }) {
+/** `primary` is left out when the children carry it (a details form whose submit button is the primary). */
+export function FixCard({ primary, secondary, others = [], input, note, children }: { primary?: FixChoice; secondary?: FixChoice; others?: FixChoice[]; input?: FixInput; note?: ReactNode; children?: ReactNode }) {
   const hid = useId();
   return (
     <section aria-labelledby={hid} className="fixcard">
@@ -201,9 +203,11 @@ export function FixCard({ primary, secondary, others = [], input, note, children
       {note && <p className="muted">{note}</p>}
       {children}
       <div className="fix-actions">
-        <Button variant="primary" size="page" onClick={primary.onClick} disabled={primary.disabled}>
-          {primary.label}
-        </Button>
+        {primary && (
+          <Button variant="primary" size="page" onClick={primary.onClick} disabled={primary.disabled}>
+            {primary.label}
+          </Button>
+        )}
         {secondary && (
           <Button size="page" onClick={secondary.onClick} disabled={secondary.disabled}>
             {secondary.label}

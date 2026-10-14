@@ -20,7 +20,10 @@ import { fetchJob, useFactory, useLoad, useMe, useToast } from "../lib/state";
 import { fetchRunSpend, money, total } from "../lib/costs";
 import { stageLabel } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
-import { ClientNeedsPanel, RecoveryPanel } from "../components/Recovery";
+import { ClientNeedsPanel } from "../components/Recovery";
+import { StoppedBuild } from "../components/StoppedBuild";
+import { clientNameOf } from "../lib/clients";
+import { buildsOf } from "../lib/path";
 import { PlaceholdersPanel } from "../components/Placeholders";
 import { LiveBuild } from "../components/LiveBuild";
 import { subjectOf } from "./Home";
@@ -428,6 +431,30 @@ export function RunPage() {
     await Promise.all([job.reload(), f.reload()]);
   }
 
+  // Cockpit v2: a stopped build is its own view (chip, headline, facts, the fix, Why?).
+  if (showRecovery) {
+    const n = planId ? [...buildsOf(planId, jobs)].sort((a, b) => a.created_at.localeCompare(b.created_at)).findIndex((x) => x.id === j.id) + 1 : 0;
+    const context = [plan ? clientNameOf(plan) : null, n > 0 ? `Build ${n}` : "Build"].filter(Boolean).join(" · ");
+    return (
+      <>
+        {actionError && <Notice tone="stop" title="That didn't work.">{actionError} Nothing changed.</Notice>}
+        <StoppedBuild
+          job={jv}
+          siblings={siblings}
+          planId={planId}
+          planName={plan ? planName(plan) : null}
+          context={context}
+          timeline={timeline!}
+          onChanged={async () => {
+            await Promise.all([job.reload(), f.reload()]);
+          }}
+          onStarted={(id) => nav(`/activity/${id}`)}
+          onArchive={() => void act(() => archiveJob(j.id, true), "Put away. It's hidden from Activity and Home; nothing was deleted.")}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <PageHead
@@ -478,19 +505,6 @@ export function RunPage() {
       />
       <div className="split narrow">
         <div className="stack">
-          {showRecovery && (
-            <RecoveryPanel
-              job={jv}
-              siblings={siblings}
-              planId={planId}
-              planName={plan ? planName(plan) : null}
-              timeline={timeline!}
-              onChanged={async () => {
-                await Promise.all([job.reload(), f.reload()]);
-              }}
-              onStarted={(id) => nav(`/activity/${id}`)}
-            />
-          )}
           {j.status === "failed" && superseded && (
             <Notice tone="stop" title="What happened.">
               {explainJobError(j).happened}

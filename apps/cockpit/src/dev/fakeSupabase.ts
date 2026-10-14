@@ -10,6 +10,19 @@ const role = new URLSearchParams(location.search).get("fake-role");
 const rows = fixtures();
 // ?fake-role=pm|admin signs in the synthetic user with that role instead of owner.
 if (role === "pm" || role === "admin") rows.profiles = rows.profiles.map((p) => ({ ...p, role }));
+// ?fake-stop=2|5|6 shows the failed build as that stop case (the passing build is removed so the stop is current).
+const CP = { lastCheckpoint: { path: "clients/x/sites/track-a/site.manifest.json", stage: "build", cycle: 1 } };
+const STOPS: Record<string, { result: Record<string, unknown>; error: string }> = {
+  "2": { result: { status: "failed_verification", qaIssues: ["[claims.unsourced-fact] The phone number 0400 111 222 on contact.html has no source in the brief."], ...CP }, error: "QA still failing after 2 revision(s)" },
+  "5": { result: { status: "failed_verification", cycles: 3, qaIssues: ["[render.perf] LCP 4.1s on the Home page, on a mid-range phone.", "[seo.single-h1] /services has two page headings."], ...CP }, error: "QA still failing after 2 revision(s)" },
+  "6": { result: { status: "build_failed", ...CP }, error: "spend:$5.00 ceiling of $5.00 reached before render.design-review" },
+};
+const stop = STOPS[new URLSearchParams(location.search).get("fake-stop") ?? ""];
+if (stop) {
+  rows.jobs = rows.jobs
+    .filter((j) => j.id !== "44444444-4444-4444-8444-444444444444")
+    .map((j) => (j.id === "33333333-3333-4333-8333-333333333333" ? { ...j, error: stop.error, result: { planId: "22222222-2222-4222-8222-222222222222", workflowRunId: "66666666-6666-4666-8666-666666666666", ...stop.result } } : j));
+}
 const fake = createFake(rows);
 
 const signedIn = {

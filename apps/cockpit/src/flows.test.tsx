@@ -224,18 +224,18 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(screen.queryByRole("button", { name: /continue/i })).toBeNull();
   });
 
-  it("a stopped build: plain reason, what is saved, ONE button that carries on from the saved step (reopens the run)", async () => {
+  it("a stopped build: plain reason, who acts, ONE primary that carries on from the saved step after the money confirm", async () => {
     const fx = fixtures();
     fx.jobs = fx.jobs.filter((j) => j.id !== JOB_VERIFIED);
     const t = start(`/activity/${JOB_FAILED}`, "owner", fx);
-    expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: the site builder is out of credits" }, T)).toBeInTheDocument();
-    expect(screen.getByText(/Adding credits to Agent 37 is a spending decision/)).toBeInTheDocument();
-    expect(screen.getByText(/Nothing was saved before it stopped/)).toBeInTheDocument();
-    await t.click(screen.getByRole("button", { name: "I've added credits, continue" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "An AI service is out of credit or not set up" }, T)).toBeInTheDocument();
+    expect(screen.getByText("Huraira adds credit to the site builder account.")).toBeInTheDocument();
+    await t.click(screen.getByRole("button", { name: "Try again once it is set up" }));
     // Nothing was saved, so continuing writes the site again: a full build, confirmed first, and nothing starts before that.
-    expect(screen.getByText(/costs a full build\. Nothing is published/)).toBeInTheDocument();
+    const dlg = screen.getByRole("alertdialog");
+    expect(dlg).toHaveTextContent(/Costs about one build\. Each build stops itself at/);
     expect(t.calls().some((c) => c.op === "insert")).toBe(false);
-    await t.click(screen.getByRole("button", { name: "Build again" }));
+    await t.click(within(dlg).getByRole("button", { name: "Try again once it is set up" }));
     expect(t.calls()).toContainEqual(
       expect.objectContaining({
         op: "insert",
@@ -245,7 +245,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     );
   });
 
-  it("a build that needs details: asks in plain fields, saves them to the plan, then continues the build", async () => {
+  it("an unsourced fact: add the real one inline (a password is refused), saved to the plan, then the build continues", async () => {
     const fx = fixtures();
     fx.jobs = fx.jobs.filter((j) => j.id !== JOB_VERIFIED).map((j) =>
       j.id === JOB_FAILED
@@ -257,27 +257,29 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
         : j,
     );
     const t = start(`/activity/${JOB_FAILED}`, "owner", fx);
-    expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: it needs a few details" }, T)).toBeInTheDocument();
-    expect(screen.getByText(/The site it had built is saved/)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "The checks found a business phone number on the site that nobody gave us" }, T)).toBeInTheDocument();
     // Pressing with nothing filled in is refused, nothing is saved.
-    await t.click(await screen.findByRole("button", { name: "Save the details and continue" }, T));
-    expect(screen.getByText(/Fill in at least one detail/)).toBeInTheDocument();
+    await t.click(await screen.findByRole("button", { name: "Fix it and continue" }, T));
+    expect(screen.getByText(/Type the real business phone number first/)).toBeInTheDocument();
     expect(t.calls().some((c) => c.op === "insert")).toBe(false);
     // A password or key is refused before storage.
-    await t.user.type(screen.getByLabelText("Business phone number"), "password: hunter2hunter2");
-    await t.click(screen.getByRole("button", { name: "Save the details and continue" }));
+    await t.user.type(await screen.findByLabelText("The real business phone number", {}, T), "password: hunter2hunter2");
+    await t.click(screen.getByRole("button", { name: "Fix it and continue" }));
+    await t.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Fix it and continue" }));
     expect(await screen.findByText(/looks like a password or key/)).toBeInTheDocument();
     expect(t.calls().some((c) => c.op === "insert")).toBe(false);
+    await t.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Not now" }));
     // The real value is saved, then the build continues.
-    await t.user.clear(screen.getByLabelText("Business phone number"));
-    await t.user.type(screen.getByLabelText("Business phone number"), "0400 111 222");
-    await t.click(screen.getByRole("button", { name: "Save the details and continue" }));
+    await t.user.clear(screen.getByLabelText("The real business phone number"));
+    await t.user.type(screen.getByLabelText("The real business phone number"), "0400 111 222");
+    await t.click(screen.getByRole("button", { name: "Fix it and continue" }));
+    await t.click(within(screen.getByRole("alertdialog")).getByRole("button", { name: "Fix it and continue" }));
     const inserts = t.calls().filter((c) => c.op === "insert");
     expect(inserts[0]).toEqual(expect.objectContaining({ table: "plan_inputs", values: [expect.objectContaining({ plan_id: PLAN_APPROVED, key: "phone", value: "0400 111 222", waived: false })] }));
     expect(inserts[1]).toEqual(expect.objectContaining({ table: "jobs", values: expect.objectContaining({ kind: "resume", params: expect.objectContaining({ workflowRunId: RUN_FAILED, reopen: true }) }) }));
   });
 
-  it("a problem only Huraira can fix leads with a report, not a retry", async () => {
+  it("a problem only Huraira can fix leads with a note for Huraira, not a retry", async () => {
     const fx = fixtures();
     fx.jobs = fx.jobs.filter((j) => j.id !== JOB_VERIFIED).map((j) =>
       j.id === JOB_FAILED
@@ -285,9 +287,11 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
         : j,
     );
     start(`/activity/${JOB_FAILED}`, "owner", fx);
-    expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: the factory hit a problem of its own" }, T)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Copy a report for Huraira" })).toBeInTheDocument();
-    expect(screen.getByText(/Huraira does: it is a problem inside the factory/)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "The factory hit a problem of its own" }, T)).toBeInTheDocument();
+    const fix = screen.getByRole("region", { name: "The fix" });
+    expect(within(fix).getByRole("button", { name: "Copy a note for Huraira" })).toHaveClass("primary");
+    expect(within(fix).getByRole("button", { name: "Try again anyway" })).not.toHaveClass("primary");
+    expect(screen.getByText(/Huraira fixes this: it is a problem inside the factory/)).toBeInTheDocument();
   });
 
   it("two admins pressing continue: the database's 'already in progress' becomes a plain sentence, nothing is duplicated", async () => {
@@ -302,8 +306,8 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
       }
       return q;
     }) as typeof realFrom;
-    await t.click(await screen.findByRole("button", { name: "I've added credits, continue" }, T));
-    await t.click(await screen.findByRole("button", { name: "Build again" }, T));
+    await t.click(await screen.findByRole("button", { name: "Try again once it is set up" }, T));
+    await t.click(within(await screen.findByRole("alertdialog", {}, T)).getByRole("button", { name: "Try again once it is set up" }));
     expect(await screen.findByText(/This build is already running/)).toBeInTheDocument();
   });
 

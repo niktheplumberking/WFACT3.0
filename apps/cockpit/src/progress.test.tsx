@@ -82,7 +82,7 @@ describe("a running build shows where it is", () => {
   });
 });
 
-describe("a stopped build offers the right ways on, at the step it stopped", () => {
+describe("a stopped build offers the right ways on (Cockpit v2 stop view)", () => {
   function failedVerification() {
     const fx = fixtures();
     fx.jobs = fx.jobs
@@ -101,23 +101,26 @@ describe("a stopped build offers the right ways on, at the step it stopped", () 
     return fx;
   }
 
-  it("failed checks: Fix and continue, or Check again without changes, inside the stopped step", async () => {
+  it("failed checks: the checks that still fail, Fix it and continue, or Check again without changes (confirmed)", async () => {
     const t = start(`/activity/${JOB_FAILED}`, failedVerification());
-    const steps = await screen.findByRole("list", { name: "Where the build stopped" }, T);
-    const stoppedStep = within(steps).getByText("Quality checks").closest("li")!;
-    expect(within(stoppedStep).getByText("Stopped here")).toBeInTheDocument();
-    expect(within(stoppedStep).getByText("Page speed")).toBeInTheDocument();
-    expect(within(stoppedStep).getByRole("button", { name: "Fix and continue" })).toBeInTheDocument();
-    expect(within(stoppedStep).getByText(/This saves a full rebuild/)).toBeInTheDocument();
-    await t.user.click(within(stoppedStep).getByRole("button", { name: "Check again without changes" }));
+    expect(await screen.findByRole("heading", { level: 1, name: "The checks still failed after the last round of fixes" }, T)).toBeInTheDocument();
+    expect(within(screen.getByRole("region", { name: "Checks that still fail" })).getByText("Page speed")).toBeInTheDocument();
+    const fix = screen.getByRole("region", { name: "The fix" });
+    expect(within(fix).getByText(/This saves a full rebuild/)).toBeInTheDocument();
+    await t.user.click(within(fix).getByRole("button", { name: "Check again without changes" }));
+    const dlg = await screen.findByRole("alertdialog", {}, T);
+    expect(dlg).toHaveTextContent(/only the checks run/);
+    await t.user.click(within(dlg).getByRole("button", { name: "Check again without changes" }));
     expect(t.calls()).toContainEqual(
       expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "resume", params: expect.objectContaining({ workflowRunId: RUN_FAILED, reopen: true, fromStep: "qa" }) }) }),
     );
   });
 
-  it("Fix and continue sends the saved site back to the builder (fromStep revise), with no confirmation", async () => {
+  it("Fix it and continue sends the saved site back to the builder (fromStep revise), after the money confirm", async () => {
     const t = start(`/activity/${JOB_FAILED}`, failedVerification());
-    await t.user.click(await screen.findByRole("button", { name: "Fix and continue" }, T));
+    await t.user.click(await screen.findByRole("button", { name: "Fix it and continue" }, T));
+    expect(t.calls().some((c) => c.op === "insert")).toBe(false);
+    await t.user.click(within(await screen.findByRole("alertdialog", {}, T)).getByRole("button", { name: "Fix it and continue" }));
     expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "resume", params: expect.objectContaining({ fromStep: "revise" }) }) }));
   });
 
@@ -139,10 +142,9 @@ describe("a stopped build offers the right ways on, at the step it stopped", () 
       audit(RUN_FAILED, 178.9, "workflow.halt", { status: "needs_input", stage: "preflight", cycles: 0 }),
     ];
     start(`/activity/${JOB_FAILED}`, fx);
-    expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: it needs details before it can start" }, T)).toBeInTheDocument();
-    const steps = screen.getByRole("list", { name: "Where the build stopped" });
-    const stoppedStep = within(steps).getByText("Ready to build").closest("li")!;
-    expect(within(stoppedStep).getAllByText(/Nothing was spent/).length).toBeGreaterThan(0);
+    expect(await screen.findByRole("heading", { level: 1, name: "The site needs details nobody gave us" }, T)).toBeInTheDocument();
+    expect(screen.getByText("No money was spent")).toBeInTheDocument();
+    const stoppedStep = screen.getByRole("region", { name: "The fix" });
     expect(await within(stoppedStep).findByLabelText("Business phone number", {}, T)).toBeInTheDocument();
     // The logo is uploaded right here (no trip to the plan page), or skipped.
     expect(within(stoppedStep).getByLabelText("Logo file")).toHaveAttribute("type", "file");
