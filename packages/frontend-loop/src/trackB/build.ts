@@ -122,7 +122,7 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
     writeFileSync(path.join(work, "content/site.json"), `${JSON.stringify(content, null, 2)}\n`);
     writeFileSync(path.join(work, "content/theme.json"), `${JSON.stringify(palette, null, 2)}\n`);
     const logoInfo = logo ? { src: `/${logo.file}`, mime: logo.mime, ...logoDisplaySize(logo) } : null;
-    writeFileSync(path.join(work, "content/launch.json"), `${JSON.stringify({ siteUrl, logo: logoInfo }, null, 2)}\n`);
+    writeFileSync(path.join(work, "content/launch.json"), `${JSON.stringify({ siteUrl, ...(logoInfo ? { logo: logoInfo } : {}) }, null, 2)}\n`);
     // Launch files (MVP M5): Next copies public/ into the export as is.
     mkdirSync(path.join(work, "public"));
     writeFileSync(path.join(work, "public/robots.txt"), robotsTxt(siteUrl));
