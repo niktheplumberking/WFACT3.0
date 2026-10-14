@@ -33,7 +33,7 @@ phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07)
 steps; this file tracks the Continuation Stages.
 
 **Status summary (2026-10-14, 23:30 +05, `/step-close 28`)**:
-- **Step 28 IN PROGRESS**: Package 3 built and verified locally (`7e30b09`). Sites now show the client's own photos where the owner uploaded them and a labelled "Image to come" card everywhere else; the launch check refuses placeholders unless the owner ticks "launch with placeholders". Migration 0023 is live.
+- **Step 28 IN PROGRESS**: Package 3 built, CI `38585878100` green and deployed (`7e30b09`; two CI-only fixes `301e6d6`, `ba3c41c`: a registry fixture must come from make-fixtures.ts, and rendered-qa tests may import only the packages its CI job installs). Sites now show the client's own photos where the owner uploaded them and a labelled "Image to come" card everywhere else; the launch check refuses placeholders unless the owner ticks "launch with placeholders". Migration 0023 is live.
 
 **Status summary (2026-10-14, 21:30 +05, superseded)**:
 - **Step 28 IN PROGRESS**: Package 2 built and verified locally (`d112f62`). Track B starter 1.4.0 shows the client's logo (it rendered 0x0), fills buttons with the client's orange, keeps the action in reach on phones, removes the empty band under the phone hero, and gives every section an entrance. Four new rendered checks fail on 1.3.0 and pass on 1.4.0.
