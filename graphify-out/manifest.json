@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1791996474.7673662,
-    "seen": 1791996478.632084,
-    "ast_hash": "92d4c67c3bc6291f04796d2653f5980a",
+    "mtime": 1791996861.674634,
+    "seen": 1791996865.7182982,
+    "ast_hash": "478d59de00fa7d93bc8f51e1f0a2a730",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1791996474.7669208,
-    "seen": 1791996478.6325161,
-    "ast_hash": "5b96f7b32e38bbba1740c0b5ee4d8104",
+    "mtime": 1791996861.6741686,
+    "seen": 1791996865.7187269,
+    "ast_hash": "efedfafcb927230a285fda62558919d2",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1686,9 +1686,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Activity.tsx": {
-    "mtime": 1791986954.5107312,
-    "seen": 1791989613.805963,
-    "ast_hash": "fbca22fa40aebb37c1c4948d4c4d6278",
+    "mtime": 1791996828.0338268,
+    "seen": 1791996865.7136629,
+    "ast_hash": "267d23fd2c2d6e55e208d64f1821bf38",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Decisions.tsx": {
@@ -3702,9 +3702,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/progress.test.tsx": {
-    "mtime": 1791972411.6197126,
-    "seen": 1791982653.7100239,
-    "ast_hash": "0eb63ac5eec5400288b07f23ebcac4af",
+    "mtime": 1791996794.0974336,
+    "seen": 1791996865.7137878,
+    "ast_hash": "2a3f4a0fe87839afb7a6cbc7539ba171",
     "semantic_hash": ""
   },
   "packages/db/migrations/0021_brand_assets.sql": {
@@ -4044,9 +4044,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/components/flow.tsx": {
-    "mtime": 1791995109.30721,
-    "seen": 1791995213.5638661,
-    "ast_hash": "f78dcdaa0eda3d075515d30e8e3b3198",
+    "mtime": 1791996794.0857775,
+    "seen": 1791996865.713181,
+    "ast_hash": "bee958a5667b7b44243dfb2485b066c4",
     "semantic_hash": ""
   },
   "apps/cockpit/src/components/kit.tsx": {
@@ -4317,6 +4317,18 @@
     "mtime": 1791996474.7686977,
     "seen": 1791996478.631777,
     "ast_hash": "1d35cd15b3c6376258bb2a6d4f4cd554",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/components/LiveBuild.tsx": {
+    "mtime": 1791996828.033658,
+    "seen": 1791996865.7131362,
+    "ast_hash": "e5f53575e27ced1071d96b676e61eb04",
+    "semantic_hash": ""
+  },
+  ".claude/completions/2026-10-15-step-28-package-4-phase-11.md": {
+    "mtime": 1791996861.6761749,
+    "seen": 1791996865.717961,
+    "ast_hash": "2954c1a3446f5432ced76ff7cabe26d7",
     "semantic_hash": ""
   }
 }
