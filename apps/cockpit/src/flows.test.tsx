@@ -148,23 +148,50 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(screen.getByRole("button", { name: "Ask for changes" })).toBeInTheDocument();
   });
 
-  it("start a build of an approved plan from its proposal (1 click)", async () => {
-    // v2: there is no Decisions room in the menu; Home's client list and the palette open a client's proposal.
-    // The palette's Clients group is checked in shell.test.tsx; here the build itself, from the approved proposal.
-    const t = start(`/decisions/plans/${PLAN_APPROVED}`);
-    await t.click(await screen.findByRole("button", { name: "Build it again" }, T));
-    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "build_plan", params: { planId: PLAN_APPROVED } }) }));
-    expect(t.clicks()).toBe(1);
+  const withLogo = (fx = fixtures()) => {
+    fx.plan_inputs = [{ id: "in-logo", created_at: new Date().toISOString(), plan_id: PLAN_APPROVED, kind: "fact", key: "asset.logo", label: "The logo", value: JSON.stringify({ path: "clients/northlight/logo.svg", name: "logo.svg" }), waived: false }];
+    return fx;
+  };
+
+  it("an approved proposal opens 'What the site still needs'; the build waits for the logo (design rule)", async () => {
+    start(`/decisions/plans/${PLAN_APPROVED}`);
+    expect(await screen.findByRole("heading", { level: 1, name: "What the site still needs" }, T)).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: /of \d+ supplied/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Build it again" })).toBeDisabled();
+    expect(screen.getByText("Add the logo to start the build. It goes at the top of every page.")).toBeInTheDocument();
   });
 
-  it("start the first build of a plan approved as Track B", async () => {
-    const fx = fixtures();
+  it("build again once the logo is in, after confirming the cost (2 clicks)", async () => {
+    const t = start(`/decisions/plans/${PLAN_APPROVED}`, "owner", withLogo());
+    await t.click(await screen.findByRole("button", { name: "Build it again" }, T));
+    const dialog = await screen.findByRole("alertdialog", { name: "Build the site again?" }, T);
+    expect(dialog).toHaveAccessibleDescription(/stops itself at/);
+    await t.click(within(dialog).getByRole("button", { name: "Build it again" }));
+    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "build_plan", params: { planId: PLAN_APPROVED } }) }));
+    expect(t.clicks()).toBe(2);
+  });
+
+  it("start the first build of a proposal approved as a Showcase site, and say what is left out", async () => {
+    const fx = withLogo();
     fx.plan_approvals = fx.plan_approvals.map((p) => (p.id === PLAN_APPROVED ? { ...p, build_track: "B", track_overridden: true } : p));
     fx.jobs = fx.jobs.filter((j) => (j.params as { planId?: string })?.planId !== PLAN_APPROVED);
     const t = start(`/decisions/plans/${PLAN_APPROVED}`, "owner", fx);
-    expect(await screen.findByText(/Approved as Track B, against the recommendation/, {}, T)).toBeInTheDocument();
-    await t.click(screen.getByRole("button", { name: "Start build" }));
+    expect(await screen.findByText(/^Ready to build\. \d+ items will be left out, never made up:/, {}, T)).toBeInTheDocument();
+    await t.click(screen.getByRole("button", { name: "Start the build" }));
+    const dialog = await screen.findByRole("alertdialog", { name: "Start the build?" }, T);
+    expect(dialog).toHaveTextContent("Showcase site with motion");
+    await t.click(within(dialog).getByRole("button", { name: "Start the build" }));
     expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "jobs", values: expect.objectContaining({ kind: "build_plan", params: { planId: PLAN_APPROVED } }) }));
+  });
+
+  it("answer a detail and skip another: the same plan_inputs rows as before", async () => {
+    const t = start(`/decisions/plans/${PLAN_APPROVED}`);
+    await t.click(await screen.findByRole("button", { name: "Answer: Business phone number" }, T));
+    await t.user.type(screen.getByLabelText("Your answer: Business phone number"), "(03) 9000 0000");
+    await t.click(screen.getByRole("button", { name: "Save" }));
+    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "plan_inputs", values: [expect.objectContaining({ plan_id: PLAN_APPROVED, kind: "fact", key: "phone", value: "(03) 9000 0000", waived: false })] }));
+    await t.click(screen.getByRole("button", { name: "Build without it: Opening hours" }));
+    expect(t.calls()).toContainEqual(expect.objectContaining({ op: "insert", table: "plan_inputs", values: [expect.objectContaining({ key: "hours", value: null, waived: true })] }));
   });
 
   it("archive a failed run from its page; nothing is deleted", async () => {

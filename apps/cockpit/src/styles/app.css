@@ -634,3 +634,13 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
 @media (max-width: 900px) {
   .sticky-bar { bottom: calc(76px + env(safe-area-inset-bottom)); }
 }
+
+/* ---------- What the site still needs (v2) ---------- */
+.needs-page { display: grid; gap: 32px; padding-bottom: 20px; }
+.needs-head { display: grid; gap: 12px; max-width: 780px; }
+.needs-meter { display: grid; gap: 8px; margin-top: 6px; }
+.needs-group { display: grid; gap: 0; }
+.needs-group h2 { margin-bottom: 6px; }
+.tick { display: flex; gap: 12px; align-items: flex-start; min-height: var(--target); padding: 12px 14px; border-radius: var(--r-ctl); background: var(--need-w); cursor: pointer; }
+.tick input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--ink); flex-shrink: 0; }
+.start-line { flex: 1 1 280px; }

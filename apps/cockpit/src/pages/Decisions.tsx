@@ -7,9 +7,15 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
-import { ArrowRight, ArrowClockwise, Circle, Diamond, RadioButton, SealCheck } from "@phosphor-icons/react";
-import { Button, TechDetails } from "../components/kit";
-import { buildStopLine } from "../lib/costs";
+import { ArrowRight, ArrowClockwise, Circle, Diamond, Play, RadioButton, SealCheck } from "@phosphor-icons/react";
+import { Button, ButtonLink, TechDetails } from "../components/kit";
+import { NeedRow } from "../components/flow";
+import { buildsOf } from "../lib/path";
+import { currentInputs, savePlanInputs, SLOTS } from "../lib/inputs";
+import { placeholdersOf } from "../components/Placeholders";
+import { uploadImage, uploadLogo } from "../lib/brandUpload";
+import { median } from "../lib/timeline";
+import { buildStopLine, capped, costLine, fetchCostData, money, runSpend } from "../lib/costs";
 import { supabase } from "../supabaseClient";
 import { isActive, requestJob } from "../jobsClient";
 import { planIdOfJob } from "../lib/attention";
@@ -671,6 +677,207 @@ function ProposalReview({ row, onDone }: { row: PlanRow; onDone: () => void }) {
   );
 }
 
+/**
+ * What the site still needs (Cockpit v2): everything the client never gave us, grouped as Files, Details, Words and
+ * Questions, each with why; Upload / Answer / "Build without it" (left out, never made up). A progress meter, the
+ * placeholders still on the site (owner-only "launch with placeholders"), and a sticky "Start the build", disabled
+ * until the logo is in (design rule), which confirms the cost first. Writes are the same plan_inputs rows as before.
+ */
+function NeedsScreen({ row }: { row: PlanRow }) {
+  const me = useMe();
+  const f = useFactory();
+  const toast = useToast();
+  const nav = useNavigate();
+  const owner = me.role === "owner";
+  const decider = canDecide(me.role);
+  const costs = useLoad(async () => (owner ? fetchCostData() : null), [owner]);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reopened, setReopened] = useState<Record<string, boolean>>({});
+  const [confirm, setConfirm] = useState(false);
+  const p = row.plan.plan;
+  const client = p.intake?.clientName ?? row.client_slug;
+  const current = currentInputs((f.inputs ?? []).filter((i) => i.plan_id === row.id));
+  const builds = buildsOf(row.id, f.jobs ?? []).sort((x, y) => y.created_at.localeCompare(x.created_at));
+  const latest = builds[0] ?? null;
+  const running = builds.find((j) => isActive(j));
+  const briefLogo = !!(p.brief as { logo?: unknown }).logo;
+  const slots = latest ? placeholdersOf(latest) : [];
+  const questions = [...p.openQuestions, ...(row.plan.direction?.openQuestions ?? [])];
+
+  type Item = { key: string; label: string; why: string; kind: "file" | "text"; group: "Files" | "Details" | "Words" | "Questions"; accept?: string; answer?: boolean };
+  const items: Item[] = [
+    { key: "asset.logo", label: "The logo", why: "It goes at the top of every page. The factory never draws one.", kind: "file", group: "Files", accept: ".svg,.png,.webp,image/svg+xml,image/png,image/webp" },
+    ...slots.map((sl) => ({ key: `asset.image.${sl.slot}`, label: `Picture: ${sl.note}`, why: `For the ${sl.page === "index" ? "Home" : sl.page.replace(/-/g, " ")} page${sl.section ? `, ${sl.section}` : ""}. It should show ${sl.note.charAt(0).toLowerCase()}${sl.note.slice(1)}.`, kind: "file" as const, group: "Files" as const, accept: ".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" })),
+    ...SLOTS.filter((sl) => sl.key !== "quotes").map((sl) => ({ key: sl.key, label: sl.label, why: sl.hint, kind: "text" as const, group: "Details" as const })),
+    ...SLOTS.filter((sl) => sl.key === "quotes").map((sl) => ({ key: sl.key, label: sl.label, why: sl.hint, kind: "text" as const, group: "Words" as const })),
+    ...questions.map((q, i) => ({ key: `q${i + 1}`, label: q, why: "An open question in the proposal. Your answer is given to the builder as a confirmed fact.", kind: "text" as const, group: "Questions" as const, answer: true })),
+  ];
+  const stateOf = (key: string): "open" | "done" | "skipped" => {
+    if (reopened[key]) return "open";
+    if (key === "asset.logo" && briefLogo) return "done";
+    const r = current.find((c) => c.key === key);
+    return !r ? "open" : r.waived ? "skipped" : (r.value ?? "").trim() ? "done" : "open";
+  };
+  const valueOf = (key: string) => {
+    const r = current.find((c) => c.key === key);
+    if (key === "asset.logo" && briefLogo && !r) return "Supplied with the request";
+    if (!r?.value) return undefined;
+    if (key.startsWith("asset.")) {
+      try {
+        const rec = JSON.parse(r.value) as { name?: string; path?: string; width?: number; height?: number };
+        return rec.name ?? rec.path?.split("/").pop() ?? "File supplied";
+      } catch {
+        return "File supplied";
+      }
+    }
+    return r.value;
+  };
+  const done = items.filter((i) => stateOf(i.key) === "done").length;
+  const logoIn = stateOf("asset.logo") === "done";
+  const leftOut = items.filter((i) => stateOf(i.key) !== "done").map((i) => i.label.replace(/^Picture: /, "").replace(/^The /, "the "));
+
+  async function save(item: Item, value: string | null, waived: boolean) {
+    setBusy(item.key);
+    setError(null);
+    const e = await savePlanInputs(row.id, [{ kind: item.answer ? "answer" : "fact", key: item.key, label: item.label.slice(0, 120), value, waived }]);
+    setBusy(null);
+    if (e) return setError(e);
+    setReopened((r) => ({ ...r, [item.key]: false }));
+    await f.reload();
+    toast(waived ? `${item.label} will be left out, never made up.` : `${item.label} saved.`);
+  }
+
+  async function file(item: Item, fl: File) {
+    setBusy(item.key);
+    setError(null);
+    const up = item.key === "asset.logo" ? await uploadLogo(fl) : await uploadImage(fl);
+    if (!up.ok) {
+      setBusy(null);
+      return setError(up.reason);
+    }
+    await save(item, JSON.stringify({ ...up.record, name: fl.name }), false);
+  }
+
+  async function start() {
+    setConfirm(false);
+    setBusy("build");
+    setError(null);
+    const { jobId, error: e } = await requestJob("build_plan", { planId: row.id });
+    setBusy(null);
+    if (!jobId) return setError(/already in progress/i.test(e ?? "") ? "A build is already running for this client." : `The build didn't start: ${e}. Nothing changed; try again.`);
+    toast(e ?? "The build has started. You can leave this page; it shows on Home when it finishes or needs you.");
+    await f.reload();
+    nav(`/activity/${jobId}`);
+  }
+
+  const runCosts = (costs.data?.runs ?? []).map((r) => capped(runSpend(r))).filter((x) => x > 0);
+  const usual = runCosts.length >= 3 ? median(runCosts) : null;
+  const groups = (["Files", "Details", "Words", "Questions"] as const).map((g) => [g, items.filter((i) => i.group === g)] as const).filter(([, l]) => l.length > 0);
+  const remainingSlots = slots.filter((sl) => stateOf(`asset.image.${sl.slot}`) !== "done");
+  const launchOk = current.find((c) => c.key === "launch.placeholders_ok")?.value === "yes";
+
+  return (
+    <div className="needs-page">
+      <header className="needs-head">
+        <h1 className="t-title">What the site still needs</h1>
+        <p className="t-lead muted">Anything the client never gave us. Add it, answer it, or skip it. Anything skipped is left out of the site, never made up.</p>
+        <div className="needs-meter">
+          <div className="meter" role="progressbar" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={done} aria-label={`${done} of ${items.length} supplied`}>
+            <span style={{ width: `${items.length ? (done / items.length) * 100 : 0}%` }} />
+          </div>
+          <p aria-live="polite" className="t-label">
+            {done} of {items.length} supplied
+          </p>
+        </div>
+      </header>
+      {groups.map(([g, list]) => (
+        <section key={g} aria-labelledby={`g-${g}`} className="needs-group">
+          <h2 id={`g-${g}`} className="t-item">
+            {g}
+          </h2>
+          <ul className="needs-v2">
+            {list.map((i) => (
+              <NeedRow
+                key={i.key}
+                label={i.label}
+                why={i.why}
+                kind={i.kind}
+                state={stateOf(i.key)}
+                value={valueOf(i.key)}
+                accept={i.accept}
+                busy={!decider || busy !== null}
+                onFile={(fl) => void file(i, fl)}
+                onAnswer={(v) => void save(i, v, false)}
+                onSkip={() => void save(i, null, true)}
+                onChange={() => setReopened((r) => ({ ...r, [i.key]: true }))}
+              />
+            ))}
+          </ul>
+        </section>
+      ))}
+      <section aria-labelledby="ph-h" className="client-section">
+        <h2 id="ph-h" className="t-item">
+          Placeholders still on the site
+        </h2>
+        {!latest ? (
+          <p className="muted">None yet: the site has not been built. After a build, any picture you skipped shows here as a labelled placeholder, and the site is not ready to launch until it is added or you knowingly accept it.</p>
+        ) : remainingSlots.length === 0 ? (
+          <p className="muted">None. Every picture on the site is one the client supplied.</p>
+        ) : (
+          <>
+            <p className="muted">
+              {remainingSlots.length} {remainingSlots.length === 1 ? "picture shows" : "pictures show"} “Image to come” on the last build. Add {remainingSlots.length === 1 ? "it" : "them"} above, or knowingly launch with {remainingSlots.length === 1 ? "it" : "them"}.
+            </p>
+            {owner ? (
+              <label className="tick">
+                <input type="checkbox" checked={launchOk} disabled={busy !== null} onChange={(e) => void save({ key: "launch.placeholders_ok", label: "Launch with placeholder pictures", why: "", kind: "text", group: "Details" }, e.target.checked ? "yes" : null, !e.target.checked)} />
+                <span>Launch with placeholders: the client knows these pictures will show “Image to come” until they send them.</span>
+              </label>
+            ) : (
+              <p className="t-small muted">Only an owner can choose to launch with placeholders.</p>
+            )}
+          </>
+        )}
+      </section>
+      {error && <Notice tone="stop">{error}</Notice>}
+      {decider && (
+        <div className="sticky-bar">
+          <div className="row-actions">
+            {running ? (
+              <ButtonLink to={`/activity/${running.id}`} variant="primary" size="page">
+                Watch the build
+              </ButtonLink>
+            ) : (
+              <Button variant="primary" size="page" icon={Play} disabled={!logoIn || busy !== null} onClick={() => setConfirm(true)}>
+                {builds.length ? "Build it again" : "Start the build"}
+              </Button>
+            )}
+            <p className="t-small muted start-line">
+              {running
+                ? "A build is running for this client."
+                : !logoIn
+                  ? "Add the logo to start the build. It goes at the top of every page."
+                  : leftOut.length
+                    ? `Ready to build. ${leftOut.length} ${leftOut.length === 1 ? "item" : "items"} will be left out, never made up: ${leftOut.join(", ")}.`
+                    : "Ready to build. Everything is in."}
+            </p>
+          </div>
+        </div>
+      )}
+      <ConfirmDialog
+        open={confirm}
+        title={builds.length ? "Build the site again?" : "Start the build?"}
+        body={`${client}, ${row.build_track === "B" ? "Showcase site with motion" : "Fast local site"}. The factory builds it and runs every check. Nothing is published.`}
+        cost={usual ? costLine(money(usual)) : `The cost depends on the site. ${buildStopLine()}`}
+        confirmLabel={builds.length ? "Build it again" : "Start the build"}
+        onConfirm={() => void start()}
+        onCancel={() => setConfirm(false)}
+      />
+    </div>
+  );
+}
+
 export function PlanPage() {
   const { id = "" } = useParams();
   const plan = useLoad(() => fetchPlan(id), [id]);
@@ -681,6 +888,7 @@ export function PlanPage() {
   // Cockpit v2: a proposal waiting for a decision is reviewed here; decided ones keep the pre-v2 page until the
   // details-list screen replaces it.
   if (row.status === "pending") return <ProposalReview row={row} onDone={plan.reload} />;
+  if (row.status === "approved" && row.build_track) return <NeedsScreen row={row} />;
   const p = row.plan.plan;
   return (
     <>
