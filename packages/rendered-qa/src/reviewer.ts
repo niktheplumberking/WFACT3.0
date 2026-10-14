@@ -23,6 +23,7 @@ import type { Rulebook } from "./rulebook.js";
 import { loadRulebook } from "./rulebook.js";
 import type { Shot } from "./rendered.js";
 import { fetchWithTimeout } from "./longFetch.js";
+import { isCreditsExhausted } from "@wfact/verification/credits";
 
 export const REVIEW_CHECK_ID = "render.design-review";
 export type ReviewerProvider = "openai" | "agent37" | "anthropic";
@@ -30,10 +31,11 @@ export const DEFAULT_MODELS: Record<ReviewerProvider, string> = { openai: "gpt-5
 const PROVIDERS: ReviewerProvider[] = ["openai", "agent37", "anthropic"];
 /**
  * One review call longer than this is no answer. The first live Anthropic review (5 pages, 15 images, 2026-10-13)
- * answered in 32 s, so this is ~4x headroom. It was 600 s: with Node's 300 s fetch cut removed (fetchWithTimeout),
+ * answered in 32 s and direct Claude reviews take 30-65 s live, so 150 s (2026-10-14, P0 item 2) is over 2x the slowest.
+ * It was 600 s, then 120 s: with Node's 300 s fetch cut removed (fetchWithTimeout),
  * a hung gateway could then hold QA for four 10-minute calls.
  */
-export const REVIEW_REQUEST_TIMEOUT_MS = 120_000;
+export const REVIEW_REQUEST_TIMEOUT_MS = 150_000;
 /**
  * The whole review, every call and wait included, ends by this deadline (P0, docs/BUILD-SPEED-UX-PROMPTS.md).
  * Hung Agent 37 reviews held QA for 1,247-1,392 s on 2026-10-07/13 and ended NOT RUN anyway.
@@ -118,6 +120,8 @@ export interface ScreenshotReviewOptions extends ReviewCallHooks {
   requestTimeoutMs?: number;
   /** Deadline for the whole review; default REVIEW_TOTAL_BUDGET_MS. Tests pass small values. */
   totalBudgetMs?: number;
+  /** A 5xx/429 or connection error slower than this is a hang, not an outage; default FAST_FAILURE_MS. Tests pass small values. */
+  fastFailureMs?: number;
 }
 
 /**
@@ -129,6 +133,26 @@ export interface ScreenshotReviewOptions extends ReviewCallHooks {
  */
 export const REVIEW_RETRY_DELAYS_MS = [15_000, 45_000, 120_000];
 const MAX_ANSWER_ATTEMPTS = 2;
+/**
+ * Backoff waits are for FAST gateway failures only (a 502 in a second or two). A 5xx/429 that arrived after this
+ * long is treated like a timeout: the gateway sat on the request, so it gets at most the one timeout retry, never
+ * the long waits (2026-10-14 catalogue: a slow 5xx plus three waits could otherwise eat most of the budget).
+ */
+export const FAST_FAILURE_MS = 20_000;
+
+/**
+ * The longest a review can take, every call and wait included. The loop never starts a call or a wait that would
+ * end past the deadline (each call's timeout is clipped to the time left), so the bound is the smaller of the
+ * deadline and the longest legal sequence: (1 + timeout retries) hung calls, every backoff wait after a fast
+ * failure, and the unusable-answer retries at full length. Hooks (trace writes) are not counted.
+ */
+export function reviewWorstCaseMs(o: { requestTimeoutMs?: number; totalBudgetMs?: number; retryDelaysMs?: number[] } = {}): number {
+  const call = o.requestTimeoutMs ?? REVIEW_REQUEST_TIMEOUT_MS;
+  const delays = o.retryDelaysMs ?? REVIEW_RETRY_DELAYS_MS;
+  const sequence =
+    (1 + MAX_TIMEOUT_RETRIES) * call + delays.reduce((a, d) => a + d + FAST_FAILURE_MS, 0) + MAX_ANSWER_ATTEMPTS * call;
+  return Math.min(o.totalBudgetMs ?? REVIEW_TOTAL_BUDGET_MS, sequence);
+}
 
 export interface ScreenshotReviewSuite extends AsyncCheckSuite {
   provider: ReviewerProvider;
@@ -275,6 +299,7 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
 
       const delays = opts.retryDelaysMs ?? REVIEW_RETRY_DELAYS_MS;
       const requestTimeoutMs = opts.requestTimeoutMs ?? REVIEW_REQUEST_TIMEOUT_MS;
+      const fastFailureMs = opts.fastFailureMs ?? FAST_FAILURE_MS;
       const deadline = Date.now() + (opts.totalBudgetMs ?? REVIEW_TOTAL_BUDGET_MS);
       let lastError = "";
       let calls = 0;
@@ -323,10 +348,12 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
           });
         } catch (err) {
           const ms = Date.now() - started;
-          const timedOut = (err instanceof Error && err.name === "TimeoutError") || ms >= callTimeoutMs;
-          lastError = timedOut
+          // A connection error after a long silence is a hang too: timeout rule, not the backoff waits.
+          const cut = (err instanceof Error && err.name === "TimeoutError") || ms >= callTimeoutMs;
+          const timedOut = cut || ms >= fastFailureMs;
+          lastError = cut
             ? `no answer within ${Math.round(callTimeoutMs / 1000)} s`
-            : `request failed: ${err instanceof Error ? err.message : String(err)}`;
+            : `request failed${timedOut ? ` after ${Math.round(ms / 1000)} s` : ""}: ${err instanceof Error ? err.message : String(err)}`;
           await record(undefined, ms, lastError);
           // A hang is not a short outage: one more try at most, straight away, never the long waits.
           if (timedOut) {
@@ -346,9 +373,21 @@ export function createScreenshotReviewSuite(opts: ScreenshotReviewOptions): Scre
         if (!res.ok) {
           const msg = typeof json.error === "string" ? json.error : json.error?.message;
           lastError = `HTTP ${res.status}: ${msg?.slice(0, 200) ?? "no message"}`;
-          if (res.status === 401 || res.status === 402 || res.status === 403 || res.status === 404) break;
-          if ((res.status >= 500 || res.status === 429) && (await retryAfterTransportError())) continue;
-          if (res.status >= 500 || res.status === 429) break;
+          // Out of money (402, Anthropic 400 "credit balance is too low", OpenAI insufficient_quota): never retried.
+          if (isCreditsExhausted(res.status, msg ?? "")) {
+            lastError = `credits exhausted: ${lastError}`;
+            break;
+          }
+          if (res.status === 401 || res.status === 403 || res.status === 404) break;
+          if (res.status >= 500 || res.status === 429) {
+            // A slow 5xx is a hang that ended in an error: the timeout rule (one retry, no wait), not the backoff.
+            if (Date.now() - started >= fastFailureMs) {
+              if (timeoutRetries++ < MAX_TIMEOUT_RETRIES) continue;
+              break;
+            }
+            if (await retryAfterTransportError()) continue;
+            break;
+          }
           if (++answerAttempts >= MAX_ANSWER_ATTEMPTS) break;
           continue;
         }

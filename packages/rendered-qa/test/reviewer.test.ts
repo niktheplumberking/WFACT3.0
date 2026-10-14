@@ -5,7 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { REVIEW_RETRY_DELAYS_MS, REVIEW_REQUEST_TIMEOUT_MS, REVIEW_TOTAL_BUDGET_MS, createScreenshotReviewSuite, parseReview, REVIEW_CHECK_ID } from "../src/reviewer.js";
+import { FAST_FAILURE_MS, REVIEW_RETRY_DELAYS_MS, REVIEW_REQUEST_TIMEOUT_MS, REVIEW_TOTAL_BUDGET_MS, createScreenshotReviewSuite, parseReview, REVIEW_CHECK_ID, reviewWorstCaseMs } from "../src/reviewer.js";
 import { loadRulebook } from "../src/rulebook.js";
 import type { Shot } from "../src/rendered.js";
 import type { VerificationContext } from "@wfact/verification/checks/types";
@@ -138,11 +138,70 @@ function hungFetch(then: (string | { status: number } | null)[] = []) {
   return { impl, calls };
 }
 
-test("P0 defaults: one call is cut at 120 s and the whole review ends within 5 minutes", () => {
-  assert.equal(REVIEW_REQUEST_TIMEOUT_MS, 120_000);
+test("P0 defaults: one call is cut at 150 s and the whole review ends within 5 minutes", () => {
+  assert.equal(REVIEW_REQUEST_TIMEOUT_MS, 150_000);
   assert.ok(REVIEW_TOTAL_BUDGET_MS <= 300_000, `review budget ${REVIEW_TOTAL_BUDGET_MS} ms`);
   // A hang gets one retry: two full calls fit the budget, so the retry is never cut short by design.
   assert.ok(2 * REVIEW_REQUEST_TIMEOUT_MS <= REVIEW_TOTAL_BUDGET_MS);
+});
+
+test("P0 item 2: the computed worst case of a whole review, every call and wait included, is under 6 minutes", () => {
+  const worst = reviewWorstCaseMs();
+  assert.ok(worst < 6 * 60_000, `worst case ${worst} ms`);
+  assert.ok(REVIEW_REQUEST_TIMEOUT_MS <= 150_000, `per-call timeout ${REVIEW_REQUEST_TIMEOUT_MS} ms`);
+  // Live direct Claude reviews take 30-65 s: a call is never cut before twice the slowest seen.
+  assert.ok(REVIEW_REQUEST_TIMEOUT_MS >= 2 * 65_000);
+  // Even with the per-call timeout raised to 150 s, the hard cap still bounds the review.
+  assert.ok(reviewWorstCaseMs({ requestTimeoutMs: 150_000 }) < 6 * 60_000);
+});
+
+/** Node 22: AbortSignal.timeout timers are unref'd, so a mocked hang needs something keeping the loop alive (a9b271f). */
+const keepAlive = () => {
+  const t = setInterval(() => {}, 1_000);
+  return () => clearInterval(t);
+};
+
+test("a SLOW 5xx (gateway sat on the request) is a hang: one retry, no backoff waits", async () => {
+  const release = keepAlive();
+  try {
+    const calls: number[] = [];
+    const impl = (async () => {
+      calls.push(Date.now());
+      await new Promise((r) => setTimeout(r, 40)); // 'slow' at test scale (FAST_FAILURE_MS is 20 s in production)
+      return new Response(JSON.stringify({ error: { message: "upstream timeout" } }), { status: 504 });
+    }) as unknown as typeof fetch;
+    assert.equal(FAST_FAILURE_MS, 20_000, "production threshold; scaled to 20 ms below");
+    const started = Date.now();
+    const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, retryDelaysMs: [5_000, 5_000, 5_000], fastFailureMs: 20, totalBudgetMs: 60_000 }).run(ctx);
+    assert.equal(calls.length, 2, "one retry, as for a timeout");
+    assert.ok(Date.now() - started < 1_000, "none of the 5 s backoff waits was taken");
+    assert.equal(r!.notRun, true);
+    assert.match(r!.details[0]!, /HTTP 504/);
+    // A FAST 5xx still gets the backoff waits (a short outage).
+    const fast = mockFetch([{ status: 502 }, allPass()]);
+    const [ok] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: fast.impl, retryDelaysMs: [0, 0, 0], fastFailureMs: 20_000 }).run(ctx);
+    assert.equal(ok!.passed, true);
+  } finally {
+    release();
+  }
+});
+
+test("credits exhausted (402, Anthropic 400 credit balance, OpenAI insufficient_quota): one call, no retry, reason says 'credits exhausted'", async () => {
+  for (const [status, message, provider] of [
+    [402, "AI credits exhausted.", "agent37"],
+    [400, "Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.", "agent37"],
+    [429, "You exceeded your current quota (insufficient_quota)", "agent37"],
+  ] as const) {
+    const calls: number[] = [];
+    const impl = (async () => {
+      calls.push(1);
+      return new Response(JSON.stringify({ error: { message } }), { status });
+    }) as unknown as typeof fetch;
+    const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "anthropic", provider, baseUrl: "https://gw.test", shots: () => shots, fetchImpl: impl, retryDelaysMs: [0, 0, 0] }).run(ctx);
+    assert.equal(calls.length, 1, `HTTP ${status} must not be retried`);
+    assert.equal(r!.notRun, true);
+    assert.match(r!.details[0]!, /credits exhausted/);
+  }
 });
 
 test("a hung call is no answer: retried once straight away (no backoff), then NOT RUN", async () => {
@@ -175,10 +234,10 @@ test("the review time budget is a hard ceiling: a wait that would end past it is
 });
 
 test("worst case, scaled: hangs and outages mixed never run past the budget", async () => {
-  // The defaults' shape (call 120 s, waits 15/45/120 s, budget 300 s) at 1/1000 scale: two fast 502s, then hangs.
+  // The defaults' shape (call 150 s, waits 15/45/120 s, budget 300 s) at 1/1000 scale: two fast 502s, then hangs.
   const { impl, calls } = hungFetch([{ status: 502 }, { status: 502 }]);
   const started = Date.now();
-  const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, retryDelaysMs: [15, 45, 120], requestTimeoutMs: 120, totalBudgetMs: 300 }).run(ctx);
+  const [r] = await createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl: impl, retryDelaysMs: [15, 45, 120], requestTimeoutMs: 150, totalBudgetMs: 300 }).run(ctx);
   const elapsed = Date.now() - started;
   assert.ok(elapsed < 300 + 50, `ended in ${elapsed} ms against a 300 ms budget`);
   assert.ok(calls.length >= 3);

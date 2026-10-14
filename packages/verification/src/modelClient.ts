@@ -15,6 +15,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { familyOf, loadEvaluatorConfig, type EvaluatorConfig, type ModelIdentity } from "./crossModel.js";
+import { isCreditsExhausted } from "./credits.js";
 
 export interface ModelRequest {
   system: string;
@@ -27,9 +28,8 @@ export interface ModelClient {
 }
 
 /**
- * The provider account is out of money: HTTP 402, Anthropic's 400 "credit balance is too low", or OpenAI's
- * insufficient_quota. Retrying cannot help, so callers fail at once. The message always contains the words
- * "credits exhausted": the Cockpit's recovery classifier maps that to the "money" bucket (a human tops up).
+ * The provider account is out of money (see credits.ts). Retrying cannot help, so callers fail at once. The
+ * message always contains the words "credits exhausted" (the Cockpit's recovery classifier: "money").
  */
 export class CreditsExhaustedError extends Error {
   constructor(provider: string, detail: string) {
@@ -38,11 +38,7 @@ export class CreditsExhaustedError extends Error {
   }
 }
 
-/** True when an HTTP status + body means the account has no credit left (never retry these). */
-export function isCreditsExhausted(status: number | undefined, body: string): boolean {
-  if (status === 402) return true;
-  return (status === 400 || status === 429) && /credit balance is too low|insufficient_quota|exceeded your current quota|credits exhausted/i.test(body);
-}
+export { isCreditsExhausted };
 
 export class ModelNotConfiguredError extends Error {
   constructor(reason: string) {

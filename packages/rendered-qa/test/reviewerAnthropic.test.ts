@@ -110,7 +110,7 @@ async function slowServer(delayMs: number) {
 }
 
 test("fetchWithTimeout: the header limit follows the caller's timeout plus headroom, not Node's fixed 300 s", async () => {
-  // P0 (2026-10-13): a review call is cut at 120 s by its own signal, inside Node's 300 s default; the dispatcher
+  // P0 (2026-10-13): a review call is cut at 150 s (2026-10-14; 120 s on 10-13) by its own signal, inside Node's 300 s default; the dispatcher
   // limit only has to sit above that signal so the caller's message is the one reported.
   assert.ok(DISPATCHER_HEADROOM_MS > 0, "the caller's signal fires before the dispatcher limit");
   assert.ok(REVIEW_REQUEST_TIMEOUT_MS < 300_000, "a review call ends inside Node's default limit as well");

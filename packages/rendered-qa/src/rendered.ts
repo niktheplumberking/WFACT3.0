@@ -127,6 +127,8 @@ export interface RenderedMetrics {
   motion?: { blockingMs: number | null; longFrames: number | null; animations: number };
   jsBytes: number;
   lcpMs: number | null;
+  /** When the first LCP was a near miss (within 10% over budget): all three applied-throttling samples; lcpMs is their median. */
+  lcpSamplesMs?: number[];
   /** Lighthouse's simulated (lantern) LCP: advisory, recorded for comparison, never gates (2026-10-07). */
   lcpSimulatedMs?: number | null;
   cls: number | null;
@@ -294,6 +296,33 @@ async function lighthouseRun(url: string, methods: ThrottlingMethod[]): Promise<
     clearTimeout(timer);
     chrome.kill();
   }
+}
+
+/** A first LCP at most this far over the budget is a near miss and is re-measured; further over fails at once. */
+export const LCP_NEAR_MISS = 0.1;
+
+/**
+ * Applied-throttling LCP is noisy by a few percent run to run (Cockpit job c775c396 failed all 3 rounds at
+ * 2.52-2.63 s against 2.5 s). The budget is NOT raised: a first measurement under the budget passes; one more
+ * than 10% over fails immediately; a near miss (budget <= LCP <= budget * 1.1) is measured twice more and the
+ * median of the three is what is judged. Every sample is returned so the result can show all three.
+ */
+export async function settleLcp(first: number, budgetMs: number, remeasure: () => Promise<number>): Promise<{ lcpMs: number; samples: number[] }> {
+  if (!(first >= budgetMs) || !(first <= budgetMs * (1 + LCP_NEAR_MISS))) return { lcpMs: first, samples: [first] };
+  const samples = [first, await remeasure(), await remeasure()];
+  // A sample Lighthouse could not measure (NaN) makes the result unmeasured (a failure), never a pass.
+  return { lcpMs: samples.some(Number.isNaN) ? Number.NaN : [...samples].sort((a, b) => a - b)[1]!, samples };
+}
+
+const secs = (ms: number) => `${(ms / 1000).toFixed(2)} s`;
+
+/** The render.perf LCP failure line, naming every sample when the near miss was re-measured. */
+export function lcpFailureDetail(where: string, lcp: { lcpMs: number; samples: number[] }, budgetMs: number): string {
+  const measured =
+    lcp.samples.length > 1
+      ? `LCP ${secs(lcp.lcpMs)} on mobile (median of ${lcp.samples.map(secs).join(", ")}: the first run was within ${LCP_NEAR_MISS * 100}% of the budget, so it was measured twice more; Lighthouse, applied throttling)`
+      : `LCP ${secs(lcp.lcpMs)} on mobile (Lighthouse, applied throttling)`;
+  return `${where}${measured}; the budget is ${(budgetMs / 1000).toFixed(1)} s`;
 }
 
 /** Runs every rendered check against a site directory served over loopback HTTP. */
@@ -466,10 +495,12 @@ export async function runRenderedQa(siteDir: string, opts: RenderedQaOptions): P
             async (err) => (isHome ? [...(await lighthouseRun(url, ["devtools"])), undefined] : Promise.reject(err)),
           );
           if (!lh) throw new Error("Lighthouse returned no applied-throttling result");
-          m.lcpMs = lh.lcpMs;
+          const lcp = await settleLcp(lh.lcpMs, budget.lcpMs, async () => (await lighthouseRun(url, ["devtools"]))[0]?.lcpMs ?? Number.NaN);
+          m.lcpMs = lcp.lcpMs;
+          if (lcp.samples.length > 1) m.lcpSamplesMs = lcp.samples;
           m.cls = lh.cls;
           m.performanceScore = lh.score;
-          if (!(lh.lcpMs < budget.lcpMs)) details["render.perf"]!.push(`${where}LCP ${(lh.lcpMs / 1000).toFixed(2)} s on mobile (Lighthouse, applied throttling); the budget is ${(budget.lcpMs / 1000).toFixed(1)} s`);
+          if (!(lcp.lcpMs < budget.lcpMs)) details["render.perf"]!.push(lcpFailureDetail(where, lcp, budget.lcpMs));
           // Advisory only: never fails the check; home page only, so multi-page QA stays inside the 30-minute job limit.
           if (isHome) m.lcpSimulatedMs = sim?.lcpMs ?? null;
           if (!(lh.cls < budget.cls)) details["render.perf"]!.push(`${where}CLS ${lh.cls.toFixed(3)}; the budget is ${budget.cls}`);
