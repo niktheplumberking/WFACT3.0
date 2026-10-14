@@ -115,6 +115,11 @@ export function BuildTimeline({
                   {when(s, now)}
                 </div>
                 {s.detail && <p className="tl-detail">{s.detail}</p>}
+                {(s.notes ?? []).length > 0 && (
+                  <p className="quiet fine tl-notes" style={{ margin: "4px 0 0" }}>
+                    Notes, not blocking: {s.notes!.join("; ")}.
+                  </p>
+                )}
                 {s.problems.length > 0 && (
                   <ul className="tl-problems" aria-label={s.kind === "preflight" ? "Missing details" : "What the checks found"}>
                     {s.problems.slice(0, 8).map((p) => (

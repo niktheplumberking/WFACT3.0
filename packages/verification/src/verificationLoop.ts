@@ -100,7 +100,7 @@ export class VerificationLoop {
           clientSlug: ctx.clientSlug,
           status: result.status,
           goal,
-          checks: result.checkResults.map(({ checkId, passed, details }) => ({ checkId, passed, details })),
+          checks: result.checkResults.map(({ checkId, passed, details, advisory }) => ({ checkId, passed, details, ...(advisory ? { advisory: true } : {}) })),
           evaluator: result.evaluator,
           ...(result.evaluatorError ? { evaluatorError: result.evaluatorError } : {}),
           evaluatorModel: this.evaluatorModel?.name ?? null,

@@ -2,6 +2,7 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { WarningOctagon, Info, CheckCircle, Warning, ArrowsOut, ArrowsIn, X, Eye } from "@phosphor-icons/react";
 import { previewHtml } from "../jobsClient";
+import { loadSitePreview, pageForHref, pageLabel, type SitePreviewData } from "../lib/sitePreview";
 import { GATE_STAGES, LAUNCH_STAGE, STAGES, STAGE_SHORT, stageIndex, stageLabel } from "../stages";
 import type { Tone } from "../lib/model";
 
@@ -203,6 +204,102 @@ export function ConfirmDialog({
  * session. Built pages are model output — treat them as untrusted.
  */
 export function PagePreview({ path }: { path: string }) {
+  // A multi-page site (Track A or B) is checkpointed as its manifest: preview the site itself, never the file list.
+  if (path.endsWith("/site.manifest.json")) return <SitePreview manifestPath={path} />;
+  return <SinglePagePreview path={path} />;
+}
+
+function SitePreview({ manifestPath }: { manifestPath: string }) {
+  const [site, setSite] = useState<SitePreviewData | null>(null);
+  const [page, setPage] = useState<string | null>(null);
+  const [html, setHtml] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [full, setFull] = useState(false);
+  const frame = useRef<HTMLIFrameElement>(null);
+  const selectId = useId();
+
+  async function show(s: SitePreviewData, p: string) {
+    setLoading(true);
+    setError(null);
+    try {
+      setHtml(await s.render(p));
+      setPage(p);
+    } catch (e) {
+      setError(`Couldn't load ${pageLabel(p)}: ${e instanceof Error ? e.message : String(e)}. Nothing was changed; try again.`);
+    }
+    setLoading(false);
+  }
+
+  async function open() {
+    setLoading(true);
+    setError(null);
+    const res = await loadSitePreview(manifestPath);
+    setLoading(false);
+    if (!res.data) return setError(`Couldn't load the built site: ${res.error}. Nothing was changed; try again.`);
+    setSite(res.data);
+    await show(res.data, res.data.pages[0]!);
+  }
+
+  // Links inside the site arrive as messages from its frame (and only from it): a known page is shown, anything else is ignored.
+  useEffect(() => {
+    if (!site) return;
+    const onMessage = (e: MessageEvent) => {
+      if (e.source !== frame.current?.contentWindow) return;
+      const href = (e.data as { wfactPreviewHref?: unknown } | null)?.wfactPreviewHref;
+      if (typeof href !== "string") return;
+      const target = pageForHref(href, site.pages);
+      if (target) void show(site, target);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [site]);
+
+  if (!site || html === null) {
+    return (
+      <div className="stack-tight">
+        <div>
+          <button className="btn" type="button" disabled={loading} onClick={open}>
+            <Eye aria-hidden="true" />
+            {loading ? "Loading…" : "Preview the built site"}
+          </button>
+        </div>
+        {error && <Notice tone="stop">{error}</Notice>}
+      </div>
+    );
+  }
+  return (
+    <div className={full ? "preview full" : "preview"}>
+      <div className="actions">
+        <label htmlFor={selectId} className="quiet">
+          Page
+        </label>
+        <select id={selectId} className="input" style={{ width: "auto" }} value={page ?? ""} disabled={loading} onChange={(e) => void show(site, e.target.value)}>
+          {site.pages.map((p) => (
+            <option key={p} value={p}>
+              {pageLabel(p)}
+            </option>
+          ))}
+        </select>
+        <button className="btn small" type="button" onClick={() => setFull(!full)}>
+          {full ? <ArrowsIn aria-hidden="true" /> : <ArrowsOut aria-hidden="true" />}
+          {full ? "Exit full screen" : "Full screen"}
+        </button>
+        <button className="btn small ghost" type="button" onClick={() => { setSite(null); setHtml(null); setFull(false); }}>
+          <X aria-hidden="true" />
+          Close preview
+        </button>
+      </div>
+      {error && <Notice tone="stop">{error}</Notice>}
+      <iframe ref={frame} key={page ?? ""} title={`Preview of the built site: ${page ? pageLabel(page) : ""}`} sandbox="allow-scripts" srcDoc={html} />
+      <p className="quiet fine" style={{ margin: 0 }}>
+        The pages as built: words, layout, colours, fonts and logo. Motion and interactive parts play on a real preview link, not here. Links switch the page here; forms don't send.
+      </p>
+    </div>
+  );
+}
+
+function SinglePagePreview({ path }: { path: string }) {
   const [html, setHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

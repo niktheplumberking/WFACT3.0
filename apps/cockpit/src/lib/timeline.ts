@@ -38,6 +38,8 @@ export interface TimelineStep {
   detail: string | null;
   /** Failed checks (quality steps) or missing details (readiness step), in plain words. */
   problems: string[];
+  /** Advisory findings: reported, never blocking (a passed step can carry them). */
+  notes?: string[];
   /** Which part of the run this belongs to: 0 = the first go, 1+ = after each "continue". */
   segment: number;
   /** Builder steps: 0 = the first write, n = revision round n. Quality steps: the round they checked. */
@@ -343,9 +345,14 @@ export function deriveTimeline(input: DeriveInput): Timeline {
         const s = inSeg("qa");
         if (!s) break;
         const status = str(field(r, "status"));
-        const checks = Array.isArray(field(r, "checks")) ? (field(r, "checks") as { checkId?: string; passed?: boolean }[]) : [];
-        const failed = uniq(checks.filter((c) => c && c.passed === false && typeof c.checkId === "string").map((c) => checkLabel(c.checkId!)));
+        const checks = Array.isArray(field(r, "checks")) ? (field(r, "checks") as { checkId?: string; passed?: boolean; advisory?: boolean }[]) : [];
+        const failing = checks.filter((c) => c && c.passed === false && typeof c.checkId === "string");
+        // Advisory findings never block. Rows written before the flag existed: on an approved result every failing check was advisory.
+        const isNote = (c: { advisory?: boolean }) => c.advisory === true || status === "approved";
+        const failed = uniq(failing.filter((c) => !isNote(c)).map((c) => checkLabel(c.checkId!)));
         s.problems = failed;
+        const notes = uniq(failing.filter(isNote).map((c) => checkLabel(c.checkId!)));
+        if (notes.length > 0) s.notes = notes;
         s.detail =
           status === "approved"
             ? "Every check passed."
