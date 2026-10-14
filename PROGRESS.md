@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-14, via `/step-close` (Steps 21 and 4D): `8b3caed` and `a444a3d` built locally (intake logo and live address, readiness check, continue from a chosen step, build timeline); migration 0021 not applied; not pushed.
+Last synced: 2026-10-14 (17:00 +05), via `/progress-sync`. Re-synced after `caf42bc` (head of both branches). Step 4D closed: its last open item (owner details reaching the builder live) is met by job `55ddba7c` (SQL-checked: reopen brief `ownerFacts`, built `site.json` facts `source: "brief"`). CI `38554457540` (`8271858`) green incl. deploy; `38557714567` (`caf42bc`) all jobs green except Rendered QA, still running at sync. Live: 31 jobs, 0 active; 151 `model_traces`; latest migration 20261014110708 (0021); 1 uploaded logo; 8 `plan_inputs`; 0 `account_requests` (Step 3A still unproven). Not checked: the new Cockpit site preview on the deployed app (needs a signed-in look).
+Previous sync: 2026-10-14, via `/step-close` (Steps 21 and 4D): `8b3caed` and `a444a3d` built locally (intake logo and live address, readiness check, continue from a chosen step, build timeline); migration 0021 not applied; not pushed.
 Previous sync: 2026-10-14 (00:45 +05), via `/progress-sync`. Re-synced after `67033f7`, `d5129e0`, `a9b271f`, `92fd4ac`. **Push state:** `origin/main` and `origin/huraira-work` are at `d5129e0`; `a9b271f` (test fix) and `92fd4ac` (docs) are local only. **CI:** `38452956084` on `d5129e0` FAILED in Rendered QA only (Node 22 cancelled reviewer tests 35-40), so the Cockpit deploy was skipped. `a9b271f` fixes it: `test/reviewer.test.ts` 18/18 re-run locally on Node 24; not yet proven on Node 22 or CI. **Live** (Supabase `mcaxxhgjptwowwrluhra`, read-only SQL): 30 jobs, 0 queued or running, 141 `model_traces` rows, latest migration 20261013162735 (0020). The Cockpit job runner runs from `main` (`d5129e0` includes `67033f7`), so the new reviewer is live even though the deploy job was skipped. Cockpit "continue" job `e2a204fb` (resume of the Lanternworks Track B build `83f2841f`, run `4c35703b`, GitHub run `38453886170`) ran QA end to end. It wrote 5 successful `anthropic` `agent:qa-evaluator` rows ($0.438) and 0 NOT RUN reviews. The site was reused with no builder call before the first review. It then halted at 19:40 UTC with `failed_verification` after 2 revisions, on named evaluator issues: the supplied logo is never embedded, and colours are outside the brief. `account_requests` and `plan_inputs` both have 0 rows. Not checked: signed-in Cockpit (Run page spend), Doppler, the Agent 37 gateway itself.
 Previous sync: 2026-10-14 (+05), via the Step 25 rehearsal (D4): `67033f7` fixes the design review that halted every build since 2026-10-07 (Node's 300 s fetch header limit, reproduced at 301,008 ms; reviewer moved to Anthropic, `reviewer.json` 1.1.0), the direction-step truncation (2048 to 6144) and the review payload (15 images for 5 pages, was 35). Tests: rendered-qa 70/70, planning 33, frontend-loop 77, hermes 55, jobs 24, workflow 33. Live: Anthropic review on Summit Track A passed in 32 s ($0.071); Lanternworks rehearsal build `83f2841f` and Summit resume `63278e56` stopped on the old reviewer. CI for `67033f7` pending at sync.
 Previous sync: 2026-10-13 (22:45 +05), via `/progress-sync`. Re-synced after `76e9d6c` (graphify and completion notes only, no code); no step changed status. Both branches and `origin/main` at `76e9d6c`. CI: `38437214851` (`c97e329`) and `38438423293` (`76e9d6c`) succeeded, every job including Deploy Cockpit to Vercel. Live: Cockpit HTTP 200; Supabase `mcaxxhgjptwowwrluhra` has 25 jobs, last 2026-10-12 18:01 UTC, 0 queued or running; 117 `model_traces` rows; latest migration 20261013162735 (0020). No build since the last sync, so M6's new trace rows are still unproven live. Nick's Bennett & Co brief is still not in the repo (no `clients/bennett*`) the day before the MVP deadline (2026-10-14). Not checked: signed-in Cockpit, Agent 37 gateway, Doppler.
@@ -29,7 +30,12 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-14, 00:45 +05, `/progress-sync`)**:
+**Status summary (2026-10-14, 17:00 +05, `/progress-sync`)**:
+- **First passing build since 2026-10-01**: Lanternworks (Track B, SYNTHETIC) continued with the uploaded logo and the owner's details, job `55ddba7c`, reached the launch gate in 14 min for ~$0.68. The intake logo slice (Step 21), continue-from-a-step (Step 4D, now DONE) and the Anthropic reviewer (Step 26 item 1) are all proven live.
+- **Open from that run**: Huraira's screenshot review (4B M4) and his UI audit request (empty-feeling pages, no images, little motion), interrupted by this sync; the Track B starter's 23 px contact links.
+- **Still blocked**: Step 25 proper on Nick's Bennett & Co brief.
+
+**Status summary (2026-10-14, 00:45 +05, superseded)**:
 - **First live build with a working review since 2026-10-07**: the Cockpit continue `e2a204fb` on Lanternworks (Track B, SYNTHETIC rehearsal) reached a real QA verdict. It failed on named evaluator issues, not on a NOT RUN review. That proves Step 26 item 1 in the Cockpit (Anthropic trace rows on run `4c35703b`) and Step 4D's one-press continue live (`63278e56` and `e2a204fb` both reused the saved site). It also proves Step 12's live trace rows (Agent 37 rows `estimated`, reviewer rows present).
 - **Why it failed**: the brief says to use the supplied logo, but intake cannot take a logo file, so no build can pass that check (the gap the rehearsal already found). Fix: the Step 21 intake slice under D4 Tier 2.
 - **CI is red on the pushed head** (`d5129e0`, Rendered QA on Node 22). The fix `a9b271f` is committed but not pushed. No step changed status.
@@ -63,7 +69,11 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-14, 00:45 +05):
+**Next up** (2026-10-14, 17:00 +05):
+1. **Agent**: finish the UI audit of the Lanternworks site Huraira asked for (what was built, why no images or placeholder cards, why pages feel thin, why motion is light) with fixes; it feeds 4B M4's screenshot review and Step 27.
+2. **Huraira**: check the new site preview on the deployed Cockpit (`caf42bc`) and do the 4B M4 screenshot review.
+3. **Nick**: the Bennett & Co brief (Step 25).
+**Next up** (2026-10-14, 00:45 +05, superseded):
 1. **Huraira**: push `a9b271f` and `92fd4ac` to both branches. The CI on the new head must be green, including Rendered QA and the Cockpit deploy.
 2. **Agent, on GO**: the D4 Tier 2 intake slice (logo file and live address in intake, the logo passed to the builder as an asset). Without it, every brief that names a logo fails QA, including Bennett & Co. Then press "continue" on Summit Line `63278e56` (Track A) to close Step 26 item 1 and 4B M4's Track A build.
 3. **Nick**: the Bennett & Co brief (logo, colours, live address, CRM target). Step 25 proper still waits on it.
@@ -1029,9 +1039,9 @@ config; existing verification tests pass unchanged."* — **MET** (44 -> 98 test
 gaps above. CI `37617845669` green.
 
 
-## Step 4D — Build recovery (PARTIAL 2026-10-14 — one-press continue proven live on `63278e56` and `e2a204fb`; missing-facts form not yet proven live)
+## Step 4D — Build recovery (DONE 2026-10-14 — exit check met live: `63278e56`, `e2a204fb`, `55ddba7c`)
 
-- [ ] **Continue from a chosen step and readiness check (2026-10-14)**: built in `8b3caed` (local, not pushed): resume `fromStep` qa/revise/rebuild, `workflow.preflight` before any paid step, Agent 37 timeouts not retried, live step timeline in the Cockpit. Evidence: workflow 41, jobs 28, Cockpit 115 tests. Not live yet.
+- [x] **Continue from a chosen step and readiness check (2026-10-14)**: built in `8b3caed`, pushed (CI `38554457540` green incl. deploy), live in job `55ddba7c` (reopen `fromStep: revise`, `workflow.preflight` ok, builder first): resume `fromStep` qa/revise/rebuild, `workflow.preflight` before any paid step, Agent 37 timeouts not retried, live step timeline in the Cockpit. Evidence: workflow 41, jobs 28, Cockpit 115 tests. Not live yet.
 
 Governed by `docs/BUILD-RECOVERY-DESIGN.md`. Huraira's request: stop Tracks failing again and again; when a build fails say why, offer a button
 that fixes it and continues from where it left off; when something is missing, ask for it in the Cockpit and continue.
@@ -1055,7 +1065,7 @@ that fixes it and continues from where it left off; when something is missing, a
       - Summit Line `63278e56` resumed run `2dcaacfa` with a `workflow.reopen` row (17:53 UTC). Its only model calls were reviewer calls, so there was no rebuild. It halted on the old Agent 37 reviewer (`not_verified_no_evaluator`).
       - Lanternworks `e2a204fb` resumed run `4c35703b` after the runner crash of `83f2841f`. Its first call was the review (19:24 UTC), with no builder call before it. It reached a real QA verdict (`failed_verification`, see Step 26).
       - Nothing was published.
-- [ ] Missing facts asked in the Cockpit and passed to the builder, live: not yet run (`plan_inputs` has 0 rows, 2026-10-14).
+- [x] Missing facts asked in the Cockpit and passed to the builder, live (2026-10-14): Huraira's details form wrote 8 `plan_inputs` rows; job `55ddba7c`'s reopen brief carries them as `ownerFacts`; the built `content/site.json` has phone, email and location with `source: "brief"`; launch gate reached (`4e4434db…`). Earlier note "0 rows" is superseded.
 - [ ] Not covered: file uploads (photos, logos: Step 4B M5), closing a stale `running` row from the Cockpit, a per-build total spend cap, saving the
       approved content before the site build.
 
