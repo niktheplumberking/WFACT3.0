@@ -19,11 +19,10 @@ Part D; open steps carry a **Next action** line and a continuation or verificati
 and deployed (`3e493f6`, CI `38569635936`; migration 0022 live, attack test 11/11); Package 2 (Track B starter 1.4.0: logo, accent,
 phone action, motion; four new rendered checks) green in CI and deployed (`d112f62`); Package 3 (image slots and labelled
 placeholders, migration 0023 live) built and verified locally (`7e30b09`); Package 4 (Cockpit v2 rebuild to the locked design in
-`docs/design/cockpit-v2/`) phases 1–4 of 9 built: tokens `4a50b22` and components `a8fa3cf` CI-green and deployed (CI `38588413325`),
-shell `8532f4e` and the six-step path `fd020a5` CI-green and deployed (CI `38593657465`); Home `00ec210`, Projects `2cd7f6b` and
-New request `9513166` and the client's page `fd7a08a` verified locally (the shell's first CI failed on a test race,
-fixed); Package 5 open.
-A caps conflict, three role conflicts (design vs RLS) and a missing site-approval record wait on Nick (`BLOCKED-ON-NICK.md`).
+`docs/design/cockpit-v2/`) phases 1–13 built: phases 1–12 CI-green and deployed (last CI `38604205509`, `56e545f`),
+phase 13 (Finished site review, `a01dbbf`) waiting on CI `38605626110`; Activity, Costs, Team, Settings, Notifications
+preferences and the final cleanup left; Package 5 open.
+Open Cockpit v2 decisions (caps, role rules, site-approval record, logo rule, stop-view actions, Ask for changes) wait on Nick (`BLOCKED-ON-NICK.md`); the owner-only database check for "launch with placeholders" is written (migration 0024, `562c5ae`, branch `claude/objective-engelbart-d65df7`), not merged or applied.
 
 **Status as of 2026-10-14**: the evidence moved on Steps 4D, 12 and 26, but no status changed:
 - **Step 4D**: the one-press continue is proven live on Summit `63278e56` and Lanternworks `e2a204fb`. The missing-facts form is still unproven live.
@@ -1419,7 +1418,9 @@ Track A 1.4.0, content `track-b/2` and `track-a/2`, both upgraded from v1 on rea
 every job and deployed, live Cockpit serves v2, `theme-color #F4F2ED`, HTTP 200; `8532f4e` phase 3 pushed in `a87e6db`, whose CI
 `38591851925` FAILED in the Cockpit job on a test race (sign-out test read the button before the lazy Settings page loaded), fixed in
 the test; `fd020a5` phase 4, pushed in `b3a3707`, CI `38593657465` green on every job and deployed (phases 3–4 live); `00ec210`
-phase 5 and `2cd7f6b` phase 6 pushed, CI `38595375699` and `38596185659` running at this sync; `9513166` phase 7, local). Source of truth: `docs/design/cockpit-v2/` (locked 2026-10-14); the build prompt is
+phase 5 and `2cd7f6b` phase 6, CI `38595375699` and `38596185659` green and deployed; phases 7–12 (`9513166`, `fd7a08a`,
+`74e1384`, `5a96bb2`, `99ba999`, `a94eb6f`) green and deployed, last CI `38604205509` on `56e545f` incl. Deploy Cockpit to Vercel
+(smoke HTTP 200); phase 13 `a01dbbf` pushed in `47a2da4`, CI `38605626110` running at the 2026-10-15 05:30 sync). Source of truth: `docs/design/cockpit-v2/` (locked 2026-10-14); the build prompt is
 `docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md` (phases: tokens, components, shell, `path.ts`, then each screen).
 - Phase 1 tokens (`4a50b22`): v2 light/dark values, four accents, density, type scale, motion, reduced motion (device or in-app),
   text-size zoom; `lib/appearance.ts`; Newsreader. `tokens.test.ts` proves the locked values and 4.5:1 for every text, status and
@@ -1493,7 +1494,7 @@ phase 5 and `2cd7f6b` phase 6 pushed, CI `38595375699` and `38596185659` running
 - Not done: the remaining screens ( Project page, Proposal, Needs, Live build, Stopped, Finished site, Activity,
   Costs, Team, Settings, Notifications preferences); no Lighthouse run yet.
 
-**Next action**: Huraira reviews the Package 4 phase 13 report (Finished site review) and gives GO for the next screen (Activity).
+**Next action**: Huraira gives GO for Package 4 phase 14 (Activity) and confirms CI `38605626110` (phase 13) is green. Separately (Huraira): review, merge and apply migration 0024 (`562c5ae`) and run `scripts/rls_attack_test_placeholders.sql`.
 Confirm CI green on the latest push. Nick answers the caps, role and site-approval questions. Package 5: see the source doc.
 
 Continuation prompt — updated 2026-10-15, after phase 13 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
@@ -1528,11 +1529,22 @@ ALREADY DONE (do not redo):
   (fd7a08a); lib/phrases.ts translates audit actions (reuse it in Activity). Phase 9 Proposal review: ProposalReview in
   pages/Decisions.tsx (pending only). Phase 10: NeedsScreen in pages/Decisions.tsx (5a96bb2) for approved proposals with a kind
   of site; rejected and pre-track proposals still use the pre-v2 AfterDecision.
+- Phase 11 Live build, 99ba999: components/LiveBuild.tsx on RunPage (ten rows mapped from deriveTimeline; steps the run does
+  not record say "Not recorded"). Not done: Spent so far, the phone toggle (no push channel).
+- Phase 12 Stopped build, a94eb6f: components/StoppedBuild.tsx + lib/stopCases.ts (8 cases from diagnoseJob(); every paid
+  move confirms its cost), pages/stopped.test.tsx. Dev: ?fake-stop=2|5|6. RecoveryPanel is no longer used by RunPage.
+- Phase 13 Finished site review, a01dbbf: components/SiteReview.tsx on the newest passing build waiting for approval;
+  Approve the site shown off (no approval record), Ask for changes not offered (no runner input), pages/review.test.tsx.
+  Dev: ?fake-ph=1.
+- Not UI (side session, branch claude/objective-engelbart-d65df7, 562c5ae): migration 0024 makes launch.placeholders_ok
+  owner-only in the database; not merged, not applied. Leave it to Huraira.
 
 LEFT, in order (each a separate commit, then /step-close 28 and STOP for GO):
-5–9. Screens in the brief's order (§6), starting at 10. Activity (Finished site review a01dbbf,  Home, Projects, New request, the client's page,
-   Proposal review, Needs, Stopped build a94eb6f, Live build 99ba999 done; the site approval has no record yet, see BLOCKED-ON-NICK), each with empty, loading, running, waiting, stopped and success states; the 8 stop
-   cases mapped to diagnoseJob().cause; owner-only gates; PM view.
+14. Activity (brief §7.10): filters by client, person and type pills; save view; grouped by day; time, glyph, who, plain
+   sentence, client; audit actions only through lib/phrases.ts (never a raw slug). PMs do not see Activity (RLS).
+15. Costs, Team, Settings (appearance draft, per-person settings, Home order), Notifications preferences.
+16. Final cleanup: delete the tokens.css alias block, the old Overpass fonts and the old icon; Lighthouse a11y >= 95 per room.
+Each screen with empty, loading, running, waiting, stopped and success states; owner-only gates; PM view.
 Every phase: npm test green; screenshots at 1440x900 and 375x812, light and dark, beside the matching frame in
 Cockpit Screens*.dc.html; axe 0 per room; at 375 px scrollWidth === 375; banned-word grep of the DOM outside <details>;
 no element labelled deploy or publish. Waiting step rows stay dimmed by colour (opacity failed contrast).
@@ -1711,7 +1723,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | not started | | |
 | 26 | Quality calibration | **PARTIAL**: item 1 built (`67033f7`, Anthropic screenshot reviewer, local live review passed 32 s / $0.071); Cockpit trace row pending | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
-| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09` (+ CI fixes `301e6d6`, `ba3c41c`), CI `38585878100` green and deployed: image slots, placeholder cards, migration 0023 live, attack test 19/19. Package 4 (Cockpit v2 to the locked design): tokens `4a50b22` and components `a8fa3cf`, CI `38588413325` green and deployed (live serves v2); shell `8532f4e` (its CI `38591851925` failed on a test race, fixed `1278a29`), path `fd020a5`, Home `00ec210`, Projects `2cd7f6b`, New request `9513166` and the client's page `fd7a08a` (224 tests, axe 0 owner/admin/PM, light/dark, 1440/375). Remaining screens and Package 5 open; caps, role and site-approval questions with Nick) | 2026-10-14 | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09` (+ CI fixes `301e6d6`, `ba3c41c`), CI `38585878100` green and deployed: image slots, placeholder cards, migration 0023 live, attack test 19/19. Package 4 (Cockpit v2 to the locked design): tokens `4a50b22` and components `a8fa3cf`, CI `38588413325` green and deployed (live serves v2); shell `8532f4e` (its CI `38591851925` failed on a test race, fixed `1278a29`), path `fd020a5`, Home `00ec210`, Projects `2cd7f6b`, New request `9513166`, the client's page `fd7a08a`, Proposal review `74e1384`, Needs `5a96bb2`, Live build `99ba999`, Stopped build `a94eb6f` (phases 1–12 CI-green and deployed, last CI `38604205509`), Finished site review `a01dbbf` (CI `38605626110` running at sync); 248 tests, axe 0. Activity, Costs, Team, Settings, Notifications preferences, cleanup and Package 5 open; Nick's decisions in BLOCKED-ON-NICK; migration 0024 written, not applied) | 2026-10-15 | |
 
 **Goal tracker (Blueprint §16K)**
 

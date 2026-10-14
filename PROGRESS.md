@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-15 (04:50 +05), via `/step-close 28` (Package 4 phase 13): `a01dbbf` Finished site review. Cockpit 248/248 locally; CI for the latest pushes not re-checked at this sync.
+Last synced: 2026-10-15 (05:30 +05), via `/progress-sync`. Re-synced after `47a2da4` (head of both branches; no commits since the 04:50 sync). Re-run here: Cockpit 248/248, typecheck clean, `check-trackers` OK. CI: `38604205509` (`56e545f`, phase 12) green on every job incl. Deploy Cockpit to Vercel (its smoke check returned HTTP 200), so phases 1–12 are live; `38605626110` (`47a2da4`, phase 13) still running at sync. Side session: migration 0024 (owner-only `launch.placeholders_ok`) written on branch `claude/objective-engelbart-d65df7` (`562c5ae`), not merged or applied. Tracker tidy: 16 superseded status-summary and 16 superseded next-up blocks merged away (history stays in these sync lines and git); Step 28 heading and P4 list corrected. Not checked: the live Cockpit URL directly (held in Doppler), the signed-in Cockpit, Supabase rows.
+Previous sync: 2026-10-15 (04:50 +05), via `/step-close 28` (Package 4 phase 13): `a01dbbf` Finished site review. Cockpit 248/248 locally; CI for the latest pushes not re-checked at this sync.
 Previous sync: 2026-10-15 (04:10 +05), via `/step-close 28` (Package 4 phase 12): `a94eb6f` Stopped build. Cockpit 243/243 locally; CI for the latest pushes not re-checked at this sync.
 Previous sync: 2026-10-15 (03:20 +05), via `/step-close 28` (Package 4 phase 11): `99ba999` Live build. Cockpit 227/227 locally; CI for the latest pushes not re-checked at this sync.
 Previous sync: 2026-10-15 (02:40 +05), via `/step-close 28` (Package 4 phase 10): `5a96bb2` What the site still needs. Cockpit 227/227 locally; CI for the latest pushes not re-checked at this sync.
@@ -43,63 +44,16 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-15, 04:50 +05, `/step-close 28`)**:
-- **Step 28 IN PROGRESS**: Package 4 is 13 phases in. A passing build now opens as the finished site review (the site, placeholder pictures, the owner's launch tick, readiness); approving is switched off until there is somewhere to record it. Next: Activity. Waiting on Nick: caps, role rules, the site-approval record, the logo rule, the stop-view actions, Ask for changes.
+**Status summary (2026-10-15, 05:30 +05, `/progress-sync`)**:
+- **Step 28 IN PROGRESS**: the Cockpit v2 rebuild (Package 4) has 13 screens and shells built; phases 1–12 are CI-green and live (CI `38604205509`), phase 13 (Finished site review) is waiting on CI `38605626110`. About 13 of ~18 Package 4 pieces done: Activity, Costs, Team, Settings, Notifications preferences and the final cleanup remain; Package 5 (paid proof) after that.
+- **Biggest blocker**: decisions owed by Nick in `BLOCKED-ON-NICK.md` (caps, role rules, the site-approval record, the logo rule, stop-view actions, Ask for changes). The UI follows the database where they disagree, so none of them stops the next screen.
+- **Database follow-up**: the owner-only check for "launch with placeholders" is written (`562c5ae`, migration 0024, not merged, not applied, attack test not run).
 
-**Status summary (2026-10-15, 04:10 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 12 phases in. A stopped build now says which of the 8 cases it is, what was spent, what the factory tried and the one fix, with every paid move confirmed. Next: Finished site review. Waiting on Nick: caps, three role rules, the site-approval record, the logo rule, the stop-view actions.
-
-**Status summary (2026-10-15, 03:20 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 11 phases in. The live build page shows the ten steps from the run's own record, never inventing a step it did not record. Next: Stopped build (8 cases). Waiting on Nick: caps, three role rules, the site-approval record, the logo rule.
-
-**Status summary (2026-10-15, 02:40 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 10 phases in. "What the site still needs" is rebuilt: a progress meter, files, details, words and questions with upload, answer or leave out, placeholders with the owner-only launch tick, and a Start the build that waits for the logo and confirms the cost. Next: Live build. Waiting on Nick: caps, three role rules, the site-approval record, and the logo rule.
-
-**Status summary (2026-10-15, 02:00 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 9 phases in; Home and Projects are live. Proposal review is rebuilt: the client's words, the kind of site with the factory's reasons, open questions, owner-only approval that confirms first, and "Ask for changes" that asks for a new proposal. Next: Needs from the client. Waiting on Nick: caps, three role rules, where a site approval is recorded.
-
-**Status summary (2026-10-15, 01:20 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 8 phases in. The client's page is rebuilt: the six-step strip with one next action, the proposal, details and files, every build, cost so far (owner), and a decisions timeline from the real audit trail in plain words. Next: Proposal review. Waiting on Nick: caps, three role rules, where a site approval is recorded.
-
-**Status summary (2026-10-15, 00:30 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 7 phases in; the new shell is live. New request is rebuilt: the client's words, business name, live address, logo drop zone, and a send button that confirms the rough cost first. Next: the Project page. Waiting on Nick: caps, three role rules, and where a site approval is recorded.
-
-**Status summary (2026-10-14, 23:40 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 6 phases in. Projects is rebuilt (`2cd7f6b`): search, sort, group, filters with counts, saved views, pins, grid and list. Next: New request. Waiting on Nick: caps, three role rules, and where a site approval is recorded.
-
-**Status summary (2026-10-14, 23:00 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 5 of 9 phases in. Home is rebuilt to the design: one greeting sentence and count, what needs you in order with one button each, what is running, this week's spend against the cap (owner only), and every client on the six-step path. Home and Notifications now share one list in plain words. Next: Projects and New request. Waiting on Nick: caps, three role rules, and where a site approval is recorded.
-
-**Status summary (2026-10-14, 22:20 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 4 is 4 of 9 phases in. Live: the v2 colours, type and components. Built and checked locally: the new menu, top bar and palette (its first CI run failed on a test timing race, now fixed) and the six-step path every screen will read (`lib/path.ts`, 22 tests). Next: the Home screen. Waiting on Nick: caps, three role rules, and where a site approval is recorded.
-
-**Status summary (2026-10-14, 21:45 +05, `/progress-sync`, superseded)**:
-- **Step 28 IN PROGRESS**: Packages 1–3 built, CI-green and deployed. Package 4 (the Cockpit rebuilt to the locked v2 design) is 3 of 9 phases in: the new colours, type and components are live (CI `38588413325`), and the new menu, top bar, phone tab bar, command palette and keyboard shortcuts are built and checked locally (`8532f4e`). The screens themselves (phases 4–9) are next. Biggest open items: Nick's answers on the caps and on three role rules where the design and the database disagree.
-
-**Status summary (2026-10-14, 23:30 +05, `/step-close 28`, superseded)**:
-- **Step 28 IN PROGRESS**: Package 3 built, CI `38585878100` green and deployed (`7e30b09`; two CI-only fixes `301e6d6`, `ba3c41c`: a registry fixture must come from make-fixtures.ts, and rendered-qa tests may import only the packages its CI job installs). Sites now show the client's own photos where the owner uploaded them and a labelled "Image to come" card everywhere else; the launch check refuses placeholders unless the owner ticks "launch with placeholders". Migration 0023 is live.
-
-**Status summary (2026-10-14, 21:30 +05, superseded)**:
-- **Step 28 IN PROGRESS**: Package 2 built and verified locally (`d112f62`). Track B starter 1.4.0 shows the client's logo (it rendered 0x0), fills buttons with the client's orange, keeps the action in reach on phones, removes the empty band under the phone hero, and gives every section an entrance. Four new rendered checks fail on 1.3.0 and pass on 1.4.0.
-
-**Status summary (2026-10-14, 18:30 +05, superseded)**:
-- **Step 28 IN PROGRESS** (new, from the Lanternworks audit): Package 1 built and verified locally (`3e493f6`). The builder now gets the client's request and a checked list of what they asked for; content that misses a requested service, step, CTA label, page or form field, is thin, or talks about the website itself is refused before any build. The stored Lanternworks content went from 0 errors to 19. Packages 2–5 wait for GO.
-
-**Status summary (2026-10-14, 17:00 +05, `/progress-sync`, superseded)**:
-- **First passing build since 2026-10-01**: Lanternworks (Track B, SYNTHETIC) continued with the uploaded logo and the owner's details, job `55ddba7c`, reached the launch gate in 14 min for ~$0.68. The intake logo slice (Step 21), continue-from-a-step (Step 4D, now DONE) and the Anthropic reviewer (Step 26 item 1) are all proven live.
-- **Open from that run**: Huraira's screenshot review (4B M4) and his UI audit request (empty-feeling pages, no images, little motion), interrupted by this sync; the Track B starter's 23 px contact links.
-- **Still blocked**: Step 25 proper on Nick's Bennett & Co brief.
-
-**Status summary (2026-10-14, 00:45 +05, superseded)**:
-- **First live build with a working review since 2026-10-07**: the Cockpit continue `e2a204fb` on Lanternworks (Track B, SYNTHETIC rehearsal) reached a real QA verdict. It failed on named evaluator issues, not on a NOT RUN review. That proves Step 26 item 1 in the Cockpit (Anthropic trace rows on run `4c35703b`) and Step 4D's one-press continue live (`63278e56` and `e2a204fb` both reused the saved site). It also proves Step 12's live trace rows (Agent 37 rows `estimated`, reviewer rows present).
-- **Why it failed**: the brief says to use the supplied logo, but intake cannot take a logo file, so no build can pass that check (the gap the rehearsal already found). Fix: the Step 21 intake slice under D4 Tier 2.
-- **CI is red on the pushed head** (`d5129e0`, Rendered QA on Node 22). The fix `a9b271f` is committed but not pushed. No step changed status.
-
-**Status summary (2026-10-14)**:
+**Earlier (2026-10-14)**:
 - **Why no build succeeded since 2026-10-01 (diagnosed 2026-10-13)**: 0 of 17 builds passed. The main blocker was the design review: Node's fetch cut every Agent 37 review at 300 s, so builds that passed every deterministic check (`b880a7d5`, `456368c5`, `63278e56`, `83f2841f`) halted there. Fixed in `67033f7` (reviewer on Anthropic, 32 s live). Other causes: QA failing after 2 revisions (4 builds), builder schema strictness (2, fixed), checkpoint/resume (4, fixed by 4D), Agent 37 credits or a dropped connection (2).
 - **Step 25 rehearsal (D4)** on synthetic Lanternworks Studio: intake, owner rejection, re-plan, approval on Track B and build ran through the live Cockpit; log in `clients/lanternworks-studio/rehearsal-log.md`. Gaps found: intake takes no logo or live address; re-plan keeps the old `sections`; reject needs a second click to re-plan.
 
-**Status summary (2026-10-13, later)**:
+**Earlier (2026-10-13, later)**:
 - **Live:** MVP M6 is pushed and live (CI `38433400406` green, Cockpit deployed).
 - **Caps:** ON at $5 per build and $20 per week, approved by Nick.
 - **Agent 37:** topped up and answering.
@@ -124,93 +78,11 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-15, 04:50 +05):
-1. **Huraira**: review the Step 28 Package 4 phase 13 report; GO for Activity. Also: an owner check on `launch.placeholders_ok` in the database (BLOCKED-ON-NICK).
-2. **Nick**: caps, role conflicts, the site-approval record, the logo-before-build rule, the stop-view actions, Ask for changes (`BLOCKED-ON-NICK.md`).
-3. **Nick**: the Bennett & Co brief (Step 25).
+**Next up** (2026-10-15, 05:30 +05):
+1. **Huraira**: GO for Step 28 Package 4 phase 14 (Activity). Confirm CI `38605626110` (phase 13) finishes green.
+2. **Huraira**: review migration 0024 on `claude/objective-engelbart-d65df7` (`562c5ae`); merge, apply live, run `scripts/rls_attack_test_placeholders.sql`, record the result.
+3. **Nick**: the open Cockpit v2 decisions in `BLOCKED-ON-NICK.md`, and the Bennett & Co brief (Step 25).
 
-**Next up** (2026-10-15, 04:10 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 12 report; GO for Finished site review.
-2. **Nick**: caps, three role conflicts, the site-approval record, the logo-before-build rule, the stop-view actions (`BLOCKED-ON-NICK.md`).
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-15, 03:20 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 11 report; GO for Stopped build.
-2. **Nick**: caps, three role conflicts, the site-approval record, the logo-before-build rule, `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-15, 02:40 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 10 report; GO for Live build.
-2. **Nick**: caps, three role conflicts, the site-approval record, and the logo-before-build rule, `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-15, 02:00 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 9 report (Proposal review); GO for Needs from the client.
-2. **Nick**: the caps conflict, three role conflicts, and the missing site-approval record, `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-15, 01:20 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 8 report (the client's page); GO for Proposal review. Confirm CI green on the latest pushes.
-2. **Nick**: the caps conflict, three role conflicts, and the missing site-approval record, `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-15, 00:30 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 7 report (New request); GO for the Project page. Confirm the two running CI runs end green.
-2. **Nick**: the caps conflict, three role conflicts, and the missing site-approval record, `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 23:40 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 6 report (Projects); GO for New request. Confirm the two running CI runs end green.
-2. **Nick**: the caps conflict, three role conflicts, and the missing site-approval record, `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 23:00 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 5 report (Home); GO for the next screen (Projects, then New request). Confirm CI green on the latest push.
-2. **Nick**: the caps conflict, three role conflicts, and the missing site-approval record, `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 22:20 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 4 report (the six-step path); GO for phase 5 (Home). Confirm the re-push CI is green.
-2. **Nick**: the caps conflict, three role conflicts, and the missing site-approval record, `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 21:45 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 3 report (the shell); GO for phase 4 (`lib/path.ts`, the six-step path).
-2. **Nick**: the caps conflict and the three role conflicts (PM Activity, admin Costs, PM cost so far), `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 21:05 +05, superseded):
-1. **Huraira**: review the Step 28 Package 4 phase 1–2 report (Cockpit v2 tokens and components); GO for phase 3 (shell).
-2. **Nick**: the caps conflict (design "$2.00 per build, $20 a month, new builds only" vs live "$5 per build, $20 per 7 days, every call"), `BLOCKED-ON-NICK.md`.
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 23:30 +05, superseded):
-1. **Huraira**: review the Step 28 Package 3 report and screenshots; GO for Package 4 (Cockpit plain-language UX), optionally after a Claude Design pass with `docs/COCKPIT-CLAUDE-DESIGN-PROMPT.md`.
-2. **Huraira**: the 4B M4 screenshot review (unchanged).
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 21:30 +05, superseded):
-1. **Huraira**: review the Step 28 Package 2 report and screenshots; GO for Package 3 (image slots and labelled placeholders).
-2. **Huraira**: the 4B M4 screenshot review and the deployed site preview check (unchanged).
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 18:30 +05, superseded):
-1. **Huraira**: review the Step 28 Package 1 report; GO for Package 2 (Track B starter: logo, accent, phone CTA, motion). Push when ready (CI has not run on `3e493f6`).
-2. **Huraira**: the 4B M4 screenshot review and the deployed site preview check (unchanged).
-3. **Nick**: the Bennett & Co brief (Step 25).
-
-**Next up** (2026-10-14, 17:00 +05, superseded):
-1. **Agent**: finish the UI audit of the Lanternworks site Huraira asked for (what was built, why no images or placeholder cards, why pages feel thin, why motion is light) with fixes; it feeds 4B M4's screenshot review and Step 27.
-2. **Huraira**: check the new site preview on the deployed Cockpit (`caf42bc`) and do the 4B M4 screenshot review.
-3. **Nick**: the Bennett & Co brief (Step 25).
-**Next up** (2026-10-14, 00:45 +05, superseded):
-1. **Huraira**: push `a9b271f` and `92fd4ac` to both branches. The CI on the new head must be green, including Rendered QA and the Cockpit deploy.
-2. **Agent, on GO**: the D4 Tier 2 intake slice (logo file and live address in intake, the logo passed to the builder as an asset). Without it, every brief that names a logo fails QA, including Bennett & Co. Then press "continue" on Summit Line `63278e56` (Track A) to close Step 26 item 1 and 4B M4's Track A build.
-3. **Nick**: the Bennett & Co brief (logo, colours, live address, CRM target). Step 25 proper still waits on it.
-**Next up** (2026-10-13, caps on, superseded):
-1. **Nick**: the Bennett & Co brief, logo, exact colours, live address and CRM target. Everything else for the build is ready.
-2. **Agent, on GO**: Step 25, the Bennett & Co build, stopping at "awaiting launch approval". It also proves M6 live: estimated rows, reviewer rows, and the cost on the Run page.
-3. **Huraira**: ask Agent 37 whether a plain model route exists without the ~21k-token agent wrapper (`docs/AI-COST-AUDIT.md` 1b).
 Earlier list (2026-10-12 evening, after `/step-close 21`):
 1. **Huraira**: review the M5 report; say whether to push `9968019` (CI then proves it; the Cockpit deploy job must run this time); give the cost-cap yes so M6 can start; send Nick the cut-line questions, now including the live site address (needed for canonical, sitemap and og:image).
 2. **Agent, on GO**: MVP M6 (per-build cap, Agent 37 priced) if the cap is approved, else Step 27's one-page motion-budget design.
@@ -223,7 +95,9 @@ After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bund
 
 **Gaps noticed**:
 - Cockpit v2 (Step 28 P4): the design's "Test client" badge has no data source (no test flag on clients or projects); not shown until one exists.
-- Cockpit v2 (Step 28 P4): no table or column records a site approval, so "Approved, waiting for launch" cannot be reached; logged for Nick, then Huraira (needed by phase 9).
+- Cockpit v2 (Step 28 P4): no table or column records a site approval, so "Approved, waiting for launch" cannot be reached; logged for Nick, then Huraira. Phase 13 shows "Approve the site" switched off with the reason until it exists.
+- Cockpit v2 (Step 28 P4, phase 13): "Ask for changes" on the finished site has no runner input that reaches the builder; not offered (BLOCKED-ON-NICK).
+- Cockpit v2 (Step 28 P4, phase 13): "launch with placeholders" is owner-only in the UI but any owner or admin can insert it in the database; fix written as migration 0024 (`562c5ae`), not applied.
 - Cockpit v2 (Step 28 P4): three role rules in the design are wider than RLS allows (PM Activity, admin Costs, PM cost so far on project pages); the UI follows RLS; logged for Nick, then Huraira (policies plus attack tests).
 - Cockpit v2 (Step 28 P4): the design's caps ($2.00 per build, $20 a month, monthly cap stops new builds only) disagree with the live caps ($5 per build, $20 per rolling 7 days, checked before every call); logged for Nick. Until he decides the Cockpit reads `spend-caps.json`.
 - Cockpit v2: pre-v2 rules still render through a temporary alias block in `tokens.css`; the old breathing lamp in the build timeline still loops and the app icon is still the signal-lamp tile; all go in phases 3–7.
@@ -1269,7 +1143,7 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - Met live 2026-10-14: a build wrote estimated rows and reviewer rows (run `4c35703b`).
 - Not yet proven live: the Run page and a live cap refusal.
 
-## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-14 — Packages 1–3 of 5 built and verified; Package 4 phases 1–5 of 9 built, 1–2 CI-green and deployed)
+## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-15 — Packages 1–3 of 5 built and verified; Package 4 phases 1–13 built, 1–12 CI-green and deployed)
 
 Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one at a time, GO between) and Part D Step 28 of the plan.
 
@@ -1292,20 +1166,22 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 - [x] P4 phase 1, tokens (`4a50b22`): locked v2 values light/dark, accents, density, type scale, motion, reduced motion, text-size zoom; `lib/appearance.ts`; Newsreader. `src/styles/tokens.test.ts`: exact values and 4.5:1 for every text/status/accent pair; browser: 125% zoom and no horizontal scroll at 375, in-app reduced motion stops all animations.
 - [x] P4 phase 2, components (`a8fa3cf`): `kit.tsx`, `flow.tsx`, `CommandPalette.tsx`, v2 ConfirmDialog and SitePreview, 9 s toast with Undo, `lib/detail.tsx`. `src/components/v2.test.tsx` 26 tests; dev gallery axe 0 light/dark at 1440 and 375 (also with confirm and palette open); money lines from `spend-caps.json`.
 - [x] P4 phases 1–2 shipped: CI `38588413325` (`3b5e668`) green on every job incl. the Cockpit deploy; live Cockpit HTTP 200 with `theme-color #F4F2ED` (v2).
-- [x] P4 phase 3, shell (`8532f4e`, local): rail with typeset wordmark, top bar, phone header and tab bar, More, palette with "Ask the factory a question" (`requestJob("ask")`), keys ⌘K / G H P A C / N / D / ? / Esc, Notifications inbox, `/team`. `src/shell/shell.test.tsx` 11 tests, Cockpit 175/175; axe 0 via the `cockpit-fake` dev server (owner and PM, light and dark, 1440 and 375); `scrollWidth` 375; no target under 44 px. Roles follow RLS where the design disagrees (BLOCKED-ON-NICK.md).
+- [x] P4 phase 3, shell (`8532f4e`): rail with typeset wordmark, top bar, phone header and tab bar, More, palette with "Ask the factory a question" (`requestJob("ask")`), keys ⌘K / G H P A C / N / D / ? / Esc, Notifications inbox, `/team`. `src/shell/shell.test.tsx` 11 tests, Cockpit 175/175; axe 0 via the `cockpit-fake` dev server (owner and PM, light and dark, 1440 and 375); `scrollWidth` 375; no target under 44 px. Roles follow RLS where the design disagrees (BLOCKED-ON-NICK.md).
 - [x] P4 phase 4, the six-step path (`fd020a5`): `src/lib/path.ts` (`derivePath`, `stripSteps`, `fixLabel`, `latestBuild`, `knownNeeds`); `src/lib/path.test.ts` 22 tests; Cockpit 197/197.
 - [x] P4 phase 5, Home (`00ec210`): `pages/Home.tsx`, `lib/clients.ts`, `lib/attention.ts` rebuilt on the client paths (Home and Notifications share it); `home.test.tsx` 8 tests, Cockpit 205/205; axe 0 owner (light/dark, 1440/375), admin, PM; `scrollWidth` 375; no banned word outside Technical details.
 - [x] P4 phases 3–4 shipped: `38591851925` on `a87e6db` failed (sign-out test race, fixed `1278a29`); `38593657465` on `b3a3707` green on every job incl. the deploy.
-- [x] P4 phase 7, New request (`9513166`): `newrequest.test.tsx` 5; intake flow test confirms the cost; 217/217; axe 0 light/dark 1440/375 and with the confirm open; keyboard run. Money confirm added (hard rule). Deviation kept: "Re-check a built page". Fixed: button class `page` collided with the main wrapper.
-- [x] P4 phases 5–6 shipped: CI `38595375699` (`c02d125`) and `38596185659` (`32d1e91`) green incl. the deploy.
-- [x] P4 phase 9, Proposal review (`74e1384`): owner-only approve with confirm, Ask for changes with money confirm, direction re-run kept; 225/225; axe 0 light/dark 1440/375.
 - [x] P4 phase 6, Projects (`2cd7f6b`): `pages/Work.tsx` Projects; `projects.test.tsx` 7 tests, Cockpit 212/212; axe 0 grid/list, light/dark, 1440/375; `scrollWidth` 375. Deviation kept with reason: the hand-add client/project form (needed before "Record that it is live").
+- [x] P4 phases 5–6 shipped: CI `38595375699` (`c02d125`) and `38596185659` (`32d1e91`) green incl. the deploy.
+- [x] P4 phase 7, New request (`9513166`): `newrequest.test.tsx` 5; intake flow test confirms the cost; 217/217; axe 0 light/dark 1440/375 and with the confirm open; keyboard run. Money confirm added (hard rule). Deviation kept: "Re-check a built page". Fixed: button class `page` collided with the main wrapper.
 - [x] P4 phase 8, the client's page (`fd7a08a`): `client.test.tsx` 7; 224/224; axe 0 light/dark 1440/375; decisions timeline from the audit trail via `lib/phrases.ts`. Not shown: "Test client" badge (no data source).
+- [x] P4 phase 9, Proposal review (`74e1384`): owner-only approve with confirm, Ask for changes with money confirm, direction re-run kept; 225/225; axe 0 light/dark 1440/375.
 - [x] P4 phase 10, What the site still needs (`5a96bb2`): 227/227; axe 0 light/dark 1440/375; logo gate, money confirm, owner-only launch tick.
 - [x] P4 phase 11, Live build (`99ba999`): 227/227; axe 0 at 1440 and 375. Not done here: Spent so far, phone toggle.
 - [x] P4 phase 12, Stopped build, 8 cases (`a94eb6f`): 243/243; axe 0 at 1440 and 375. Not done here: see BLOCKED-ON-NICK (stop-view actions).
-- [x] P4 phase 13, Finished site review (`a01dbbf`): 248/248; axe 0 at 1440 and 375. Approve is off (no record); Ask for changes not offered.
-- [ ] P4 remaining screens: Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications preferences (Home, Projects, New request, Project, Proposal, Needs, Live build, Stopped (8 cases), Finished site, Activity, Costs, Team, Settings, Notifications); Lighthouse a11y ≥ 95 per room; banned-word DOM grep.
+- [x] P4 phases 7–12 shipped: CI green on every job incl. the deploy for each push: `38599509988` (`d65c5b9`), `38600629357` (`2d53fbe`), `38601154434` (`49e6843`), `38602080530` (`f45c83d`, phase 11), `38604205509` (`56e545f`, phase 12; deploy smoke check HTTP 200). Live URL not probed directly this sync (it is held in Doppler).
+- [x] P4 phase 13, Finished site review (`a01dbbf`): 248/248; axe 0 at 1440 and 375. Approve is off (no record); Ask for changes not offered. Re-run at the 2026-10-15 05:30 sync: 248/248, typecheck clean. CI `38605626110` (`47a2da4`) still running at sync, so phase 13 is **not yet confirmed deployed**.
+- [ ] P4 remaining screens: Activity (phase 14), then Costs, Team, Settings (appearance, per-person settings, Home order) and Notifications preferences; final cleanup (remove the `tokens.css` alias block, the old fonts and icon); Lighthouse a11y ≥ 95 per room; banned-word DOM grep. Done so far: Home, Projects, New request, the client's page, Proposal review, Needs, Live build, Stopped build, Finished site review (phases 5–13 above).
+- [ ] DB owner check on `launch.placeholders_ok` (locked decision 3): migration `0024_placeholders_owner_only.sql` + `scripts/rls_attack_test_placeholders.sql` written on branch `claude/objective-engelbart-d65df7` (`562c5ae`, side session), **not merged, not applied, attack test not run**. Waits on Huraira to review, merge, apply live and run the attack test.
 - [ ] Package 5 (paid Lanternworks proof).
 
 **Verification**: suites green locally (frontend-loop 115, planning 42, jobs 33, workflow 42, verification 113, agent-runtime 39, hermes 55, rendered-qa 79, Cockpit 123); typecheck clean. Independent agent review: 6 defects in the new checks, all fixed with tests that failed first. Not pushed, so no CI run; no live build (Package 1 forbids one).
