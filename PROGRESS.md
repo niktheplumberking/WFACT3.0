@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-14 (17:00 +05), via `/progress-sync`. Re-synced after `caf42bc` (head of both branches). Step 4D closed: its last open item (owner details reaching the builder live) is met by job `55ddba7c` (SQL-checked: reopen brief `ownerFacts`, built `site.json` facts `source: "brief"`). CI `38554457540` (`8271858`) green incl. deploy; `38557714567` (`caf42bc`) all jobs green except Rendered QA, still running at sync. Live: 31 jobs, 0 active; 151 `model_traces`; latest migration 20261014110708 (0021); 1 uploaded logo; 8 `plan_inputs`; 0 `account_requests` (Step 3A still unproven). Not checked: the new Cockpit site preview on the deployed app (needs a signed-in look).
+Last synced: 2026-10-14 (18:30 +05), via `/step-close 28` (Package 1): `cf2f04b..3e493f6`, not pushed, no CI run. Migration 0022 applied live (attack test 11/11, recovery 25/25, advisors unchanged).
+Previous sync: 2026-10-14 (17:00 +05), via `/progress-sync`. Re-synced after `caf42bc` (head of both branches). Step 4D closed: its last open item (owner details reaching the builder live) is met by job `55ddba7c` (SQL-checked: reopen brief `ownerFacts`, built `site.json` facts `source: "brief"`). CI `38554457540` (`8271858`) green incl. deploy; `38557714567` (`caf42bc`) all jobs green except Rendered QA, still running at sync. Live: 31 jobs, 0 active; 151 `model_traces`; latest migration 20261014110708 (0021); 1 uploaded logo; 8 `plan_inputs`; 0 `account_requests` (Step 3A still unproven). Not checked: the new Cockpit site preview on the deployed app (needs a signed-in look).
 Previous sync: 2026-10-14, via `/step-close` (Steps 21 and 4D): `8b3caed` and `a444a3d` built locally (intake logo and live address, readiness check, continue from a chosen step, build timeline); migration 0021 not applied; not pushed.
 Previous sync: 2026-10-14 (00:45 +05), via `/progress-sync`. Re-synced after `67033f7`, `d5129e0`, `a9b271f`, `92fd4ac`. **Push state:** `origin/main` and `origin/huraira-work` are at `d5129e0`; `a9b271f` (test fix) and `92fd4ac` (docs) are local only. **CI:** `38452956084` on `d5129e0` FAILED in Rendered QA only (Node 22 cancelled reviewer tests 35-40), so the Cockpit deploy was skipped. `a9b271f` fixes it: `test/reviewer.test.ts` 18/18 re-run locally on Node 24; not yet proven on Node 22 or CI. **Live** (Supabase `mcaxxhgjptwowwrluhra`, read-only SQL): 30 jobs, 0 queued or running, 141 `model_traces` rows, latest migration 20261013162735 (0020). The Cockpit job runner runs from `main` (`d5129e0` includes `67033f7`), so the new reviewer is live even though the deploy job was skipped. Cockpit "continue" job `e2a204fb` (resume of the Lanternworks Track B build `83f2841f`, run `4c35703b`, GitHub run `38453886170`) ran QA end to end. It wrote 5 successful `anthropic` `agent:qa-evaluator` rows ($0.438) and 0 NOT RUN reviews. The site was reused with no builder call before the first review. It then halted at 19:40 UTC with `failed_verification` after 2 revisions, on named evaluator issues: the supplied logo is never embedded, and colours are outside the brief. `account_requests` and `plan_inputs` both have 0 rows. Not checked: signed-in Cockpit (Run page spend), Doppler, the Agent 37 gateway itself.
 Previous sync: 2026-10-14 (+05), via the Step 25 rehearsal (D4): `67033f7` fixes the design review that halted every build since 2026-10-07 (Node's 300 s fetch header limit, reproduced at 301,008 ms; reviewer moved to Anthropic, `reviewer.json` 1.1.0), the direction-step truncation (2048 to 6144) and the review payload (15 images for 5 pages, was 35). Tests: rendered-qa 70/70, planning 33, frontend-loop 77, hermes 55, jobs 24, workflow 33. Live: Anthropic review on Summit Track A passed in 32 s ($0.071); Lanternworks rehearsal build `83f2841f` and Summit resume `63278e56` stopped on the old reviewer. CI for `67033f7` pending at sync.
@@ -30,7 +31,10 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-14, 17:00 +05, `/progress-sync`)**:
+**Status summary (2026-10-14, 18:30 +05, `/step-close 28`)**:
+- **Step 28 IN PROGRESS** (new, from the Lanternworks audit): Package 1 built and verified locally (`3e493f6`). The builder now gets the client's request and a checked list of what they asked for; content that misses a requested service, step, CTA label, page or form field, is thin, or talks about the website itself is refused before any build. The stored Lanternworks content went from 0 errors to 19. Packages 2–5 wait for GO.
+
+**Status summary (2026-10-14, 17:00 +05, `/progress-sync`, superseded)**:
 - **First passing build since 2026-10-01**: Lanternworks (Track B, SYNTHETIC) continued with the uploaded logo and the owner's details, job `55ddba7c`, reached the launch gate in 14 min for ~$0.68. The intake logo slice (Step 21), continue-from-a-step (Step 4D, now DONE) and the Anthropic reviewer (Step 26 item 1) are all proven live.
 - **Open from that run**: Huraira's screenshot review (4B M4) and his UI audit request (empty-feeling pages, no images, little motion), interrupted by this sync; the Track B starter's 23 px contact links.
 - **Still blocked**: Step 25 proper on Nick's Bennett & Co brief.
@@ -69,7 +73,12 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-14, 17:00 +05):
+**Next up** (2026-10-14, 18:30 +05):
+1. **Huraira**: review the Step 28 Package 1 report; GO for Package 2 (Track B starter: logo, accent, phone CTA, motion). Push when ready (CI has not run on `3e493f6`).
+2. **Huraira**: the 4B M4 screenshot review and the deployed site preview check (unchanged).
+3. **Nick**: the Bennett & Co brief (Step 25).
+
+**Next up** (2026-10-14, 17:00 +05, superseded):
 1. **Agent**: finish the UI audit of the Lanternworks site Huraira asked for (what was built, why no images or placeholder cards, why pages feel thin, why motion is light) with fixes; it feeds 4B M4's screenshot review and Step 27.
 2. **Huraira**: check the new site preview on the deployed Cockpit (`caf42bc`) and do the 4B M4 screenshot review.
 3. **Nick**: the Bennett & Co brief (Step 25).
@@ -92,6 +101,9 @@ Earlier list (2026-10-12 morning):
 After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bundle, Health room). Deferred: Steps 15, 16, 24; e-commerce out of scope.
 
 **Gaps noticed**:
+- **Request text now supports prices on the site** (Step 28 review, 2026-10-14): the request is a fact source, so a price or phone the client mentions (even about a competitor) counts as sourced for `claims.unsourced-fact`. Banned claims are unaffected (that check ignores fact sources).
+- **`public.rls_auto_enable()` is executable by anon** (security advisor, seen 2026-10-14; pre-existing, not from 0022).
+- **Lanternworks owner facts are test values** (a phone number, "Testing Address"): correct them before Package 5 (redacted from the committed fixture).
 - **A brief that names a logo cannot pass QA yet** (2026-10-13, `e2a204fb`): intake takes no logo file, so the builder writes a text wordmark. The evaluator then fails the build twice ("no page references any logo asset"). That costs a full revision budget (about $1.50 on run `4c35703b`) for a defect the factory cannot fix on its own. Bennett & Co has a fixed logo, so this blocks Step 25.
 - **Synthetic rehearsal spend is booked to `bennett-co`**: every trace row of the Summit Line resume (run `2dcaacfa`) and the Lanternworks build (run `4c35703b`) carries `entity_slug = 'bennett-co'`, because only DreamSign and Bennett & Co are active entities. Bennett's cost per client (Step 12) therefore includes rehearsal spend. Filter by run, or give synthetic clients their own entity.
 - **Agent 37 adds ~21k hidden input tokens to every call** (probe 2026-10-13: 21,182 tokens for a 5-word message). That is about $0.06 per call before our own prompt. See `docs/AI-COST-AUDIT.md` 1b.
@@ -1131,3 +1143,18 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - Met live 2026-10-14: a build wrote estimated rows and reviewer rows (run `4c35703b`).
 - Not yet proven live: the Run page and a live cap refusal.
 
+## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-14 — Package 1 of 5 built and verified)
+
+Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one at a time, GO between) and Part D Step 28 of the plan.
+
+- [x] P1.1 Request carried into the build: `requestText` stored by code at intake, `requested` checked by code; planner, re-plan, `briefForBuild` (old plans: intake job text, else "summary only" note). `packages/frontend-loop/src/request.ts`, `packages/planning/src/{intake,planner,pipeline}.ts`, `packages/jobs/src/{handlers,requestLookup}.ts`; tests `frontend-loop/test/request.test.ts`, `planning/test/request.test.ts`, `jobs/test/handlers.test.ts`.
+- [x] P1.2 Builder prompts (both tracks): request and requested list fenced as data; meta copy banned. Test: request.test.ts "reaches the builder and the reviewer fenced as data".
+- [x] P1.3 Coverage check before any build (both tracks): services, steps in order, CTA label, pages, form fields (unholdable field -> openQuestions). HEAD `cf2f04b` passes the stored Lanternworks content with 0 errors; `3e493f6` gives 19 incl. the three named in the package.
+- [x] P1.4 Content floors 4/180 home, 3/120 other pages, measured and documented in `request.ts`. Summit and Northfold fixtures extended to meet them.
+- [x] P1.5 Reviewers get the request and check coverage and site-talk; "do not invent requirements" kept.
+- [x] P1.6 Section synonyms collapse; build task named for the whole site; direction re-run alone (job kind `direction`, migration 0022 applied live 2026-10-14, `scripts/rls_attack_test_direction.sql` 11/11 after, 9 wrong before; Cockpit button and test).
+- [ ] Packages 2–5 (Track B starter, image slots, Cockpit UX, paid Lanternworks proof).
+
+**Verification**: suites green locally (frontend-loop 115, planning 42, jobs 33, workflow 42, verification 113, agent-runtime 39, hermes 55, rendered-qa 79, Cockpit 123); typecheck clean. Independent agent review: 6 defects in the new checks, all fixed with tests that failed first. Not pushed, so no CI run; no live build (Package 1 forbids one).
+
+**Exit check** (Package 1): "validating the stored Lanternworks content now FAILS with 'missing: Ongoing care', 'missing step: discovery call, proposal, care', 'primary action should be 'Book a discovery call'' and the meta-copy errors". **MET** (locally). Step exit (Package 5 proof): **NOT MET**.

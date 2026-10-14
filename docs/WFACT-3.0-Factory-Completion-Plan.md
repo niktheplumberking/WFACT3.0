@@ -14,6 +14,10 @@ parallel with Steps 5-8 because it only touches `apps/cockpit`.
 **Last synced 2026-10-14 (17:00 +05)** via `/progress-sync`: Step 4D closed (exit check met live, `55ddba7c`); Steps 4B, 25, 26 updated from the first passing build since 2026-10-01; CI `38554457540` green on `8271858`, `38557714567` on `caf42bc` running at sync (all jobs green except Rendered QA, still running). Previous sync 2026-10-14 (00:45 +05) via `/progress-sync`: every step re-checked against git (`92fd4ac`; `a9b271f` and `92fd4ac` local only, remotes at `d5129e0`), CI (`38452956084` on `d5129e0` FAILED in Rendered QA only, fixed by `a9b271f`, unpushed) and the live database (Cockpit continue `e2a204fb` reached a real QA verdict with the Anthropic reviewer). No status changed. No step newly qualifies for Closed: 3A still lacks its live sign-up (0 `account_requests` rows). The step table row for 4B is fixed (its columns were misaligned) and the Part E rows for 3A, 4B, 4D, 12 and 26 are refreshed. Previous sync 2026-10-13 via `/progress-sync`: every step re-checked against git (`76e9d6c`, no code since `c97e329`), CI (`38437214851`, `38438423293` green incl. deploy) and the live database (no build since 2026-10-12); no status changed. Previous full re-audit 2026-10-12 (no commits since `072b391`,
 2026-10-07), CI and the live database. Closed steps (DONE with citable evidence: 1, 2, 3, 5, 6, 7) moved to **"Closed steps"** at the end of
 Part D; open steps carry a **Next action** line and a continuation or verification prompt.
+**Status as of 2026-10-14 (later)**: **Step 28** (build quality and Cockpit plain-language UX, added 2026-10-14 from
+`docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md`) is **IN PROGRESS**: Package 1 (the builder sees the whole request) built and verified
+locally (`3e493f6`; migration 0022 applied live, attack test 11/11); Packages 2–5 open, each waiting for Huraira's GO.
+
 **Status as of 2026-10-14**: the evidence moved on Steps 4D, 12 and 26, but no status changed:
 - **Step 4D**: the one-press continue is proven live on Summit `63278e56` and Lanternworks `e2a204fb`. The missing-facts form is still unproven live.
 - **Step 12**: live `estimated` rows and reviewer rows were written on run `4c35703b`. The Run page and a live cap refusal are still unchecked.
@@ -106,6 +110,7 @@ the goals · **P3** later or depends on Nick.
 | 24 | Advanced autonomy and optimization | Earns auto-pass gates from measured runs; local-model migration decision | Blueprint Phases 11–12 need real data first | Evidence-backed autonomy upgrades | P3 |
 | 25 | Real-client proof run (added 2026-10-07) | Runs one real client (Nick's brief, or the real 2.0 DreamSign case if his brief is not ready) through intake, build, verify and human launch; measures corrections, cost, time | Goal 1; the loop has only run on synthetic clients | Measured result against the 40+ baseline, with a failure analysis | P0 |
 | 26 | Quality calibration | **PARTIAL**: item 1 met live 2026-10-14 (`67033f7`; Anthropic reviewer and evaluator rows on run `4c35703b`, build `55ddba7c` reached the launch gate; CI `38554457540` green). Items 2–4 (blind calibration, reference set, cost report) open, after the MVP | 2026-10-14 | |
+| 28 | Build quality and Cockpit plain-language UX (added 2026-10-14) | Five packages from the Lanternworks audit: the builder sees the whole request; Track B starter defects (logo, accent, phone CTA, motion); image slots and labelled placeholders; a Cockpit an owner can use without engineering words; a paid proof on Lanternworks | Lanternworks reached the launch gate with zero QA issues yet thin, off-brief pages; the Cockpit reads like an engineering console | Each package's fail-then-pass checks; Package 5's independent Lanternworks proof | P0 |
 | 27 | Track A motion budget (added 2026-10-07, decision D1) | Makes Track A visibly richer within a motion budget (CSS/vanilla only, reduced-motion respected, no framework scripts) with conversion as a hard gate; builds one brief on both tracks for Nick's blind rating | Nick found delivered sites visually flat; Track B's framework cost hurts speed and reliability for local business | Richer Track A passing the existing performance, layout-shift and CTA checks; blind-rating result | P0 |
 
 ### Execution order (approved by Huraira 2026-10-07; supersedes "do them in order of number")
@@ -1351,6 +1356,30 @@ REPORT in the Part C format, then STOP.
 
 ---
 
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Package 1 of 5 built and verified
+
+**Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
+2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
+
+**Package 1 — the builder sees the whole request: built and verified locally** (`3e493f6`):
+- `PilotBrief.requestText` (stored by code at intake, fenced as data) and `requested` (Intake extracts, code keeps only items in the
+  request and never claims); carried through planner, re-plan and `briefForBuild`; old plans use the intake job's text, else build
+  "summary only" (Cockpit note). `packages/frontend-loop/src/request.ts`.
+- Deterministic checks before any build (both tracks): requested services, steps (in order), primary action label, pages and form
+  fields by name; content floors (home 4 sections / 180 words, others 3 / 120, measured on Summit Line, Northfold, Lanternworks);
+  copy about the website itself. Builder and reviewer prompts get the request.
+- Planner: synonym sections collapse (hero/home, process/how-we-work); build task named for the whole site. Direction re-run alone for
+  a pending plan: job kind `direction`, migration 0022 (applied live), Cockpit button "Prepare the direction again".
+- Evidence: HEAD `cf2f04b` accepts the stored Lanternworks content with 0 errors; now 19 errors incl. "missing: Ongoing care",
+  "missing step: discovery call, proposal, care", "primary action should be 'Book a discovery call'", meta copy. Suites: frontend-loop
+  115, planning 42, jobs 33, workflow 42, verification 113, rendered-qa 79, Cockpit 123, all green; typecheck clean.
+  `scripts/rls_attack_test_direction.sql`: before 0022 9 of 11 wrong, after 11/11; recovery attack 25/25 after. Independent review
+  (separate agent) found 6 defects in the new checks; all fixed with tests that failed first.
+- Not done: no live build (by design); CI not run (not pushed); Track A has no form-field "openQuestions" path beyond the check.
+
+**Next action**: Huraira reviews the Package 1 report and gives GO for Package 2 (Track B starter defects). Packages 2–5: see the
+source doc; prompt unchanged.
+
 ### STEP 27 — Track A motion budget (P0, added 2026-10-07, decision D1) — NOT STARTED
 
 **Depends on**: Step 4B M4 closed; Step 26 item 3 (reference set) preferred.
@@ -1520,6 +1549,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | not started | | |
 | 26 | Quality calibration | **PARTIAL**: item 1 built (`67033f7`, Anthropic screenshot reviewer, local live review passed 32 s / $0.071); Cockpit trace row pending | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 built and verified locally, `3e493f6`: request carried into the build, coverage/floors/meta-copy checks, direction re-run with migration 0022 live and attack test 11/11; not pushed, no CI; Packages 2–5 open) | 2026-10-14 | |
 
 **Goal tracker (Blueprint §16K)**
 
