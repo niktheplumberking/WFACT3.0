@@ -7,7 +7,8 @@ import { Button, PathSegments, StatusChip, StatusGlyph, TechDetails, type Status
 
 /* ---------------- progress strip ---------------- */
 
-export const STEP_NAMES = ["Request", "Proposal", "Details needed", "Building", "Ready for approval", "Live"] as const;
+import { STEP_NAMES } from "../lib/path";
+export { STEP_NAMES };
 
 export interface StripStep {
   /** One sentence: done = what happened, current = where it stands, later = "Not yet." */
