@@ -40,6 +40,11 @@ export interface VerificationResult {
   evaluator: EvaluatorVerdict | null;
   /** Step 7: per-check time and cost, in run order. */
   costs?: CheckCost[];
+  /**
+   * The evaluator (run concurrently with the screenshot review) threw while the review had already decided the
+   * verdict (failed or NOT RUN). Kept so the audit row is complete; when every review passed the error propagates.
+   */
+  evaluatorError?: string;
 }
 
 export interface VerificationLoopOptions {
@@ -51,8 +56,9 @@ export interface VerificationLoopOptions {
   asyncChecks?: AsyncCheckSuite[];
   /**
    * Step 4B M1: model-based review suites (the cross-vendor screenshot reviewer). Run only after
-   * every deterministic check passed, before the evaluator. A failed result is
-   * `changes_requested`; a `notRun` result is `blocked_no_evaluator` (never a pass).
+   * every deterministic check passed, CONCURRENTLY with the evaluator (one round, all findings). A failed
+   * result is `changes_requested` with the evaluator's issues alongside; a `notRun` result is
+   * `blocked_no_evaluator` (never a pass).
    */
   reviewSuites?: AsyncCheckSuite[];
   evaluatorModel?: ModelClient | null;
@@ -96,6 +102,7 @@ export class VerificationLoop {
           goal,
           checks: result.checkResults.map(({ checkId, passed, details }) => ({ checkId, passed, details })),
           evaluator: result.evaluator,
+          ...(result.evaluatorError ? { evaluatorError: result.evaluatorError } : {}),
           evaluatorModel: this.evaluatorModel?.name ?? null,
           costs: result.costs ?? [],
         },
@@ -127,33 +134,34 @@ export class VerificationLoop {
       return { status: "failed_checks", checkResults, evaluator: null, costs };
     }
 
-    if (this.reviewSuites.length > 0) {
-      const reviewResults: CheckResult[] = [];
-      for (const suite of this.reviewSuites) {
-        const started = Date.now();
-        const callsBefore = suiteCalls(suite).length;
-        reviewResults.push(...(await suite.run(ctx)));
-        const calls = suiteCalls(suite).slice(callsBefore);
-        costs.push({ id: suite.id, kind: "model", ms: Date.now() - started, usd: sumUsd(calls.map((c) => c.costUsd)), ...(calls[0]?.model ? { model: calls[0].model } : {}) });
-      }
-      checkResults.push(...reviewResults);
-      if (reviewResults.some((r) => r.notRun)) {
-        return { status: "blocked_no_evaluator", checkResults, evaluator: null, costs };
-      }
-      if (reviewResults.some((r) => !r.passed)) {
-        // The reviewer's rule ids go back to the builder like any failed check; no evaluator call.
-        return { status: "changes_requested", checkResults, evaluator: null, costs };
-      }
-    }
+    // One round, all findings (2026-10-14 catalogue of 22 live builds: job 102faa27 needed three paid revision
+    // rounds because each layer only spoke after the previous one passed). The deterministic layer above still
+    // gates everything for free. Past it, the screenshot review and the evaluator run CONCURRENTLY and the
+    // verdict carries the union of their findings, so one revision round fixes everything known. Pass/fail is
+    // unchanged: approved only when every review passed AND the evaluator approved; any NOT RUN review is still
+    // blocked_no_evaluator (not verified), whatever the evaluator said.
+    const [reviewSettled, evaluatorSettled] = await Promise.allSettled([this.runReviews(ctx), this.runEvaluatorTimed(ctx, goal)]);
+    if (reviewSettled.status === "rejected") throw reviewSettled.reason;
+    const { results: reviewResults, costs: reviewCosts } = reviewSettled.value;
+    costs.push(...reviewCosts);
+    checkResults.push(...reviewResults);
+    const evaluatorOutcome = evaluatorSettled.status === "fulfilled" ? evaluatorSettled.value : null;
+    if (evaluatorOutcome) costs.push(evaluatorOutcome.cost);
+    const evaluator = evaluatorOutcome?.verdict ?? null;
+    const withError = evaluatorSettled.status === "rejected" ? { evaluatorError: errorText(evaluatorSettled.reason) } : {};
 
-    if (!this.evaluatorModel) {
+    if (reviewResults.some((r) => r.notRun)) {
+      return { status: "blocked_no_evaluator", checkResults, evaluator, costs, ...withError };
+    }
+    if (reviewResults.some((r) => !r.passed)) {
+      // The reviewer's rule ids go back to the builder like any failed check, together with the evaluator's issues.
+      return { status: "changes_requested", checkResults, evaluator, costs, ...withError };
+    }
+    // Every review passed: the evaluator decides, exactly as before. An evaluator error is an error, never a verdict.
+    if (evaluatorSettled.status === "rejected") throw evaluatorSettled.reason;
+    if (!evaluator) {
       return { status: "blocked_no_evaluator", checkResults, evaluator: null, costs };
     }
-
-    const started = Date.now();
-    const usageBefore = modelUsage(this.evaluatorModel);
-    const evaluator = await runEvaluator(this.evaluatorModel, ctx, goal);
-    costs.push(evaluatorCost(this.evaluatorModel, usageBefore, Date.now() - started));
     return {
       status: evaluator.verdict === "approved" ? "approved" : "changes_requested",
       checkResults,
@@ -161,7 +169,32 @@ export class VerificationLoop {
       costs,
     };
   }
+
+  /** Runs every review suite (in order), with its time and cost. */
+  private async runReviews(ctx: VerificationContext): Promise<{ results: CheckResult[]; costs: CheckCost[] }> {
+    const results: CheckResult[] = [];
+    const costs: CheckCost[] = [];
+    for (const suite of this.reviewSuites) {
+      const started = Date.now();
+      const callsBefore = suiteCalls(suite).length;
+      results.push(...(await suite.run(ctx)));
+      const calls = suiteCalls(suite).slice(callsBefore);
+      costs.push({ id: suite.id, kind: "model", ms: Date.now() - started, usd: sumUsd(calls.map((c) => c.costUsd)), ...(calls[0]?.model ? { model: calls[0].model } : {}) });
+    }
+    return { results, costs };
+  }
+
+  /** The evaluator with its time and cost; null when no evaluator model is configured. */
+  private async runEvaluatorTimed(ctx: VerificationContext, goal: string): Promise<{ verdict: EvaluatorVerdict; cost: CheckCost } | null> {
+    if (!this.evaluatorModel) return null;
+    const started = Date.now();
+    const usageBefore = modelUsage(this.evaluatorModel);
+    const verdict = await runEvaluator(this.evaluatorModel, ctx, goal);
+    return { verdict, cost: evaluatorCost(this.evaluatorModel, usageBefore, Date.now() - started) };
+  }
 }
+
+const errorText = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
 /** A suite that records its model calls (the screenshot reviewer's `calls`). */
 const suiteCalls = (suite: AsyncCheckSuite): { costUsd: number | null; model?: string }[] => {
@@ -208,16 +241,25 @@ export function formatVerificationSummary(result: VerificationResult): string {
               "was configured. Per CLAUDE.md §1, checks-only is not the same as verified.",
       );
       break;
-    case "changes_requested":
+    case "changes_requested": {
+      const reviewFailed = result.checkResults.some((c) => !c.passed && !c.notRun);
       if (!result.evaluator) {
-        lines.push("VERIFICATION: CHANGES REQUESTED by the screenshot review (failed rules above); evaluator not run.");
+        lines.push(
+          `VERIFICATION: CHANGES REQUESTED by the screenshot review (failed rules above); ${result.evaluatorError ? `evaluator error: ${result.evaluatorError}` : "evaluator not run"}.`,
+        );
+        break;
+      }
+      if (reviewFailed) lines.push("VERIFICATION: CHANGES REQUESTED by the screenshot review (failed rules above).");
+      if (result.evaluator.verdict === "approved") {
+        lines.push("Evaluator: approved (the review findings above still need fixing).");
         break;
       }
       lines.push("VERIFICATION: CHANGES REQUESTED by evaluator:");
-      for (const issue of result.evaluator?.issues ?? []) {
+      for (const issue of result.evaluator.issues) {
         lines.push(`    - ${issue}`);
       }
       break;
+    }
     case "approved":
       lines.push("VERIFICATION: APPROVED — deterministic checks passed and evaluator approved.");
       break;

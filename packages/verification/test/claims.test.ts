@@ -146,19 +146,21 @@ test("loop: a screenshot review that did not run is NOT verified (never a pass)"
     reviewSuites: [suite("render.design-review", { passed: false, notRun: true, details: ["no reviewer"] })],
     evaluatorModel: evaluator,
   }).run(cleanCtx(), brief.goal);
+  // Since 2026-10-14 the evaluator runs concurrently with the review; its approval cannot outvote a NOT RUN review.
   assert.equal(result.status, "blocked_no_evaluator");
-  assert.equal(evaluator.calls.length, 0);
+  assert.equal(evaluator.calls.length, 1);
 });
 
-test("loop: a failed screenshot review is changes_requested with its rule ids, evaluator not called", async () => {
-  const evaluator = new MockModelClient(() => "VERDICT: APPROVED");
+test("loop: a failed screenshot review is changes_requested with its rule ids, and the evaluator's findings ride along", async () => {
+  const evaluator = new MockModelClient(() => "VERDICT: CHANGES_REQUESTED\nISSUES:\n- the hero promises a date the brief lacks");
   const result = await new VerificationLoop({
     checks: QA_GATE_CHECKS,
     reviewSuites: [suite("render.design-review", { passed: false, details: ["DR-THREE-CARD-ROW: ..."] })],
     evaluatorModel: evaluator,
   }).run(cleanCtx(), brief.goal);
   assert.equal(result.status, "changes_requested");
-  assert.equal(evaluator.calls.length, 0);
+  assert.equal(evaluator.calls.length, 1, "one round, all findings: the evaluator ran in the same round");
+  assert.deepEqual(result.evaluator?.issues, ["the hero promises a date the brief lacks"]);
   assert.match(result.checkResults.find((c) => c.checkId === "render.design-review")!.details[0]!, /^DR-THREE-CARD-ROW/);
 });
 
@@ -171,4 +173,54 @@ test("loop: review passes, then the evaluator still has to approve", async () =>
   }).run(cleanCtx(), brief.goal);
   assert.equal(result.status, "approved");
   assert.equal(evaluator.calls.length, 1);
+});
+
+// --- FACT-AREA false positives (rules 1.2.0; jobs 102faa27, 0b62c4a6) ---------------------------------------
+
+const page = (title: string, body: string) => `<!DOCTYPE html><html><head><title>${title}</title></head><body>${body}</body></html>`;
+const areaResult = (c: VerificationContext) => byId(runChecks(c, CLAIMS_CHECKS))["claims.unsourced-fact"]!;
+// The two strings the gate wrongly flagged as invented service areas, in the markup that produced them.
+const PRIVACY_BAKERY = page(
+  "Privacy policy | Rise Bakery",
+  `<main><h1>Privacy policy</h1><section><h2>Who we are</h2><p><strong>A neighbourhood bakery.</strong> We're a bakery, so the only details we keep are the ones you send us.</p></section></main>`,
+);
+const CONTACT_FORM = page(
+  "Contact | Rise Bakery",
+  `<main><h1>Say hello</h1><form><label for="hood">Neighbourhood</label><input id="hood" name="hood">
+  <label for="t">Best time to reach you</label><select id="t"><option>Morning</option><option>Afternoon</option></select></form></main>`,
+);
+
+test("FACT-AREA: 'We're a bakery' on a privacy page and 'best time to reach you' in a form are not service areas", () => {
+  for (const [name, html] of [["privacy", PRIVACY_BAKERY], ["contact form", CONTACT_FORM]] as const) {
+    const r = areaResult(ctx(html));
+    assert.ok(!r.details.some((d) => d.startsWith("FACT-AREA")), `${name}: ${r.details.join(" | ")}`);
+  }
+  // The privacy copy on an ordinary page is not a label either (the label must BE the label, not a word in copy).
+  const onHome = PRIVACY_BAKERY.replace("Privacy policy | Rise Bakery", "Rise Bakery").replace("<h1>Privacy policy</h1>", "<h1>Fresh every morning</h1>");
+  assert.ok(!areaResult(ctx(onHome)).details.some((d) => d.startsWith("FACT-AREA")));
+});
+
+test("FACT-AREA: legal pages (privacy, terms, cookies) are skipped by page name or heading", () => {
+  const listed = `<main><h1>Our terms</h1><p><strong>Service area</strong> Maple Ridge, Cedar Hollow</p></main>`;
+  const r = areaResult({ ...ctx(""), html: "", site: { files: { "privacy.html": page("Rise Bakery", listed) }, pages: ["privacy.html"] } });
+  assert.ok(!r.details.some((d) => d.includes("FACT-AREA")), r.details.join(" | "));
+  assert.ok(!areaResult(ctx(page("Terms of service | Rise", listed))).details.some((d) => d.startsWith("FACT-AREA")));
+});
+
+test("FACT-AREA: a real invented service-area list still fails (label, heading or 'Serving:' forms), and a law firm is not a legal page", () => {
+  const cases = [
+    `<section><h2>Areas we serve</h2><p>Maple Ridge, Cedar Hollow and Briarwood</p></section>`,
+    `<ul><li><strong>Service Area</strong>Maple Ridge, Cedar Hollow, Briarwood</li></ul>`,
+    `<p><strong>Serving:</strong> Maple Ridge, Cedar Hollow</p>`,
+    `<ul aria-label="Neighbourhoods we serve"><li>Maple Ridge</li><li>Cedar Hollow</li></ul>`,
+  ];
+  for (const body of cases) {
+    const r = areaResult(ctx(page("Rise Bakery", `<main><h1>Bread</h1>${body}</main>`)));
+    assert.equal(r.passed, false, body);
+    assert.match(r.details.join("\n"), /FACT-AREA: service area "Maple Ridge"/, body);
+  }
+  const lawFirm = areaResult(ctx(page("Smith Legal Services", `<main><h1>Smith Legal</h1>${cases[0]}</main>`)));
+  assert.match(lawFirm.details.join("\n"), /FACT-AREA: service area "Maple Ridge"/);
+  // Labelled SAMPLE or supplied by the brief: passes.
+  assert.ok(areaResult(ctx(page("Rise", `<main><h1>Bread</h1>${cases[0]}</main>`), ["Areas: Maple Ridge, Cedar Hollow, Briarwood"])).passed);
 });

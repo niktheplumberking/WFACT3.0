@@ -26,6 +26,24 @@ export interface ModelClient {
   complete(request: ModelRequest): Promise<string>;
 }
 
+/**
+ * The provider account is out of money: HTTP 402, Anthropic's 400 "credit balance is too low", or OpenAI's
+ * insufficient_quota. Retrying cannot help, so callers fail at once. The message always contains the words
+ * "credits exhausted": the Cockpit's recovery classifier maps that to the "money" bucket (a human tops up).
+ */
+export class CreditsExhaustedError extends Error {
+  constructor(provider: string, detail: string) {
+    super(`${provider} credits exhausted: ${detail.slice(0, 200)}`);
+    this.name = "CreditsExhaustedError";
+  }
+}
+
+/** True when an HTTP status + body means the account has no credit left (never retry these). */
+export function isCreditsExhausted(status: number | undefined, body: string): boolean {
+  if (status === 402) return true;
+  return (status === 400 || status === 429) && /credit balance is too low|insufficient_quota|exceeded your current quota|credits exhausted/i.test(body);
+}
+
 export class ModelNotConfiguredError extends Error {
   constructor(reason: string) {
     super(reason);
@@ -52,15 +70,24 @@ export class ClaudeModelClient implements ModelClient {
   }
 
   async complete({ system, user }: ModelRequest): Promise<string> {
-    const response = await this.client.messages.create({
-      model: this.modelId,
-      // claude-sonnet-5 thinks adaptively by default and thinking counts against max_tokens: at 4096 a
-      // multi-page review spent the whole budget thinking and returned no text (Step 4B M3 live run
-      // b2cd975e). 16000 is the recommended non-streaming ceiling; it is a cap, not a cost.
-      max_tokens: MAX_OUTPUT_TOKENS,
-      system,
-      messages: [{ role: "user", content: user }],
-    });
+    let response: Anthropic.Message;
+    try {
+      response = await this.client.messages.create({
+        model: this.modelId,
+        // claude-sonnet-5 thinks adaptively by default and thinking counts against max_tokens: at 4096 a
+        // multi-page review spent the whole budget thinking and returned no text (Step 4B M3 live run
+        // b2cd975e). 16000 is the recommended non-streaming ceiling; it is a cap, not a cost.
+        max_tokens: MAX_OUTPUT_TOKENS,
+        system,
+        messages: [{ role: "user", content: user }],
+      });
+    } catch (e) {
+      // The SDK does not retry 400/402; turn the out-of-money ones into a named, non-retryable failure.
+      const status = (e as { status?: number }).status;
+      const text = e instanceof Error ? e.message : String(e);
+      if (status !== undefined && isCreditsExhausted(status, text)) throw new CreditsExhaustedError("Anthropic evaluator", `HTTP ${status} ${text}`);
+      throw e;
+    }
     this.totalUsage.inputTokens += response.usage.input_tokens;
     this.totalUsage.outputTokens += response.usage.output_tokens;
     if (response.stop_reason === "max_tokens") {
@@ -110,6 +137,7 @@ export class OpenAIModelClient implements ModelClient {
     });
     if (!res.ok) {
       const body = (await res.text()).replace(/sk-[A-Za-z0-9_-]{8,}/g, "sk-…").slice(0, 300);
+      if (isCreditsExhausted(res.status, body)) throw new CreditsExhaustedError("OpenAI evaluator", `HTTP ${res.status} ${body}`);
       throw new Error(`OpenAI evaluator request failed: HTTP ${res.status} ${body}`);
     }
     const data = (await res.json()) as {

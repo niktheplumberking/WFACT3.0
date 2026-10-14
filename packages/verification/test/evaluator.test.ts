@@ -45,6 +45,33 @@ test("evaluator knows the honesty rules and sees the brief's facts; 'needs clien
   assert.match(blind.calls[0]!.user, /brief's facts were not supplied to this review/);
 });
 
+test("SAMPLE contradiction (jobs f696ba43, 2c930391): the rubric agrees with the claims gate; SAMPLE facts become client needs, unlabelled ones still fail", async () => {
+  const { RUBRIC, LAUNCH_STAGE_NOTE, runEvaluator } = await import("../src/evaluator.js");
+  const { MockModelClient } = await import("../src/modelClient.js");
+  assert.match(RUBRIC, /visibly labelled SAMPLE is the factory's REQUIRED honest/);
+  assert.match(RUBRIC, /never\s+fail a preview for a clearly SAMPLE-labelled placeholder/);
+  assert.match(RUBRIC, /NOT labelled SAMPLE is invented and still fails/);
+  assert.doesNotMatch(RUBRIC, /SAMPLE placeholder badges[^\n]*not publishable/i);
+  const model = new MockModelClient(() => "VERDICT: APPROVED");
+  await runEvaluator(model, { html: "<p/>", requiredSections: [] } as never, "g");
+  assert.match(model.calls[0]!.user, /^Build stage: preview/);
+  assert.ok(!model.calls[0]!.user.includes(LAUNCH_STAGE_NOTE));
+  await runEvaluator(model, { html: "<p/>", requiredSections: [], stage: "launch" } as never, "g");
+  assert.ok(model.calls[1]!.user.includes(LAUNCH_STAGE_NOTE), "at launch SAMPLE placeholders are defects again");
+});
+
+test("brand colours (Lanternworks 4c35703b): tints and shades of the brief's colours are on-brief in the rubric", async () => {
+  const { RUBRIC } = await import("../src/evaluator.js");
+  assert.match(RUBRIC, /tints and shades of the brief's colours/);
+  assert.match(RUBRIC, /Flag a colour only when\s+its hue does not come from any of the brief's colours/);
+});
+
+test("parseEvaluatorResponse: NOTES after ISSUES are client needs, never issues (backward compatible)", () => {
+  const v = parseEvaluatorResponse("VERDICT: CHANGES_REQUESTED\nISSUES:\n- the hero headline is cut off\nNOTES:\n- NEEDS CLIENT INPUT: the real phone number");
+  assert.deepEqual(v, { verdict: "changes_requested", issues: ["the hero headline is cut off"], notes: ["NEEDS CLIENT INPUT: the real phone number"] });
+  assert.deepEqual(parseEvaluatorResponse("VERDICT: CHANGES_REQUESTED\nISSUES:\n- a\n- b"), { verdict: "changes_requested", issues: ["a", "b"] });
+});
+
 test("Step 4D: a reply that ignores the format is asked for again once; a second one stops the run instead of blaming the site", async () => {
   const { runEvaluator } = await import("../src/evaluator.js");
   const ctx = { html: "<p>x</p>", requiredSections: ["hero"], clientSlug: "c", otherClientSlugs: [] } as never;

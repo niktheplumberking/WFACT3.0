@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import {
   CrossModelViolationError, assertCrossModelSeparation, familyOf, identityFromVendor, loadEvaluatorConfig, modelIdentity, type EvaluatorConfig,
 } from "../src/crossModel.js";
-import { ClaudeModelClient, MockModelClient, OpenAIModelClient, evaluatorModelClientFromEnv } from "../src/modelClient.js";
+import { ClaudeModelClient, MockModelClient, OpenAIModelClient, evaluatorModelClientFromEnv, isCreditsExhausted } from "../src/modelClient.js";
 
 const config = loadEvaluatorConfig();
 
@@ -104,9 +104,36 @@ test("OpenAI adapter: sends system + user, key only in the Authorization header,
   assert.deepEqual(c.totalUsage, { inputTokens: 1200, outputTokens: 40 });
 });
 
+test("credits exhausted fails fast with the words 'credits exhausted' (402, Anthropic 400 credit balance, OpenAI insufficient_quota); one call, no retry", async () => {
+  let calls = 0;
+  const pay = new OpenAIModelClient("k", "gpt-5.4", undefined, fakeFetch(() => (calls++, { status: 402, text: '{"error":"payment required"}' })).impl);
+  await assert.rejects(pay.complete({ system: "s", user: "u" }), (e: Error) => e.name === "CreditsExhaustedError" && /credits exhausted/.test(e.message));
+  assert.equal(calls, 1);
+  const quota = new OpenAIModelClient("k", "gpt-5.4", undefined, fakeFetch(() => ({ status: 429, text: '{"error":{"type":"insufficient_quota"}}' })).impl);
+  await assert.rejects(quota.complete({ system: "s", user: "u" }), /credits exhausted/);
+  // A plain rate limit is NOT credits exhausted (it is a temporary condition).
+  const busy = new OpenAIModelClient("k", "gpt-5.4", undefined, fakeFetch(() => ({ status: 429, text: '{"error":{"type":"rate_limit_exceeded"}}' })).impl);
+  await assert.rejects(busy.complete({ system: "s", user: "u" }), (e: Error) => !/credits exhausted/.test(e.message));
+
+  const claude = new ClaudeModelClient("test-key-not-real");
+  let claudeCalls = 0;
+  (claude as unknown as { client: unknown }).client = {
+    messages: {
+      create: async () => {
+        claudeCalls += 1;
+        throw Object.assign(new Error('400 {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API."}}'), { status: 400 });
+      },
+    },
+  };
+  await assert.rejects(claude.complete({ system: "s", user: "u" }), /Anthropic evaluator credits exhausted/);
+  assert.equal(claudeCalls, 1);
+  assert.equal(isCreditsExhausted(400, "invalid model"), false, "an ordinary 400 is not a money problem");
+});
+
 test("OpenAI adapter: HTTP errors (e.g. 429 no credits), truncation and empty answers throw; never an approval", async () => {
   const noCredit = new OpenAIModelClient("k", "gpt-5.4", undefined, fakeFetch(() => ({ status: 429, text: '{"error":{"message":"You exceeded your current quota"}}' })).impl);
   await assert.rejects(noCredit.complete({ system: "s", user: "u" }), /HTTP 429/);
+  await assert.rejects(noCredit.complete({ system: "s", user: "u" }), /credits exhausted/);
   const cut = new OpenAIModelClient("k", "gpt-5.4", undefined, fakeFetch(() => ({ status: 200, json: { choices: [{ message: { content: "VERDICT: APP" }, finish_reason: "length" }] } })).impl);
   await assert.rejects(cut.complete({ system: "s", user: "u" }), /truncated/);
   const empty = new OpenAIModelClient("k", "gpt-5.4", undefined, fakeFetch(() => ({ status: 200, json: { choices: [{ message: { content: null }, finish_reason: "stop" }] } })).impl);

@@ -218,18 +218,41 @@ export const bannedClaimsCheck: Check = {
 const norm = (s: string) => s.toLowerCase().replace(/[–—]/g, "-").replace(/\s+/g, " ").trim();
 const digits = (s: string) => s.replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
 
+/**
+ * Rules 1.2.0 (jobs 102faa27, 0b62c4a6): the label must BE a service-area label ("Service area:", "Areas we cover",
+ * "Serving"), the whole of its short text, not a word inside other copy. "A neighbourhood bakery." on a privacy
+ * page read as a label and turned "We're a bakery" into an invented area; a form's "Neighbourhood" field label
+ * turned "Best time to reach you" into one.
+ */
+const AREA_LABEL = new RegExp(`^(?:(?:our|the)\\s+)?(?:${CLAIMS_RULES.serviceAreaLabel})(?:\\s+include)?\\s*:?$`, "i");
+const isAreaLabel = (text: string) => AREA_LABEL.test(text.replace(/\s+/g, " ").trim());
+const insideForm = (el: HTMLElement) => {
+  for (let p: HTMLElement | null = el; p; p = p.parentNode) if (p.tagName?.toLowerCase() === "form") return true;
+  return false;
+};
+
+/** Legal pages (privacy, terms, cookies) describe the business; they never list service areas. */
+// Anchored at the start, so a law firm's homepage ("Smith Legal Services") is not mistaken for a legal page.
+const LEGAL_HEADING = /^\s*(privacy( policy| notice| statement)?|terms( of (service|use)| and conditions)?|cookies?( policy| notice)?|legal notice|disclaimer)\b/i;
+function isLegalPage(ctx: VerificationContext, root: HTMLElement): boolean {
+  if (ctx.pageOf && /(^|[/_-])(privacy|terms|cookies?|disclaimer)([/._-]|$)/i.test(ctx.pageOf.page)) return true;
+  const title = parse(ctx.html).querySelector("title")?.text ?? "";
+  const h1 = root.querySelector("h1")?.text ?? "";
+  return [title, h1].some((t) => LEGAL_HEADING.test(t));
+}
+
 /** Names listed after a "Service area" / "Neighborhoods we serve" label (aria-label or visible label). */
 function serviceAreaNames(root: HTMLElement): string[] {
   const label = new RegExp(CLAIMS_RULES.serviceAreaLabel, "i");
   const names: string[] = [];
   for (const el of root.querySelectorAll("*")) {
-    if (label.test(el.getAttribute("aria-label") ?? "")) {
+    if (isAreaLabel(el.getAttribute("aria-label") ?? "") && !insideForm(el)) {
       const leaves = el.querySelectorAll("*").filter((c) => !c.childNodes.some(isElement));
       if (leaves.length > 0) leaves.forEach((c) => names.push(c.text));
       else names.push(...el.text.split(/,|\n|·|•/));
       continue;
     }
-    const isLabel = /^(strong|b|dt|th|h[2-6]|span|label)$/i.test(el.tagName) && el.text.trim().length < 40 && label.test(el.text);
+    const isLabel = /^(strong|b|dt|th|h[2-6]|span|label)$/i.test(el.tagName) && el.text.trim().length < 40 && isAreaLabel(el.text) && !insideForm(el);
     if (isLabel && el.parentNode) {
       names.push(...el.parentNode.text.replace(el.text, "").split(/,|\n|·|•|\band\b/));
     }
@@ -259,7 +282,7 @@ export const unsourcedFactsCheck: Check = {
       }
     }
     const seen = new Set<string>();
-    for (const name of serviceAreaNames(root)) {
+    for (const name of isLegalPage(ctx, root) ? [] : serviceAreaNames(root)) {
       if (seen.has(norm(name))) continue;
       seen.add(norm(name));
       if (!normSources.includes(norm(name)) && !labelledSample(root, name)) {
