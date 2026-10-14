@@ -17,7 +17,8 @@ Part D; open steps carry a **Next action** line and a continuation or verificati
 **Status as of 2026-10-14 (later)**: **Step 28** (build quality and Cockpit plain-language UX, added 2026-10-14 from
 `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md`) is **IN PROGRESS**: Package 1 (the builder sees the whole request) built and verified
 and deployed (`3e493f6`, CI `38569635936`; migration 0022 live, attack test 11/11); Package 2 (Track B starter 1.4.0: logo, accent,
-phone action, motion; four new rendered checks) built and verified locally (`d112f62`); Packages 3–5 open, each waiting for GO.
+phone action, motion; four new rendered checks) green in CI and deployed (`d112f62`); Package 3 (image slots and labelled
+placeholders, migration 0023 live) built and verified locally (`7e30b09`); Packages 4–5 open, each waiting for GO.
 
 **Status as of 2026-10-14**: the evidence moved on Steps 4D, 12 and 26, but no status changed:
 - **Step 4D**: the one-press continue is proven live on Summit `63278e56` and Lanternworks `e2a204fb`. The missing-facts form is still unproven live.
@@ -1357,7 +1358,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1 and 2 of 5 built and verified
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1393,8 +1394,24 @@ REPORT in the Part C format, then STOP.
 - Not done: Lighthouse on the Lanternworks build (the Northfold build's LCP/CLS pass); the phone bar and the hero button both show at
   the top of the home page; the meta-copy check misses "replaced our single page site with six"; no live build.
 
-**Next action**: Huraira reviews the Package 2 report and gives GO for Package 3 (image slots and labelled placeholders).
-Packages 3–5: see the source doc; prompt unchanged.
+**Package 3 — image slots and labelled placeholder cards: built and verified locally** (`7e30b09`; Track B starter 1.5.0,
+Track A 1.4.0, content `track-b/2` and `track-a/2`, both upgraded from v1 on read; migration 0023 applied live):
+- The builder describes each picture ({kind, alt, aspect, note}); it never sets a source or asks for a generated image. Code shows
+  the owner's verified image for a slot, else an "Image to come: <note>" card in brand tints (`data-placeholder`). The home hero
+  and every work item need a slot; a team section takes names only from the client's words. `src/media.ts`, `MediaFrame.tsx`.
+- Supplied images: Cockpit upload (JPEG/PNG/WebP, 2 MB) -> plan input `asset.image.<slot>`, checked by the database (0023,
+  `scripts/rls_attack_test_images.sql` 7 of 19 wrong before, 19/19 after; the 0021 suite 29/29 after, with a new "logo over
+  512 KB still refused" case) and again by the build (fingerprint and format in the readiness check).
+- Launch: placeholders are listed as still needed from the client (job result `placeholders`, Cockpit panel with per-slot upload);
+  `content.placeholders-launch` (registry 1.3.0, launch stage) refuses them unless the owner ticks "launch with placeholders".
+- `GeneratedImageProvider` interface only; no paid calls. Evidence: before this package the stored Lanternworks site had no
+  image or placeholder at all and the schema had no slot to hold one.
+- Suites: frontend-loop 125, rendered-qa 88 (the media site passes every rendered check on all six pages), verification 116,
+  workflow 44, jobs 34, planning 42, Cockpit 124 plus build. Screenshots at 1440 and 375.
+- Not done: no live build; an uploaded image's real use in a paid build is proven only in Package 5.
+
+**Next action**: Huraira reviews the Package 3 report and gives GO for Package 4 (Cockpit plain-language UX; the Claude Design
+prompt `docs/COCKPIT-CLAUDE-DESIGN-PROMPT.md` may feed it). Packages 4–5: see the source doc; prompt unchanged.
 
 ### STEP 27 — Track A motion budget (P0, added 2026-10-07, decision D1) — NOT STARTED
 
@@ -1565,7 +1582,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | not started | | |
 | 26 | Quality calibration | **PARTIAL**: item 1 built (`67033f7`, Anthropic screenshot reviewer, local live review passed 32 s / $0.071); Cockpit trace row pending | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
-| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, verified locally: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Packages 3–5 open) | 2026-10-14 | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09`, verified locally: image slots, placeholder cards, migration 0023 live, attack test 19/19. Packages 4–5 open) | 2026-10-14 | |
 
 **Goal tracker (Blueprint §16K)**
 

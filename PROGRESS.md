@@ -31,7 +31,10 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-14, 21:30 +05, `/step-close 28`)**:
+**Status summary (2026-10-14, 23:30 +05, `/step-close 28`)**:
+- **Step 28 IN PROGRESS**: Package 3 built and verified locally (`7e30b09`). Sites now show the client's own photos where the owner uploaded them and a labelled "Image to come" card everywhere else; the launch check refuses placeholders unless the owner ticks "launch with placeholders". Migration 0023 is live.
+
+**Status summary (2026-10-14, 21:30 +05, superseded)**:
 - **Step 28 IN PROGRESS**: Package 2 built and verified locally (`d112f62`). Track B starter 1.4.0 shows the client's logo (it rendered 0x0), fills buttons with the client's orange, keeps the action in reach on phones, removes the empty band under the phone hero, and gives every section an entrance. Four new rendered checks fail on 1.3.0 and pass on 1.4.0.
 
 **Status summary (2026-10-14, 18:30 +05, superseded)**:
@@ -76,7 +79,12 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-14, 21:30 +05):
+**Next up** (2026-10-14, 23:30 +05):
+1. **Huraira**: review the Step 28 Package 3 report and screenshots; GO for Package 4 (Cockpit plain-language UX), optionally after a Claude Design pass with `docs/COCKPIT-CLAUDE-DESIGN-PROMPT.md`.
+2. **Huraira**: the 4B M4 screenshot review (unchanged).
+3. **Nick**: the Bennett & Co brief (Step 25).
+
+**Next up** (2026-10-14, 21:30 +05, superseded):
 1. **Huraira**: review the Step 28 Package 2 report and screenshots; GO for Package 3 (image slots and labelled placeholders).
 2. **Huraira**: the 4B M4 screenshot review and the deployed site preview check (unchanged).
 3. **Nick**: the Bennett & Co brief (Step 25).
@@ -1151,7 +1159,7 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - Met live 2026-10-14: a build wrote estimated rows and reviewer rows (run `4c35703b`).
 - Not yet proven live: the Run page and a live cap refusal.
 
-## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-14 — Packages 1 and 2 of 5 built and verified)
+## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-14 — Packages 1–3 of 5 built and verified)
 
 Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one at a time, GO between) and Part D Step 28 of the plan.
 
@@ -1166,7 +1174,12 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 - [x] P2.3 Phones: action bar, no hero gap, swipeable reel. `render.mobile-action-visible` on 1.3.0: no visible action at the middle/bottom; passes on 1.4.0.
 - [x] P2.4 Motion per section type, reduced motion respected, inside the motion and JS budgets (Northfold clean test with Lighthouse passes). `render.motion-coverage` on 1.3.0: e.g. "4 of 4 section(s) show no motion" on services; passes on 1.4.0.
 - [x] P2.5 Registry 1.2.0 entries with planted fixtures (each fails only its own check); screenshots at 1280 and 375, before and after.
-- [ ] Packages 3–5 (image slots, Cockpit UX, paid Lanternworks proof).
+- [x] P3.1 Schema track-b/2 and track-a/2 (v1 upgraded on read) with media slots and a team section; builder never sets a source (media.test.ts 7/7).
+- [x] P3.2 Starter MediaFrame (Track B 1.5.0) and Track A 1.4.0: supplied image sized and lazy, or an "Image to come" card with data-placeholder; never an external service (rendered-qa media.test.ts: every rendered check passes on all six pages).
+- [x] P3.3 Supplied images via Cockpit upload, verified like the logo: migration 0023 live, `scripts/rls_attack_test_images.sql` 19/19 (7 wrong before), 0021 suite 29/29.
+- [x] P3.4 Placeholders listed at the gate and in the Cockpit; `content.placeholders-launch` refuses them unless the owner ticks "launch with placeholders" (registry 1.3.0; Cockpit flow test).
+- [x] P3.5 GeneratedImageProvider seam, interface only.
+- [ ] Packages 4–5 (Cockpit UX, paid Lanternworks proof).
 
 **Verification**: suites green locally (frontend-loop 115, planning 42, jobs 33, workflow 42, verification 113, agent-runtime 39, hermes 55, rendered-qa 79, Cockpit 123); typecheck clean. Independent agent review: 6 defects in the new checks, all fixed with tests that failed first. Not pushed, so no CI run; no live build (Package 1 forbids one).
 
