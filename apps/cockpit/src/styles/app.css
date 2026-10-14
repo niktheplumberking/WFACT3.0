@@ -644,3 +644,14 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
 .tick { display: flex; gap: 12px; align-items: flex-start; min-height: var(--target); padding: 12px 14px; border-radius: var(--r-ctl); background: var(--need-w); cursor: pointer; }
 .tick input { width: 22px; height: 22px; margin-top: 2px; accent-color: var(--ink); flex-shrink: 0; }
 .start-line { flex: 1 1 280px; }
+
+/* ---------- Live build (v2) ---------- */
+.live-build { display: grid; gap: 18px; }
+.live-bar { height: 8px; }
+.live-figures { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.live-done { display: flex; gap: 10px; align-items: center; padding: 14px 16px; border-radius: 12px; background: var(--done-w); }
+.live-done svg { color: var(--done); width: 20px; height: 20px; flex-shrink: 0; }
+.step-extra { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; font-size: var(--fs-small); color: var(--ink-2); }
+.leave { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 18px 20px; border-radius: 14px; background: var(--sunk); }
+.leave svg { width: 22px; height: 22px; }
+.leave p { flex: 1 1 260px; }

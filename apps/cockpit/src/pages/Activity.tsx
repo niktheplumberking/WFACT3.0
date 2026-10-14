@@ -22,7 +22,7 @@ import { stageLabel } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
 import { ClientNeedsPanel, RecoveryPanel } from "../components/Recovery";
 import { PlaceholdersPanel } from "../components/Placeholders";
-import { BuildTimeline } from "../components/BuildTimeline";
+import { LiveBuild } from "../components/LiveBuild";
 import { subjectOf } from "./Home";
 
 /* ---------------- list ---------------- */
@@ -520,9 +520,15 @@ export function RunPage() {
               <Loading rows={3} label="Reading the build's steps" />
             </Plate>
           ) : timeline && !showRecovery ? (
-            <Plate title={live ? "Build progress" : "What the factory did"} note={timeline.fromAudit ? undefined : "From the job's own record"}>
+            <Plate title={live ? "Build progress" : "What the factory did"} note={timeline.fromAudit ? undefined : "From the build's own record"}>
               <div className="plate-body">
-                <BuildTimeline timeline={timeline} stats={stats.data} startedAt={j.started_at ?? j.created_at} />
+                <LiveBuild
+                  timeline={timeline}
+                  stats={stats.data}
+                  startedAt={j.started_at ?? j.created_at}
+                  finishedAt={j.finished_at}
+                  tech={[{ k: "job", v: j.id }, ...(j.result?.workflowRunId ? [{ k: "run", v: String(j.result.workflowRunId) }] : []), ...(j.gh_run_url ? [{ k: "worker log", v: j.gh_run_url }] : [])]}
+                />
                 {run.data?.error && <p className="quiet fine" style={{ marginTop: 12 }}>The run's step-by-step record couldn't be read just now (“{run.data.error}”), so this shows what the job itself reported. Nothing changed.</p>}
               </div>
             </Plate>

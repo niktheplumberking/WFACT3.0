@@ -102,7 +102,7 @@ export interface CheckResult {
  *  The running row is raised; a stopped row gets the stop wash. */
 export function StepRow({ n, title, time, tone, word, sentence, checks, showSlugs, children }: { n: number; title: string; time?: string; tone: StatusTone; word?: string; sentence?: ReactNode; checks?: CheckResult[]; showSlugs?: boolean; children?: ReactNode }) {
   return (
-    <li className={`steprow steprow-${tone}`}>
+    <li className={`steprow steprow-${tone}`} aria-current={tone === "run" ? "step" : undefined}>
       <span className="steprow-n">{String(n).padStart(2, "0")}</span>
       <div className="steprow-head">
         <span className="steprow-title">{title}</span>

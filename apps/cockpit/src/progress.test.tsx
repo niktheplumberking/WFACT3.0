@@ -54,15 +54,18 @@ describe("a running build shows where it is", () => {
       audit(RUN_LIVE, 2, "agent.spawn", { role: "qa-evaluator" }),
     ];
     start(`/activity/${JOB_RUNNING}`, fx);
+    // Cockpit v2: the ten steps in the brief's order, mapped from the run's own rows.
     const steps = await screen.findByRole("list", { name: "Build steps" }, T);
-    const current = await within(steps).findByText("Quality checks", {}, T);
+    const current = await within(steps).findByText("Automatic checks in a real browser", {}, T);
     expect(current.closest("li")).toHaveAttribute("aria-current", "step");
-    expect(within(current.closest("li")!).getByText("Running now")).toBeInTheDocument();
-    expect(within(steps).getByText("Writing the site").closest("li")).not.toHaveAttribute("aria-current");
-    expect(within(steps).getByText("Ready for launch approval").closest("li")).toHaveClass("pending");
-    expect(screen.getByText(/^Checking quality: the automatic checks and the design review \(2 min/)).toBeInTheDocument();
-    expect(await screen.findByText(/Not enough past builds to estimate/, {}, T)).toBeInTheDocument();
-    expect(screen.getAllByRole("status").some((s) => s.textContent === "Now: Quality checks.")).toBe(true);
+    expect(within(current.closest("li")!).getByText("Running")).toBeInTheDocument();
+    expect(within(steps).getByText("Writing the site's words and structure").closest("li")).not.toHaveAttribute("aria-current");
+    expect(within(steps).getByText("Writing the site's words and structure").closest("li")).toHaveClass("steprow-done");
+    expect(within(steps).getByText("Ready for your approval").closest("li")).toHaveClass("steprow-wait");
+    // steps the run does not record separately are never shown as done
+    expect(within(steps).getByText("Design review of the screenshots").closest("li")).toHaveClass("steprow-wait");
+    expect(screen.getByRole("heading", { name: "Now: automatic checks in a real browser" })).toBeInTheDocument();
+    expect(await screen.findByText("Not enough past builds to say", {}, T)).toBeInTheDocument();
     // No way to "continue" a build that is still running.
     expect(screen.queryByRole("button", { name: /continue|again/i })).toBeNull();
   });
