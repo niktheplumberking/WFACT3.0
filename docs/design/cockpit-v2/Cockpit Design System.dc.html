@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&family=Overpass+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>body{margin:0;background:#F4F2ED;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}a{color:#1C1B18;text-underline-offset:3px}a:hover{color:#46433D}</style>
+</helmet>
+<div style="container-type:inline-size;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:17px;line-height:1.55;color:#1C1B18;background:#F4F2ED">
+<div style="max-width:1120px;margin:0 auto;padding:clamp(24px,5cqi,72px) clamp(16px,4cqi,48px) 120px;display:grid;gap:80px">
+
+<header style="display:grid;gap:16px">
+  <p style="margin:0;font:600 12px 'Overpass Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#625E55">WFACT Cockpit · design rationale and system · direction locked 14 Oct 2026</p>
+  <h1 style="margin:0;font:400 clamp(44px,7cqi,88px)/0.98 Newsreader,Georgia,serif;letter-spacing:-0.025em;text-wrap:balance">A quiet room where every decision is yours.</h1>
+  <p style="margin:0;font-size:20px;color:#46433D;max-width:62ch">The Cockpit reads like a well-set morning paper, not a dashboard. It opens on one sentence that says whether everything is fine and what needs you, then lists those things in order, each with one button. Everything else is one step deeper.</p>
+  <nav aria-label="On this page" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><sc-for list="{{ toc }}" as="t"><a href="{{ t.h }}" style="display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border:1px solid #C7C1B5;border-radius:999px;text-decoration:none;font-size:15px;font-weight:600">{{ t.l }}</a></sc-for></nav>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px"><a href="Cockpit Prototype.dc.html" style="display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 18px;border-radius:10px;background:#1C1B18;color:#FBFAF7;text-decoration:none;font-weight:600"><i class="ph ph-play" aria-hidden="true"></i>Open the prototype</a><a href="Cockpit Screens.dc.html" style="display:inline-flex;align-items:center;min-height:46px;padding:0 18px;border-radius:10px;border:1px solid #C7C1B5;text-decoration:none;font-weight:600">Screens 01 to 08</a><a href="Cockpit Screens 2.dc.html" style="display:inline-flex;align-items:center;min-height:46px;padding:0 18px;border-radius:10px;border:1px solid #C7C1B5;text-decoration:none;font-weight:600">Screens 09 to 17</a><a href="Current Cockpit Home (reference).dc.html" style="display:inline-flex;align-items:center;min-height:46px;padding:0 18px;border-radius:10px;border:1px solid #C7C1B5;text-decoration:none;font-weight:600">Today's Cockpit, for reference</a></div>
+</header>
+
+<section id="assume" style="display:grid;gap:20px">
+  <h2 style="margin:0;font:500 36px/1.1 Newsreader,Georgia,serif">Assumptions and locked decisions</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:40px">
+    <div style="display:grid;gap:10px"><h3 style="margin:0;font-size:17px;font-weight:700">Assumed</h3><ol style="margin:0;padding-left:22px;display:grid;gap:8px"><sc-for list="{{ assumptions }}" as="a"><li>{{ a }}</li></sc-for></ol></div>
+    <div style="display:grid;gap:10px"><h3 style="margin:0;font-size:17px;font-weight:700">Decisions, locked 14 Oct 2026</h3><ol style="margin:0;padding-left:22px;display:grid;gap:8px"><sc-for list="{{ questions }}" as="q"><li>{{ q }}</li></sc-for></ol></div>
+  </div>
+</section>
+
+<section id="concept" style="display:grid;gap:20px">
+  <h2 style="margin:0;font:500 36px/1.1 Newsreader,Georgia,serif">The concept: an editorial control room</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:32px 48px">
+    <sc-for list="{{ principles }}" as="p"><div style="display:grid;gap:6px;padding-top:14px;border-top:2px solid #1C1B18"><h3 style="margin:0;font:500 22px/1.25 Newsreader,Georgia,serif">{{ p.t }}</h3><p style="margin:0;color:#46433D">{{ p.d }}</p></div></sc-for>
+  </div>
+</section>
+
+<section id="modes" style="display:grid;gap:20px">
+  <h2 style="margin:0;font:500 36px/1.1 Newsreader,Georgia,serif">Simple and Detailed</h2>
+  <p style="margin:0;max-width:66ch;color:#46433D">One product, one set of screens. Detail is a per-person setting, switchable from the bottom of the menu, the More tab on phones, the command palette or the D key. Role decides what you may do; detail level decides how much you see.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px">
+    <div style="padding:24px;border-radius:16px;background:#FBFAF7;border:1px solid #DFDBD2;display:grid;gap:10px"><h3 style="margin:0;font:500 24px Newsreader,Georgia,serif">Simple</h3><p style="margin:0;color:#46433D">Default for owners and PMs. Plain sentences, durations rounded, every Technical details drawer closed. Nothing is hidden that changes a decision: money, missing details and placeholders always show.</p><p style="margin:0;padding:12px 14px;border-radius:10px;background:#ECE9E2">Checking the words · Done · 1 min</p></div>
+    <div style="padding:24px;border-radius:16px;background:#FBFAF7;border:1px solid #DFDBD2;display:grid;gap:10px"><h3 style="margin:0;font:500 24px Newsreader,Georgia,serif">Detailed</h3><p style="margin:0;color:#46433D">Default for Huraira and admins. Technical details open, ids and exact timings visible, copy buttons on every id, model names and tokens in drawers, check slugs next to their plain names.</p><p style="margin:0;padding:12px 14px;border-radius:10px;background:#ECE9E2;font:400 14px 'Overpass Mono',monospace">Checking the words · Done · 58.2 s · claims.unsourced-fact passed · wf-1198</p></div>
+  </div>
+</section>
+
+<section id="color" style="display:grid;gap:24px">
+  <h2 style="margin:0;font:500 36px/1.1 Newsreader,Georgia,serif">Colour</h2>
+  <p style="margin:0;max-width:66ch;color:#46433D">Warm paper neutrals carry everything. Three status colours mean one thing each and always come with a glyph and a word: a diamond for needs you, a tick for done, a stop sign for stopped. Running is ink with a turning ring; waiting is a hollow circle. The accent is a personal choice for buttons and focus only; it never means status.</p>
+  <sc-for list="{{ palettes }}" as="pal">
+  <div style="display:grid;gap:12px">
+    <h3 style="margin:0;font-size:16px;font-weight:700">{{ pal.name }}</h3>
+    <div style="{{ pal.wrap }}">
+      <sc-for list="{{ pal.sw }}" as="c"><div style="display:grid;gap:6px;min-width:0"><span style="{{ c.box }}"></span><span style="{{ c.lab }}"><b style="font-weight:600">{{ c.n }}</b><br>{{ c.v }}<br>{{ c.u }}</span></div></sc-for>
+    </div>
+  </div>
+  </sc-for>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><span style="font-size:15px;color:#46433D">Accent choices:</span><sc-for list="{{ accents }}" as="a"><span style="display:inline-flex;gap:8px;align-items:center;min-height:40px;padding:0 12px 0 8px;border:1px solid #C7C1B5;border-radius:10px;font-weight:600;font-size:15px"><span style="{{ a.sw }}"></span>{{ a.n }}</span></sc-for></div>
+  <p style="margin:0;font-size:15px;color:#46433D">Contrast: ink on paper 15.8:1; ink-2 8.6:1; ink-3 5.6:1; need on its wash 5.4:1; done on its wash 5.9:1; stop on its wash 5.6:1. Dark values meet the same 4.5:1 floor.</p>
+</section>
+
+<section id="type" style="display:grid;gap:20px">
+  <h2 style="margin:0;font:500 36px/1.1 Newsreader,Georgia,serif">Type</h2>
+  <p style="margin:0;max-width:66ch;color:#46433D"><b>Newsreader</b> is the display face: an editorial serif with real character at large sizes and a warm italic for the client's own words. <b>Atkinson Hyperlegible Next</b>, kept from today's Cockpit, is the reading face, designed for low-vision readers. <b>Overpass Mono</b>, also kept, is for figures, times and ids, with tabular numbers.</p>
+  <div style="display:grid;border-top:1px solid #DFDBD2"><sc-for list="{{ typeScale }}" as="t"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px 24px;align-items:baseline;padding:16px 0;border-bottom:1px solid #DFDBD2"><span style="font:400 13px 'Overpass Mono',monospace;color:#625E55">{{ t.k }}</span><span style="{{ t.s }}">{{ t.x }}</span></div></sc-for></div>
+</section>
+
+<section id="space" style="display:grid;gap:20px">
+  <h2 style="margin:0;font:500 36px/1.1 Newsreader,Georgia,serif">Space, radius, motion</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:32px">
+    <div style="display:grid;gap:8px"><h3 style="margin:0;font-size:16px;font-weight:700">Space · 4 px base</h3><sc-for list="{{ spaces }}" as="s"><div style="display:flex;gap:12px;align-items:center"><span style="font:400 13px 'Overpass Mono',monospace;width:64px;color:#625E55">{{ s.k }}</span><span style="{{ s.bar }}"></span></div></sc-for><p style="margin:6px 0 0;font-size:15px;color:#46433D">Comfortable density uses 20 px row padding; Compact uses 11 px. Touch targets never drop below 44 px.</p></div>
+    <div style="display:grid;gap:12px;align-content:start"><h3 style="margin:0;font-size:16px;font-weight:700">Radius</h3><div style="display:flex;flex-wrap:wrap;gap:14px"><sc-for list="{{ radii }}" as="r"><div style="display:grid;gap:6px;justify-items:center"><span style="{{ r.box }}"></span><span style="font:400 13px 'Overpass Mono',monospace;color:#625E55">{{ r.k }}</span></div></sc-for></div></div>
+    <div style="display:grid;gap:8px;align-content:start"><h3 style="margin:0;font-size:16px;font-weight:700">Motion</h3><ul style="margin:0;padding-left:20px;display:grid;gap:6px;color:#46433D"><li>Enter: 180 to 400 ms, ease, 6 px rise. Only for things that newly arrived.</li><li>Running ring: 1.1 s turn. Progress bar: 800 ms ease on change.</li><li>Nothing loops for decoration. Reduce motion (system or setting) stops every animation; states still read from words and glyphs.</li></ul></div>
+  </div>
+</section>
+
+<section id="components" style="display:grid;gap:32px">
+  <h2 style="margin:0;font:500 36px/1.1 Newsreader,Georgia,serif">Components</h2>
+
+  <div style="display:grid;gap:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Buttons</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <button style="display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 20px;border-radius:12px;border:1px solid #1C1B18;background:#1C1B18;color:#FBFAF7;font-weight:600;font-size:16px;cursor:pointer">Primary · one per view<i class="ph ph-arrow-right" aria-hidden="true"></i></button>
+      <button style="min-height:48px;padding:0 18px;border-radius:12px;border:1px solid #C7C1B5;background:#FBFAF7;font-weight:600;font-size:16px;cursor:pointer">Secondary</button>
+      <button style="min-height:44px;padding:0 8px;border:0;background:none;color:#46433D;text-decoration:underline;text-underline-offset:3px;font-size:16px;cursor:pointer">Quiet alternative</button>
+      <button disabled style="min-height:48px;padding:0 18px;border-radius:12px;border:1px solid #C7C1B5;background:#ECE9E2;color:#625E55;font-weight:600;font-size:16px">Disabled, with a reason nearby</button>
+      <button style="min-height:48px;padding:0 18px;border-radius:12px;border:1px solid #1C1B18;background:#1C1B18;color:#FBFAF7;font-weight:600;font-size:16px;outline:2px solid #1C1B18;outline-offset:3px">Focus ring</button>
+    </div>
+    <p style="margin:0;font-size:15px;color:#46433D">Verbs on every button. A button that spends money always opens a confirmation that says roughly how much; anything undoable shows Undo or Changed my mind in its toast.</p>
+  </div>
+
+  <div style="display:grid;gap:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Status chips</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:10px"><sc-for list="{{ chips }}" as="c"><span style="{{ c.s }}"><i class="{{ c.i }}" aria-hidden="true"></i>{{ c.w }}</span></sc-for></div>
+    <p style="margin:0;font-size:15px;color:#46433D">The glyph carries the state for colour-blind readers; the word carries it for everyone. Chips are text, not buttons.</p>
+  </div>
+
+  <div style="display:grid;gap:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Progress strip</h3>
+    <ol style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));border:1px solid #DFDBD2;border-radius:18px;overflow:hidden;background:#FBFAF7">
+      <sc-for list="{{ stripDemo }}" as="s"><li style="{{ s.cell }}"><i class="{{ s.i }}" aria-hidden="true" style="{{ s.is }}"></i><b style="font-weight:600">{{ s.n }}</b><span style="font-size:14px;color:#46433D">{{ s.l }}</span></li></sc-for>
+    </ol>
+    <p style="margin:0;font-size:15px;color:#46433D">Six steps, always the same words. The current step gets the status wash, a 3 px ink rule on top and aria-current="step". Below the strip sits one line, “The one thing to do next”, and one primary button. On phones it collapses to “Step 3 of 6”, a segmented bar, the sentence, and a disclosure for all six.</p>
+  </div>
+
+  <div style="display:grid;gap:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Step row (live build)</h3>
+    <div style="display:grid;gap:2px;max-width:820px">
+      <div style="display:grid;grid-template-columns:28px 1fr;gap:4px 14px;padding:16px;border-radius:14px"><span style="font:600 13px/26px 'Overpass Mono',monospace;color:#625E55">04</span><div style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center"><span style="flex:1 1 220px;font-weight:600">An independent reviewer reads the content</span><span style="font:400 14px 'Overpass Mono',monospace;color:#46433D">1 min 20 s</span><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:#DCEADF;color:#2A6641;font-size:13px;font-weight:600"><i class="ph-fill ph-check-circle" aria-hidden="true"></i>Done</span></div></div>
+      <div style="display:grid;grid-template-columns:28px 1fr;gap:4px 14px;padding:16px;border-radius:14px;background:#FBFAF7;border:1px solid #C7C1B5"><span style="font:600 13px/26px 'Overpass Mono',monospace;color:#625E55">05</span><div style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center"><span style="flex:1 1 220px;font-weight:600">Building the site</span><span style="font:400 14px 'Overpass Mono',monospace;color:#46433D">2 min so far</span><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:#ECE9E2;font-size:13px;font-weight:600"><i class="ph-bold ph-circle-notch" aria-hidden="true"></i>Running</span></div><p style="grid-column:2;margin:0;font-size:15px;color:#46433D">Turning the approved words into real pages.</p></div>
+      <div style="display:grid;grid-template-columns:28px 1fr;gap:4px 14px;padding:16px;border-radius:14px;opacity:.82"><span style="font:600 13px/26px 'Overpass Mono',monospace;color:#625E55">06</span><div style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center"><span style="flex:1 1 220px;font-weight:600">Automatic checks in a real browser</span><span style="font:400 14px 'Overpass Mono',monospace;color:#46433D">Usually about 2 min</span><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;border:1px solid #C7C1B5;color:#46433D;font-size:13px;font-weight:600"><i class="ph ph-circle" aria-hidden="true"></i>Waiting</span></div></div>
+    </div>
+    <p style="margin:0;font-size:15px;color:#46433D">Done rows show how long they took; the running row shows time so far; waiting rows show the usual time from past builds. States: waiting, running, done, skipped, needs you, stopped.</p>
+  </div>
+
+  <div style="display:grid;gap:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Fix card</h3>
+    <div style="display:grid;gap:14px;padding:22px;border-radius:18px;border:2px solid #1C1B18;background:#FBFAF7;max-width:720px"><span style="font:500 22px Newsreader,Georgia,serif">The fix</span><div style="display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center"><button style="min-height:50px;padding:0 22px;border-radius:12px;border:1px solid #1C1B18;background:#1C1B18;color:#FBFAF7;font-weight:600;font-size:16px">Fix it and continue</button><button style="min-height:44px;padding:0 8px;border:0;background:none;color:#46433D;text-decoration:underline;font-size:16px">See where it appeared</button><button style="min-height:44px;padding:0 8px;border:0;background:none;color:#46433D;text-decoration:underline;font-size:16px">Write the site again from the proposal</button></div></div>
+    <p style="margin:0;font-size:15px;color:#46433D">Always preceded by three facts: what happened, was money spent, what the factory already tried. Then one primary fix, quiet alternatives, and a Why? disclosure with the evidence. See section 17 of the screens for all eight cases.</p>
+  </div>
+
+  <div style="display:grid;gap:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Upload row</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:16px 0;border-top:1px solid #DFDBD2;border-bottom:1px solid #DFDBD2;max-width:820px"><div style="flex:1 1 280px;display:grid;gap:4px"><span style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center"><b style="font-weight:600">Picture: the shopfront</b><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:#F5E6CC;color:#8A4F00;font-size:13px;font-weight:600"><i class="ph-fill ph-diamond" aria-hidden="true"></i>Needs a file</span></span><span style="font-size:15px;color:#46433D">For the Visit us page. It should show the front of the bakery from the street.</span></div><div style="display:flex;gap:8px;align-items:center"><button style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #1C1B18;background:#1C1B18;color:#FBFAF7;font-weight:600"><i class="ph ph-upload-simple" aria-hidden="true"></i>Upload</button><button style="min-height:44px;padding:0 10px;border:0;background:none;color:#46433D;text-decoration:underline">Build without it</button></div></div>
+  </div>
+
+  <div style="display:grid;gap:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Side-by-side site preview</h3>
+    <div style="display:grid;grid-template-columns:3fr 1fr;gap:16px;align-items:end;max-width:820px"><div role="img" aria-label="Desktop preview" style="aspect-ratio:16/10;border-radius:12px;border:1px solid #C7C1B5;background:repeating-linear-gradient(135deg,#ECE9E2 0 10px,#FBFAF7 10px 20px);display:grid;place-items:center"><span style="font:500 12px 'Overpass Mono',monospace;background:#FBFAF7;padding:6px 10px;border-radius:6px">live site · desktop · /</span></div><div role="img" aria-label="Phone preview" style="aspect-ratio:9/19;border-radius:22px;border:5px solid #1C1B18;background:repeating-linear-gradient(135deg,#ECE9E2 0 10px,#FBFAF7 10px 20px)"></div></div>
+    <p style="margin:0;font-size:15px;color:#46433D">Both frames load the real preview at the same page; the page switcher is a tablist. On phones the two stack.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:28px">
+    <div style="display:grid;gap:12px;align-content:start"><h3 style="margin:0;font-size:18px;font-weight:700">Technical details drawer</h3><details style="border-top:1px solid #DFDBD2;padding-top:4px"><summary style="min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><i class="ph ph-wrench" aria-hidden="true"></i>Technical details</summary><p style="margin:0;font:400 13px 'Overpass Mono',monospace;color:#46433D">job j-c41f02 · run wf-1198 · commit 9f3c1ae</p></details><p style="margin:0;font-size:15px;color:#46433D">A native details element. Closed in Simple, open in Detailed. Every id has a copy button.</p></div>
+    <div style="display:grid;gap:12px;align-content:start"><h3 style="margin:0;font-size:18px;font-weight:700">Toast</h3><div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:14px 16px;border-radius:14px;background:#1C1B18;color:#FBFAF7"><span style="flex:1 1 200px;font-size:15px">Continuing from the saved site.</span><span style="min-height:40px;display:inline-flex;align-items:center;padding:0 12px;border-radius:8px;border:1px solid #FBFAF7;font-weight:600">Changed my mind</span></div><p style="margin:0;font-size:15px;color:#46433D">In a polite live region; stays 9 s; never the only place information appears.</p></div>
+    <div style="display:grid;gap:12px;align-content:start"><h3 style="margin:0;font-size:18px;font-weight:700">Empty state</h3><div style="padding:22px 0;border-top:1px solid #DFDBD2;display:grid;gap:8px"><span style="font:400 24px/1.2 Newsreader,Georgia,serif">Your first client starts with a request.</span><span style="color:#46433D;font-size:15px">Says what will appear here and offers the one way to start.</span></div></div>
+    <div style="display:grid;gap:12px;align-content:start"><h3 style="margin:0;font-size:18px;font-weight:700">Coming later card</h3><div style="padding:16px;border-radius:12px;border:1px dashed #C7C1B5;font-size:15px">System · not built yet, so it shows nothing rather than made-up numbers.</div></div>
+  </div>
+
+  <div style="display:grid;gap:12px"><h3 style="margin:0;font-size:18px;font-weight:700">Command palette</h3><p style="margin:0;font-size:15px;color:#46433D">See screens, section 15. A dialog with one labelled search field; results grouped as Clients, Actions, Go to, Settings; Enter runs the first match.</p></div>
+</section>
+
+<section id="annotations" style="display:grid;gap:20px">
+  <h2 style="margin:0;font:500 36px/1.1 Newsreader,Georgia,serif">Annotations for developers</h2>
+  <p style="margin:0;max-width:66ch;color:#46433D">What each screen shows, where it comes from in today's code, and what screen readers and keyboards get. File names are in apps/cockpit/src unless noted.</p>
+  <div style="display:grid;border-top:1px solid #DFDBD2">
+    <sc-for list="{{ notes }}" as="n"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:8px 28px;padding:18px 0;border-bottom:1px solid #DFDBD2">
+      <div style="display:grid;gap:2px"><b style="font:500 20px/1.25 Newsreader,Georgia,serif">{{ n.s }}</b><span style="font-size:14px;color:#625E55">{{ n.f }}</span></div>
+      <p style="margin:0;font-size:15px"><b style="font-weight:600">Shows and reads from:</b> {{ n.d }}</p>
+      <p style="margin:0;font-size:15px"><b style="font-weight:600">Access:</b> {{ n.a }}</p>
+    </div></sc-for>
+  </div>
+  <div style="display:grid;gap:8px;padding:22px;border-radius:16px;background:#ECE9E2"><h3 style="margin:0;font-size:17px;font-weight:700">Everywhere</h3><ul style="margin:0;padding-left:20px;display:grid;gap:6px"><li>Skip link to main; on navigation, focus moves to the h1 and the document title updates.</li><li>Focus order: menu, top bar (search, notifications, New request), page content top to bottom, sticky action bar last. Dialogs trap focus and return it to the button that opened them.</li><li>Every icon is aria-hidden; every icon-only button has a label. Pressed filters use aria-pressed, the view switch and kind of site use radiogroup.</li><li>No horizontal scroll at 375 px: wide tables scroll inside their own region; everything else wraps.</li><li>Text size setting scales the whole page; layouts are fluid so 200% zoom holds.</li><li>There is no deploy or publish control anywhere. “Record that it is live” only records a date after a person launched it.</li></ul></div>
+</section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const sw = (n, v, u, dark) => ({ n, v, u, box: { display: 'block', height: 72, borderRadius: 10, background: v, border: '1px solid rgba(0,0,0,.08)' }, lab: { fontSize: 13, lineHeight: 1.4, fontFamily: "'Overpass Mono',monospace", color: dark ? '#C4C0B7' : '#46433D' } });
+    const wrap = dark => ({ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(110px,1fr))', gap: 14, padding: dark ? 18 : 0, borderRadius: 16, background: dark ? '#121211' : 'transparent' });
+    const chip = (bg, fg, i, w, outline) => ({ s: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 12px 6px 10px', borderRadius: 999, background: bg, color: fg, fontSize: 14, fontWeight: 600, border: outline ? '1px solid #C7C1B5' : '1px solid transparent' }, i, w });
+    const cell = (bg, top) => ({ display: 'grid', gap: 4, padding: '16px 14px', borderLeft: '1px solid #DFDBD2', background: bg, boxShadow: top ? 'inset 0 3px 0 #1C1B18' : 'none' });
+    return {
+      toc: [['#assume', 'Assumptions'], ['#concept', 'Concept'], ['#modes', 'Simple and Detailed'], ['#color', 'Colour'], ['#type', 'Type'], ['#space', 'Space and motion'], ['#components', 'Components'], ['#annotations', 'Annotations']].map(([h, l]) => ({ h, l })),
+      assumptions: [
+        'The six-step path replaces the 11 internal stages on screen; the stages stay in the database and map onto the six.',
+        'Launch stays outside the Cockpit. After a person launches, an owner records it; the Cockpit never publishes.',
+        'Caps come from spend-caps.json: $2.00 per build and $20 a month are shown as the working values. Only owners change them.',
+        'A build that stops for missing details or a service problem spends nothing, because the readiness check runs first (as in recovery.ts).',
+        'Admins can do everything except approve money and launches; PMs see only assigned clients, as RLS already enforces.',
+        'Sample clients are the repo’s labelled test clients; team names other than Nick and Huraira, prices and timings are design content until wired to real rows.',
+        'Phone push arrives with the installable app already in place (PWA).',
+        'English only for now; region settings change date, time and currency formats.',
+      ],
+      questions: [
+        'The monthly cap stops new builds only. A build already running finishes inside its own $2.00 per-build cap, so it can never overspend.',
+        'Client answers are relayed by a person for now. A shareable link for the client to fill in the details list is a later room, shown as “coming later”.',
+        'Only owners (Nick or Huraira) may tick “launch with placeholders”. The tick is recorded in the decisions timeline.',
+        'Project managers see “cost so far” on their own clients’ project pages. The Costs room and the caps stay with owners and admins.',
+        '“Ask the factory a question” lives in the command palette as an action, not as a box in the top bar.',
+        'WFACT stays a wordmark set in Newsreader with “Cockpit” in italic until a real mark exists. No logo is drawn.',
+      ],
+      principles: [
+        { t: 'One sentence first', d: 'Every screen opens with a sentence in the display face that says what is true now. Nick can stop reading there.' },
+        { t: 'One button per decision', d: 'Each row, card and step offers exactly one primary action. Alternatives exist, but are quiet links.' },
+        { t: 'Missing is visible', d: 'What the client never gave is listed by name with why it matters. Skipping is explicit, and skipped means left out, never made up.' },
+        { t: 'Money is a sentence', d: 'Before anything that costs money: roughly how much, and that it stops itself at the cap. After: what it cost.' },
+        { t: 'Proof on demand', d: 'A result links to the check behind it. Technical details are always one fold away, never in the way.' },
+        { t: 'Gates feel like gates', d: 'Approvals use a confirmation, are recorded in the decisions timeline, and can be changed while the action allows.' },
+      ],
+      palettes: [
+        { name: 'Light', wrap: wrap(false), sw: [sw('paper', '#F4F2ED', 'page'), sw('sheet', '#FBFAF7', 'cards'), sw('sunk', '#ECE9E2', 'wells'), sw('line', '#DFDBD2', 'rules'), sw('line-2', '#C7C1B5', 'borders'), sw('ink', '#1C1B18', 'text'), sw('ink-2', '#46433D', 'secondary'), sw('ink-3', '#625E55', 'meta'), sw('need', '#8A4F00', 'needs you'), sw('need-w', '#F5E6CC', 'its wash'), sw('done', '#2A6641', 'done'), sw('done-w', '#DCEADF', 'its wash'), sw('stop', '#A93322', 'stopped'), sw('stop-w', '#F6DDD7', 'its wash')] },
+        { name: 'Dark', wrap: wrap(true), sw: [sw('paper', '#121211', 'page', 1), sw('sheet', '#1B1B19', 'cards', 1), sw('sunk', '#232220', 'wells', 1), sw('line', '#2F2E2B', 'rules', 1), sw('line-2', '#4A4843', 'borders', 1), sw('ink', '#EEECE6', 'text', 1), sw('ink-2', '#C4C0B7', 'secondary', 1), sw('ink-3', '#A09B91', 'meta', 1), sw('need', '#F2B865', 'needs you', 1), sw('need-w', '#3A2B14', 'its wash', 1), sw('done', '#82CC9C', 'done', 1), sw('done-w', '#17301F', 'its wash', 1), sw('stop', '#F59380', 'stopped', 1), sw('stop-w', '#3D1C15', 'its wash', 1)] },
+      ],
+      accents: [['Ink (default)', '#1C1B18'], ['Harbour', '#1F5D66'], ['Clay', '#8C4A2C'], ['Moss', '#3E5A2C']].map(([n, c]) => ({ n, sw: { width: 22, height: 22, borderRadius: '50%', background: c } })),
+      typeScale: [
+        { k: 'display · Newsreader 400 · 58/1.03', x: 'Four things need you.', s: { fontFamily: 'Newsreader,Georgia,serif', fontSize: 58, lineHeight: 1.03, letterSpacing: '-0.02em' } },
+        { k: 'title · Newsreader 400 · 46/1.08', x: 'Harbor Street Bakery', s: { fontFamily: 'Newsreader,Georgia,serif', fontSize: 46, lineHeight: 1.08 } },
+        { k: 'section · Newsreader 500 · 26/1.2', x: 'What needs you', s: { fontFamily: 'Newsreader,Georgia,serif', fontWeight: 500, fontSize: 26 } },
+        { k: 'item · Newsreader 500 · 22/1.25', x: 'Approve the finished site', s: { fontFamily: 'Newsreader,Georgia,serif', fontWeight: 500, fontSize: 22 } },
+        { k: 'quote · Newsreader italic · 24/1.4', x: '“Tells them where to park.”', s: { fontFamily: 'Newsreader,Georgia,serif', fontStyle: 'italic', fontSize: 24 } },
+        { k: 'lead · Atkinson 400 · 18/1.5', x: 'The factory is building one site.', s: { fontSize: 18 } },
+        { k: 'body · Atkinson 400 · 16/1.5', x: 'Every check passed. 1 placeholder picture is still on the site.', s: { fontSize: 16 } },
+        { k: 'label · Atkinson 600 · 15', x: 'Business phone number', s: { fontSize: 15, fontWeight: 600 } },
+        { k: 'small · Atkinson 400 · 14 (minimum)', x: 'Usually about 2 min', s: { fontSize: 14, color: '#46433D' } },
+        { k: 'figure · Overpass Mono 600 · 16', x: '$0.68 · 14 min · 10:41', s: { fontFamily: "'Overpass Mono',monospace", fontWeight: 600, fontSize: 16 } },
+        { k: 'eyebrow · Overpass Mono 600 · 12 caps', x: 'WEDNESDAY 14 OCTOBER', s: { fontFamily: "'Overpass Mono',monospace", fontSize: 12, letterSpacing: '.08em', color: '#625E55' } },
+      ],
+      spaces: [4, 8, 12, 16, 20, 24, 32, 44, 64].map(v => ({ k: `${v} px`, bar: { height: 12, width: v * 3, background: '#1C1B18', borderRadius: 3 } })),
+      radii: [['8 · small', 8], ['10 · control', 10], ['14 · card', 14], ['18 · panel', 18], ['999 · chip', 999]].map(([k, r]) => ({ k, box: { width: 72, height: 52, borderRadius: r, border: '2px solid #1C1B18', background: '#FBFAF7' } })),
+      chips: [chip('#F5E6CC', '#8A4F00', 'ph-fill ph-diamond', 'Needs you'), chip('#DCEADF', '#2A6641', 'ph-fill ph-check-circle', 'Done'), chip('#F6DDD7', '#A93322', 'ph-fill ph-stop-circle', 'Stopped'), chip('#ECE9E2', '#1C1B18', 'ph-bold ph-circle-notch', 'Running'), chip('transparent', '#46433D', 'ph ph-circle', 'Waiting', true), chip('transparent', '#46433D', 'ph ph-minus-circle', 'Skipped', true), chip('#ECE9E2', '#46433D', 'ph ph-circle-dashed', 'No build yet')],
+      stripDemo: [['Request', 'Received 14 Oct.', 'done'], ['Proposal', 'Approved: Fast local site.', 'done'], ['Details needed', '2 of 7 supplied. Waiting for the logo.', 'need'], ['Building', 'Not yet.', 'wait'], ['Ready for approval', 'Not yet.', 'wait'], ['Live', 'Not yet.', 'wait']].map(([n, l, t]) => ({ n, l, i: t === 'done' ? 'ph-fill ph-check-circle' : t === 'need' ? 'ph-fill ph-diamond' : 'ph ph-circle', is: { fontSize: 18, color: t === 'done' ? '#2A6641' : t === 'need' ? '#8A4F00' : '#625E55' }, cell: cell(t === 'need' ? '#F5E6CC' : 'transparent', t === 'need') })),
+      notes: [
+        { s: 'Home', f: 'pages/Home.tsx · lib/attention.ts · lib/costs.ts', d: 'Status sentence from attention count; prioritised list (stopped builds, then approvals, then missing details) each with one action; Running now from active jobs with deriveTimeline().current; spend = capped() of this month vs CAPS; every client as a six-step line.', a: 'h1 is the sentence; list is an ol with numbered rows; mini path lines are decorative with the step in text beside them; PM rows replace buttons with who decides.' },
+        { s: 'Projects', f: 'pages/Work.tsx · fetchProjects()', d: 'projects + clients + latest plan + latest job. Next step and waiting-on come from the same mapping as the progress strip. Pins and saved views are per-person settings.', a: 'Search input labelled; filters aria-pressed; grid is a list of cards; list view role=table with headers; pin buttons name the client.' },
+        { s: 'New request', f: 'requestJob("intake") · lib/brandUpload.ts', d: 'Request text, business name, optional live address, optional logo (SVG policy from lib/svgPolicy.ts). Durations from past medians.', a: 'Visible labels, hint tied by aria-describedby, sending state role=status.' },
+        { s: 'Project page', f: 'stages.ts mapped to six steps · plan_inputs · jobs · costs', d: 'Progress strip, one next action, proposal summary, details and files, builds, cost so far, decisions timeline from the audit trail, Technical details.', a: 'Strip is an ol with aria-current="step"; phone strip uses details for all steps.' },
+        { s: 'Proposal review', f: 'pages/Decisions.tsx · plan.plan', d: 'Summary, verbatim client quote, two kinds of site with reasons, pages, open questions. Approve writes the decision and track; Ask for changes writes a note and requests revision n+1.', a: 'Kind of site is role=radiogroup; confirm is an alertdialog; sticky bar stays reachable by keyboard after content.' },
+        { s: 'Live build', f: 'lib/timeline.ts · deriveTimeline, estimate, stallNote', d: 'Ten steps with state, sentence, duration or usual time; elapsed, estimate (≥3 past runs or “not enough to say”), cost so far, current round. stallNote() appears when a step runs past twice its usual time.', a: 'Hidden role=status announces step changes only; progress bar is decorative because the text carries the same facts.' },
+        { s: 'Stopped build', f: 'lib/recovery.ts · diagnoseJob, continueOptions, reportText', d: 'Headline from Diagnosis, money from job spend, what was tried from halt status and attempts, one primary from continueOptions()[0], others quiet; Why? shows qaIssues in plain words via checkLabel(); raw log under Technical details; Copy a note for Huraira uses reportText().', a: 'Fix choices are a radiogroup; the primary confirms when it costs money; toast offers Changed my mind.' },
+        { s: 'Needs from the client', f: 'lib/inputs.ts · SLOTS · savePlanInputs', d: 'One row per slot or open question or picture slot, each with why. Skip writes waived=true. Count is supplied over total; skipped is shown separately.', a: 'progressbar with text; each action button names its item; inline answer has a label.' },
+        { s: 'Finished site review', f: 'lib/sitePreview.ts · Placeholders.tsx', d: 'Preview at chosen page on desktop and phone; placeholders from content.placeholder-media with the brief for each picture; readiness line; approval records only.', a: 'Pages are a tablist; previews have text names; approve is disabled with the reason stated beside it.' },
+        { s: 'Activity, Costs, Team, Settings, Notifications, Palette', f: 'pages/Activity.tsx · pages/Costs.tsx · pages/Misc.tsx · shell/Shell.tsx', d: 'Audit feed in plain words; costs led by sentences with per-model table folded; team from accounts and pm assignments; settings stored per person with owner defaults; notifications from the attention source; palette searches clients, actions and settings.', a: 'Tables have scoped headers; charts have text alternatives; settings preview before save; palette is a dialog with Esc to close.' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

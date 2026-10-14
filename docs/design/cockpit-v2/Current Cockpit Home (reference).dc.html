@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@500;600;700;800&family=Overpass+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>body{margin:0;background:#121816;-webkit-font-smoothing:antialiased}*{box-sizing:border-box}a{color:inherit;text-underline-offset:3px}a:hover{color:inherit}</style>
+</helmet>
+<div style="display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh;background:#121816;color:#e8ede9;font:400 16px/1.55 'Atkinson Hyperlegible Next',system-ui,sans-serif">
+  <aside style="display:flex;flex-direction:column;gap:24px;padding:20px 12px;background:#0e1312;border-right:1px solid #2c3833;min-height:100vh">
+    <div style="display:flex;align-items:center;gap:12px;padding:0 8px">
+      <span style="width:28px;height:28px;border-radius:4px;background:#e8ede9;color:#121816;display:grid;place-items:center;font:800 13px/1 Overpass,sans-serif">WF</span>
+      <span style="font:700 16px/1 Overpass,sans-serif">WFACT<span style="display:block;font:400 13px/1.3 'Atkinson Hyperlegible Next';color:#8f9c95;margin-top:3px">Cockpit</span></span>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:2px;font:600 14px/1 Overpass,sans-serif">
+      <a style="display:flex;align-items:center;gap:12px;min-height:40px;padding:0 12px;border-radius:4px;background:#202a26;box-shadow:inset 0 0 0 1px #3d4b45;text-decoration:none"><i class="ph ph-house" style="font-size:18px"></i>Home</a>
+      <a style="display:flex;align-items:center;gap:12px;min-height:40px;padding:0 12px;color:#b3beb8;text-decoration:none"><i class="ph ph-seal-check" style="font-size:18px"></i>Decisions<span style="margin-left:auto;min-width:22px;height:22px;border-radius:11px;background:#f0c84b;color:#121816;font:700 12px/22px 'Overpass Mono';text-align:center">3</span></a>
+      <a style="display:flex;align-items:center;gap:12px;min-height:40px;padding:0 12px;color:#b3beb8;text-decoration:none"><i class="ph ph-path" style="font-size:18px"></i>Projects</a>
+      <a style="display:flex;align-items:center;gap:12px;min-height:40px;padding:0 12px;color:#b3beb8;text-decoration:none"><i class="ph ph-list-checks" style="font-size:18px"></i>Activity</a>
+      <a style="display:flex;align-items:center;gap:12px;min-height:40px;padding:0 12px;color:#b3beb8;text-decoration:none"><i class="ph ph-receipt" style="font-size:18px"></i>Costs</a>
+      <div style="margin-top:16px;padding:0 12px 8px;font:600 13px/1 Overpass;color:#8f9c95">Coming next</div>
+      <sc-for list="{{ soon }}" as="s" hint-placeholder-count="4">
+        <a style="display:flex;align-items:center;gap:12px;min-height:40px;padding:0 12px;color:#8f9c95;font-weight:500;text-decoration:none"><i class="{{ s.icon }}" style="font-size:18px"></i>{{ s.label }}<span style="margin-left:auto;font:500 11px/1 'Overpass Mono'">Step {{ s.step }}</span></a>
+      </sc-for>
+    </nav>
+    <div style="margin-top:auto;border-top:1px solid #2c3833;padding-top:16px;display:flex;align-items:center;gap:12px;padding-left:12px">
+      <i class="ph ph-user-circle" style="font-size:28px"></i>
+      <span><b style="display:block;font:600 14px/1.2 Overpass">Nick</b><small style="color:#8f9c95;font-size:13px">Owner. Account, sign out</small></span>
+    </div>
+  </aside>
+  <div style="min-width:0">
+    <header style="display:flex;align-items:center;gap:16px;min-height:64px;padding:0 32px;border-bottom:1px solid #2c3833">
+      <span style="color:#8f9c95;font:600 14px/1 Overpass">Home</span>
+      <span style="flex:1"></span>
+      <div style="display:flex;align-items:center;gap:8px;width:360px;min-height:40px;padding:8px 12px;background:#19211e;border:1px solid #2c3833;border-radius:4px;color:#8f9c95;font-size:14px"><i class="ph ph-chat-circle-text"></i>Ask the factory a question<kbd style="margin-left:auto;font:500 11px/1 'Overpass Mono';border:1px solid #3d4b45;border-radius:3px;padding:3px 5px">/</kbd></div>
+      <a style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 20px;border-radius:4px;background:#e8ede9;color:#121816;font:700 14px/1 Overpass;text-decoration:none"><i class="ph ph-plus" style="font-size:18px"></i>New request</a>
+    </header>
+    <main style="padding:32px;max-width:1240px">
+      <div style="margin-bottom:32px">
+        <h1 style="margin:0;font:700 42px/1.08 Overpass;letter-spacing:-0.01em;max-width:26ch">3 things are waiting for you.</h1>
+        <p style="margin:8px 0 0;color:#b3beb8;max-width:62ch">1 job is running. The last build passed every check on 13 Oct. Full system health (queue, error rate, backups) arrives in Step 9.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:24px;margin-bottom:24px;align-items:start">
+        <section style="background:#19211e;border:1px solid #2c3833;border-radius:6px">
+          <div style="display:flex;align-items:baseline;gap:12px;padding:16px 20px;border-bottom:1px solid #2c3833"><h2 style="margin:0;font:700 19px Overpass">Waiting for you</h2><span style="margin-left:auto;font-size:14px;color:#8f9c95">Oldest first</span></div>
+          <sc-for list="{{ queue }}" as="q" hint-placeholder-count="3">
+            <div style="display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:16px;align-items:center;padding:16px 20px;border-top:1px solid #2c3833">
+              <span style="{{ q.lamp }}"></span>
+              <div><div style="font:700 16px/1.3 Overpass">{{ q.title }}</div><p style="margin:3px 0 0;color:#b3beb8;font-size:14px">{{ q.why }}</p></div>
+              <span style="{{ q.aspect }}">{{ q.label }}</span>
+            </div>
+          </sc-for>
+        </section>
+        <div style="display:grid;gap:24px">
+          <section style="background:#19211e;border:1px solid #2c3833;border-radius:6px">
+            <div style="padding:16px 20px;border-bottom:1px solid #2c3833"><h2 style="margin:0;font:700 19px Overpass">Running now</h2></div>
+            <div style="display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 20px;font-size:14px"><span style="color:#f0c84b;font:700 13px Overpass">● Running</span><a>Build: Summit Line Roofing</a><span style="font-family:'Overpass Mono';color:#8f9c95">10:02</span></div>
+          </section>
+          <section style="background:#19211e;border:1px solid #2c3833;border-radius:6px">
+            <div style="display:flex;padding:16px 20px;border-bottom:1px solid #2c3833"><h2 style="margin:0;font:700 19px Overpass">Recently finished</h2><a style="margin-left:auto;font-size:14px;color:#8f9c95">All activity</a></div>
+            <div style="display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 20px;font-size:14px"><span style="color:#5cc994;font:700 13px Overpass">● Verified</span><a>Build: Northlight Signs</a><span style="font-family:'Overpass Mono';color:#8f9c95">13 Oct</span></div>
+            <div style="display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 20px;font-size:14px"><span style="color:#f2706a;font:700 13px Overpass">● Failed</span><a>Build: DreamSign pilot</a><span style="font-family:'Overpass Mono';color:#8f9c95">13 Oct</span></div>
+          </section>
+        </div>
+      </div>
+      <section style="background:#19211e;border:1px solid #2c3833;border-radius:6px">
+        <div style="display:flex;padding:16px 20px;border-bottom:1px solid #2c3833"><h2 style="margin:0;font:700 19px Overpass">Where every client is</h2><span style="margin-left:auto;font-size:14px;color:#8f9c95">Signals mark human gates. Launch only ever moves by hand.</span></div>
+        <sc-for list="{{ lines }}" as="l" hint-placeholder-count="3">
+          <div style="display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px;align-items:center;padding:20px;border-top:1px solid #2c3833">
+            <div><a style="display:block;font:700 16px/1.3 Overpass;text-decoration:none">{{ l.name }}</a><span style="font-size:14px;color:#8f9c95">{{ l.sub }}</span></div>
+            <div style="position:relative;display:grid;grid-template-columns:repeat(11,minmax(0,1fr));align-items:center;height:34px">
+              <span style="position:absolute;left:0;right:0;top:50%;height:2px;background:#3f4d47"></span>
+              <span style="{{ l.proven }}"></span>
+              <sc-for list="{{ l.pts }}" as="p"><span style="{{ p }}"></span></sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </section>
+      <p style="margin-top:24px;font:500 12px 'Overpass Mono';color:#8f9c95">Reference recreation of apps/cockpit today (Shell.tsx, Home.tsx, tokens.css). Not the new design.</p>
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const lamp = c => ({ width: 12, height: 12, borderRadius: '50%', justifySelf: 'center', background: c, boxShadow: `0 0 0 4px ${c}22` });
+    const asp = c => ({ color: c, font: '700 13px/1 Overpass', whiteSpace: 'nowrap' });
+    const pts = (here, waitAt) => Array.from({ length: 11 }, (_, i) => {
+      const gate = i === 5 || i === 8;
+      if (gate) return { position: 'relative', justifySelf: 'center', width: 14, height: 22, borderRadius: 7, background: '#0e1312', border: '1.5px solid #3d4b45', boxShadow: i === waitAt ? 'inset 0 0 0 4px #0e1312, inset 0 0 0 8px #f0c84b' : 'inset 0 0 0 4px #0e1312, inset 0 0 0 8px #3f4d47' };
+      if (i === here) return { position: 'relative', justifySelf: 'center', width: 16, height: 16, borderRadius: '50%', background: '#f4f6f2', boxShadow: '0 0 0 4px #f4f6f233' };
+      return { position: 'relative', justifySelf: 'center', width: 9, height: 9, borderRadius: '50%', background: i < here ? '#e8ede9' : '#19211e', border: `2px solid ${i < here ? '#e8ede9' : '#3f4d47'}` };
+    });
+    const line = (name, sub, here, waitAt) => ({ name, sub, pts: pts(here, waitAt), proven: { position: 'absolute', left: 0, top: '50%', height: 3, background: '#e8ede9', transform: 'translateY(-50%)', width: `${(here / 10) * 100}%`, borderRadius: 2 } });
+    return {
+      soon: [{ icon: 'ph ph-heartbeat', label: 'System', step: 9 }, { icon: 'ph ph-robot', label: 'Agents', step: 10 }, { icon: 'ph ph-brain', label: 'Memory', step: 14 }, { icon: 'ph ph-briefcase', label: 'Business', step: 23 }],
+      queue: [
+        { title: 'Plan for Lanternworks Studio', why: 'The planner finished. Approve or reject it and pick a build track.', label: 'Waiting for you', lamp: lamp('#f0c84b'), aspect: asp('#f0c84b') },
+        { title: 'Northlight Signs is awaiting launch approval', why: 'Every check passed. Launch is your decision, made outside the Cockpit.', label: 'Waiting for you', lamp: lamp('#f0c84b'), aspect: asp('#f0c84b') },
+        { title: 'Build stopped: it needs a few details', why: 'DreamSign pilot. The checks found a phone number nobody gave us.', label: 'Failed', lamp: lamp('#f2706a'), aspect: asp('#f2706a') },
+      ],
+      lines: [line('Northlight Signs', 'Synthetic. Active.', 7, 8), line('Summit Line Roofing', 'Synthetic. Active.', 4), line('DreamSign pilot', 'DreamSign. Active.', 4), line('Lanternworks Studio', 'lanternworks. Plan waits for you. No project yet.', 1, 5)],
+    };
+  }
+}
+</script>
+</body>
+</html>

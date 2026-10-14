@@ -6,11 +6,14 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
+import "@fontsource-variable/newsreader/opsz.css";
 import "@fontsource/atkinson-hyperlegible-next/latin-400.css";
+import "@fontsource/atkinson-hyperlegible-next/latin-600.css";
 import "@fontsource/atkinson-hyperlegible-next/latin-700.css";
 import "@fontsource/overpass/latin-600.css";
 import "@fontsource/overpass/latin-700.css";
 import "@fontsource/overpass-mono/latin-500.css";
+import "@fontsource/overpass-mono/latin-600.css";
 import "../styles/tokens.css";
 import "../styles/app.css";
 import type { JobRow } from "../jobsClient";
@@ -18,6 +21,11 @@ import { BuildTimeline } from "../components/BuildTimeline";
 import { RecoveryPanel } from "../components/Recovery";
 import { deriveTimeline, estimate, type RunRow } from "../lib/timeline";
 import { Plate } from "../components/ui";
+import { DEFAULT_APPEARANCE, applyAppearance, normalise } from "../lib/appearance";
+
+// ?theme=dark&accent=clay etc. lets the fixture page be checked in every appearance.
+const q = new URLSearchParams(location.search);
+applyAppearance(normalise({ ...DEFAULT_APPEARANCE, ...Object.fromEntries(q), textSize: Number(q.get("textSize") ?? 100), reduceMotion: q.get("reduceMotion") === "true" }));
 
 const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
 const r = (min: number, action: string, payload: Record<string, unknown> = {}): RunRow => ({ action, occurred_at: ago(min), payload });

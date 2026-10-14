@@ -19,8 +19,8 @@ export default defineConfig({
         start_url: "/",
         scope: "/",
         display: "standalone",
-        background_color: "#121816",
-        theme_color: "#121816",
+        background_color: "#F4F2ED",
+        theme_color: "#F4F2ED",
         icons: [
           { src: "icon-192.png", sizes: "192x192", type: "image/png" },
           { src: "icon-512.png", sizes: "512x512", type: "image/png" },
@@ -50,6 +50,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
-    css: false,
+    // Stylesheets are not processed in tests, except tokens.css, which tokens.test.ts reads raw to prove contrast.
+    css: { include: [/styles\/tokens\.css/] },
   },
 });

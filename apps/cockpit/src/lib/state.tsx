@@ -6,6 +6,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { supabase } from "../supabaseClient";
 import { JOB_COLUMNS, isActive, type JobRow } from "../jobsClient";
+import { applyAppearance, readAppearance, saveAppearance, type Theme } from "./appearance";
 import { buildAttention, type AttentionItem } from "./attention";
 import { PLAN_COLUMNS, type AccountRequestRow, type PlanRow, type Role } from "./model";
 
@@ -176,24 +177,18 @@ export function useFactory(): Factory {
   return f;
 }
 
-/* ---------------- theme (dark first; light is the daylight panel) ---------------- */
+/* ---------------- theme (v2: light first; see lib/appearance.ts for accent, density, text size, motion) ---------------- */
 
-export type ThemePref = "system" | "dark" | "light";
+export type ThemePref = Theme;
 
 export function applyTheme(pref: ThemePref) {
-  const dark = pref === "dark" || (pref === "system" && !window.matchMedia?.("(prefers-color-scheme: light)").matches);
-  if (dark) document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme", "light");
+  const a = { ...readAppearance(), theme: pref };
+  saveAppearance(a);
+  applyAppearance(a);
 }
 
 export function readThemePref(): ThemePref {
-  try {
-    const v = localStorage.getItem("cockpit-theme");
-    // Dark first (Step 4C brief); "Match this device" and light are a choice in Settings.
-    return v === "system" || v === "light" ? v : "dark";
-  } catch {
-    return "dark";
-  }
+  return readAppearance().theme;
 }
 
 /* ---------------- toasts ---------------- */

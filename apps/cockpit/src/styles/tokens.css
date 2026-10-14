@@ -1,108 +1,160 @@
-/* WFACT Cockpit design system: "the signal-box panel" (Step 4C, approved 2026-10-01).
-   A route only lights when every signal along it is proven clear. Colour means state and nothing else.
-   Dark is the default; [data-theme="light"] is the daylight panel. See docs/step-4c/PHASE-1-PROPOSAL.md §4. */
+/* WFACT Cockpit design system v2 (locked 14 Oct 2026). Source of truth: docs/design/cockpit-v2/
+   (Cockpit Design System.dc.html for rationale, Cockpit.dc.html for the live component).
+   Warm paper neutrals. Colour means status only: amber = needs you (diamond), green = done (tick),
+   red = stopped (stop sign); running = ink + turning ring; waiting = hollow circle.
+   Accent is personal and never means status. Light is the default; dark is [data-theme="dark"].
+   Do not alter these values: every text pair passes 4.5:1 (src/styles/tokens.test.ts proves it). */
 
 :root {
-  /* ground and plates */
-  --ground: #121816;
-  --plate: #19211e;
-  --plate-2: #202a26;
-  --plate-sunk: #0e1312;
-  --seam: #2c3833;
-  --seam-strong: #3d4b45;
-
+  /* surfaces */
+  --paper: #F4F2ED; --sheet: #FBFAF7; --sunk: #ECE9E2; --line: #DFDBD2; --line-2: #C7C1B5;
   /* ink */
-  --ink: #e8ede9;
-  --ink-2: #b3beb8;
-  --ink-3: #8f9c95;
-  --ink-inverse: #121816;
-
-  /* track lines (diagram, not text) */
-  --track-idle: #3f4d47;
-  --track-proven: #e8ede9;
-
-  /* signal aspects: state only, never decoration */
-  --clear: #5cc994;        /* verified, done, approved */
-  --clear-wash: rgb(92 201 148 / 0.12);
-  --caution: #f0c84b;      /* waiting for a human: the Cockpit's own colour */
-  --caution-wash: rgb(240 200 75 / 0.12);
-  --stop: #f2706a;         /* failed, refused */
-  --stop-wash: rgb(242 112 106 / 0.12);
-  --lamp: #f4f6f2;         /* where a project is now */
+  --ink: #1C1B18; --ink-2: #46433D; --ink-3: #625E55; --inv: #FBFAF7;
+  /* status: needs you, done, stopped (text colour, dot, wash) */
+  --need: #8A4F00; --need-dot: #D4891F; --need-w: #F5E6CC;
+  --done: #2A6641; --done-w: #DCEADF;
+  --stop: #A93322; --stop-w: #F6DDD7;
+  /* accent: personal, never status */
+  --acc: #1C1B18; --acc-ink: #FBFAF7; --focus: var(--ink);
 
   /* type */
-  --face-plate: "Overpass", system-ui, sans-serif;            /* headings, plates, nav */
-  --face-text: "Atkinson Hyperlegible Next", system-ui, sans-serif; /* everything you read */
-  --face-figure: "Overpass Mono", ui-monospace, monospace;    /* ids, money, counts, times */
+  --face-display: "Newsreader Variable", "Newsreader", Georgia, serif;
+  --face-text: "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  --face-figure: "Overpass Mono", ui-monospace, monospace;
 
-  --t-xs: 0.8125rem;   /* 13 */
-  --t-sm: 0.875rem;    /* 14 */
-  --t-md: 1rem;        /* 16 body */
-  --t-lg: 1.1875rem;   /* 19 */
-  --t-xl: 1.5rem;      /* 24 */
-  --t-2xl: 2rem;       /* 32 */
-  --t-3xl: 2.625rem;   /* 42 status line */
+  --fs-display: clamp(34px, 4.4vw, 58px);
+  --fs-title: 46px;
+  --fs-section: 26px;
+  --fs-item: 22px;
+  --fs-quote: 24px;
+  --fs-lead: 18px;
+  --fs-body: 16px;
+  --fs-label: 15px;
+  --fs-small: 14px;   /* the minimum on screen */
+  --fs-chip: 13px;    /* status chips only, 600 weight */
+  --fs-figure: 16px;
+  --fs-eyebrow: 12px; /* Overpass Mono 600, caps, 0.08em */
 
   /* space: 4px base */
-  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-7: 28px; --s-8: 32px;
+  --s-10: 40px; --s-12: 48px; --s-14: 56px; --s-16: 64px;
+  --row: 20px; /* list row padding; compact density makes it 11px */
 
-  /* shape lock: plates 6, controls 4, lamps round */
-  --r-plate: 6px;
-  --r-control: 4px;
+  /* shape */
+  --r-sm: 8px; --r-ctl: 10px; --r-card: 14px; --r-panel: 18px; --r-pill: 999px;
 
-  /* elevation: seams first; one real shadow, for things that float */
-  --float: 0 12px 32px -8px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.35);
+  /* targets */
+  --target: 44px;
 
-  /* motion */
+  /* elevation: lines first; one soft shadow for things that float */
+  --float: 0 18px 40px -16px rgb(28 27 24 / 0.28), 0 2px 6px rgb(28 27 24 / 0.08);
+
+  /* motion: enter 180–400ms with a 6px rise; the running ring turns once per 1.1s; the bar eases over 800ms.
+     Nothing decorative loops. Reduced motion (device or in-app) turns all of it off. */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --d-fast: 140ms;
-  --d-mid: 220ms;
-  --d-route: 600ms;
+  --d-fast: 180ms;
+  --d-mid: 260ms;
+  --d-slow: 400ms;
+  --d-spin: 1.1s;
+  --d-bar: 800ms;
+  --rise: 6px;
 
-  color-scheme: dark;
-}
+  /* the text-size setting (100 / 112 / 125%) scales the whole UI */
+  --text-scale: 1;
 
-[data-theme="light"] {
-  --ground: #e4e9e6;
-  --plate: #f6f8f7;
-  --plate-2: #edf1ef;
-  --plate-sunk: #dde3e0;
-  --seam: #c9d2cd;
-  --seam-strong: #a9b5af;
-  --ink: #141c19;
-  --ink-2: #3b4843;
-  --ink-3: #56635d;
-  --ink-inverse: #f6f8f7;
-  --track-idle: #b9c4bf;
-  --track-proven: #141c19;
-  --clear: #15663f;
-  --clear-wash: rgb(21 102 63 / 0.08);
-  --caution: #8a6400;
-  --caution-wash: rgb(240 200 75 / 0.28);
-  --stop: #b3302b;
-  --stop-wash: rgb(179 48 43 / 0.09);
-  --lamp: #141c19;
-  --float: 0 12px 32px -10px rgb(30 45 38 / 0.28), 0 2px 6px rgb(30 45 38 / 0.12);
   color-scheme: light;
 }
 
+[data-theme="dark"] {
+  --paper: #121211; --sheet: #1B1B19; --sunk: #232220; --line: #2F2E2B; --line-2: #4A4843;
+  --ink: #EEECE6; --ink-2: #C4C0B7; --ink-3: #A09B91; --inv: #121211;
+  --need: #F2B865; --need-dot: #F2B865; --need-w: #3A2B14;
+  --done: #82CC9C; --done-w: #17301F;
+  --stop: #F59380; --stop-w: #3D1C15;
+  --acc: #EEECE6; --acc-ink: #121211;
+  --float: 0 18px 40px -16px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.35);
+  color-scheme: dark;
+}
+
+[data-accent="harbour"] { --acc: #1F5D66; } [data-theme="dark"][data-accent="harbour"] { --acc: #86C7CF; }
+[data-accent="clay"]    { --acc: #8C4A2C; } [data-theme="dark"][data-accent="clay"]    { --acc: #E6A584; }
+[data-accent="moss"]    { --acc: #3E5A2C; } [data-theme="dark"][data-accent="moss"]    { --acc: #AFCB93; }
+
+[data-density="compact"] { --row: 11px; }
+
+/* ---------- transitional aliases (remove in phases 2–3) ----------
+   The pre-v2 component rules below and in app.css still read the old signal-box names. They point at
+   the v2 tokens so every room renders in the new palette while its components are rebuilt. Nothing new
+   may use these names. */
+:root {
+  --ground: var(--paper);
+  --plate: var(--sheet);
+  --plate-2: var(--sunk);
+  --plate-sunk: var(--sunk);
+  --seam: var(--line);
+  --seam-strong: var(--line-2);
+  --ink-inverse: var(--inv);
+  --track-idle: var(--line-2);
+  --track-proven: var(--ink);
+  --clear: var(--done);
+  --clear-wash: var(--done-w);
+  --caution: var(--need);
+  --caution-wash: var(--need-w);
+  --stop-wash: var(--stop-w);
+  --lamp: var(--ink);
+  --face-plate: var(--face-text);
+  --t-xs: 0.875rem; --t-sm: 0.875rem; --t-md: 1rem; --t-lg: 1.125rem; --t-xl: 1.375rem; --t-2xl: 2rem; --t-3xl: 2.875rem;
+  --r-plate: var(--r-card);
+  --r-control: var(--r-ctl);
+  --d-route: var(--d-bar);
+}
+
+/* ---------- base ---------- */
 * { box-sizing: border-box; }
-html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; zoom: var(--text-scale); }
 body {
   margin: 0;
-  background: var(--ground);
+  background: var(--paper);
   color: var(--ink);
-  font: 400 var(--t-md)/1.55 var(--face-text);
+  font: 400 var(--fs-body)/1.5 var(--face-text);
 }
-::selection { background: var(--caution); color: var(--ink-inverse); }
-:focus-visible { outline: 2px solid var(--caution); outline-offset: 2px; border-radius: 2px; }
+::selection { background: var(--need-w); color: var(--ink); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
 a { color: inherit; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-h1, h2, h3 { font-family: var(--face-plate); font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+h1, h2, h3 { font-family: var(--face-display); font-weight: 500; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
 p { margin: 0; text-wrap: pretty; }
-.fig { font-family: var(--face-figure); font-variant-numeric: tabular-nums; font-size: 0.92em; }
+
+/* type styles (design system type scale) */
+.t-display { font: 400 var(--fs-display)/1.03 var(--face-display); letter-spacing: -0.02em; }
+.t-title { font: 400 var(--fs-title)/1.08 var(--face-display); letter-spacing: -0.015em; }
+.t-section { font: 500 var(--fs-section)/1.2 var(--face-display); }
+.t-item { font: 500 var(--fs-item)/1.25 var(--face-display); }
+.t-quote { font: italic 400 var(--fs-quote)/1.4 var(--face-display); }
+.t-lead { font: 400 var(--fs-lead)/1.5 var(--face-text); }
+.t-body { font: 400 var(--fs-body)/1.5 var(--face-text); }
+.t-label { font: 600 var(--fs-label)/1.3 var(--face-text); }
+.t-small { font: 400 var(--fs-small)/1.45 var(--face-text); }
+.t-figure, .fig { font-family: var(--face-figure); font-weight: 600; font-variant-numeric: tabular-nums; }
+.t-figure { font-size: var(--fs-figure); }
+.t-eyebrow { font: 600 var(--fs-eyebrow)/1.2 var(--face-figure); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+
 .muted { color: var(--ink-2); }
 .quiet { color: var(--ink-3); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* motion primitives */
+@keyframes rise { from { opacity: 0; transform: translateY(var(--rise)); } }
+@keyframes turn { to { transform: rotate(360deg); } }
+.enter { animation: rise var(--d-mid) var(--ease-out) both; }
+.spin { animation: turn var(--d-spin) linear infinite; } /* the running ring: status, not decoration */
+
+/* reduced motion: the device setting or the in-app setting turns every animation off */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+[data-motion="reduce"] *, [data-motion="reduce"] *::before, [data-motion="reduce"] *::after {
+  animation: none !important; transition: none !important; scroll-behavior: auto !important;
+}
 
 /* ---------- shell ---------- */
 .skip { position: absolute; left: -999px; top: 8px; background: var(--caution); color: var(--ink-inverse); padding: 8px 12px; z-index: 30; }
@@ -194,8 +246,7 @@ p { margin: 0; text-wrap: pretty; }
 .btn:active { transform: translateY(1px); }
 .btn.primary { background: var(--ink); color: var(--ink-inverse); border-color: var(--ink); }
 .btn.primary:hover { background: color-mix(in srgb, var(--ink) 88%, var(--ground)); }
-.btn.go { background: var(--clear); border-color: var(--clear); color: #08130d; }
-[data-theme="light"] .btn.go { color: #fff; }
+.btn.go { background: var(--done); border-color: var(--done); color: var(--inv); }
 .btn.danger { background: transparent; border-color: var(--stop); color: var(--stop); }
 .btn.ghost { background: transparent; border-color: transparent; color: var(--ink-2); }
 .btn.ghost:hover { background: var(--plate-2); color: var(--ink); }
@@ -286,7 +337,7 @@ p { margin: 0; text-wrap: pretty; }
 .empty b { display: block; color: var(--ink); font: 700 var(--t-md)/1.3 var(--face-plate); margin-bottom: 4px; }
 
 .skeleton { background: linear-gradient(90deg, var(--plate-2) 0 40%, color-mix(in srgb, var(--plate-2) 60%, var(--seam-strong)) 50%, var(--plate-2) 60% 100%); background-size: 300% 100%; border-radius: 3px; height: 12px; }
-@media (prefers-reduced-motion: no-preference) { .skeleton { animation: shimmer 1.6s linear infinite; } @keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } } }
+/* No shimmer: nothing decorative loops (design system, motion). */
 
 .toast { display: flex; gap: var(--s-3); align-items: center; padding: var(--s-3) var(--s-4); background: var(--ink); color: var(--ink-inverse); border-radius: var(--r-plate); box-shadow: var(--float); font-size: var(--t-sm); max-width: 420px; }
 .toast i { font-size: 18px; }

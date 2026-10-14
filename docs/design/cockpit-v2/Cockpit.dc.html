@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&family=Overpass+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>
+body{margin:0;background:#F4F2ED;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:inherit;text-underline-offset:3px}a:hover{color:inherit;text-decoration-thickness:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus,#1C1B18);outline-offset:2px}
+@keyframes wfspin{to{transform:rotate(360deg)}}
+@keyframes wfpulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes wfin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="--paper:#F4F2ED;--sheet:#FBFAF7;--sunk:#ECE9E2;--line:#DFDBD2;--line-2:#C7C1B5;--ink:#1C1B18;--ink-2:#46433D;--ink-3:#625E55;--inv:#FBFAF7;--need:#8A4F00;--need-dot:#D4891F;--need-w:#F5E6CC;--done:#2A6641;--done-w:#DCEADF;--stop:#A93322;--stop-w:#F6DDD7;--acc:#1C1B18;--acc-ink:#FBFAF7;--focus:#1C1B18;container-type:inline-size;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;font-size:16px;line-height:1.5;color:#1C1B18">
+<div style="{{ themeVars }}">
+<div style="display:flex;min-height:100vh;background:var(--paper);color:var(--ink)">
+
+<sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}">
+<aside aria-label="Main" style="width:236px;flex:0 0 236px;position:sticky;top:0;align-self:flex-start;height:100vh;display:flex;flex-direction:column;gap:28px;padding:24px 14px 18px;border-right:1px solid var(--line);background:var(--paper)">
+  <button onClick="{{ go.home }}" style="display:flex;align-items:baseline;gap:8px;padding:0 10px;border:0;background:none;cursor:pointer;text-align:left">
+    <span style="font-family:Newsreader,Georgia,serif;font-size:26px;font-weight:600;letter-spacing:-0.01em;line-height:1">WFACT</span>
+    <span style="font-family:Newsreader,Georgia,serif;font-style:italic;font-size:18px;color:var(--ink-2)">Cockpit</span>
+  </button>
+  <nav aria-label="Main navigation" style="display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6">
+      <button onClick="{{ n.go }}" aria-current="{{ n.current }}" style="{{ n.style }}" style-hover="background:var(--sunk)">
+        <i class="{{ n.icon }}" aria-hidden="true" style="font-size:19px"></i><span style="flex:1;text-align:left">{{ n.label }}</span>
+        <sc-if value="{{ n.count }}"><span style="min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:var(--need-w);color:var(--need);font:600 13px/24px 'Overpass Mono',monospace;text-align:center">{{ n.count }}<span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"> waiting</span></span></sc-if>
+      </button>
+    </sc-for>
+    <p style="margin:22px 10px 6px;font-family:'Overpass Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">Coming later</p>
+    <sc-for list="{{ soon }}" as="s" hint-placeholder-count="4">
+      <button onClick="{{ s.go }}" style="display:flex;align-items:center;gap:12px;min-height:40px;padding:0 10px;border:0;border-radius:8px;background:none;color:var(--ink-3);cursor:pointer;font-size:15px" style-hover="background:var(--sunk);color:var(--ink-2)"><i class="{{ s.icon }}" aria-hidden="true" style="font-size:18px"></i>{{ s.label }}</button>
+    </sc-for>
+  </nav>
+  <div style="margin-top:auto;display:grid;gap:12px">
+    <div role="radiogroup" aria-label="Detail level" style="display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:10px;background:var(--sunk);border:1px solid var(--line)">
+      <button role="radio" aria-checked="{{ detailSimple }}" onClick="{{ setSimple }}" style="{{ segSimple }}">Simple</button>
+      <button role="radio" aria-checked="{{ detailDetailed }}" onClick="{{ setDetailed }}" style="{{ segDetailed }}">Detailed</button>
+    </div>
+    <button onClick="{{ go.settings }}" style="display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 10px;border:0;border-radius:10px;background:none;cursor:pointer;text-align:left" style-hover="background:var(--sunk)">
+      <span aria-hidden="true" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font:600 13px/1 'Overpass Mono',monospace;color:var(--ink-2)">{{ me.initial }}</span>
+      <span style="display:grid;line-height:1.25"><b style="font-weight:600;font-size:15px">{{ me.name }}</b><small style="font-size:13px;color:var(--ink-3)">{{ me.role }}</small></span>
+    </button>
+  </div>
+</aside>
+</sc-if>
+
+<div style="flex:1;min-width:0;display:flex;flex-direction:column">
+<sc-if value="{{ desk }}" hint-placeholder-val="{{ true }}">
+<header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:14px;min-height:68px;padding:0 40px;background:var(--paper);border-bottom:1px solid var(--line)">
+  <nav aria-label="Breadcrumb" style="display:flex;align-items:center;gap:8px;font-size:15px;color:var(--ink-3);min-width:0;flex:0 1 auto;overflow:hidden">
+    <sc-if value="{{ crumb.parent }}"><button onClick="{{ crumb.back }}" style="border:0;background:none;padding:6px 0;color:var(--ink-2);cursor:pointer;text-decoration:underline;text-underline-offset:3px;white-space:nowrap">{{ crumb.parent }}</button><span aria-hidden="true">/</span></sc-if>
+    <span aria-current="page" style="color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ crumb.here }}</span>
+  </nav>
+  <span style="flex:1"></span>
+  <button onClick="{{ openPalette }}" aria-label="Search or run a command" style="display:flex;align-items:center;gap:10px;width:min(340px,32cqi);min-height:42px;padding:0 10px 0 14px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);color:var(--ink-3);cursor:pointer;font-size:15px">
+    <i class="ph ph-magnifying-glass" aria-hidden="true" style="font-size:17px"></i><span style="flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Search or run a command</span><kbd style="font:500 12px/1 'Overpass Mono',monospace;padding:4px 6px;border:1px solid var(--line-2);border-radius:5px">⌘K</kbd>
+  </button>
+  <button onClick="{{ go.notifications }}" aria-label="{{ bellLabel }}" style="position:relative;width:44px;height:44px;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);cursor:pointer;display:grid;place-items:center"><i class="ph ph-bell" aria-hidden="true" style="font-size:19px"></i><sc-if value="{{ unread }}"><span aria-hidden="true" style="position:absolute;top:8px;right:9px;width:9px;height:9px;border-radius:50%;background:var(--need-dot);border:2px solid var(--sheet)"></span></sc-if></button>
+  <sc-if value="{{ canStart }}"><button onClick="{{ go.new }}" style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:15px;cursor:pointer;white-space:nowrap"><i class="ph ph-plus" aria-hidden="true"></i>New request</button></sc-if>
+</header>
+</sc-if>
+<sc-if value="{{ phone }}">
+<header style="position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;min-height:60px;padding:0 12px 0 16px;background:var(--paper);border-bottom:1px solid var(--line)">
+  <sc-if value="{{ crumb.parent }}"><button onClick="{{ crumb.back }}" aria-label="{{ crumb.backLabel }}" style="width:44px;height:44px;margin-left:-10px;border:0;background:none;display:grid;place-items:center;cursor:pointer"><i class="ph ph-caret-left" aria-hidden="true" style="font-size:20px"></i></button></sc-if>
+  <span style="flex:1;min-width:0;font-family:Newsreader,Georgia,serif;font-size:21px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ crumb.here }}</span>
+  <button onClick="{{ openPalette }}" aria-label="Search or run a command" style="width:44px;height:44px;border:0;background:none;display:grid;place-items:center;cursor:pointer"><i class="ph ph-magnifying-glass" aria-hidden="true" style="font-size:21px"></i></button>
+  <button onClick="{{ go.notifications }}" aria-label="{{ bellLabel }}" style="position:relative;width:44px;height:44px;border:0;background:none;display:grid;place-items:center;cursor:pointer"><i class="ph ph-bell" aria-hidden="true" style="font-size:21px"></i><sc-if value="{{ unread }}"><span aria-hidden="true" style="position:absolute;top:10px;right:11px;width:9px;height:9px;border-radius:50%;background:var(--need-dot);border:2px solid var(--paper)"></span></sc-if></button>
+</header>
+</sc-if>
+
+<main id="main" style="flex:1;min-width:0;padding:clamp(20px,3.4cqi,48px) clamp(16px,3.4cqi,48px) 72px">
+<div style="{{ zoomStyle }}">
+<div style="max-width:1160px;margin:0 auto">
+
+<sc-if value="{{ is.home }}" hint-placeholder-val="{{ true }}">
+<div style="display:grid;gap:44px">
+  <header style="display:grid;gap:12px;max-width:780px">
+    <p style="margin:0;font-family:'Overpass Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">{{ today }}</p>
+    <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4.4cqi,58px);line-height:1.03;letter-spacing:-0.02em;text-wrap:balance">{{ home.headline }}</h1>
+    <p style="margin:0;font-size:18px;color:var(--ink-2);max-width:60ch;text-wrap:pretty">{{ home.sub }}</p>
+  </header>
+
+  <sc-if value="{{ home.loading }}">
+    <div role="status" aria-label="Loading what needs you" style="display:grid;gap:14px">
+      <sc-for list="{{ skel }}" as="k"><div style="display:grid;gap:10px;padding:20px 0;border-bottom:1px solid var(--line)"><div style="width:120px;height:12px;border-radius:6px;background:var(--sunk);animation:wfpulse 1.6s ease-in-out infinite"></div><div style="{{ k }}"></div></div></sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ home.hasNeeds }}">
+  <section aria-labelledby="needs-h">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px">
+      <h2 id="needs-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">What needs you</h2>
+      <span style="font-size:14px;color:var(--ink-3)">Most urgent first</span>
+    </div>
+    <ol style="list-style:none;margin:0;padding:0">
+      <sc-for list="{{ needs }}" as="n" hint-placeholder-count="4">
+      <li style="display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;padding:var(--row,20px) 0;border-bottom:1px solid var(--line);animation:wfin .4s ease both">
+        <span aria-hidden="true" style="font:600 13px/1 'Overpass Mono',monospace;color:var(--ink-3);width:20px;align-self:flex-start;padding-top:6px">{{ n.num }}</span>
+        <div style="flex:1 1 300px;min-width:0;display:grid;gap:6px">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px">
+            <span style="{{ n.chip.style }}"><i class="{{ n.chip.icon }}" aria-hidden="true"></i>{{ n.chip.word }}</span>
+            <span style="font-size:14px;color:var(--ink-2)">{{ n.client }}</span>
+          </div>
+          <p style="margin:0;font-family:Newsreader,Georgia,serif;font-size:22px;line-height:1.25;font-weight:500">{{ n.title }}</p>
+          <p style="margin:0;font-size:15px;color:var(--ink-2);text-wrap:pretty">{{ n.why }}</p>
+        </div>
+        <sc-if value="{{ n.canAct }}"><button onClick="{{ n.go }}" style="display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:10px 20px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:15px;cursor:pointer;margin-left:44px;white-space:nowrap" style-hover="box-shadow:0 0 0 3px var(--line-2)">{{ n.cta }}<i class="ph ph-arrow-right" aria-hidden="true"></i></button></sc-if>
+        <sc-if value="{{ n.cannotAct }}"><span style="margin-left:44px;font-size:14px;color:var(--ink-2)">{{ n.decider }} decides this</span></sc-if>
+      </li>
+      </sc-for>
+    </ol>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ home.clear }}">
+  <section style="display:flex;flex-wrap:wrap;gap:20px;align-items:center;padding:28px;border-radius:16px;background:var(--done-w);color:var(--ink)">
+    <i class="ph-fill ph-check-circle" aria-hidden="true" style="font-size:34px;color:var(--done)"></i>
+    <div style="flex:1 1 280px;display:grid;gap:4px"><p style="margin:0;font-family:Newsreader,Georgia,serif;font-size:24px;font-weight:500">Nothing needs you right now.</p><p style="margin:0;color:var(--ink-2)">The factory is building Summit Line Roofing. You will get a message when it finishes or needs you.</p></div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ home.empty }}">
+  <section style="display:grid;gap:16px;justify-items:start;padding:40px 0;border-top:1px solid var(--line);max-width:620px">
+    <p style="margin:0;font-family:Newsreader,Georgia,serif;font-size:28px;line-height:1.2">Your first client starts with a request.</p>
+    <p style="margin:0;color:var(--ink-2)">Paste what the client asked for. The factory reads it and writes a proposal for you to approve, usually in 2 to 4 minutes. Nothing is built or spent until you say so.</p>
+    <button onClick="{{ go.new }}" style="display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:10px 20px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:15px;cursor:pointer"><i class="ph ph-plus" aria-hidden="true"></i>Start a new request</button>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ home.overview }}">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px">
+    <section aria-labelledby="run-h" style="background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:24px;display:grid;gap:14px;align-content:start">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><h2 id="run-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">Running now</h2><span style="{{ runChip.style }}"><i class="{{ runChip.icon }}" style="{{ runChip.is }}" aria-hidden="true"></i>{{ runChip.word }}</span></div>
+      <div style="display:grid;gap:4px"><p style="margin:0;font-weight:600;font-size:18px">Summit Line Roofing</p><p style="margin:0;color:var(--ink-2)">Round 2 of 3: fixing the phone layout</p></div>
+      <div aria-hidden="true" style="display:flex;gap:4px"><sc-for list="{{ runSegs }}" as="g"><span style="{{ g }}"></span></sc-for></div>
+      <dl style="margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+        <div><dt style="font-size:13px;color:var(--ink-3)">Running for</dt><dd style="margin:0;font:600 16px 'Overpass Mono',monospace">14 min</dd></div>
+        <div><dt style="font-size:13px;color:var(--ink-3)">Time left</dt><dd style="margin:0;font:600 16px 'Overpass Mono',monospace">~3 min</dd></div>
+        <div><dt style="font-size:13px;color:var(--ink-3)">Spent so far</dt><dd style="margin:0;font:600 16px 'Overpass Mono',monospace">$0.52</dd></div>
+      </dl>
+      <button onClick="{{ go.buildSummit }}" style="justify-self:start;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:var(--sunk)">Watch the build</button>
+    </section>
+    <section aria-labelledby="spend-h" style="background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:24px;display:grid;gap:14px;align-content:start">
+      <h2 id="spend-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">This month</h2>
+      <p style="margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span style="font-family:Newsreader,Georgia,serif;font-size:44px;line-height:1">$14.20</span><span style="color:var(--ink-2)">of your $20 cap</span></p>
+      <div role="meter" aria-valuemin="0" aria-valuemax="20" aria-valuenow="14.2" aria-label="Monthly spend" style="position:relative;height:10px;border-radius:999px;background:var(--sunk);overflow:hidden"><span style="position:absolute;inset:0 29% 0 0;background:var(--ink);border-radius:999px"></span></div>
+      <p style="margin:0;font-size:15px;color:var(--ink-2)">$5.80 left, about 8 more builds at the usual $0.70. Every build also stops itself at $2.00.</p>
+      <button onClick="{{ go.costs }}" style="justify-self:start;border:0;background:none;padding:10px 0;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer">See costs</button>
+    </section>
+  </div>
+
+  <section aria-labelledby="clients-h">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:6px"><h2 id="clients-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Every client</h2><button onClick="{{ go.projects }}" style="border:0;background:none;padding:10px 0;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer">All projects</button></div>
+    <ul style="list-style:none;margin:0;padding:0">
+      <sc-for list="{{ clients }}" as="c" hint-placeholder-count="5">
+      <li style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 28px;padding:var(--row,18px) 0;border-top:1px solid var(--line)">
+        <div style="flex:1 1 220px;min-width:0"><button onClick="{{ c.open }}" style="border:0;background:none;padding:2px 0;font-weight:600;font-size:17px;cursor:pointer;text-align:left" style-hover="text-decoration:underline">{{ c.name }}</button><p style="margin:0;font-size:14px;color:var(--ink-3)">{{ c.kind }}</p></div>
+        <div style="flex:2 1 260px;display:grid;gap:7px"><div aria-hidden="true" style="display:flex;gap:4px"><sc-for list="{{ c.segs }}" as="g"><span style="{{ g }}"></span></sc-for></div><span style="font-size:14px;color:var(--ink-2)">Step {{ c.stepNum }} of 6 · {{ c.where }}</span></div>
+        <div style="flex:1 1 200px;display:flex;align-items:center;gap:10px;justify-content:space-between"><span style="font-size:14px;color:var(--ink-2)">{{ c.next }}</span><span style="{{ c.chip.style }}"><i class="{{ c.chip.icon }}" style="{{ c.chip.is }}" aria-hidden="true"></i>{{ c.chip.word }}</span></div>
+      </li>
+      </sc-for>
+    </ul>
+  </section>
+  </sc-if>
+  <sc-if value="{{ desk }}"><p style="margin:0;font-size:14px;color:var(--ink-3)">Choose, reorder or hide these sections in <button onClick="{{ go.settingsHome }}" style="border:0;background:none;padding:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;color:var(--ink-2)">Settings, Home</button>.</p></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.projects }}">
+<div style="display:grid;gap:28px">
+  <header style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px">
+    <div style="display:grid;gap:8px"><h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4cqi,52px);line-height:1.05;letter-spacing:-0.02em">Projects</h1><p style="margin:0;color:var(--ink-2)">{{ proj.summary }}</p></div>
+    <div role="radiogroup" aria-label="View" style="display:flex;padding:3px;border-radius:10px;background:var(--sunk);border:1px solid var(--line)">
+      <button role="radio" aria-checked="{{ proj.isGrid }}" onClick="{{ proj.toGrid }}" style="{{ proj.gridBtn }}"><i class="ph ph-squares-four" aria-hidden="true"></i>Grid</button>
+      <button role="radio" aria-checked="{{ proj.isList }}" onClick="{{ proj.toList }}" style="{{ proj.listBtn }}"><i class="ph ph-rows" aria-hidden="true"></i>List</button>
+    </div>
+  </header>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+    <label style="flex:1 1 260px;display:flex;align-items:center;gap:10px;min-height:46px;padding:0 14px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet)"><i class="ph ph-magnifying-glass" aria-hidden="true" style="color:var(--ink-3)"></i><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Search clients</span><input value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search clients" style="flex:1;min-width:0;border:0;background:transparent;font-size:16px;outline:none"></label>
+    <label style="display:flex;align-items:center;gap:8px;min-height:46px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:15px"><span style="color:var(--ink-3)">Sort</span><select style="border:0;background:transparent;font-weight:600;min-height:40px"><option>Needs someone first</option><option>Newest first</option><option>Name</option><option>Last build</option></select></label>
+    <label style="display:flex;align-items:center;gap:8px;min-height:46px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:15px"><span style="color:var(--ink-3)">Group</span><select style="border:0;background:transparent;font-weight:600;min-height:40px"><option>None</option><option>Step on the path</option><option>Waiting on</option><option>Kind of site</option></select></label>
+  </div>
+  <div role="group" aria-label="Filter" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:-12px">
+    <sc-for list="{{ filters }}" as="f"><button onClick="{{ f.pick }}" aria-pressed="{{ f.on }}" style="{{ f.style }}">{{ f.label }}<span style="font-family:'Overpass Mono',monospace;font-size:12px;opacity:.75">{{ f.n }}</span></button></sc-for>
+    <span style="flex:1"></span>
+    <button style="display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 10px;border:0;background:none;color:var(--ink-2);cursor:pointer;font-size:14px;text-decoration:underline;text-underline-offset:3px"><i class="ph ph-bookmark-simple" aria-hidden="true"></i>Save this view</button>
+  </div>
+
+  <sc-if value="{{ proj.none }}">
+    <div role="status" style="padding:40px 0;border-top:1px solid var(--line);display:grid;gap:10px;justify-items:start"><p style="margin:0;font-family:Newsreader,Georgia,serif;font-size:24px">No client matches “{{ query }}”.</p><p style="margin:0;color:var(--ink-2)">Search looks at client names, kinds of site and who a client is waiting on.</p><button onClick="{{ clearQuery }}" style="min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">Clear the search</button></div>
+  </sc-if>
+
+  <sc-if value="{{ proj.showGrid }}">
+  <ul style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:18px">
+    <sc-for list="{{ shown }}" as="c" hint-placeholder-count="5">
+    <li style="background:var(--sheet);border:1px solid var(--line);border-radius:16px;padding:20px;display:grid;gap:14px;align-content:start">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <div style="flex:1;min-width:0;display:grid;gap:2px"><button onClick="{{ c.open }}" style="border:0;background:none;padding:0;text-align:left;font-family:Newsreader,Georgia,serif;font-size:23px;line-height:1.15;font-weight:500;cursor:pointer" style-hover="text-decoration:underline">{{ c.name }}</button><span style="font-size:14px;color:var(--ink-3)">{{ c.kind }} · Test client</span></div>
+        <button onClick="{{ c.pin }}" aria-pressed="{{ c.pinned }}" aria-label="{{ c.pinLabel }}" style="width:44px;height:44px;margin:-8px -8px 0 0;border:0;background:none;border-radius:10px;cursor:pointer;display:grid;place-items:center;color:var(--ink-2)" style-hover="background:var(--sunk)"><i class="{{ c.pinIcon }}" aria-hidden="true" style="font-size:19px"></i></button>
+      </div>
+      <div style="display:grid;gap:7px"><div aria-hidden="true" style="display:flex;gap:4px"><sc-for list="{{ c.segs }}" as="g"><span style="{{ g }}"></span></sc-for></div><span style="font-size:14px;color:var(--ink-2)">Step {{ c.stepNum }} of 6 · {{ c.where }}</span></div>
+      <dl style="margin:0;display:grid;gap:8px;font-size:15px">
+        <div style="display:flex;justify-content:space-between;gap:12px"><dt style="color:var(--ink-3)">Next step</dt><dd style="margin:0;text-align:right;font-weight:600">{{ c.next }}</dd></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><dt style="color:var(--ink-3)">Waiting on</dt><dd style="margin:0;text-align:right">{{ c.who }}</dd></div>
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><dt style="color:var(--ink-3)">Last build</dt><dd style="margin:0"><span style="{{ c.lastChip.style }}"><i class="{{ c.lastChip.icon }}" style="{{ c.lastChip.is }}" aria-hidden="true"></i>{{ c.lastChip.word }}</span></dd></div>
+      </dl>
+      <sc-if value="{{ detailed }}"><p style="margin:0;font:400 12px/1.4 'Overpass Mono',monospace;color:var(--ink-3)">{{ c.tech }}</p></sc-if>
+    </li>
+    </sc-for>
+  </ul>
+  </sc-if>
+
+  <sc-if value="{{ proj.showList }}">
+  <div role="table" aria-label="Projects" style="border-top:1px solid var(--line)">
+    <sc-if value="{{ desk }}"><div role="row" style="display:grid;grid-template-columns:44px minmax(0,1.4fr) minmax(0,1.3fr) minmax(0,1.2fr) minmax(0,.8fr) minmax(0,1fr);gap:16px;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-3)"><span role="columnheader"></span><span role="columnheader">Client</span><span role="columnheader">On the path</span><span role="columnheader">Next step</span><span role="columnheader">Waiting on</span><span role="columnheader">Last build</span></div></sc-if>
+    <sc-for list="{{ shown }}" as="c">
+    <div role="row" style="{{ listRow }}">
+      <button onClick="{{ c.pin }}" aria-pressed="{{ c.pinned }}" aria-label="{{ c.pinLabel }}" style="width:44px;height:44px;border:0;background:none;border-radius:10px;cursor:pointer;color:var(--ink-2)"><i class="{{ c.pinIcon }}" aria-hidden="true" style="font-size:18px"></i></button>
+      <div role="cell" style="min-width:0"><button onClick="{{ c.open }}" style="border:0;background:none;padding:0;font-weight:600;font-size:16px;cursor:pointer;text-align:left">{{ c.name }}</button><p style="margin:0;font-size:13px;color:var(--ink-3)">{{ c.kind }}</p></div>
+      <div role="cell" style="display:grid;gap:6px"><div aria-hidden="true" style="display:flex;gap:3px"><sc-for list="{{ c.segs }}" as="g"><span style="{{ g }}"></span></sc-for></div><span style="font-size:13px;color:var(--ink-2)">{{ c.where }}</span></div>
+      <span role="cell" style="font-size:15px">{{ c.next }}</span>
+      <span role="cell" style="font-size:15px;color:var(--ink-2)">{{ c.who }}</span>
+      <span role="cell"><span style="{{ c.lastChip.style }}"><i class="{{ c.lastChip.icon }}" style="{{ c.lastChip.is }}" aria-hidden="true"></i>{{ c.lastChip.word }}</span></span>
+    </div>
+    </sc-for>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.new }}">
+<div style="display:grid;gap:32px">
+  <header style="display:grid;gap:10px;max-width:720px">
+    <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4cqi,52px);line-height:1.05;letter-spacing:-0.02em">New request</h1>
+    <p style="margin:0;font-size:18px;color:var(--ink-2)">Paste what the client asked for. The factory turns it into a proposal for you to approve. Nothing is built or spent until you start a build.</p>
+  </header>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:40px;align-items:start">
+    <form onSubmit="{{ submitRequest }}" style="display:grid;gap:24px;grid-column:span 2;min-width:0" aria-describedby="req-next">
+      <div style="display:grid;gap:8px"><label for="req-text" style="font-weight:600;font-size:16px">What did the client ask for?</label><p id="req-hint" style="margin:0;font-size:14px;color:var(--ink-2)">Paste the email or your notes as they are. The factory quotes the client's own words back to you.</p><textarea id="req-text" aria-describedby="req-hint" value="{{ reqText }}" onChange="{{ setReqText }}" rows="9" style="width:100%;min-height:200px;padding:14px 16px;border:1px solid var(--line-2);border-radius:12px;background:var(--sheet);font-size:16px;line-height:1.55;resize:vertical"></textarea></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:20px">
+        <div style="display:grid;gap:8px"><label for="req-name" style="font-weight:600">Client's business name</label><input id="req-name" value="{{ reqName }}" onChange="{{ setReqName }}" style="min-height:48px;padding:0 14px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"></div>
+        <div style="display:grid;gap:8px"><label for="req-url" style="font-weight:600">Their live web address <span style="font-weight:400;color:var(--ink-3)">(if they have one)</span></label><input id="req-url" value="{{ reqUrl }}" onChange="{{ setReqUrl }}" placeholder="https://" inputmode="url" style="min-height:48px;padding:0 14px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"></div>
+      </div>
+      <div style="display:grid;gap:8px"><span style="font-weight:600">The client's logo <span style="font-weight:400;color:var(--ink-3)">(you can add it later)</span></span>
+        <sc-if value="{{ reqLogoMissing }}"><button type="button" onClick="{{ addReqLogo }}" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:20px;border:1.5px dashed var(--line-2);border-radius:12px;background:transparent;cursor:pointer;text-align:left" style-hover="background:var(--sunk)"><i class="ph ph-upload-simple" aria-hidden="true" style="font-size:24px"></i><span style="display:grid;gap:2px"><b style="font-weight:600">Drop the logo here, or choose a file</b><span style="font-size:14px;color:var(--ink-2)">SVG, PNG or WebP, up to 512 KB. It is used exactly as supplied.</span></span></button></sc-if>
+        <sc-if value="{{ reqLogoAdded }}"><div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--sheet)"><span aria-hidden="true" style="width:44px;height:44px;border-radius:8px;background:repeating-linear-gradient(135deg,var(--sunk) 0 6px,var(--line) 6px 7px)"></span><span style="flex:1;display:grid"><b style="font-weight:600">harbor-street-logo.svg</b><span style="font-size:14px;color:var(--ink-2)">18 KB · checked: a real vector logo</span></span><button type="button" onClick="{{ addReqLogo }}" style="min-height:44px;padding:0 12px;border:0;background:none;text-decoration:underline;cursor:pointer">Remove</button></div></sc-if>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding-top:8px;border-top:1px solid var(--line)">
+        <button type="submit" disabled="{{ sending }}" style="display:inline-flex;align-items:center;gap:8px;min-height:50px;padding:10px 24px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:16px;cursor:pointer">{{ sendLabel }}</button>
+        <span style="font-size:14px;color:var(--ink-2)">Costs about $0.04 to read and write the proposal.</span>
+      </div>
+      <sc-if value="{{ sending }}"><div role="status" aria-live="polite" style="display:flex;gap:12px;align-items:center;padding:16px;border-radius:12px;background:var(--sunk)"><i class="ph-bold ph-circle-notch" aria-hidden="true" style="font-size:20px;animation:wfspin 1.1s linear infinite"></i><span>The factory is reading the request. This usually takes 2 to 4 minutes. You can leave this page; we will tell you when the proposal is ready.</span></div></sc-if>
+    </form>
+    <aside id="req-next" aria-label="What happens next" style="display:grid;gap:16px;padding:24px;border-radius:16px;background:var(--sunk);min-width:0">
+      <h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">What happens next</h2>
+      <ol style="margin:0;padding:0;list-style:none;display:grid;gap:16px">
+        <sc-for list="{{ nextSteps }}" as="x"><li style="display:grid;grid-template-columns:28px 1fr;gap:10px"><span style="font:600 13px/24px 'Overpass Mono',monospace;color:var(--ink-3)">{{ x.n }}</span><span style="display:grid;gap:2px"><b style="font-weight:600">{{ x.t }}</b><span style="font-size:14px;color:var(--ink-2)">{{ x.d }}</span></span></li></sc-for>
+      </ol>
+    </aside>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.project }}">
+<div style="display:grid;gap:32px">
+  <header style="display:grid;gap:10px">
+    <p style="margin:0;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px;color:var(--ink-3)"><span>{{ pj.kind }}</span><span aria-hidden="true">·</span><span>Project manager: Omar Qureshi</span><span style="padding:2px 8px;border:1px solid var(--line-2);border-radius:999px;font-size:12px">Test client</span></p>
+    <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4.4cqi,56px);line-height:1.03;letter-spacing:-0.02em">{{ pj.name }}</h1>
+  </header>
+
+  <section aria-label="Progress" style="display:grid;gap:0;border:1px solid var(--line);border-radius:18px;background:var(--sheet);overflow:hidden">
+    <sc-if value="{{ desk }}">
+    <ol style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr))">
+      <sc-for list="{{ strip }}" as="s">
+      <li aria-current="{{ s.current }}" style="{{ s.cell }}">
+        <div style="display:flex;align-items:center;gap:8px"><i class="{{ s.icon }}" aria-hidden="true" style="{{ s.iconStyle }}"></i><span style="font:600 12px/1 'Overpass Mono',monospace;color:var(--ink-3)">{{ s.n }}</span></div>
+        <p style="margin:0;font-weight:600;font-size:16px;line-height:1.25">{{ s.name }}</p>
+        <p style="margin:0;font-size:14px;color:var(--ink-2);line-height:1.4">{{ s.line }}</p>
+        <p style="margin:0;font-size:12px;color:var(--ink-3)">{{ s.usual }}</p>
+      </li>
+      </sc-for>
+    </ol>
+    </sc-if>
+    <sc-if value="{{ phone }}">
+    <div style="display:grid;gap:10px;padding:18px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:600 12px/1 'Overpass Mono',monospace;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase">Step {{ pj.stepNum }} of 6</span><span style="{{ pj.chip.style }}"><i class="{{ pj.chip.icon }}" style="{{ pj.chip.is }}" aria-hidden="true"></i>{{ pj.chip.word }}</span></div>
+      <div aria-hidden="true" style="display:flex;gap:4px"><sc-for list="{{ pj.segs }}" as="g"><span style="{{ g }}"></span></sc-for></div>
+      <p style="margin:0;font-family:Newsreader,Georgia,serif;font-size:22px;font-weight:500">{{ pj.where }}</p>
+      <p style="margin:0;font-size:15px;color:var(--ink-2)">{{ pj.line }}</p>
+      <details style="font-size:15px"><summary style="min-height:44px;display:flex;align-items:center;cursor:pointer;color:var(--ink-2)">See all six steps</summary><ol style="margin:0;padding:0 0 4px;list-style:none;display:grid;gap:10px"><sc-for list="{{ strip }}" as="s"><li style="display:grid;grid-template-columns:22px 1fr;gap:8px"><i class="{{ s.icon }}" aria-hidden="true" style="{{ s.iconStyle }}"></i><span><b style="font-weight:600">{{ s.name }}</b> · <span style="color:var(--ink-2)">{{ s.line }}</span></span></li></sc-for></ol></details>
+    </div>
+    </sc-if>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px;padding:18px 22px;border-top:1px solid var(--line);background:var(--paper)">
+      <div style="flex:1 1 280px;display:grid;gap:2px"><span style="font-size:13px;color:var(--ink-3)">The one thing to do next</span><span style="font-size:17px;font-weight:600">{{ pj.nextLine }}</span></div>
+      <button onClick="{{ pj.nextGo }}" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 22px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:16px;cursor:pointer;flex:0 1 auto" style-hover="box-shadow:0 0 0 3px var(--line-2)">{{ pj.nextCta }}<i class="ph ph-arrow-right" aria-hidden="true"></i></button>
+    </div>
+  </section>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:32px;align-items:start">
+    <div style="display:grid;gap:32px;grid-column:span 2;min-width:0">
+      <section aria-labelledby="pp-h" style="display:grid;gap:14px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h2 id="pp-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px">The proposal</h2><button onClick="{{ go.proposal }}" style="border:0;background:none;padding:10px 0;font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Read it</button></div>
+        <p style="margin:0;font-size:17px;max-width:62ch">A small site for a neighbourhood bakery that shows the daily bakes, takes custom cake requests and makes opening hours and parking easy to find.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ pages }}" as="p"><span style="padding:6px 12px;border-radius:999px;border:1px solid var(--line-2);font-size:14px">{{ p.name }}</span></sc-for></div>
+        <p style="margin:0;font-size:14px;color:var(--ink-2)">{{ pj.proposalLine }}</p>
+      </section>
+      <section aria-labelledby="pd-h" style="display:grid;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h2 id="pd-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px">Details and files</h2><span style="font-size:14px;color:var(--ink-2)">{{ needsCount }}</span></div>
+        <ul style="list-style:none;margin:0;padding:0"><sc-for list="{{ needItems }}" as="d"><li style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 0;border-top:1px solid var(--line)"><span style="flex:1 1 200px">{{ d.label }}</span><span style="{{ d.chip.style }}"><i class="{{ d.chip.icon }}" aria-hidden="true"></i>{{ d.chip.word }}</span></li></sc-for></ul>
+        <button onClick="{{ go.needs }}" style="justify-self:start;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">Open the details list</button>
+      </section>
+      <section aria-labelledby="pb-h" style="display:grid;gap:10px">
+        <h2 id="pb-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px">Builds</h2>
+        <sc-if value="{{ noBuilds }}"><p style="margin:0;padding:16px 0;border-top:1px solid var(--line);color:var(--ink-2)">No build yet. The first one starts when you press Start the build on the details list.</p></sc-if>
+        <ul style="list-style:none;margin:0;padding:0"><sc-for list="{{ builds }}" as="b"><li style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;padding:14px 0;border-top:1px solid var(--line)"><span style="font:600 13px 'Overpass Mono',monospace;color:var(--ink-3);width:64px">{{ b.n }}</span><span style="flex:1 1 220px;display:grid"><span style="font-weight:600">{{ b.what }}</span><span style="font-size:14px;color:var(--ink-2)">{{ b.when }}</span></span><span style="font:600 14px 'Overpass Mono',monospace">{{ b.cost }}</span><span style="{{ b.chip.style }}"><i class="{{ b.chip.icon }}" style="{{ b.chip.is }}" aria-hidden="true"></i>{{ b.chip.word }}</span><button onClick="{{ b.open }}" style="min-height:44px;padding:0 12px;border:0;background:none;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Open</button></li></sc-for></ul>
+      </section>
+    </div>
+    <aside style="display:grid;gap:24px;min-width:0">
+      <section aria-labelledby="pc-h" style="padding:22px;border-radius:16px;background:var(--sunk);display:grid;gap:6px">
+        <h2 id="pc-h" style="margin:0;font-size:14px;font-weight:600;color:var(--ink-2)">Cost so far</h2>
+        <p style="margin:0;font-family:Newsreader,Georgia,serif;font-size:40px;line-height:1">{{ pj.cost }}</p>
+        <p style="margin:0;font-size:14px;color:var(--ink-2)">{{ pj.costLine }}</p>
+      </section>
+      <section aria-labelledby="pt-h" style="display:grid;gap:12px">
+        <h2 id="pt-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">Decisions</h2>
+        <ol style="list-style:none;margin:0;padding:0 0 0 14px;border-left:1px solid var(--line-2);display:grid;gap:16px"><sc-for list="{{ decisions }}" as="d"><li style="position:relative;display:grid;gap:2px"><span aria-hidden="true" style="position:absolute;left:-19px;top:7px;width:9px;height:9px;border-radius:50%;background:var(--ink)"></span><span style="font-size:15px">{{ d.t }}</span><span style="font-size:13px;color:var(--ink-3)">{{ d.w }}</span></li></sc-for></ol>
+      </section>
+      <details open="{{ detailed }}" style="border-top:1px solid var(--line);padding-top:6px"><summary style="min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><i class="ph ph-wrench" aria-hidden="true"></i>Technical details</summary>
+        <dl style="margin:0;display:grid;gap:8px;font:400 13px/1.4 'Overpass Mono',monospace;color:var(--ink-2)"><sc-for list="{{ pjTech }}" as="t"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><dt style="color:var(--ink-3)">{{ t.k }}</dt><dd style="margin:0;display:flex;gap:6px;align-items:center;overflow-wrap:anywhere">{{ t.v }}<button aria-label="Copy" style="width:32px;height:32px;border:0;background:none;cursor:pointer;color:var(--ink-2)"><i class="ph ph-copy" aria-hidden="true"></i></button></dd></div></sc-for></dl>
+      </details>
+    </aside>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.proposal }}">
+<div style="display:grid;gap:36px;padding-bottom:20px">
+  <header style="display:grid;gap:10px;max-width:800px">
+    <p style="margin:0;font-family:'Overpass Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">Proposal 1 · written 14 Oct, 10:11</p>
+    <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(32px,4cqi,52px);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">A site for Harbor Street Bakery</h1>
+    <p style="margin:0;font-size:18px;color:var(--ink-2);max-width:62ch">A small site for a neighbourhood bakery that shows the daily bakes, takes custom cake requests and makes opening hours and parking easy to find.</p>
+  </header>
+  <figure style="margin:0;display:grid;gap:10px;padding:0 0 0 22px;border-left:3px solid var(--ink);max-width:780px">
+    <figcaption style="font-size:14px;color:var(--ink-3)">What the client wrote, in their own words</figcaption>
+    <blockquote style="margin:0;font-family:Newsreader,Georgia,serif;font-style:italic;font-size:clamp(20px,2.2cqi,26px);line-height:1.4;text-wrap:pretty">“People keep asking if we do custom cakes and what time we open on Sundays. We need a website that shows the cakes, lets people ask for a cake for pickup, and tells them where to park.”</blockquote>
+    <p style="margin:0;font-size:14px;color:var(--ink-2)">Dana, Harbor Street Bakery · pasted by Huraira</p>
+  </figure>
+  <section aria-labelledby="kind-h" style="display:grid;gap:16px">
+    <div style="display:grid;gap:4px"><h2 id="kind-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Choose the kind of site</h2><p style="margin:0;color:var(--ink-2)">The factory recommends a Fast local site. You can choose either.</p></div>
+    <div role="radiogroup" aria-labelledby="kind-h" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px">
+      <button role="radio" aria-checked="{{ kindFast }}" onClick="{{ pickFast }}" style="{{ kindFastStyle }}">
+        <div style="display:flex;align-items:center;gap:10px"><i class="{{ fastRadio }}" aria-hidden="true" style="font-size:22px"></i><span style="font-family:Newsreader,Georgia,serif;font-size:24px;font-weight:500">Fast local site</span><span style="margin-left:auto;padding:4px 10px;border-radius:999px;background:var(--done-w);color:var(--done);font-size:13px;font-weight:600">Recommended</span></div>
+        <div aria-hidden="true" style="display:grid;grid-template-columns:2fr 1fr;gap:6px;height:96px"><span style="border-radius:8px;background:var(--sunk)"></span><span style="display:grid;gap:6px"><span style="border-radius:6px;background:var(--sunk)"></span><span style="border-radius:6px;background:var(--sunk)"></span></span></div>
+        <p style="margin:0;font-size:15px;color:var(--ink-2)">Quick to load, simple to use. Hours, directions and the call button come first.</p>
+        <ul style="margin:0;padding-left:18px;display:grid;gap:4px;font-size:15px"><li>Most visitors will be on phones nearby, looking for hours and parking.</li><li>The client asked for nothing that needs motion.</li><li>Shows on a phone in under 2 seconds.</li></ul>
+      </button>
+      <button role="radio" aria-checked="{{ kindShow }}" onClick="{{ pickShow }}" style="{{ kindShowStyle }}">
+        <div style="display:flex;align-items:center;gap:10px"><i class="{{ showRadio }}" aria-hidden="true" style="font-size:22px"></i><span style="font-family:Newsreader,Georgia,serif;font-size:24px;font-weight:500">Showcase site with motion</span></div>
+        <div aria-hidden="true" style="height:96px;border-radius:8px;background:repeating-linear-gradient(135deg,var(--sunk) 0 10px,var(--line) 10px 11px)"></div>
+        <p style="margin:0;font-size:15px;color:var(--ink-2)">Large pictures and gentle motion between sections. Best when the work itself is the reason to visit.</p>
+        <ul style="margin:0;padding-left:18px;display:grid;gap:4px;font-size:15px"><li>Needs strong photos of the cakes, which the client has not sent yet.</li><li>A little slower on phones.</li><li>Costs about $0.20 more per build.</li></ul>
+      </button>
+    </div>
+  </section>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:32px">
+    <section aria-labelledby="pages-h" style="display:grid;gap:12px;align-content:start">
+      <h2 id="pages-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px">Pages</h2>
+      <ol style="margin:0;padding:0;list-style:none">
+        <li style="display:grid;grid-template-columns:32px 1fr;padding:12px 0;border-top:1px solid var(--line)"><span style="font:600 13px/24px 'Overpass Mono',monospace;color:var(--ink-3)">01</span><span><b style="font-weight:600">Home</b><br><span style="font-size:15px;color:var(--ink-2)">Today's bakes, the sourdough, hours, and a call button.</span></span></li>
+        <li style="display:grid;grid-template-columns:32px 1fr;padding:12px 0;border-top:1px solid var(--line)"><span style="font:600 13px/24px 'Overpass Mono',monospace;color:var(--ink-3)">02</span><span><b style="font-weight:600">Today's bakes</b><br><span style="font-size:15px;color:var(--ink-2)">What is on the counter, updated by the bakery.</span></span></li>
+        <li style="display:grid;grid-template-columns:32px 1fr;padding:12px 0;border-top:1px solid var(--line)"><span style="font:600 13px/24px 'Overpass Mono',monospace;color:var(--ink-3)">03</span><span><b style="font-weight:600">Custom cakes</b><br><span style="font-size:15px;color:var(--ink-2)">Past cakes and a request form for pickup.</span></span></li>
+        <li style="display:grid;grid-template-columns:32px 1fr;padding:12px 0;border-top:1px solid var(--line)"><span style="font:600 13px/24px 'Overpass Mono',monospace;color:var(--ink-3)">04</span><span><b style="font-weight:600">Visit us</b><br><span style="font-size:15px;color:var(--ink-2)">Hours, address, a map and where to park.</span></span></li>
+        <li style="display:grid;grid-template-columns:32px 1fr;padding:12px 0;border-top:1px solid var(--line)"><span style="font:600 13px/24px 'Overpass Mono',monospace;color:var(--ink-3)">05</span><span><b style="font-weight:600">About</b><br><span style="font-size:15px;color:var(--ink-2)">The bakery's story, only from what the client gives.</span></span></li>
+      </ol>
+    </section>
+    <section aria-labelledby="oq-h" style="display:grid;gap:12px;align-content:start">
+      <h2 id="oq-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px">Questions still open</h2>
+      <p style="margin:0;font-size:15px;color:var(--ink-2)">The factory could not answer these from the request. After you approve, they go on the details list, where you or the client can answer or skip them.</p>
+      <ul style="margin:0;padding:0;list-style:none;display:grid;gap:10px">
+        <li style="display:flex;gap:12px;padding:14px 16px;border-radius:12px;background:var(--need-w)"><i class="ph-fill ph-diamond" aria-hidden="true" style="color:var(--need);margin-top:4px"></i><span>Can people order cakes online, or only send a request?</span></li>
+        <li style="display:flex;gap:12px;padding:14px 16px;border-radius:12px;background:var(--need-w)"><i class="ph-fill ph-diamond" aria-hidden="true" style="color:var(--need);margin-top:4px"></i><span>Is there customer parking, or only street parking?</span></li>
+      </ul>
+    </section>
+  </div>
+  <sc-if value="{{ proposalOpen }}">
+  <div style="position:sticky;bottom:0;z-index:4;display:grid;gap:12px;padding:16px 0 4px;background:var(--paper);border-top:1px solid var(--line)">
+    <sc-if value="{{ askChanges }}">
+      <div style="display:grid;gap:8px"><label for="chg" style="font-weight:600">What should change?</label><textarea id="chg" value="{{ changeNote }}" onChange="{{ setChangeNote }}" rows="3" placeholder="For example: add a page for wholesale orders to cafés." style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--sheet);font-size:16px"></textarea><div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><button onClick="{{ sendChanges }}" style="min-height:46px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer">Send for a new proposal</button><span style="font-size:14px;color:var(--ink-2)">The factory writes proposal 2 from your note. Usually 2 to 4 min, about $0.04.</span></div></div>
+    </sc-if>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <sc-if value="{{ canApproveProposal }}"><button onClick="{{ approveProposal }}" style="flex:1 1 auto;max-width:420px;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 22px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:16px;cursor:pointer"><i class="ph ph-seal-check" aria-hidden="true"></i>{{ approveLabel }}</button></sc-if>
+      <sc-if value="{{ cannotApproveProposal }}"><span style="font-size:15px;color:var(--ink-2)">Nick approves proposals. He has been told it is ready.</span></sc-if>
+      <button onClick="{{ toggleChanges }}" aria-expanded="{{ askChanges }}" style="min-height:50px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">Ask for changes</button>
+    </div>
+  </div>
+  </sc-if>
+  <sc-if value="{{ proposalDone }}"><p role="status" style="margin:0;display:flex;gap:10px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--done-w)"><i class="ph-fill ph-check-circle" aria-hidden="true" style="color:var(--done);font-size:20px"></i>Approved by Nick on 14 Oct as a Fast local site.</p></sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.needs }}">
+<div style="display:grid;gap:32px;padding-bottom:20px">
+  <header style="display:grid;gap:12px;max-width:780px">
+    <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(32px,4cqi,52px);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">What the site still needs</h1>
+    <p style="margin:0;font-size:18px;color:var(--ink-2)">Anything the client never gave us. Add it, answer it, or skip it. Anything skipped is left out of the site, never made up.</p>
+    <div style="display:grid;gap:8px;margin-top:6px"><div role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="{{ needsCountNum }}" aria-label="{{ needsCount }}" style="display:flex;gap:4px"><sc-for list="{{ needSegs }}" as="g"><span style="{{ g }}"></span></sc-for></div><p aria-live="polite" style="margin:0;font-weight:600">{{ needsCount }}</p></div>
+  </header>
+  <sc-for list="{{ needGroups }}" as="grp">
+  <section style="display:grid;gap:0">
+    <h2 style="margin:0 0 6px;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">{{ grp.g }}</h2>
+    <ul style="list-style:none;margin:0;padding:0">
+      <sc-for list="{{ grp.items }}" as="d">
+      <li style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:var(--row,18px) 0;border-top:1px solid var(--line)">
+        <div style="flex:1 1 300px;min-width:0;display:grid;gap:4px">
+          <div style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center"><span style="font-weight:600;font-size:17px">{{ d.label }}</span><span style="{{ d.chip.style }}"><i class="{{ d.chip.icon }}" aria-hidden="true"></i>{{ d.chip.word }}</span></div>
+          <p style="margin:0;font-size:15px;color:var(--ink-2)">{{ d.why }}</p>
+          <sc-if value="{{ d.isDone }}"><p style="margin:2px 0 0;font-size:15px;display:flex;gap:8px;align-items:center"><i class="ph ph-paperclip" aria-hidden="true"></i>{{ d.valueText }}</p></sc-if>
+          <sc-if value="{{ d.isAnswering }}"><div style="display:grid;gap:8px;margin-top:8px"><label style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Your answer</label><textarea value="{{ answerText }}" onChange="{{ setAnswer }}" rows="3" placeholder="Type it exactly as it should appear on the site." style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--sheet);font-size:16px"></textarea><div style="display:flex;gap:8px"><button onClick="{{ d.saveAnswer }}" style="min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer">Save</button><button onClick="{{ cancelAnswer }}" style="min-height:44px;padding:0 12px;border:0;background:none;text-decoration:underline;cursor:pointer">Cancel</button></div></div></sc-if>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+          <sc-if value="{{ d.isOpen }}">
+            <sc-if value="{{ d.isFile }}"><button onClick="{{ d.upload }}" style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer"><i class="ph ph-upload-simple" aria-hidden="true"></i>Upload</button></sc-if>
+            <sc-if value="{{ d.isText }}"><button onClick="{{ d.startAnswer }}" style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer"><i class="ph ph-pencil-simple" aria-hidden="true"></i>Answer</button></sc-if>
+            <button onClick="{{ d.skip }}" style="min-height:44px;padding:0 12px;border:0;background:none;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;cursor:pointer">Build without it</button>
+          </sc-if>
+          <sc-if value="{{ d.isDone }}"><button onClick="{{ d.change }}" style="min-height:44px;padding:0 12px;border:0;background:none;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Change</button></sc-if>
+          <sc-if value="{{ d.isSkipped }}"><button onClick="{{ d.change }}" style="min-height:44px;padding:0 12px;border:0;background:none;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Add it after all</button></sc-if>
+        </div>
+      </li>
+      </sc-for>
+    </ul>
+  </section>
+  </sc-for>
+  <section aria-labelledby="ph-h" style="display:grid;gap:6px">
+    <h2 id="ph-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">Placeholders still on the site</h2>
+    <p style="margin:0;color:var(--ink-2)">None yet: the site has not been built. After a build, any picture you skipped shows here as a labelled placeholder, and the site is not ready to launch until it is added or you knowingly accept it.</p>
+  </section>
+  <div style="position:sticky;bottom:0;z-index:4;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:16px 0 4px;background:var(--paper);border-top:1px solid var(--line)">
+    <button onClick="{{ startBuild }}" disabled="{{ startDisabled }}" style="flex:0 1 auto;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 24px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:16px;cursor:pointer"><i class="ph ph-play" aria-hidden="true"></i>Start the build</button>
+    <p style="margin:0;flex:1 1 280px;font-size:15px;color:var(--ink-2)">{{ startLine }}</p>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.build }}">
+<div style="display:grid;gap:28px">
+  <header style="display:grid;gap:12px">
+    <p style="margin:0;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px;color:var(--ink-3)"><span>{{ build.name }}</span><span aria-hidden="true">·</span><span>Build 1</span><sc-if value="{{ protoNote }}"><span style="padding:2px 8px;border:1px dashed var(--line-2);border-radius:999px;font-size:12px">Prototype runs 20× faster</span></sc-if></p>
+    <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(30px,3.8cqi,48px);line-height:1.08;letter-spacing:-0.02em;text-wrap:balance">{{ build.headline }}</h1>
+    <p aria-live="polite" role="status" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">{{ build.announce }}</p>
+    <div aria-hidden="true" style="position:relative;height:6px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:8px"><span style="{{ build.barStyle }}"></span></div>
+    <dl style="margin:4px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(46%,150px),1fr));gap:14px">
+      <div><dt style="font-size:13px;color:var(--ink-3)">Running for</dt><dd style="margin:0;font:600 18px 'Overpass Mono',monospace">{{ build.elapsed }}</dd></div>
+      <div><dt style="font-size:13px;color:var(--ink-3)">Time left</dt><dd style="margin:0;font:600 18px 'Overpass Mono',monospace">{{ build.left }}</dd></div>
+      <div><dt style="font-size:13px;color:var(--ink-3)">Spent so far</dt><dd style="margin:0;font:600 18px 'Overpass Mono',monospace">{{ build.spent }}</dd></div>
+      <div><dt style="font-size:13px;color:var(--ink-3)">Rounds of fixes</dt><dd style="margin:0;font:600 18px 'Overpass Mono',monospace">{{ build.round }}</dd></div>
+    </dl>
+    <p style="margin:0;font-size:14px;color:var(--ink-3)">Time left is an estimate from the last 6 builds of this kind. Each build stops itself at $2.00.</p>
+  </header>
+  <sc-if value="{{ build.stopped }}">
+    <div role="alert" style="display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;padding:18px 20px;border-radius:14px;background:var(--stop-w)"><i class="ph-fill ph-stop-circle" aria-hidden="true" style="font-size:26px;color:var(--stop)"></i><div style="flex:1 1 260px"><p style="margin:0;font-weight:600">The checks found a phone number on the site that nobody gave us.</p><p style="margin:0;font-size:15px;color:var(--ink-2)">$0.21 spent. Nothing more is spent until you decide.</p></div><button onClick="{{ seeFix }}" style="min-height:46px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer">See why and fix it</button></div>
+  </sc-if>
+  <sc-if value="{{ build.done }}">
+    <div style="display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;padding:18px 20px;border-radius:14px;background:var(--done-w)"><i class="ph-fill ph-check-circle" aria-hidden="true" style="font-size:26px;color:var(--done)"></i><div style="flex:1 1 260px"><p style="margin:0;font-weight:600">Ready for your approval.</p><p style="margin:0;font-size:15px;color:var(--ink-2)">This build cost {{ build.spent }}, with 1 round of fixes.</p></div><button onClick="{{ go.review }}" style="min-height:46px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer">Review the finished site</button></div>
+  </sc-if>
+  <ol aria-label="Build steps" style="list-style:none;margin:0;padding:0;display:grid;gap:2px">
+    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+    <li aria-current="{{ r.current }}" style="{{ r.rowStyle }}">
+      <span style="font:600 13px/26px 'Overpass Mono',monospace;color:var(--ink-3)">{{ r.n }}</span>
+      <div style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;min-width:0">
+        <span style="flex:1 1 240px;font-weight:600;font-size:17px">{{ r.t }}</span>
+        <span style="font:400 14px 'Overpass Mono',monospace;color:var(--ink-2)">{{ r.time }}</span>
+        <span style="{{ r.chip.style }}"><i class="{{ r.chip.icon }}" style="{{ r.chip.is }}" aria-hidden="true"></i>{{ r.chip.word }}</span>
+      </div>
+      <p style="grid-column:2;margin:0;font-size:15px;color:var(--ink-2);max-width:68ch">{{ r.sentence }}</p>
+      <sc-if value="{{ r.hasChecks }}"><ul style="grid-column:2;margin:8px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:6px 16px"><sc-for list="{{ r.checks }}" as="c"><li style="display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)"><span>{{ c.label }}</span><span style="{{ c.chip.style }}"><i class="{{ c.chip.icon }}" aria-hidden="true"></i>{{ c.chip.word }}</span></li></sc-for></ul></sc-if>
+    </li>
+    </sc-for>
+  </ol>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:18px 20px;border-radius:14px;background:var(--sunk)"><i class="ph ph-bell-ringing" aria-hidden="true" style="font-size:22px"></i><p style="margin:0;flex:1 1 260px">You can leave this page. We will message you when it finishes or needs you.</p><label style="display:flex;gap:10px;align-items:center;min-height:44px;cursor:pointer"><input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--ink)">Also on my phone</label></div>
+  <details open="{{ detailed }}" style="border-top:1px solid var(--line);padding-top:6px"><summary style="min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><i class="ph ph-wrench" aria-hidden="true"></i>Technical details</summary>
+    <dl style="margin:0;display:grid;gap:8px;font:400 13px/1.4 'Overpass Mono',monospace;color:var(--ink-2)"><sc-for list="{{ buildTech }}" as="t"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)"><dt style="color:var(--ink-3)">{{ t.k }}</dt><dd style="margin:0;display:flex;gap:6px;align-items:center">{{ t.v }}<button aria-label="Copy" style="width:32px;height:32px;border:0;background:none;cursor:pointer;color:var(--ink-2)"><i class="ph ph-copy" aria-hidden="true"></i></button></dd></div></sc-for></dl>
+  </details>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.stopped }}">
+<article aria-labelledby="stop-h" style="display:grid;gap:28px;max-width:900px">
+  <header style="display:grid;gap:12px">
+    <p style="margin:0;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:var(--stop-w);color:var(--stop);font-size:13px;font-weight:600"><i class="ph-fill ph-stop-circle" aria-hidden="true"></i>Build stopped</span><span style="font-size:14px;color:var(--ink-3)">Harbor Street Bakery · Build 1</span><sc-if value="{{ galleryNote }}"><span style="font:500 12px 'Overpass Mono',monospace;padding:2px 8px;border:1px dashed var(--line-2);border-radius:999px;color:var(--ink-2);white-space:nowrap">Case {{ stop.n }} of 8</span></sc-if></p>
+    <h1 id="stop-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(30px,3.8cqi,46px);line-height:1.1;letter-spacing:-0.02em;text-wrap:balance">{{ stop.t }}</h1>
+  </header>
+  <dl style="margin:0;display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--sheet)">
+    <div style="flex:1 1 220px;padding:18px;display:grid;gap:8px;align-content:start;border-right:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -1px -1px 0"><dt style="font-size:13px;color:var(--ink-3)">Was money spent?</dt><dd style="margin:0;display:grid;gap:8px"><span style="{{ stop.moneyChip.style }}"><i class="{{ stop.moneyChip.icon }}" aria-hidden="true"></i>{{ stop.moneyChip.word }}</span><span style="font-weight:600">{{ stop.money }}</span></dd></div>
+    <div style="flex:3 1 320px;padding:18px;display:grid;gap:8px;align-content:start;border-bottom:1px solid var(--line);margin-bottom:-1px"><dt style="font-size:13px;color:var(--ink-3)">What the factory already tried</dt><dd style="margin:0;font-size:16px">{{ stop.tried }}</dd></div>
+  </dl>
+  <sc-if value="{{ stop.hasFailed }}"><section style="display:grid;gap:8px"><h2 style="margin:0;font-size:16px;font-weight:600">Checks that still fail</h2><ul style="margin:0;padding:0;list-style:none;display:grid;gap:6px"><sc-for list="{{ stop.failedList }}" as="f"><li style="display:flex;gap:10px;padding:12px 14px;border-radius:10px;background:var(--stop-w)"><i class="ph-fill ph-x-circle" aria-hidden="true" style="color:var(--stop);margin-top:3px"></i>{{ f.f }}</li></sc-for></ul></section></sc-if>
+  <sc-if value="{{ stop.hasWho }}"><p style="margin:0;display:flex;gap:10px;padding:14px 16px;border-radius:12px;background:var(--sunk)"><i class="ph ph-user" aria-hidden="true" style="margin-top:3px"></i>{{ stop.who }}</p></sc-if>
+  <section aria-labelledby="fix-h" style="display:grid;gap:16px;padding:24px;border-radius:18px;border:2px solid var(--ink);background:var(--sheet)">
+    <h2 id="fix-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px">The fix</h2>
+    <sc-if value="{{ stop.isInput }}">
+      <div role="radiogroup" aria-label="How to fix it" style="display:grid;gap:10px">
+        <div style="display:grid;gap:10px;padding:14px;border-radius:12px;border:1px solid var(--line-2)"><button role="radio" aria-checked="{{ modeAdd }}" onClick="{{ pickAdd }}" style="display:flex;gap:10px;align-items:center;min-height:44px;border:0;background:none;padding:0;cursor:pointer;font-weight:600;text-align:left"><i class="{{ addRadio }}" aria-hidden="true" style="font-size:20px"></i>Add the real phone number</button><sc-if value="{{ modeAdd }}"><input aria-label="The real phone number" value="{{ phoneFix }}" onChange="{{ setPhoneFix }}" inputmode="tel" placeholder="Exactly as it should appear" style="min-height:48px;padding:0 14px;border:1px solid var(--line-2);border-radius:10px;background:var(--paper);font-size:16px"></sc-if></div>
+        <div style="padding:14px;border-radius:12px;border:1px solid var(--line-2)"><button role="radio" aria-checked="{{ modeWithout }}" onClick="{{ pickWithout }}" style="display:flex;gap:10px;align-items:center;min-height:44px;border:0;background:none;padding:0;cursor:pointer;font-weight:600;text-align:left"><i class="{{ withoutRadio }}" aria-hidden="true" style="font-size:20px"></i>Build without a phone number</button><sc-if value="{{ modeWithout }}"><p style="margin:4px 0 0 30px;font-size:15px;color:var(--ink-2)">The Contact page will show the email and the request form instead.</p></sc-if></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ stop.needsOwner }}"><p style="margin:0;color:var(--ink-2)">Money limits are Nick's decision. Asking him sends a note with the amount and the reason.</p></sc-if>
+    <div style="display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center">
+      <button onClick="{{ stop.primary }}" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 22px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:16px;cursor:pointer">{{ stop.fix }}</button>
+      <sc-if value="{{ stop.hasOwner }}"><button style="min-height:50px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">{{ stop.owner }}</button></sc-if>
+      <sc-for list="{{ stop.others }}" as="o"><button onClick="{{ o.go }}" style="min-height:44px;padding:0 8px;border:0;background:none;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;cursor:pointer">{{ o.o }}</button></sc-for>
+    </div>
+  </section>
+  <section style="display:grid;gap:12px">
+    <button onClick="{{ stop.toggleWhy }}" aria-expanded="{{ stop.whyOpen }}" style="justify-self:start;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0;border:0;background:none;font-weight:600;font-size:17px;cursor:pointer"><i class="ph ph-caret-right" aria-hidden="true"></i>Why?</button>
+    <sc-if value="{{ stop.whyOpen }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:20px;animation:wfin .3s ease both">
+        <p style="margin:0;font-size:16px">{{ stop.evidence }}</p>
+        <div role="img" aria-label="{{ stop.crop }}" style="min-height:150px;border-radius:12px;border:1px solid var(--line-2);background:repeating-linear-gradient(135deg,var(--sunk) 0 8px,var(--paper) 8px 16px);display:grid;place-items:center;padding:12px"><span style="font:500 12px 'Overpass Mono',monospace;color:var(--ink-2);text-align:center">{{ stop.crop }}</span></div>
+      </div>
+      <details open="{{ detailed }}"><summary style="min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><i class="ph ph-wrench" aria-hidden="true"></i>Technical details</summary><pre style="margin:0;white-space:pre-wrap;word-break:break-word;font:400 13px/1.5 'Overpass Mono',monospace;padding:14px;border-radius:10px;background:var(--sunk);color:var(--ink-2)">{{ stop.log }}</pre></details>
+    </sc-if>
+  </section>
+</article>
+</sc-if>
+
+<sc-if value="{{ is.review }}">
+<div style="display:grid;gap:28px;padding-bottom:20px">
+  <header style="display:grid;gap:12px">
+    <p style="margin:0;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center"><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px 5px 8px;border-radius:999px;background:var(--done-w);color:var(--done);font-size:13px;font-weight:600"><i class="ph-fill ph-check-circle" aria-hidden="true"></i>Every check passed</span><span style="{{ review.readyChip.style }}"><i class="{{ review.readyChip.icon }}" aria-hidden="true"></i>{{ review.readyChip.word }}</span></p>
+    <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(30px,3.8cqi,50px);line-height:1.06;letter-spacing:-0.02em;text-wrap:balance">Harbor Street Bakery is ready for your approval</h1>
+  </header>
+  <div role="tablist" aria-label="Pages" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px"><sc-for list="{{ pageTabs }}" as="p"><button role="tab" aria-selected="{{ p.on }}" onClick="{{ p.pick }}" style="{{ p.style }}">{{ p.p }}</button></sc-for></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:20px;align-items:end">
+    <figure style="margin:0;display:grid;gap:8px;grid-column:span 3;min-width:0"><div role="img" aria-label="{{ review.page }} on a desktop screen" style="aspect-ratio:16/10;border-radius:12px;border:1px solid var(--line-2);background:repeating-linear-gradient(135deg,var(--sunk) 0 10px,var(--sheet) 10px 20px);display:grid;place-items:center"><span style="font:500 13px 'Overpass Mono',monospace;color:var(--ink-2);background:var(--sheet);padding:6px 10px;border-radius:6px">live site preview · desktop · {{ review.slug }}</span></div><figcaption style="font-size:14px;color:var(--ink-2)">Desktop · {{ review.page }}</figcaption></figure>
+    <figure style="margin:0;display:grid;gap:8px;justify-items:center;min-width:0"><div role="img" aria-label="{{ review.page }} on a phone" style="width:min(100%,220px);aspect-ratio:9/19;border-radius:28px;border:6px solid var(--ink);background:repeating-linear-gradient(135deg,var(--sunk) 0 10px,var(--sheet) 10px 20px);display:grid;place-items:center"><span style="font:500 12px 'Overpass Mono',monospace;color:var(--ink-2);background:var(--sheet);padding:6px 8px;border-radius:6px;text-align:center">phone · {{ review.slug }}</span></div><figcaption style="font-size:14px;color:var(--ink-2)">Phone · {{ review.page }}</figcaption></figure>
+  </div>
+  <section aria-labelledby="ph2-h" style="display:grid;gap:12px">
+    <h2 id="ph2-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:24px">Placeholder pictures</h2>
+    <sc-if value="{{ review.hasPh }}">
+      <ul style="margin:0;padding:0;list-style:none"><sc-for list="{{ placeholders }}" as="p"><li style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:16px;border-radius:14px;background:var(--need-w)"><span aria-hidden="true" style="width:64px;height:48px;border-radius:8px;background:repeating-linear-gradient(135deg,var(--line) 0 5px,transparent 5px 10px)"></span><span style="flex:1 1 240px;display:grid"><b style="font-weight:600">{{ p.where }}</b><span style="font-size:15px;color:var(--ink-2)">Should show: {{ p.what }}</span></span><button onClick="{{ review.addPh }}" style="display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer"><i class="ph ph-upload-simple" aria-hidden="true"></i>Add the picture</button></li></sc-for></ul>
+      <sc-if value="{{ canDecide }}"><label style="display:flex;gap:12px;align-items:flex-start;min-height:44px;cursor:pointer;max-width:70ch"><input type="checkbox" checked="{{ review.phOk }}" onChange="{{ review.togglePh }}" style="width:22px;height:22px;margin-top:1px;accent-color:var(--ink)"><span>Launch with placeholders. I know a placeholder picture is still on the site, and visitors will see it.</span></label></sc-if>
+      <sc-if value="{{ notOwner }}"><p style="margin:0;font-size:15px;color:var(--ink-2)">Only an owner can choose to launch with placeholders.</p></sc-if>
+    </sc-if>
+    <sc-if value="{{ review.noPh }}"><p style="margin:0;color:var(--ink-2)">None. Every picture on the site came from the client.</p></sc-if>
+    <p role="status" style="margin:0;font-weight:600">{{ review.readiness }}</p>
+  </section>
+  <details open="{{ detailed }}" style="border-top:1px solid var(--line);padding-top:6px"><summary style="min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><i class="ph ph-wrench" aria-hidden="true"></i>Technical details: 12 checks, 14 screenshots, $0.68, 1 round of fixes</summary>
+    <ul style="margin:8px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:6px 20px"><sc-for list="{{ reviewChecks }}" as="c"><li style="display:flex;gap:8px;align-items:center;font-size:14px;padding:6px 0;border-bottom:1px solid var(--line)"><i class="ph-fill ph-check-circle" aria-hidden="true" style="color:var(--done)"></i>{{ c.c }}</li></sc-for></ul>
+    <p style="margin:12px 0 0;font:400 13px 'Overpass Mono',monospace;color:var(--ink-2)">job j-c41f02 · run wf-1198 · commit 9f3c1ae · preview harbor-street-bakery.preview.wfact.dev</p>
+  </details>
+  <div style="position:sticky;bottom:0;z-index:4;display:grid;gap:12px;padding:16px 0 4px;background:var(--paper);border-top:1px solid var(--line)">
+    <sc-if value="{{ reviewAsk }}"><div style="display:grid;gap:8px"><label for="rv" style="font-weight:600">What should change? Write it the way you would tell a designer.</label><textarea id="rv" value="{{ reviewNote }}" onChange="{{ setReviewNote }}" rows="3" placeholder="For example: make the Sunday hours bigger on the Home page." style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:12px;background:var(--sheet);font-size:16px"></textarea><button onClick="{{ sendReview }}" style="justify-self:start;min-height:46px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer">Send the changes</button></div></sc-if>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <sc-if value="{{ canDecide }}"><button onClick="{{ review.approve }}" disabled="{{ review.approveDisabled }}" style="flex:1 1 auto;max-width:360px;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:10px 22px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;font-size:16px;cursor:pointer"><i class="ph ph-seal-check" aria-hidden="true"></i>Approve the site</button></sc-if>
+      <button onClick="{{ toggleReviewAsk }}" aria-expanded="{{ reviewAsk }}" style="min-height:50px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">Ask for changes</button>
+      <span style="font-size:14px;color:var(--ink-2)">Approving records your decision. A person launches the site, outside the Cockpit.</span>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.activity }}">
+<div style="display:grid;gap:24px">
+  <header style="display:grid;gap:8px"><h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4cqi,52px);line-height:1.05;letter-spacing:-0.02em">Activity</h1><p style="margin:0;color:var(--ink-2)">Everything the factory and the team did, newest first.</p></header>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+    <label style="display:flex;align-items:center;gap:8px;min-height:46px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet)"><span style="color:var(--ink-3);font-size:15px">Client</span><select value="{{ actClient }}" onChange="{{ setActClient }}" style="border:0;background:transparent;font-weight:600;min-height:40px"><sc-for list="{{ actClients }}" as="o"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></label>
+    <label style="display:flex;align-items:center;gap:8px;min-height:46px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet)"><span style="color:var(--ink-3);font-size:15px">Person</span><select style="border:0;background:transparent;font-weight:600;min-height:40px"><option>Anyone</option><option>The factory</option><option>Nick</option><option>Huraira</option><option>Omar Qureshi</option><option>Sana Malik</option></select></label>
+    <button style="display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 10px;border:0;background:none;color:var(--ink-2);cursor:pointer;font-size:14px;text-decoration:underline;text-underline-offset:3px"><i class="ph ph-bookmark-simple" aria-hidden="true"></i>Save this view</button>
+  </div>
+  <div role="group" aria-label="Type" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:-8px"><sc-for list="{{ actTypes }}" as="f"><button onClick="{{ f.pick }}" aria-pressed="{{ f.on }}" style="{{ f.style }}">{{ f.label }}</button></sc-for></div>
+  <sc-if value="{{ actEmpty }}"><p role="status" style="margin:0;padding:32px 0;border-top:1px solid var(--line);color:var(--ink-2)">Nothing matches these filters yet.</p></sc-if>
+  <sc-for list="{{ actDays }}" as="day">
+  <section style="display:grid;gap:0">
+    <h2 style="margin:0 0 4px;font-family:'Overpass Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600">{{ day.d }}</h2>
+    <ol style="list-style:none;margin:0;padding:0"><sc-for list="{{ day.items }}" as="a"><li style="display:grid;grid-template-columns:52px 28px minmax(0,1fr);gap:4px 12px;padding:var(--row,16px) 0;border-top:1px solid var(--line)"><span style="font:400 14px/24px 'Overpass Mono',monospace;color:var(--ink-3)">{{ a.time }}</span><i class="{{ a.icon }}" aria-hidden="true" style="{{ a.iconStyle }}"></i><div style="display:grid;gap:2px;min-width:0"><p style="margin:0"><b style="font-weight:600">{{ a.who }}</b> · {{ a.text }}</p><span style="font-size:14px;color:var(--ink-2)">{{ a.client }}</span></div></li></sc-for></ol>
+  </section>
+  </sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.costs }}">
+<div style="display:grid;gap:36px">
+  <header style="display:grid;gap:10px;max-width:800px">
+    <p style="margin:0;font-family:'Overpass Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">October so far</p>
+    <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(32px,4.2cqi,54px);line-height:1.05;letter-spacing:-0.02em;text-wrap:balance">This month: $14.20 of your $20 cap.</h1>
+    <p style="margin:0;font-size:18px;color:var(--ink-2)">The last build cost $0.68. A build usually costs between $0.50 and $0.90.</p>
+  </header>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px">
+    <section aria-labelledby="tr-h" style="padding:24px;border-radius:16px;border:1px solid var(--line);background:var(--sheet);display:grid;gap:16px">
+      <h2 id="tr-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">The last six months</h2>
+      <div role="img" aria-label="Monthly spend: May $3.10, June $6.40, July $8.90, August $11.30, September $12.70, October so far $14.20. The cap is $20." style="position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:12px;align-items:end;height:200px;padding-top:20px">
+        <span aria-hidden="true" style="position:absolute;left:0;right:0;top:20px;border-top:1.5px dashed var(--stop)"></span><span aria-hidden="true" style="position:absolute;right:0;top:0;font-size:12px;color:var(--stop);font-weight:600">$20 cap</span>
+        <sc-for list="{{ months }}" as="m"><div style="display:grid;gap:6px;justify-items:center;align-content:end;height:100%"><span style="font:400 12px 'Overpass Mono',monospace;color:var(--ink-2)">{{ m.v }}</span><span style="{{ m.bar }}"></span><span style="font-size:13px;color:var(--ink-3)">{{ m.m }}</span></div></sc-for>
+      </div>
+    </section>
+    <section aria-labelledby="pc2-h" style="padding:24px;border-radius:16px;border:1px solid var(--line);background:var(--sheet);display:grid;gap:12px;align-content:start">
+      <h2 id="pc2-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">Cost per client, this month</h2>
+      <ul style="margin:0;padding:0;list-style:none;display:grid;gap:14px"><sc-for list="{{ perClient }}" as="c"><li style="display:grid;gap:6px"><span style="display:flex;justify-content:space-between;gap:10px"><span>{{ c.n }}</span><span style="font:600 15px 'Overpass Mono',monospace">{{ c.v }}</span></span><span style="height:8px;border-radius:4px;background:var(--sunk);display:block"><span style="{{ c.bar }};display:block"></span></span></li></sc-for></ul>
+    </section>
+  </div>
+  <section aria-labelledby="cap-h" style="display:grid;gap:16px">
+    <h2 id="cap-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">How the caps protect you</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:24px;align-items:start">
+      <div style="display:grid;gap:12px">
+        <p style="margin:0;font-size:17px">Every build stops itself at <b>$2.00</b>. The month stops new builds at <b>$20</b>. A build never starts a step it cannot pay for.</p>
+        <p style="margin:0;color:var(--ink-2)">Example: DreamSign pilot's build used three rounds of fixes. Before round 3 would have gone past $2.00, it stopped on purpose and kept the saved site.</p>
+        <sc-if value="{{ isOwner }}"><button style="justify-self:start;min-height:46px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">Change the caps</button></sc-if>
+        <sc-if value="{{ notOwner }}"><button style="justify-self:start;min-height:46px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">Ask Nick to change a cap</button></sc-if>
+      </div>
+      <div role="img" aria-label="A build's spend: writing $0.42, checks $0.18, round 1 $0.46, round 2 $0.44. Round 3 would have reached $2.00, so the build stopped." style="display:grid;gap:10px;padding:20px;border-radius:16px;background:var(--sunk)">
+        <div style="position:relative;height:44px;border-radius:8px;background:var(--sheet);overflow:hidden"><sc-for list="{{ capSteps }}" as="c"><span style="{{ c.seg }}"></span></sc-for><span aria-hidden="true" style="position:absolute;top:-4px;bottom:-4px;left:83.3%;border-left:2.5px solid var(--stop)"></span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--ink-2)"><sc-for list="{{ capSteps }}" as="c"><span>{{ c.n }} {{ c.v }}</span></sc-for></div>
+        <p style="margin:0;font-size:14px;font-weight:600;color:var(--stop)">Stopped here: $2.00. Round 3 was never paid for.</p>
+      </div>
+    </div>
+  </section>
+  <details open="{{ detailed }}" style="border-top:1px solid var(--line);padding-top:6px"><summary style="min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><i class="ph ph-wrench" aria-hidden="true"></i>Technical details: cost by AI model</summary>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px;min-width:480px"><thead><tr><th scope="col" style="text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);color:var(--ink-3);font-weight:600">Model</th><th scope="col" style="text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);color:var(--ink-3);font-weight:600">Used for</th><th scope="col" style="text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);color:var(--ink-3);font-weight:600">Calls</th><th scope="col" style="text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);color:var(--ink-3);font-weight:600">Cost</th></tr></thead><tbody><sc-for list="{{ modelRows }}" as="m"><tr><td style="padding:10px 8px;border-bottom:1px solid var(--line);font-family:'Overpass Mono',monospace">{{ m.m }}</td><td style="padding:10px 8px;border-bottom:1px solid var(--line)">{{ m.u }}</td><td style="padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;font-family:'Overpass Mono',monospace">{{ m.c }}</td><td style="padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;font-family:'Overpass Mono',monospace">{{ m.v }}</td></tr></sc-for></tbody></table></div>
+    <p style="margin:10px 0 0;font-size:13px;color:var(--ink-3)">Prices from the factory's own price table (version 1.4.0). The site builder publishes no price, so its cost is an estimate and labelled as one.</p>
+  </details>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.team }}">
+<div style="display:grid;gap:36px">
+  <header style="display:grid;gap:8px"><h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4cqi,52px);line-height:1.05;letter-spacing:-0.02em">Team and access</h1><p style="margin:0;color:var(--ink-2)">Who can see what, and who decides.</p></header>
+  <section aria-labelledby="req-h" style="display:grid;gap:10px">
+    <h2 id="req-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">Waiting for your approval</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:16px 18px;border-radius:14px;background:var(--need-w)"><i class="ph-fill ph-diamond" aria-hidden="true" style="color:var(--need)"></i><span style="flex:1 1 240px"><b style="font-weight:600">priya@wfact.agency</b> asked for an account · 2 hours ago</span><button style="min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer">Approve as project manager</button><button style="min-height:44px;padding:0 10px;border:0;background:none;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Decline</button></div>
+  </section>
+  <section aria-labelledby="inv-h" style="display:grid;gap:12px">
+    <h2 id="inv-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">Invite someone</h2>
+    <form style="display:flex;flex-wrap:wrap;gap:10px;align-items:end">
+      <label style="flex:2 1 240px;display:grid;gap:6px"><span style="font-weight:600">Email</span><input type="email" placeholder="name@company.com" style="min-height:48px;padding:0 14px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"></label>
+      <label style="flex:1 1 180px;display:grid;gap:6px"><span style="font-weight:600">Role</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>Project manager</option><option>Admin</option><option>Owner</option></select></label>
+      <button type="button" style="min-height:48px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer">Send invite</button>
+    </form>
+  </section>
+  <section aria-labelledby="ppl-h" style="display:grid;gap:0">
+    <h2 id="ppl-h" style="margin:0 0 6px;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">People</h2>
+    <ul style="list-style:none;margin:0;padding:0"><sc-for list="{{ people }}" as="p"><li style="display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;padding:16px 0;border-top:1px solid var(--line)"><span aria-hidden="true" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--line-2);display:grid;place-items:center;font:600 13px 'Overpass Mono',monospace;color:var(--ink-2)">{{ p.initial }}</span><span style="flex:1 1 200px;display:grid"><b style="font-weight:600">{{ p.n }}</b><span style="font-size:14px;color:var(--ink-3)">{{ p.e }}</span></span><span style="flex:1 1 140px">{{ p.r }}</span><span style="flex:2 1 220px;font-size:15px;color:var(--ink-2)">{{ p.c }}</span><button style="min-height:44px;padding:0 12px;border:0;background:none;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Change</button></li></sc-for></ul>
+  </section>
+  <section aria-labelledby="roles-h" style="display:grid;gap:12px">
+    <h2 id="roles-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:22px">What each role can do</h2>
+    <dl style="margin:0;display:grid;gap:0"><sc-for list="{{ roles }}" as="r"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:4px 24px;padding:14px 0;border-top:1px solid var(--line)"><dt style="font-weight:600">{{ r.r }}</dt><dd style="margin:0;color:var(--ink-2);grid-column:span 2">{{ r.d }}</dd></div></sc-for></dl>
+  </section>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.settings }}">
+<div style="display:grid;gap:24px">
+  <header style="display:grid;gap:8px"><h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4cqi,52px);line-height:1.05;letter-spacing:-0.02em">Settings</h1><p style="margin:0;color:var(--ink-2)">Your own settings. Owners also set the defaults for the team.</p></header>
+  <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start">
+    <nav aria-label="Settings groups" style="flex:1 1 200px;max-width:260px;display:grid;gap:4px">
+      <label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);margin-bottom:8px"><i class="ph ph-magnifying-glass" aria-hidden="true" style="color:var(--ink-3)"></i><input aria-label="Search settings" value="{{ setQ }}" onChange="{{ setSetQ }}" placeholder="Search settings" style="flex:1;min-width:0;border:0;background:transparent;font-size:15px;outline:none"></label>
+      <sc-for list="{{ setGroups }}" as="g"><button onClick="{{ g.pick }}" aria-current="{{ g.on }}" style="{{ g.style }}">{{ g.label }}</button></sc-for>
+    </nav>
+    <div style="flex:3 1 340px;min-width:0;display:grid;gap:28px">
+      <sc-if value="{{ tab.appearance }}">
+        <section style="display:grid;gap:24px">
+          <h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Appearance</h2>
+          <div style="display:grid;gap:10px"><span style="font-weight:600">Theme</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ themeOpts }}" as="o"><button aria-pressed="{{ o.on }}" onClick="{{ o.pick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for></div></div>
+          <div style="display:grid;gap:10px"><span style="font-weight:600">Accent colour <span style="font-weight:400;color:var(--ink-3)">for buttons and focus</span></span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ accOpts }}" as="o"><button aria-pressed="{{ o.on }}" onClick="{{ o.pick }}" style="{{ o.style }}"><span aria-hidden="true" style="{{ o.sw }}"></span>{{ o.label }}</button></sc-for></div><p style="margin:0;font-size:14px;color:var(--ink-3)">Status colours never change: amber needs you, green is done, red is stopped.</p></div>
+          <div style="display:grid;gap:10px"><span style="font-weight:600">Density</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ densOpts }}" as="o"><button aria-pressed="{{ o.on }}" onClick="{{ o.pick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for></div></div>
+          <div style="display:grid;gap:10px"><span style="font-weight:600">Text size</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ sizeOpts }}" as="o"><button aria-pressed="{{ o.on }}" onClick="{{ o.pick }}" style="{{ o.style }}">{{ o.label }}</button></sc-for></div></div>
+          <label style="display:flex;gap:12px;align-items:center;min-height:44px;cursor:pointer"><input type="checkbox" checked="{{ motionOn }}" onChange="{{ toggleMotion }}" style="width:22px;height:22px;accent-color:var(--ink)"><span><b style="font-weight:600">Movement</b> · {{ motionLabel }}</span></label>
+          <div style="display:grid;gap:8px"><span style="font-size:14px;color:var(--ink-3)">Preview</span>
+            <div style="{{ previewVars }}"><span style="font-family:Newsreader,Georgia,serif;font-size:22px">Approve the finished site</span><span style="font-size:15px;color:var(--ink-2)">Northlight Signs · every check passed.</span><span style="display:flex;gap:8px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;min-height:40px;padding:0 14px;border-radius:10px;background:var(--acc);color:var(--acc-ink);font-weight:600">Review the site</span><span style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--need-w);color:var(--need);font-size:13px;font-weight:600;align-self:center"><i class="ph-fill ph-diamond" aria-hidden="true"></i>Needs you</span></span></div>
+          </div>
+          <sc-if value="{{ dirty }}"><div role="status" style="position:sticky;bottom:0;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:14px 16px;border-radius:14px;background:var(--ink);color:var(--inv)"><span style="flex:1 1 240px;font-size:15px">{{ dirtyText }}</span><button onClick="{{ saveDraft }}" style="min-height:44px;padding:0 16px;border-radius:10px;border:0;background:var(--inv);color:var(--ink);font-weight:600;cursor:pointer">Save</button><button onClick="{{ discardDraft }}" style="min-height:44px;padding:0 12px;border:0;background:none;color:var(--inv);text-decoration:underline;cursor:pointer">Discard</button></div></sc-if>
+        </section>
+      </sc-if>
+      <sc-if value="{{ tab.detail }}">
+        <section style="display:grid;gap:16px"><h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Detail level</h2><p style="margin:0;color:var(--ink-2)">Switch any time from the bottom of the menu, or press D.</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px">
+            <div style="padding:20px;border-radius:14px;border:1px solid var(--line-2);display:grid;gap:8px"><b style="font-weight:600;font-size:17px">Simple</b><p style="margin:0;font-size:15px;color:var(--ink-2)">Plain words. Technical details stay folded away. The default for owners.</p><p style="margin:6px 0 0;padding:10px 12px;border-radius:8px;background:var(--sunk);font-size:14px">Checking the words · Done · 1 min</p></div>
+            <div style="padding:20px;border-radius:14px;border:1px solid var(--line-2);display:grid;gap:8px"><b style="font-weight:600;font-size:17px">Detailed</b><p style="margin:0;font-size:15px;color:var(--ink-2)">Technical details open, ids and exact timings visible, with copy buttons.</p><p style="margin:6px 0 0;padding:10px 12px;border-radius:8px;background:var(--sunk);font:400 13px 'Overpass Mono',monospace">Checking the words · Done · 58.2 s · claims.unsourced-fact passed · wf-1198</p></div>
+          </div>
+        </section>
+      </sc-if>
+      <sc-if value="{{ tab.home }}">
+        <section style="display:grid;gap:16px"><h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Home</h2>
+          <span style="font-weight:600">Sections, in order</span>
+          <ol style="margin:0;padding:0;list-style:none;border-top:1px solid var(--line)"><sc-for list="{{ homeSecs }}" as="h"><li style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)"><input type="checkbox" checked aria-label="Show this section" style="width:20px;height:20px;accent-color:var(--ink)"><span style="flex:1">{{ h.label }}</span><button onClick="{{ h.up }}" aria-label="{{ h.upLabel }}" style="width:44px;height:44px;border:0;background:none;cursor:pointer"><i class="ph ph-arrow-up" aria-hidden="true"></i></button><button onClick="{{ h.down }}" aria-label="{{ h.downLabel }}" style="width:44px;height:44px;border:0;background:none;cursor:pointer"><i class="ph ph-arrow-down" aria-hidden="true"></i></button></li></sc-for></ol>
+          <label style="display:grid;gap:6px;max-width:360px"><span style="font-weight:600">Open the Cockpit on</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>Home: what needs me</option><option>Projects</option><option>Activity</option></select></label>
+          <p style="margin:0;color:var(--ink-2)">Pinned clients show first on Home and Projects. Pin one with the pin on its card.</p>
+        </section>
+      </sc-if>
+      <sc-if value="{{ tab.notify }}">
+        <section style="display:grid;gap:16px"><h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Notifications</h2>
+          <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:440px"><thead><tr><th scope="col" style="text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-3);font-weight:600">When</th><th scope="col" style="padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-3);font-weight:600">In the app</th><th scope="col" style="padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-3);font-weight:600">Email</th><th scope="col" style="padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-3);font-weight:600">Phone</th></tr></thead><tbody><sc-for list="{{ events }}" as="e"><tr><th scope="row" style="text-align:left;padding:12px 6px;border-bottom:1px solid var(--line);font-weight:400"><b style="font-weight:600">{{ e.e }}</b><br><span style="font-size:14px;color:var(--ink-2)">{{ e.d }}</span></th><sc-for list="{{ e.ch }}" as="c"><td style="text-align:center;border-bottom:1px solid var(--line)"><input type="checkbox" checked="{{ c.on }}" aria-label="{{ c.label }}" style="width:22px;height:22px;accent-color:var(--ink)"></td></sc-for></tr></sc-for></tbody></table></div>
+          <div style="display:flex;flex-wrap:wrap;gap:16px"><label style="display:grid;gap:6px"><span style="font-weight:600">Quiet hours</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>10pm to 7am</option><option>Off</option></select></label><label style="display:grid;gap:6px"><span style="font-weight:600">Digest</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>Daily at 8am</option><option>Weekly on Monday</option><option>Off</option></select></label></div>
+          <p style="margin:0;font-size:14px;color:var(--ink-2)">A stop that needs you still reaches you in quiet hours, unless you turn that off.</p>
+        </section>
+      </sc-if>
+      <sc-if value="{{ tab.views }}">
+        <section style="display:grid;gap:12px"><h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Saved views</h2>
+          <ul style="margin:0;padding:0;list-style:none;border-top:1px solid var(--line)"><li style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="flex:1 1 200px"><b style="font-weight:600">Waiting on me</b><br><span style="font-size:14px;color:var(--ink-2)">Projects · Needs someone · list · columns: client, next step, last build</span></span><button style="min-height:44px;padding:0 10px;border:0;background:none;text-decoration:underline;cursor:pointer">Rename</button><button style="min-height:44px;padding:0 10px;border:0;background:none;text-decoration:underline;cursor:pointer">Delete</button></li><li style="display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)"><span style="flex:1 1 200px"><b style="font-weight:600">Stops this week</b><br><span style="font-size:14px;color:var(--ink-2)">Activity · Stops · all clients</span></span><button style="min-height:44px;padding:0 10px;border:0;background:none;text-decoration:underline;cursor:pointer">Rename</button><button style="min-height:44px;padding:0 10px;border:0;background:none;text-decoration:underline;cursor:pointer">Delete</button></li></ul>
+        </section>
+      </sc-if>
+      <sc-if value="{{ tab.keys }}">
+        <section style="display:grid;gap:12px"><h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Keyboard</h2>
+          <dl style="margin:0;display:grid;border-top:1px solid var(--line)"><sc-for list="{{ keys }}" as="k"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)"><dt>{{ k.d }}</dt><dd style="margin:0"><kbd style="font:600 13px 'Overpass Mono',monospace;padding:4px 8px;border:1px solid var(--line-2);border-radius:6px;background:var(--sheet)">{{ k.k }}</kbd></dd></div></sc-for></dl>
+        </section>
+      </sc-if>
+      <sc-if value="{{ tab.budget }}">
+        <section style="display:grid;gap:14px"><h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Budget</h2>
+          <dl style="margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px"><div style="padding:18px;border-radius:14px;background:var(--sunk)"><dt style="font-size:14px;color:var(--ink-2)">Each build stops at</dt><dd style="margin:4px 0 0;font-family:Newsreader,Georgia,serif;font-size:34px">$2.00</dd></div><div style="padding:18px;border-radius:14px;background:var(--sunk)"><dt style="font-size:14px;color:var(--ink-2)">New builds stop each month at</dt><dd style="margin:4px 0 0;font-family:Newsreader,Georgia,serif;font-size:34px">$20</dd></div></dl>
+          <p style="margin:0;color:var(--ink-2)">Changing money is an owner decision. Anyone can ask; the owner sees the request on Home.</p>
+          <button style="justify-self:start;min-height:46px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:10px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">Request a change</button>
+        </section>
+      </sc-if>
+      <sc-if value="{{ tab.region }}">
+        <section style="display:grid;gap:14px"><h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Language and region</h2>
+          <div style="display:flex;flex-wrap:wrap;gap:16px"><label style="display:grid;gap:6px"><span style="font-weight:600">Dates</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>14 Oct 2026</option><option>Oct 14, 2026</option><option>2026-10-14</option></select></label><label style="display:grid;gap:6px"><span style="font-weight:600">Times</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>10:41</option><option>10:41 am</option></select></label><label style="display:grid;gap:6px"><span style="font-weight:600">Currency</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>US dollars ($0.68)</option><option>Pounds (£0.54)</option><option>Euros (€0.63)</option></select></label></div>
+          <p style="margin:0;color:var(--ink-2)">Preview: “This build cost $0.68 · 14 Oct 2026, 10:41”.</p>
+        </section>
+      </sc-if>
+      <sc-if value="{{ tab.defaults }}">
+        <section style="display:grid;gap:12px"><h2 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px">Team defaults</h2><p style="margin:0;color:var(--ink-2)">What a new person starts with. Each person can change their own.</p>
+          <dl style="margin:0;display:grid;border-top:1px solid var(--line)"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:14px 0;border-bottom:1px solid var(--line)"><dt style="font-weight:600">Owners</dt><dd style="margin:0;color:var(--ink-2)">Simple · Home · in app and phone</dd></div><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:14px 0;border-bottom:1px solid var(--line)"><dt style="font-weight:600">Admins</dt><dd style="margin:0;color:var(--ink-2)">Detailed · Projects · in app and email</dd></div><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:14px 0;border-bottom:1px solid var(--line)"><dt style="font-weight:600">Project managers</dt><dd style="margin:0;color:var(--ink-2)">Simple · Projects · daily digest</dd></div></dl>
+        </section>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.notifications }}">
+<div style="display:grid;gap:24px;max-width:860px">
+  <header style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px"><h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4cqi,52px);line-height:1.05;letter-spacing:-0.02em">Notifications</h1>
+    <div role="tablist" aria-label="Notifications" style="display:flex;padding:3px;border-radius:10px;background:var(--sunk);border:1px solid var(--line)"><button role="tab" aria-selected="{{ notifInbox }}" onClick="{{ toInbox }}" style="{{ inboxBtn }}">Inbox</button><button role="tab" aria-selected="{{ notifPrefs }}" onClick="{{ toPrefs }}" style="{{ prefsBtn }}">Preferences</button></div>
+  </header>
+  <sc-if value="{{ notifInbox }}">
+    <div style="display:flex;justify-content:flex-end;margin-top:-12px"><button onClick="{{ markAll }}" style="min-height:44px;padding:0;border:0;background:none;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Mark all as read</button></div>
+    <ul style="list-style:none;margin:0;padding:0"><sc-for list="{{ inbox }}" as="n"><li style="border-top:1px solid var(--line)"><button onClick="{{ n.go }}" style="display:flex;gap:14px;width:100%;padding:16px 0;border:0;background:none;text-align:left;cursor:pointer" style-hover="background:var(--sunk)"><span aria-hidden="true" style="{{ n.dot }}"></span><span style="flex:1;display:grid;gap:4px"><span style="display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center"><span style="{{ n.chip.style }}"><i class="{{ n.chip.icon }}" aria-hidden="true"></i>{{ n.chip.word }}</span><span style="font-size:13px;color:var(--ink-3)">{{ n.w }}</span></span><b style="font-weight:600;font-size:17px">{{ n.t }}</b><span style="font-size:15px;color:var(--ink-2)">{{ n.d }}</span></span></button></li></sc-for></ul>
+  </sc-if>
+  <sc-if value="{{ notifPrefs }}">
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:440px"><thead><tr><th scope="col" style="text-align:left;padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-3);font-weight:600">When</th><th scope="col" style="padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-3);font-weight:600">In the app</th><th scope="col" style="padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-3);font-weight:600">Email</th><th scope="col" style="padding:10px 6px;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink-3);font-weight:600">Phone</th></tr></thead><tbody><sc-for list="{{ events }}" as="e"><tr><th scope="row" style="text-align:left;padding:12px 6px;border-bottom:1px solid var(--line);font-weight:400"><b style="font-weight:600">{{ e.e }}</b><br><span style="font-size:14px;color:var(--ink-2)">{{ e.d }}</span></th><sc-for list="{{ e.ch }}" as="c"><td style="text-align:center;border-bottom:1px solid var(--line)"><input type="checkbox" checked="{{ c.on }}" aria-label="{{ c.label }}" style="width:22px;height:22px;accent-color:var(--ink)"></td></sc-for></tr></sc-for></tbody></table></div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px"><label style="display:grid;gap:6px"><span style="font-weight:600">Quiet hours</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>10pm to 7am</option><option>Off</option></select></label><label style="display:grid;gap:6px"><span style="font-weight:600">Digest</span><select style="min-height:48px;padding:0 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--sheet);font-size:16px"><option>Daily at 8am</option><option>Weekly on Monday</option><option>Off</option></select></label></div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.more }}">
+<div style="display:grid;gap:20px"><h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4cqi,52px);line-height:1.05">More</h1>
+  <ul style="list-style:none;margin:0;padding:0"><sc-for list="{{ moreLinks }}" as="m"><li style="border-top:1px solid var(--line)"><button onClick="{{ m.g }}" style="display:flex;align-items:center;gap:14px;width:100%;min-height:56px;border:0;background:none;cursor:pointer;font-size:17px;text-align:left"><i class="{{ m.i }}" aria-hidden="true" style="font-size:22px"></i><span style="flex:1">{{ m.l }}</span><i class="ph ph-caret-right" aria-hidden="true"></i></button></li></sc-for></ul>
+  <div role="radiogroup" aria-label="Detail level" style="display:grid;grid-template-columns:1fr 1fr;padding:3px;border-radius:10px;background:var(--sunk);border:1px solid var(--line)"><button role="radio" aria-checked="{{ detailSimple }}" onClick="{{ setSimple }}" style="{{ segSimple }}">Simple</button><button role="radio" aria-checked="{{ detailDetailed }}" onClick="{{ setDetailed }}" style="{{ segDetailed }}">Detailed</button></div>
+  <p style="margin:12px 0 0;font-family:'Overpass Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">Coming later</p>
+  <ul style="list-style:none;margin:0;padding:0"><sc-for list="{{ soon }}" as="s"><li style="border-top:1px solid var(--line)"><button onClick="{{ s.go }}" style="display:flex;align-items:center;gap:14px;width:100%;min-height:52px;border:0;background:none;cursor:pointer;font-size:16px;color:var(--ink-2);text-align:left"><i class="{{ s.icon }}" aria-hidden="true" style="font-size:20px"></i>{{ s.label }}</button></li></sc-for></ul>
+</div>
+</sc-if>
+
+<sc-if value="{{ is.soon }}">
+<div style="display:grid;gap:16px;max-width:640px;padding-top:20px">
+  <p style="margin:0;font-family:'Overpass Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">Coming later</p>
+  <h1 style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:400;font-size:clamp(34px,4cqi,52px);line-height:1.05">{{ soonName }}</h1>
+  <p style="margin:0;font-size:18px;color:var(--ink-2)">{{ soonWhat }}</p>
+  <p style="margin:0;padding:16px;border-radius:12px;border:1px dashed var(--line-2)">This room is not built yet, so it shows nothing rather than made-up numbers.</p>
+</div>
+</sc-if>
+
+</div>
+</div>
+</main>
+
+<sc-if value="{{ phone }}">
+<nav aria-label="Phone navigation" style="position:sticky;bottom:0;z-index:6;display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px 10px;background:var(--paper);border-top:1px solid var(--line)">
+  <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+    <button onClick="{{ t.go }}" aria-current="{{ t.current }}" style="{{ t.style }}"><span style="position:relative;display:grid;place-items:center"><i class="{{ t.icon }}" aria-hidden="true" style="{{ t.iconStyle }}"></i><sc-if value="{{ t.count }}"><span style="position:absolute;top:-6px;left:14px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--need-w);color:var(--need);font:600 11px/18px 'Overpass Mono',monospace">{{ t.count }}</span></sc-if></span>{{ t.label }}</button>
+  </sc-for>
+</nav>
+</sc-if>
+</div>
+</div>
+
+<sc-if value="{{ palette }}">
+<div style="position:fixed;inset:0;z-index:30;background:rgba(20,19,17,.38);display:flex;justify-content:center;align-items:flex-start;padding:min(12vh,96px) 12px 12px" onClick="{{ closePalette }}">
+  <div role="dialog" aria-modal="true" aria-label="Search or run a command" onClick="{{ stopProp }}" style="width:min(640px,100%);max-height:72vh;display:flex;flex-direction:column;background:var(--sheet);border:1px solid var(--line-2);border-radius:18px;box-shadow:0 24px 60px -12px rgba(0,0,0,.35);overflow:hidden;animation:wfin .18s ease both">
+    <form onSubmit="{{ palRunFirst }}" style="display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--line)"><i class="ph ph-magnifying-glass" aria-hidden="true" style="font-size:20px;color:var(--ink-3)"></i><input autofocus aria-label="Search clients, builds, actions and settings" value="{{ pq }}" onChange="{{ setPq }}" placeholder="Search clients, builds, actions, settings" style="flex:1;min-width:0;min-height:60px;border:0;background:transparent;font-size:18px;outline:none"><kbd style="font:500 12px 'Overpass Mono',monospace;padding:4px 6px;border:1px solid var(--line-2);border-radius:5px;color:var(--ink-3)">Esc</kbd></form>
+    <div role="listbox" style="overflow:auto;padding:8px">
+      <sc-if value="{{ palEmpty }}"><p style="margin:0;padding:20px 12px;color:var(--ink-2)">Nothing matches “{{ pq }}”.</p></sc-if>
+      <sc-for list="{{ palGroups }}" as="g"><div style="display:grid;gap:2px;padding:6px 0"><p style="margin:0;padding:6px 10px;font-family:'Overpass Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)">{{ g.g }}</p><sc-for list="{{ g.items }}" as="x"><button role="option" onClick="{{ x.run }}" style="display:flex;align-items:center;gap:12px;min-height:48px;padding:0 10px;border:0;border-radius:10px;background:none;cursor:pointer;text-align:left" style-hover="background:var(--sunk)"><i class="{{ x.icon }}" aria-hidden="true" style="font-size:19px;color:var(--ink-2)"></i><span style="flex:1;min-width:0;font-weight:600">{{ x.t }}</span><span style="font-size:13px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:45%">{{ x.d }}</span></button></sc-for></div></sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px 16px;padding:10px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)"><span>↑ ↓ to move</span><span>Enter to open</span><span>? for all shortcuts</span></div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ confirm }}">
+<div style="position:fixed;inset:0;z-index:40;background:rgba(20,19,17,.42);display:flex;align-items:center;justify-content:center;padding:16px">
+  <div role="alertdialog" aria-modal="true" aria-labelledby="cf-h" aria-describedby="cf-b" style="width:min(480px,100%);display:grid;gap:14px;padding:26px;background:var(--sheet);border-radius:18px;box-shadow:0 24px 60px -12px rgba(0,0,0,.35);animation:wfin .18s ease both">
+    <h2 id="cf-h" style="margin:0;font-family:Newsreader,Georgia,serif;font-weight:500;font-size:26px;line-height:1.2">{{ cf.title }}</h2>
+    <p id="cf-b" style="margin:0;color:var(--ink-2)">{{ cf.body }}</p>
+    <div style="display:flex;flex-wrap:wrap-reverse;gap:10px;justify-content:flex-end;margin-top:6px"><button onClick="{{ cfNo }}" style="min-height:48px;padding:10px 18px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--line-2);background:var(--sheet);font-weight:600;cursor:pointer">Not now</button><button autofocus onClick="{{ cfYes }}" style="min-height:48px;padding:10px 20px;line-height:1.25;text-align:center;border-radius:12px;border:1px solid var(--acc);background:var(--acc);color:var(--acc-ink);font-weight:600;cursor:pointer">{{ cf.cta }}</button></div>
+  </div>
+</div>
+</sc-if>
+
+<div aria-live="polite" style="position:fixed;z-index:50;left:50%;transform:translateX(-50%);bottom:84px;width:min(520px,calc(100% - 24px));pointer-events:none">
+  <sc-if value="{{ toast }}"><div role="status" style="pointer-events:auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:14px 16px;border-radius:14px;background:var(--ink);color:var(--inv);box-shadow:0 16px 40px -12px rgba(0,0,0,.4);animation:wfin .25s ease both"><span style="flex:1 1 220px;font-size:15px">{{ toastMsg }}</span><sc-if value="{{ toastAct }}"><button onClick="{{ toastDo }}" style="min-height:40px;padding:0 12px;border-radius:8px;border:1px solid var(--inv);background:transparent;color:var(--inv);font-weight:600;cursor:pointer">{{ toastActLabel }}</button></sc-if><button onClick="{{ toastClose }}" aria-label="Dismiss" style="width:40px;height:40px;border:0;background:none;color:var(--inv);cursor:pointer"><i class="ph ph-x" aria-hidden="true"></i></button></div></sc-if>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;projects&quot;,&quot;new&quot;,&quot;project&quot;,&quot;proposal&quot;,&quot;build&quot;,&quot;stopped&quot;,&quot;needs&quot;,&quot;review&quot;,&quot;activity&quot;,&quot;costs&quot;,&quot;team&quot;,&quot;settings&quot;,&quot;notifications&quot;,&quot;palette&quot;,&quot;more&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;device&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;desktop&quot;,&quot;phone&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;role&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;owner&quot;,&quot;tech&quot;,&quot;pm&quot;],&quot;default&quot;:&quot;owner&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;detail&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;simple&quot;,&quot;detailed&quot;],&quot;default&quot;:&quot;simple&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ink&quot;,&quot;harbour&quot;,&quot;clay&quot;,&quot;moss&quot;],&quot;default&quot;:&quot;ink&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;flow&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;request&quot;,&quot;proposal&quot;,&quot;needs&quot;,&quot;building&quot;,&quot;stopped&quot;,&quot;ready&quot;,&quot;approved&quot;,&quot;live&quot;],&quot;default&quot;:&quot;request&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;variant&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;stopCase&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;min&quot;:0,&quot;max&quot;:7,&quot;tsType&quot;:&quot;number&quot;},&quot;buildAt&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;number&quot;},&quot;fixed&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;},&quot;why&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;},&quot;setTab&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;string&quot;},&quot;interactive&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const K = 20;
+const fmt = s => { s = Math.round(s); if (s < 60) return `${s} s`; const m = Math.floor(s / 60), r = s % 60; return m >= 10 || !r ? `${m} min` : `${m} min ${r} s`; };
+const usd = v => `$${v.toFixed(2)}`;
+const TONES = {
+  need: { fg: 'var(--need)', bg: 'var(--need-w)', icon: 'ph-fill ph-diamond', word: 'Needs you' },
+  done: { fg: 'var(--done)', bg: 'var(--done-w)', icon: 'ph-fill ph-check-circle', word: 'Done' },
+  stop: { fg: 'var(--stop)', bg: 'var(--stop-w)', icon: 'ph-fill ph-stop-circle', word: 'Stopped' },
+  run: { fg: 'var(--ink)', bg: 'var(--sunk)', icon: 'ph-bold ph-circle-notch', word: 'Running' },
+  wait: { fg: 'var(--ink-2)', bg: 'transparent', icon: 'ph ph-circle', word: 'Waiting' },
+  skip: { fg: 'var(--ink-2)', bg: 'transparent', icon: 'ph ph-minus-circle', word: 'Skipped' },
+  idle: { fg: 'var(--ink-2)', bg: 'var(--sunk)', icon: 'ph ph-circle-dashed', word: 'No build yet' },
+};
+const STEP_NAMES = ['Request', 'Proposal', 'Details needed', 'Building', 'Ready for approval', 'Live'];
+const DARK = { '--paper': '#121211', '--sheet': '#1B1B19', '--sunk': '#232220', '--line': '#2F2E2B', '--line-2': '#4A4843', '--ink': '#EEECE6', '--ink-2': '#C4C0B7', '--ink-3': '#A09B91', '--inv': '#121211', '--need': '#F2B865', '--need-dot': '#F2B865', '--need-w': '#3A2B14', '--done': '#82CC9C', '--done-w': '#17301F', '--stop': '#F59380', '--stop-w': '#3D1C15', '--acc': '#EEECE6', '--acc-ink': '#121211', '--focus': '#EEECE6' };
+const ACCENTS = { ink: null, harbour: ['#1F5D66', '#86C7CF'], clay: ['#8C4A2C', '#E6A584'], moss: ['#3E5A2C', '#AFCB93'] };
+const BSTEPS = [
+  { t: 'Getting ready', d: 'Checking the logo, the pictures and that the AI services answer, before any money is spent.', usual: 'Usually under a minute', dur: 3, cost: 0 },
+  { t: "Writing the site's words and structure", d: "From the client's own request and the approved proposal.", usual: 'Usually about 2 min', dur: 6, cost: 0.18 },
+  { t: 'Checking the words', d: 'Every requested service, step and button is there. Nothing is invented. No page is thin.', usual: 'Usually under a minute', dur: 3, cost: 0.03 },
+  { t: 'An independent reviewer reads the content', d: 'A different AI from the one that wrote it.', usual: 'Usually about 1 min', dur: 4, cost: 0.06 },
+  { t: 'Building the site', d: 'Turning the approved words into real pages.', usual: 'Usually 3 to 4 min', dur: 7, cost: 0.22 },
+  { t: 'Automatic checks in a real browser', d: 'Nine checks on every page, at every screen size.', usual: 'Usually about 2 min', dur: 5, cost: 0.02 },
+  { t: 'Design review of the screenshots', d: 'Looks at every page the way a designer would.', usual: 'Usually about 1 min', dur: 3, cost: 0.05 },
+  { t: 'Final independent review', d: 'One last read of the whole site before it reaches you.', usual: 'Usually about 1 min', dur: 3, cost: 0.04 },
+  { t: 'Rounds of fixes', d: 'Only when a check fails: the factory fixes that one thing and checks again. At most 3 rounds.', usual: 'Each round about 2 min', dur: 6, cost: 0.08 },
+  { t: 'Ready for your approval', d: 'Every check passed. The decision is yours.', usual: '', dur: 0, cost: 0 },
+];
+const STARTS = []; { let a = 0; BSTEPS.forEach((b, i) => { STARTS[i] = a; a += b.dur; }); }
+const END = i => STARTS[i] + BSTEPS[i].dur;
+const CHECKS = ['Loads on every page', 'Links work', 'Accessible', 'Fast on phones', 'Holds at every size', 'The logo shows', 'Main button always reachable on phones', 'Brand colours used correctly', 'Motion on every section'];
+const STOPS = [
+  { t: 'The site needs details nobody gave us', money: 'No money was spent', spent: false, tried: 'Before paying for anything, it checked everything the site needs. Three details are missing, so it did not start.', fix: 'Save the details and continue', others: ['Build without them', 'Open the details list'], evidence: 'Missing: the business phone number, the opening hours, and 2 real customer quotes for the Home page.', crop: 'Details list: 3 empty items', log: 'status=needs_input stage=preflight needs=[phone,hours,quotes]' },
+  { t: 'The checks found a phone number on the site that nobody gave us', money: 'Yes, $0.21 so far', spent: true, tried: 'It wrote the site, then checked every fact against the request, the proposal and your details. The phone number on the Contact page has no source, so it stopped instead of guessing.', fix: 'Fix it and continue', others: ['See where it appeared', 'Write the site again from the proposal'], evidence: 'Contact page, footer: “Call us on (555) 014-2290”. This number is not in the request, the proposal or the details you gave.', crop: 'Screenshot crop: Contact page footer', log: '[claims.unsourced-fact] phone "(555) 014-2290" not in brief · page=/contact', input: true },
+  { t: 'The reviewer did not answer', money: 'No money was spent', spent: false, tried: 'It asked again 3 times over 4 minutes, as it always does, before stopping. The site is saved and unchanged.', fix: 'Check again without changes', others: ['Tell me when the reviewer is back'], evidence: 'The independent reviewer took longer than 2 minutes to reply, three times in a row. Nothing is wrong with the site.', crop: 'No screenshot: nothing on the site failed', log: 'qa-evaluator: no response after 4 attempts (120s timeout)' },
+  { t: 'An AI service is out of credit or not set up', money: 'No money was spent', spent: false, tried: 'Before starting, it checked every service it uses. The site builder said the account has no credit left.', fix: 'Try again once it is set up', others: ['Copy a note for Huraira'], who: 'Huraira adds credit to the site builder account. It takes him a few minutes.', evidence: 'The site builder refused the job: the account has no AI credit left.', crop: 'No screenshot: the build never started', log: 'provider.builder HTTP 402 insufficient_quota' },
+  { t: 'The checks still failed after the last round of fixes', money: 'Yes, $1.12', spent: true, tried: 'It ran 3 rounds of fixes. Each round fixed something, but two checks still fail, so it handed over to a person, by design.', fix: 'Fix it and continue', others: ['Check again without changes', 'Ask for changes in your own words'], failed: ['The Home page is slow to show on phones: 4.1 s, it should be under 2.5 s', 'A heading is out of order on the Services page'], evidence: 'Home on a mid-range phone: the large photo at the top takes 4.1 s to appear. Services: a small heading comes before the page heading.', crop: 'Screenshot crop: Home on a phone, top of page', log: 'failed_verification cycle=3/3 [render.perf] LCP 4.1s · [a11y.heading-order] /services' },
+  { t: 'The build used up its spending limit and stopped on purpose', money: 'Yes, $2.00, the full limit for one build', spent: true, tried: 'It stopped the moment the next step would have gone over $2.00. The site it had built is saved and safe.', fix: 'Ask Nick to raise the limit for this build', others: ['Stop here and keep the saved site'], owner: 'Raise the limit for this build to $3.00', evidence: 'Spent $2.00 of $2.00. The next step, the design review, usually costs about $0.05. Rounds of fixes used most of the money.', crop: 'Spend so far: $2.00 of $2.00', log: 'spend:$2.00 ceiling of $2.00 reached before render.design-review' },
+  { t: 'It stopped before saving anything', money: 'No money was spent', spent: false, tried: 'The connection dropped while writing the first page. Nothing was saved, so there is nothing to continue from.', fix: 'Write the site again from the proposal', others: ['Wait and try later'], evidence: 'The worker lost its connection 40 seconds in, before the first page was saved.', crop: 'No screenshot: nothing was built', log: 'runner crashed before recording a result; saved=none' },
+  { t: 'It stopped part-way. The saved site is safe', money: 'Partly: $0.46 for the parts that finished', spent: true, tried: 'It saved the built site after the browser checks, then the worker stopped before the design review.', fix: 'Continue from where it stopped', others: ['Write the site again from the proposal'], evidence: 'Saved after step 6 of 10. The design review and final review have not run yet.', crop: 'Saved site: all 5 pages', log: 'crashed saved=built cycle=0 stoppedIn=qa' },
+];
+const CLIENTS = [
+  { id: 'northlight', name: 'Northlight Signs', kind: 'Fast local site', step: 4, tone: 'need', next: 'Approve the finished site', who: 'Nick', last: 'done', lastWord: 'Passed every check', tech: 'plan p-41c2 · job j-9a01 · run 1191' },
+  { id: 'lantern', name: 'Lanternworks Studio', kind: 'Showcase site with motion', step: 1, tone: 'need', next: 'Approve the proposal', who: 'Nick', last: 'idle', lastWord: 'No build yet', tech: 'plan p-77e0 · rev 1' },
+  { id: 'harbor', name: 'Harbor Street Bakery', kind: 'Fast local site', step: 2, tone: 'need', next: 'Add the logo and 1 picture', who: 'You', last: 'idle', lastWord: 'No build yet', tech: 'plan p-1b9d · rev 1' },
+  { id: 'summit', name: 'Summit Line Roofing', kind: 'Fast local site', step: 3, tone: 'run', next: 'Round 2 of 3 of fixes', who: 'The factory', last: 'run', lastWord: 'Running', tech: 'job j-a3f7 · run 1194' },
+  { id: 'dreamsign', name: 'DreamSign pilot', kind: 'Showcase site with motion', step: 3, tone: 'stop', next: 'Fix the stopped build', who: 'Huraira', last: 'stop', lastWord: 'Stopped', tech: 'job j-58c0 · run 1187 · failed_verification' },
+];
+
+class Component extends DCLogic {
+  rootRef = React.createRef();
+  constructor(props) {
+    super(props);
+    const p = props;
+    const flow = p.flow ?? 'needs';
+    this.state = {
+      screen: p.screen === 'palette' ? 'home' : (p.screen ?? 'home'), narrow: false,
+      detail: p.detail ?? 'simple', theme: p.theme ?? 'light', accent: p.accent ?? 'ink', density: 'comfortable', textSize: 100, reduceMotion: false,
+      projView: p.variant === 'list' ? 'list' : 'grid', query: p.variant === 'none' ? 'Bennett' : '', filter: 'all', pinned: { northlight: true },
+      palette: p.screen === 'palette', pq: '', toast: null, confirm: null,
+      flow, kind: 'fast', askChanges: p.variant === 'changes', changeNote: '', sending: p.variant === 'sending',
+      reqText: "Hi, we're a small bakery on Harbor Street. People keep asking if we do custom cakes and what time we open on Sundays. We need a website that shows the cakes, lets people ask for a cake for pickup, and tells them where to park. Our sourdough is what we're known for.\n\nThanks, Dana",
+      reqName: 'Harbor Street Bakery', reqUrl: '', reqLogo: false,
+      sup: p.flow && p.flow !== 'request' && p.flow !== 'proposal' && p.flow !== 'needs' ? { logo: 'f', shop: 'f', phone: 'v', hours: 'v', counter: 'f', quotes: 's', q1: 's' } : { phone: 'v', hours: 'v' },
+      answering: null, answerText: '',
+      run: p.buildAt != null ? { t: p.buildAt, phase: p.flow === 'stopped' ? 'stopped' : 'running', fixed: !!p.fixed } : (flow === 'stopped' ? { t: END(2), phase: 'stopped', fixed: false } : flow === 'ready' || flow === 'approved' || flow === 'live' ? { t: END(8), phase: 'done', fixed: true } : { t: 0, phase: 'idle', fixed: false }),
+      stopCase: p.stopCase ?? 1, why: !!p.why, phoneFix: '', phoneMode: 'add',
+      page: 0, reviewNote: '', reviewAsk: false, phOk: false, phAdded: false,
+      setTab: p.setTab ?? 'appearance', setQ: '', draft: null,
+      notifTab: p.variant === 'prefs' ? 'prefs' : 'inbox', readAll: false,
+      actClient: 'all', actType: 'all',
+      homeOrder: ['needs', 'overview', 'clients'],
+    };
+  }
+  componentDidMount() {
+    const el = this.rootRef.current;
+    if (el && window.ResizeObserver) { this.ro = new ResizeObserver(e => { const w = e[0].contentRect.width; const n = w < 720; if (n !== this.state.narrow) this.setState({ narrow: n }); }); this.ro.observe(el); }
+    if (this.props.interactive === false) return;
+    this.onKey = e => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); this.setState(s => ({ palette: !s.palette, pq: '' })); }
+      if (e.key === 'Escape') this.setState({ palette: false, confirm: null });
+    };
+    document.addEventListener('keydown', this.onKey);
+    this.timer = setInterval(() => this.tick(), 1000);
+  }
+  componentWillUnmount() { this.ro?.disconnect(); clearInterval(this.timer); clearTimeout(this.tt); document.removeEventListener('keydown', this.onKey); }
+  tick() {
+    const r = this.state.run;
+    if (r.phase !== 'running') return;
+    const t = r.t + 1;
+    if (!r.fixed && t >= END(2)) { this.setState({ run: { ...r, t: END(2), phase: 'stopped' }, flow: 'stopped' }); this.toast('The build stopped: the checks found a phone number nobody gave us. No more money will be spent until you decide.', 'See the fix', () => this.go('stopped')); return; }
+    if (t >= END(8)) { this.setState({ run: { ...r, t: END(8), phase: 'done' }, flow: 'ready' }); this.toast('Harbor Street Bakery is ready for your approval.', 'Review the site', () => this.go('review')); return; }
+    this.setState({ run: { ...r, t } });
+  }
+  toast(msg, act, fn) { clearTimeout(this.tt); this.setState({ toast: { msg, act, fn } }); this.tt = setTimeout(() => this.setState({ toast: null }), 9000); }
+  go(screen, extra = {}) { this.setState({ screen, palette: false, toast: null, ...extra }); try { window.scrollTo(0, 0); } catch (e) {} }
+  ask(title, body, cta, fn) { clearTimeout(this.tt); this.setState({ confirm: { title, body, cta, fn }, toast: null }); }
+  phone() { const d = this.props.device; return d === 'phone' || (d !== 'desktop' && this.state.narrow); }
+  chip(t, word) { const T = TONES[t]; const outline = t === 'wait' || t === 'skip'; return { style: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 10px 5px 8px', borderRadius: 999, background: T.bg, color: T.fg, fontSize: 13, fontWeight: 600, lineHeight: 1, whiteSpace: 'nowrap', border: outline ? '1px solid var(--line-2)' : '1px solid transparent' }, icon: T.icon, word: word || T.word, is: t === 'run' && !this.state.reduceMotion ? { display: 'inline-block', animation: 'wfspin 1.1s linear infinite' } : {} }; }
+  segs(step, tone, h = 6) { return STEP_NAMES.map((_, i) => ({ flex: 1, height: h, borderRadius: 3, background: i < step ? 'var(--ink)' : i === step ? (tone === 'need' ? 'var(--need-dot)' : tone === 'stop' ? 'var(--stop)' : tone === 'done' ? 'var(--done)' : 'var(--ink-2)') : 'var(--line)', backgroundImage: i === step && tone === 'run' ? 'repeating-linear-gradient(135deg,var(--ink-2) 0 4px,var(--line-2) 4px 8px)' : 'none' })); }
+  harborStep() { return { request: 0, proposal: 1, needs: 2, building: 3, stopped: 3, ready: 4, approved: 4, live: 5 }[this.state.flow]; }
+  supplied() { const s = this.state.sup; const keys = ['logo', 'shop', 'counter', 'phone', 'hours', 'quotes', 'q1']; return { done: keys.filter(k => s[k] === 'f' || s[k] === 'v').length, skipped: keys.filter(k => s[k] === 's').length, total: keys.length }; }
+
+  buildRows() {
+    const r = this.state.run, rows = [];
+    for (let i = 0; i < BSTEPS.length; i++) {
+      const b = BSTEPS[i]; let st = 'wait', sentence = b.d, time = b.usual;
+      if (r.phase === 'stopped') { st = i < 2 ? 'done' : i === 2 ? 'stop' : 'wait'; }
+      else if (r.phase === 'idle') st = 'wait';
+      else if (i === 9) st = r.phase === 'done' ? 'done' : 'wait';
+      else if (r.t >= END(i)) st = 'done'; else if (r.t >= STARTS[i]) st = 'run';
+      if (i === 8 && !r.fixed && r.phase !== 'stopped') st = 'wait';
+      if (st === 'done' && i < 9) time = fmt(b.dur * K);
+      if (st === 'run') time = `${fmt((r.t - STARTS[i]) * K)} so far`;
+      if (i === 2 && st === 'stop') { sentence = 'Found a phone number on the Contact page that nobody gave us. It stopped instead of guessing.'; time = fmt(b.dur * K); }
+      if (i === 2 && st === 'done' && r.fixed) sentence = 'Passed. The phone number now comes from the details you gave.';
+      if (i === 5 && st === 'done') sentence = '8 of 9 passed. The main button was hidden behind the cookie notice on phones, so it went to a round of fixes.';
+      if (i === 8 && st === 'run') sentence = 'Round 1 of 3: making the main button reachable on phones.';
+      if (i === 8 && st === 'done') sentence = 'Round 1 of 3: moved the cookie notice so the main button is always reachable. Checked again: passed.';
+      if (i === 9 && st === 'stop') sentence = '';
+      const word = { done: 'Done', run: 'Running', wait: 'Waiting', stop: 'Stopped' }[st];
+      const chk = i === 5 && (st === 'run' || st === 'done') ? CHECKS.map((c, j) => { const frac = st === 'done' ? 1 : (r.t - STARTS[5]) / b.dur; const fixedNow = r.t >= END(8) - 1; const s2 = j === 6 && st === 'done' ? (fixedNow ? 'done' : 'need') : (j < Math.floor(frac * 9) ? 'done' : (st === 'run' ? 'wait' : 'done')); return { label: c, chip: this.chip(s2, s2 === 'need' ? 'Sent to fixes' : s2 === 'done' ? 'Passed' : 'Waiting') }; }) : [];
+      rows.push({ n: String(i + 1).padStart(2, '0'), t: b.t, sentence, time, chip: this.chip(st, word), hasChecks: chk.length > 0, checks: chk, current: st === 'run' || st === 'stop', rowStyle: { display: 'grid', gridTemplateColumns: '28px minmax(0,1fr)', gap: '4px 14px', padding: '18px 16px', borderRadius: 14, background: st === 'run' ? 'var(--sheet)' : st === 'stop' ? 'var(--stop-w)' : 'transparent', border: st === 'run' ? '1px solid var(--line-2)' : '1px solid transparent', opacity: st === 'wait' ? 0.82 : 1 } });
+    }
+    return rows;
+  }
+
+  renderVals() {
+    const s = this.state, P = this.phone(), detailed = s.detail === 'detailed';
+    const role = this.props.role ?? 'owner';
+    const me = { owner: { name: 'Nick', role: 'Owner', initial: 'N' }, tech: { name: 'Huraira', role: 'Technical owner', initial: 'H' }, pm: { name: 'Sana Malik', role: 'Project manager', initial: 'S' } }[role];
+    const canDecide = role === 'owner'; const canRun = role !== 'pm';
+    const go = {}; ['home', 'projects', 'new', 'project', 'proposal', 'build', 'stopped', 'needs', 'review', 'activity', 'costs', 'team', 'settings', 'notifications', 'more'].forEach(k => go[k] = () => this.go(k));
+    go.settingsHome = () => this.go('settings', { setTab: 'home' });
+    go.buildSummit = () => this.go('build');
+    const accent = ACCENTS[s.accent]; const dark = s.theme === 'dark';
+    const themeVars = { ...(dark ? DARK : {}), ...(accent ? { '--acc': accent[dark ? 1 : 0], '--acc-ink': dark ? '#121211' : '#FBFAF7' } : {}), '--row': s.density === 'compact' ? '11px' : '20px', ...(this.props.interactive === false ? { transform: 'translateZ(0)', position: 'relative' } : {}) };
+    const scr = s.screen;
+    const is = {}; ['home', 'projects', 'new', 'project', 'proposal', 'build', 'stopped', 'needs', 'review', 'activity', 'costs', 'team', 'settings', 'notifications', 'more', 'soon'].forEach(k => is[k] = scr === k);
+
+    const hs = this.harborStep(); const sup = this.supplied();
+    const clientsRaw = CLIENTS.map(c => c.id !== 'harbor' ? c : { ...c, step: hs, tone: ({ 0: 'need', 1: 'need', 2: 'need', 3: s.flow === 'stopped' ? 'stop' : 'run', 4: s.flow === 'approved' ? 'done' : 'need', 5: 'done' })[hs], next: ({ request: 'Send the request', proposal: 'Approve the proposal', needs: 'Add the logo and 2 pictures', building: 'Building now', stopped: 'Fix the stopped build', ready: 'Approve the finished site', approved: 'Waiting for launch, done outside', live: 'Live' })[s.flow], who: ({ building: 'The factory', approved: 'A person launching it', live: 'Nobody' })[s.flow] || 'You', last: s.flow === 'stopped' ? 'stop' : s.flow === 'building' ? 'run' : hs >= 4 ? 'done' : 'idle', lastWord: s.flow === 'stopped' ? 'Stopped' : s.flow === 'building' ? 'Running' : hs >= 4 ? 'Passed every check' : 'No build yet' });
+    const cl = clientsRaw.map(c => ({ ...c, stepNum: Math.min(c.step + 1, 6), where: c.tone === 'stop' ? 'Building, stopped' : STEP_NAMES[c.step], segs: this.segs(c.step, c.tone), chip: this.chip(c.tone, c.tone === 'need' ? `Waiting on ${c.who === 'You' ? me.name : c.who}` : c.tone === 'run' ? 'Running' : c.tone === 'stop' ? 'Stopped' : 'Done'), lastChip: this.chip(c.last, c.lastWord), open: () => c.id === 'harbor' ? this.go('project') : c.id === 'summit' ? this.go('build') : c.id === 'dreamsign' ? this.go('stopped', { stopCase: 4 }) : c.id === 'northlight' ? this.go('review') : this.go('proposal'), pinned: !!s.pinned[c.id], pinIcon: s.pinned[c.id] ? 'ph-fill ph-push-pin' : 'ph ph-push-pin', pinLabel: `${s.pinned[c.id] ? 'Unpin' : 'Pin'} ${c.name}`, pin: () => this.setState(st => ({ pinned: { ...st.pinned, [c.id]: !st.pinned[c.id] } })) }));
+
+    const needsAll = [
+      { k: 'stop', client: 'DreamSign pilot', tone: 'stop', word: 'Stopped', title: 'A build stopped: the checks still failed after 3 rounds of fixes', why: 'Two checks still fail: the Home page is slow on phones and a heading is out of order. $1.12 was spent.', cta: 'See the fix', go: () => this.go('stopped', { stopCase: 4 }), techOnly: true },
+      { k: 'northlight', client: 'Northlight Signs', tone: 'need', word: 'Your approval', title: 'Approve the finished site', why: 'Every check passed. 1 placeholder picture is still on the site.', cta: 'Review the site', go: go.review, owner: true },
+      { k: 'lantern', client: 'Lanternworks Studio', tone: 'need', word: 'Your approval', title: 'Approve the proposal', why: 'Recommended: Showcase site with motion. 2 questions are still open.', cta: 'Review the proposal', go: go.proposal, owner: true },
+      { k: 'harbor', client: 'Harbor Street Bakery', tone: 'need', word: 'Waiting for the logo', title: 'Add the logo and 2 pictures', why: `The build can start once the logo is in. ${sup.done} of ${sup.total} supplied.`, cta: 'Add them', go: go.needs },
+    ];
+    const needs = needsAll.filter(n => role === 'owner' ? !n.techOnly || true : true).map((n, i) => ({ ...n, num: String(i + 1).padStart(2, '0'), chip: this.chip(n.tone, n.word), canAct: role !== 'pm' && (!n.owner || canDecide), cannotAct: role === 'pm' || (n.owner && !canDecide), decider: 'Nick' }));
+    const hv = this.props.variant;
+    const homeState = is.home ? (hv === 'clear' ? 'clear' : hv === 'loading' ? 'loading' : hv === 'empty' ? 'empty' : 'needs') : 'needs';
+    const nWord = ['No things', 'One thing', 'Two things', 'Three things', 'Four things', 'Five things'][needs.length];
+    const home = {
+      headline: homeState === 'clear' ? `All calm, ${me.name}.` : homeState === 'loading' ? 'Checking the factory…' : homeState === 'empty' ? `Welcome, ${me.name}.` : `Good morning, ${me.name}. ${nWord} need you.`,
+      sub: homeState === 'empty' ? 'There are no clients yet. Everything starts with a request.' : homeState === 'loading' ? 'Loading what needs you, what is running and this month’s spend.' : 'The factory is building one site. This month: $14.20 of your $20 cap.',
+      loading: homeState === 'loading', hasNeeds: homeState === 'needs', clear: homeState === 'clear', empty: homeState === 'empty', overview: homeState === 'needs' || homeState === 'clear',
+    };
+
+    const nav = [['home', 'Home', 'ph ph-house', needs.length], ['projects', 'Projects', 'ph ph-squares-four'], ['activity', 'Activity', 'ph ph-list-bullets'], ...(role !== 'pm' ? [['costs', 'Costs', 'ph ph-coins']] : []), ...(role !== 'pm' ? [['team', 'Team', 'ph ph-users-three']] : []), ['notifications', 'Notifications', 'ph ph-bell'], ['settings', 'Settings', 'ph ph-gear-six']].map(([k, label, icon, count]) => { const cur = scr === k || (k === 'projects' && ['project', 'proposal', 'build', 'stopped', 'needs', 'review', 'new'].includes(scr)); return { label, icon: cur ? icon.replace('ph ', 'ph-fill ') : icon, count: count || 0, go: go[k], current: cur ? 'page' : undefined, style: { position: 'relative', display: 'flex', alignItems: 'center', gap: 12, minHeight: 44, padding: '0 10px', border: 0, borderRadius: 10, cursor: 'pointer', fontSize: 15, fontWeight: cur ? 600 : 500, background: cur ? 'var(--sunk)' : 'transparent', color: cur ? 'var(--ink)' : 'var(--ink-2)' } }; });
+    const soon = [['System', 'ph ph-heartbeat'], ['Agents', 'ph ph-robot'], ['Memory', 'ph ph-brain'], ['Business', 'ph ph-briefcase']].map(([label, icon]) => ({ label, icon, go: () => this.go('soon', { soonName: label }) }));
+    const tabs = [['home', 'Home', 'ph ph-house', needs.length], ['projects', 'Projects', 'ph ph-squares-four'], ['new', 'New', 'ph ph-plus'], ['activity', 'Activity', 'ph ph-list-bullets'], ['more', 'More', 'ph ph-dots-three-outline']].map(([k, label, icon, count]) => { const cur = scr === k || (k === 'more' && ['costs', 'team', 'settings', 'notifications', 'soon'].includes(scr)) || (k === 'projects' && ['project', 'proposal', 'build', 'stopped', 'needs', 'review'].includes(scr)); const isNew = k === 'new'; return { label, icon: cur ? icon.replace('ph ', 'ph-fill ') : icon, count: count || 0, go: go[k], current: cur ? 'page' : undefined, iconStyle: isNew ? { fontSize: 20, width: 40, height: 32, borderRadius: 10, display: 'grid', placeItems: 'center', background: 'var(--acc)', color: 'var(--acc-ink)' } : { fontSize: 23 }, style: { display: 'grid', justifyItems: 'center', alignContent: 'center', gap: 3, minHeight: 56, border: 0, background: 'none', cursor: 'pointer', fontSize: 12, fontWeight: cur ? 700 : 500, color: cur ? 'var(--ink)' : 'var(--ink-2)' } }; });
+
+    const titles = { home: ['', 'Home'], projects: ['', 'Projects'], new: ['Projects', 'New request'], project: ['Projects', 'Harbor Street Bakery'], proposal: ['Harbor Street Bakery', 'Proposal'], build: ['Projects', 'Live build'], stopped: ['Projects', 'Stopped build'], needs: ['Harbor Street Bakery', 'What it still needs'], review: ['Harbor Street Bakery', 'Finished site'], activity: ['', 'Activity'], costs: ['', 'Costs'], team: ['', 'Team and access'], settings: ['', 'Settings'], notifications: ['', 'Notifications'], more: ['', 'More'], soon: ['', s.soonName || 'Coming later'] }[scr] || ['', ''];
+    const crumb = { parent: titles[0], here: titles[1], back: () => this.go(titles[0] === 'Projects' ? 'projects' : 'project'), backLabel: `Back to ${titles[0]}` };
+
+    // projects
+    const q = s.query.trim().toLowerCase();
+    const fdef = [['all', 'All'], ['need', 'Needs someone'], ['run', 'Running'], ['stop', 'Stopped'], ['ready', 'Ready for approval']];
+    const fmatch = (c, f) => f === 'all' || (f === 'ready' ? c.step === 4 : c.tone === f);
+    const filters = fdef.map(([k, label]) => ({ label, n: cl.filter(c => fmatch(c, k)).length, on: s.filter === k, pick: () => this.setState({ filter: k }), style: { display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 40, padding: '0 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14, fontWeight: 600, border: s.filter === k ? '1px solid var(--ink)' : '1px solid var(--line-2)', background: s.filter === k ? 'var(--ink)' : 'var(--sheet)', color: s.filter === k ? 'var(--inv)' : 'var(--ink)' } }));
+    const shown = cl.filter(c => fmatch(c, s.filter) && (!q || `${c.name} ${c.kind} ${c.who}`.toLowerCase().includes(q))).sort((a, b) => (b.pinned - a.pinned));
+    const segBtn = on => ({ display: 'inline-flex', alignItems: 'center', gap: 6, minHeight: 38, padding: '0 14px', border: 0, borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600, background: on ? 'var(--sheet)' : 'transparent', color: on ? 'var(--ink)' : 'var(--ink-2)', boxShadow: on ? '0 1px 2px rgba(0,0,0,.08)' : 'none' });
+    const proj = { summary: `${cl.length} clients. ${cl.filter(c => c.tone === 'need' || c.tone === 'stop').length} are waiting on someone.`, isGrid: s.projView === 'grid', isList: s.projView === 'list', toGrid: () => this.setState({ projView: 'grid' }), toList: () => this.setState({ projView: 'list' }), gridBtn: segBtn(s.projView === 'grid'), listBtn: segBtn(s.projView === 'list'), none: shown.length === 0, showGrid: shown.length > 0 && s.projView === 'grid', showList: shown.length > 0 && s.projView === 'list' };
+    const listRow = P ? { display: 'grid', gridTemplateColumns: '44px minmax(0,1fr)', gap: '8px 10px', padding: '14px 0', borderBottom: '1px solid var(--line)', alignItems: 'center' } : { display: 'grid', gridTemplateColumns: '44px minmax(0,1.4fr) minmax(0,1.3fr) minmax(0,1.2fr) minmax(0,.8fr) minmax(0,1fr)', gap: 16, padding: '12px 0', borderBottom: '1px solid var(--line)', alignItems: 'center' };
+
+    // project page
+    const stripLines = [
+      ['Received 14 Oct, from your notes.', 'Paste what the client asked for.', ''],
+      ['Approved as a Fast local site.', 'The proposal is ready for you to read.', 'Writing takes 2 to 4 min'],
+      [`${sup.done} supplied, ${sup.skipped} left out on purpose.`, `${sup.done} of ${sup.total} supplied. Waiting for the logo.`, 'Depends on the client'],
+      ['Every check passed after 1 round of fixes.', s.flow === 'stopped' ? 'Stopped: a phone number nobody gave us.' : 'Building and checking now.', 'Usually 15 to 25 min'],
+      [s.flow === 'live' ? 'Approved by Nick, 14 Oct.' : 'Approved by Nick. Waiting for a person to launch it.', 'Every check passed. Your call.', 'As long as you need'],
+      ['Launched by a person, outside the Cockpit.', 'Launch happens outside the Cockpit.', 'Recorded here'],
+    ];
+    const strip = STEP_NAMES.map((name, i) => { const done = i < hs || (i === 4 && (s.flow === 'approved' || s.flow === 'live')) || (i === 5 && s.flow === 'live'); const cur = i === hs && !done; const tone = cur ? (s.flow === 'stopped' ? 'stop' : s.flow === 'building' ? 'run' : 'need') : done ? 'done' : 'wait'; return { n: String(i + 1).padStart(2, '0'), name, line: done ? stripLines[i][0] : cur ? stripLines[i][1] : 'Not yet.', usual: stripLines[i][2], current: cur ? 'step' : undefined, icon: TONES[tone].icon, iconStyle: { fontSize: 18, color: TONES[tone].fg, ...(tone === 'run' && !s.reduceMotion ? { animation: 'wfspin 1.1s linear infinite' } : {}) }, cell: { display: 'grid', gap: 6, alignContent: 'start', padding: '20px 18px', borderLeft: i ? '1px solid var(--line)' : 0, background: cur ? (tone === 'stop' ? 'var(--stop-w)' : tone === 'need' ? 'var(--need-w)' : 'var(--paper)') : 'transparent', boxShadow: cur ? 'inset 0 3px 0 var(--ink)' : 'none' } }; });
+    const pjNext = { request: ['Send the request to the factory', 'Open the request', go.new], proposal: ['Read the proposal and choose the kind of site', 'Review the proposal', go.proposal], needs: ['Add the logo and 2 pictures, then start the build', 'Add the missing details', go.needs], building: ['Nothing. The factory is building; we will tell you when it needs you.', 'Watch the build', go.build], stopped: ['Add the real phone number, or build without it', 'See the fix', go.stopped], ready: ['Look at the finished site and approve it, or ask for changes', 'Review the finished site', go.review], approved: ['When a person has launched it, record that it is live', 'Record that it is live', () => this.ask('Record that the site is live?', 'Only do this once a person has launched it. This records the date; it does not publish anything.', 'Record it as live', () => { this.setState({ flow: 'live' }); this.toast('Recorded: Harbor Street Bakery is live.'); })], live: ['Nothing. The site is live.', 'See activity', go.activity] }[s.flow];
+    const spentNow = s.run.phase === 'idle' ? 0 : BSTEPS.reduce((a, b, i) => a + (s.run.t >= END(i) ? b.cost : s.run.t > STARTS[i] ? b.cost * (s.run.t - STARTS[i]) / Math.max(b.dur, 1) : 0), 0) + (s.run.fixed ? 0.0 : 0);
+    const pj = { name: 'Harbor Street Bakery', kind: s.kind === 'fast' ? 'Fast local site' : 'Showcase site with motion', stepNum: Math.min(hs + 1, 6), where: s.flow === 'approved' ? 'Approved, waiting for launch' : STEP_NAMES[hs], line: strip[Math.min(hs, 5)].line, segs: this.segs(hs, clientsRaw[2].tone), chip: this.chip(clientsRaw[2].tone, clientsRaw[2].tone === 'need' ? 'Needs you' : undefined), nextLine: pjNext[0], nextCta: pjNext[1], nextGo: pjNext[2], cost: usd(0.03 + 0.04 + spentNow), costLine: s.run.phase === 'idle' ? 'Reading the request and writing the proposal. A build usually costs about $0.70.' : `Proposal $0.07, builds ${usd(spentNow)}. Each build stops itself at $2.00.`, proposalLine: hs >= 2 ? 'Approved by Nick as a Fast local site. 2 open questions moved to the details list.' : 'Waiting for your approval. 2 questions are still open.' };
+    const decisions = [{ t: 'Request sent by Huraira', w: '14 Oct, 10:08' }, ...(hs >= 1 ? [{ t: 'Proposal 1 written by the factory', w: '14 Oct, 10:11' }] : []), ...(hs >= 2 ? [{ t: 'Nick approved the proposal: Fast local site', w: '14 Oct, 10:20' }] : []), ...(hs >= 3 ? [{ t: 'Nick added the logo and 2 pictures, skipped 2 items', w: '14 Oct, 10:31' }, { t: 'Nick started build 1', w: '14 Oct, 10:32' }] : []), ...(s.run.fixed ? [{ t: 'Nick gave the real phone number and continued', w: '14 Oct, 10:41' }] : []), ...(s.flow === 'approved' || s.flow === 'live' ? [{ t: 'Nick approved the finished site', w: '14 Oct, 11:02' }] : []), ...(s.flow === 'live' ? [{ t: 'Nick recorded that it is live', w: '15 Oct, 09:15' }] : [])].reverse();
+    const builds = hs >= 3 ? [{ n: 'Build 1', what: s.flow === 'stopped' ? 'Stopped: a phone number nobody gave us' : s.flow === 'building' ? 'Running now' : 'Passed every check, 1 round of fixes', when: 'Started 14 Oct, 10:32', cost: usd(spentNow), chip: this.chip(s.flow === 'stopped' ? 'stop' : s.flow === 'building' ? 'run' : 'done', s.flow === 'stopped' ? 'Stopped' : s.flow === 'building' ? 'Running' : 'Passed'), open: s.flow === 'stopped' ? go.stopped : s.flow === 'building' ? go.build : go.review }] : [];
+    const pjTech = [{ k: 'Plan', v: 'p-1b9d3e · rev 1' }, { k: 'Client folder', v: 'clients/harbor-street-bakery' }, { k: 'Track', v: s.kind === 'fast' ? 'A' : 'B' }, ...(hs >= 3 ? [{ k: 'Job', v: 'j-c41f02' }, { k: 'Run', v: 'wf-1198' }] : [])];
+
+    const needDefs = [
+      { k: 'logo', g: 'Files', label: 'The logo', why: 'It goes at the top of every page. The factory never draws one.', type: 'file', file: 'harbor-street-logo.svg · 18 KB' },
+      { k: 'shop', g: 'Files', label: 'Picture: the shopfront', why: 'For the Visit us page. It should show the front of the bakery from the street, so people recognise it.', type: 'file', file: 'shopfront.jpg · 1.2 MB' },
+      { k: 'counter', g: 'Files', label: 'Picture: the cake counter', why: 'For the Custom cakes page. It should show real cakes the bakery has made.', type: 'file', file: 'counter.jpg · 940 KB' },
+      { k: 'phone', g: 'Details', label: 'Business phone number', why: 'Visitors on phones tap it to call.', type: 'text', val: '(555) 018-4471' },
+      { k: 'hours', g: 'Details', label: 'Opening hours', why: 'The client said people keep asking about Sundays.', type: 'text', val: 'Tue to Sat 7am to 3pm, Sun 8am to 1pm' },
+      { k: 'quotes', g: 'Words', label: 'Real customer quotes', why: 'The Home page has a space for customer words. The factory never invents them.', type: 'text', val: '' },
+      { k: 'q1', g: 'Questions', label: 'Can people order cakes online, or only send a request?', why: 'Decides whether the Custom cakes page has a request form or an order button.', type: 'text', val: '' },
+    ];
+    const needItems = needDefs.map(d => { const v = s.sup[d.k]; const st = v === 'f' || v === 'v' ? 'done' : v === 's' ? 'skip' : 'need'; return { ...d, st, chip: this.chip(st, st === 'done' ? 'Supplied' : st === 'skip' ? 'Left out' : d.type === 'file' ? 'Needs a file' : 'Needs an answer'), isOpen: st === 'need' && s.answering !== d.k, isAnswering: s.answering === d.k, isDone: st === 'done', isSkipped: st === 'skip', isFile: d.type === 'file', isText: d.type === 'text', valueText: d.type === 'file' ? d.file : (s.sup[d.k + '_v'] || d.val), upload: () => { this.setState(st2 => ({ sup: { ...st2.sup, [d.k]: 'f' } })); this.toast(`${d.label} added.`); }, startAnswer: () => this.setState({ answering: d.k, answerText: '' }), saveAnswer: () => { this.setState(st2 => ({ sup: { ...st2.sup, [d.k]: 'v', [d.k + '_v']: st2.answerText || d.val || 'Answered' }, answering: null })); }, skip: () => { this.setState(st2 => ({ sup: { ...st2.sup, [d.k]: 's' } })); this.toast(`${d.label}: the site will be built without it.`, 'Undo', () => this.setState(st3 => ({ sup: { ...st3.sup, [d.k]: undefined } }))); }, change: () => this.setState(st2 => ({ sup: { ...st2.sup, [d.k]: undefined } })) }; });
+    const needsCount = `${sup.done} of ${sup.total} supplied`;
+    const needGroups = ['Files', 'Details', 'Words', 'Questions'].map(g => ({ g, items: needItems.filter(i => i.g === g) }));
+    const needSegs = needItems.map(i => ({ flex: 1, height: 8, borderRadius: 4, background: i.st === 'done' ? 'var(--done)' : i.st === 'skip' ? 'var(--line-2)' : 'var(--line)' }));
+    const logoIn = s.sup.logo === 'f';
+    const leftOut = needItems.filter(i => i.st !== 'done').map(i => i.label.replace('Picture: ', '').toLowerCase());
+    const startLine = !logoIn ? 'The build can start once the logo is in.' : leftOut.length ? `Ready to build. ${leftOut.length} item${leftOut.length > 1 ? 's' : ''} will be left out, never made up: ${leftOut.join('; ')}.` : 'Ready to build. Everything is supplied.';
+
+    // build view
+    const rows = this.buildRows(); const r = s.run;
+    const curIdx = rows.findIndex(x => x.current);
+    const remaining = r.phase === 'running' ? BSTEPS.reduce((a, b, i) => a + (i === 8 && !r.fixed ? 0 : Math.max(0, END(i) - Math.max(r.t, STARTS[i]))), 0) * K : 0;
+    const build = {
+      name: 'Harbor Street Bakery', running: r.phase === 'running', stopped: r.phase === 'stopped', done: r.phase === 'done', idle: r.phase === 'idle',
+      headline: r.phase === 'stopped' ? 'The build stopped. It needs one detail from you.' : r.phase === 'done' ? 'Every check passed. It is ready for you.' : r.phase === 'idle' ? 'This build has not started.' : `Now: ${curIdx >= 0 ? BSTEPS[curIdx].t.toLowerCase() : 'moving to the next step'}.`,
+      announce: r.phase === 'stopped' ? 'Build stopped at Checking the words.' : r.phase === 'done' ? 'Build finished. Ready for your approval.' : curIdx >= 0 ? `Step ${curIdx + 1} of 10: ${BSTEPS[curIdx].t}.` : '',
+      elapsed: fmt(r.t * K), left: r.phase === 'running' ? `about ${Math.max(1, Math.round(remaining / 60))} min` : '—', spent: usd(spentNow), round: r.fixed && r.t >= STARTS[8] ? (r.t >= END(8) ? 'Round 1 of 3, done' : 'Round 1 of 3') : 'None yet', pct: Math.round(Math.min(1, r.t / END(8)) * 100),
+      barStyle: { position: 'absolute', inset: 0, right: `${100 - Math.round(Math.min(1, r.t / END(8)) * 100)}%`, background: r.phase === 'stopped' ? 'var(--stop)' : r.phase === 'done' ? 'var(--done)' : 'var(--ink)', borderRadius: 999, transition: 'right .8s ease' },
+    };
+    const buildTech = [{ k: 'Job', v: 'j-c41f02' }, { k: 'Run', v: 'wf-1198 · GitHub run 11872' }, { k: 'Writer', v: 'claude-sonnet-4.5 · 41k in / 12k out' }, { k: 'Reviewer', v: 'gpt-5-mini · 18k in / 2k out' }, { k: 'Commit', v: '9f3c1ae' }];
+
+    // stop view
+    const sc = STOPS[s.stopCase] || STOPS[1];
+    const stop = { ...sc, n: s.stopCase + 1, moneyChip: this.chip(sc.spent ? 'need' : 'done', sc.spent ? 'Money was spent' : 'Nothing spent'), hasFailed: !!sc.failed, failedList: (sc.failed || []).map(f => ({ f })), hasWho: !!sc.who, hasOwner: !!sc.owner && canDecide, needsOwner: !!sc.owner && !canDecide, isInput: !!sc.input, others: sc.others.map(o => ({ o, go: () => this.toast(`${o}: noted.`) })), whyOpen: s.why, toggleWhy: () => this.setState(st => ({ why: !st.why })), primary: () => {
+      if (sc.input) { if (s.phoneMode === 'add' && !s.phoneFix.trim()) { this.toast('Type the real phone number first, or choose Build without a phone number.'); return; } this.ask('Fix it and continue?', 'This continues the saved build: the factory changes the phone number and runs the checks again. It costs about $0.10, much less than a new build.', 'Fix it and continue', () => { this.setState(st => ({ run: { t: STARTS[2], phase: 'running', fixed: true }, flow: 'building', screen: 'build', sup: { ...st.sup, phone_v: st.phoneFix || 'left out' } })); this.toast('Continuing from the saved site.', 'Changed my mind', () => this.setState({ run: { t: END(2), phase: 'stopped', fixed: false }, flow: 'stopped', screen: 'stopped' })); }); return; }
+      if (sc.spent || /Write|Continue|Save/.test(sc.fix)) this.ask(sc.fix + '?', /Write the site again/.test(sc.fix) ? 'This starts a new build. It costs about one build ($0.70), and stops itself at $2.00.' : 'This continues the saved build. It costs less than a new build.', sc.fix, () => this.toast(`${sc.fix}: started.`, 'Undo', () => this.toast('Cancelled. Nothing was spent.')));
+      else this.toast(`${sc.fix}: started. Nothing is spent on this.`);
+    } };
+    const phoneMode = s.phoneMode;
+
+    // review
+    const reviewPages = ['Home', "Today's bakes", 'Custom cakes', 'Visit us', 'About'];
+    const pageTabs = reviewPages.map((p, i) => ({ p, on: s.page === i ? 'page' : undefined, pick: () => this.setState({ page: i }), style: { minHeight: 42, padding: '0 14px', borderRadius: 999, border: s.page === i ? '1px solid var(--ink)' : '1px solid var(--line-2)', background: s.page === i ? 'var(--ink)' : 'transparent', color: s.page === i ? 'var(--inv)' : 'var(--ink)', fontWeight: 600, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' } }));
+    const placeholders = s.phAdded ? [] : [{ where: "Today's bakes, top of the page", what: 'A tray of the morning’s sourdough loaves, close up' }];
+    const canApprove = placeholders.length === 0 || s.phOk;
+    const review = { page: reviewPages[s.page], slug: ['/', '/bakes', '/custom-cakes', '/visit', '/about'][s.page], hasPh: placeholders.length > 0, noPh: placeholders.length === 0, readiness: placeholders.length === 0 ? 'Ready to launch once you approve.' : s.phOk ? 'You chose to launch with 1 placeholder picture.' : 'Not ready to launch: 1 placeholder picture is still on the site.', readyChip: this.chip(placeholders.length === 0 || s.phOk ? 'done' : 'need', placeholders.length === 0 || s.phOk ? 'Ready to launch' : 'Not ready to launch'), canApprove, approveDisabled: !canApprove, approve: () => this.ask('Approve the finished site?', 'This records your approval. Launch is done by a person, outside the Cockpit. Nothing is published from here.', 'Approve the site', () => { this.setState({ flow: 'approved', screen: 'project' }); this.toast('Approved. When a person has launched it, record it on the project page.'); }), phOk: s.phOk, togglePh: () => this.setState(st => ({ phOk: !st.phOk })), addPh: () => { this.setState({ phAdded: true }); this.toast('Picture added. The factory will swap it in on the next small round, about $0.05.'); } };
+    const reviewChecks = ['Loads on every page', 'Links work', 'Accessible (WCAG 2.2 AA)', 'Fast on phones', 'Holds at every size', 'The logo shows', 'Main button always reachable on phones', 'Brand colours used correctly', 'Motion on every section', 'Nothing invented', 'Design review', 'Final independent review'].map(c => ({ c }));
+
+    // activity
+    const acts = [
+      { d: 'Today', time: '10:44', who: 'The factory', type: 'build', client: 'Summit Line Roofing', text: 'Started round 2 of 3: fixing the phone layout.', icon: 'ph ph-arrows-clockwise' },
+      { d: 'Today', time: '10:41', who: 'Nick', type: 'detail', client: 'Harbor Street Bakery', text: 'Gave the real phone number and continued the build.', icon: 'ph ph-pencil-simple' },
+      { d: 'Today', time: '10:38', who: 'The factory', type: 'stop', client: 'Harbor Street Bakery', text: 'Stopped: found a phone number nobody gave us. $0.21 spent.', icon: 'ph ph-stop-circle' },
+      { d: 'Today', time: '10:20', who: 'Nick', type: 'decision', client: 'Harbor Street Bakery', text: 'Approved the proposal as a Fast local site.', icon: 'ph ph-seal-check' },
+      { d: 'Today', time: '09:40', who: 'The factory', type: 'build', client: 'Northlight Signs', text: 'Finished: every check passed. Ready for approval. Cost $0.71.', icon: 'ph ph-check-circle' },
+      { d: 'Today', time: '08:15', who: 'The factory', type: 'build', client: 'Lanternworks Studio', text: 'Wrote proposal 1. Recommends a Showcase site with motion.', icon: 'ph ph-file-text' },
+      { d: 'Yesterday', time: '16:20', who: 'The factory', type: 'stop', client: 'DreamSign pilot', text: 'Stopped after 3 rounds of fixes: 2 checks still fail. $1.12 spent.', icon: 'ph ph-stop-circle' },
+      { d: 'Yesterday', time: '14:02', who: 'Huraira', type: 'team', client: '—', text: 'Assigned Sana Malik to Harbor Street Bakery and Summit Line Roofing.', icon: 'ph ph-user-plus' },
+      { d: 'Yesterday', time: '11:30', who: 'Omar Qureshi', type: 'detail', client: 'Northlight Signs', text: 'Uploaded 3 pictures from the client.', icon: 'ph ph-image' },
+    ];
+    const actTypes = [['all', 'Everything'], ['decision', 'Decisions'], ['build', 'Builds'], ['stop', 'Stops'], ['detail', 'Details'], ['team', 'Team']].map(([k, label]) => ({ label, on: s.actType === k, pick: () => this.setState({ actType: k }), style: { minHeight: 40, padding: '0 14px', borderRadius: 999, cursor: 'pointer', fontSize: 14, fontWeight: 600, border: s.actType === k ? '1px solid var(--ink)' : '1px solid var(--line-2)', background: s.actType === k ? 'var(--ink)' : 'var(--sheet)', color: s.actType === k ? 'var(--inv)' : 'var(--ink)' } }));
+    const actShown = acts.filter(a => (s.actType === 'all' || a.type === s.actType) && (s.actClient === 'all' || a.client === s.actClient));
+    const actDays = ['Today', 'Yesterday'].map(d => ({ d, items: actShown.filter(a => a.d === d).map(a => ({ ...a, iconStyle: { fontSize: 20, color: a.type === 'stop' ? 'var(--stop)' : a.type === 'decision' ? 'var(--need)' : 'var(--ink-2)' } })) })).filter(g => g.items.length);
+
+    // costs
+    const months = [['May', 3.1], ['Jun', 6.4], ['Jul', 8.9], ['Aug', 11.3], ['Sep', 12.7], ['Oct', 14.2]].map(([m, v], i, a) => ({ m, v: usd(v), bar: { width: '100%', height: `${(v / 20) * 160}px`, borderRadius: '6px 6px 2px 2px', background: i === a.length - 1 ? 'var(--ink)' : 'var(--line-2)' } }));
+    const perClient = [['DreamSign pilot', 4.86], ['Northlight Signs', 3.22], ['Summit Line Roofing', 2.9], ['Lanternworks Studio', 1.6], ['Harbor Street Bakery', 0.07 + spentNow]].map(([n, v]) => ({ n, v: usd(v), bar: { height: 8, borderRadius: 4, background: 'var(--ink-2)', width: `${(v / 4.86) * 100}%` } }));
+    const capSteps = [['Writing', 0.42], ['Checks', 0.18], ['Round 1', 0.46], ['Round 2', 0.44], ['Round 3', 0.5]].map(([n, v], i, a) => { const before = a.slice(0, i).reduce((x, y) => x + y[1], 0); return { n, v: usd(v), seg: { position: 'absolute', top: 0, bottom: 0, left: `${(before / 2.4) * 100}%`, width: `${(v / 2.4) * 100}%`, background: before + v > 2 ? 'repeating-linear-gradient(135deg,var(--stop-w) 0 5px,transparent 5px 10px)' : i % 2 ? 'var(--ink-2)' : 'var(--ink)', borderRight: '2px solid var(--sheet)' } }; });
+    const modelRows = [['claude-sonnet-4.5', 'Writing, fixes', '412', '$8.31'], ['gpt-5-mini', 'Independent review', '188', '$2.04'], ['hermes-agent', 'Site builder', '96', '$3.12 (estimated)'], ['gemini-2.5-flash', 'Design review', '71', '$0.73']].map(([m, u, c, v]) => ({ m, u, c, v }));
+
+    // team
+    const people = [{ n: 'Nick', e: 'nick@wfact.agency', r: 'Owner', c: 'All clients' }, { n: 'Huraira', e: 'huraira@wfact.agency', r: 'Owner (technical)', c: 'All clients' }, { n: 'Omar Qureshi', e: 'omar@wfact.agency', r: 'Admin', c: 'All clients' }, { n: 'Sana Malik', e: 'sana@wfact.agency', r: 'Project manager', c: 'Harbor Street Bakery, Summit Line Roofing' }].map(p => ({ ...p, initial: p.n[0] }));
+    const roles = [['Owner', 'Approves proposals, finished sites, launches and money. Sees everything.'], ['Admin', 'Runs the factory day to day: sends requests, starts builds, fixes stops. Cannot approve money or launches.'], ['Project manager', 'Follows the clients assigned to them and adds their details. Cannot approve money or launches.']].map(([r2, d]) => ({ r: r2, d }));
+
+    // settings
+    const setGroups = [['appearance', 'Appearance', 'theme dark light accent colour density text size motion'], ['detail', 'Detail level', 'simple detailed technical ids timings'], ['home', 'Home', 'sections order hide pin landing'], ['notify', 'Notifications', 'email push quiet digest'], ['views', 'Saved views', 'filters sorts grid list columns'], ['keys', 'Keyboard', 'shortcuts command palette'], ['budget', 'Budget', 'cap limit spend money'], ['region', 'Language and region', 'date time currency'], ['defaults', 'Team defaults', 'roles defaults owner']].filter(g => !s.setQ || `${g[1]} ${g[2]}`.toLowerCase().includes(s.setQ.toLowerCase())).map(([k, label]) => ({ label, on: s.setTab === k ? 'page' : undefined, pick: () => this.setState({ setTab: k }), style: { display: 'flex', alignItems: 'center', minHeight: 44, padding: '0 12px', borderRadius: 10, border: 0, cursor: 'pointer', textAlign: 'left', fontSize: 15, fontWeight: s.setTab === k ? 600 : 500, background: s.setTab === k ? 'var(--sunk)' : 'transparent', whiteSpace: 'nowrap' } }));
+    const st = is.settings ? s.setTab : '';
+    const draft = s.draft || { theme: s.theme, accent: s.accent, density: s.density, textSize: s.textSize, reduceMotion: s.reduceMotion };
+    const dirty = !!s.draft && ['theme', 'accent', 'density', 'textSize', 'reduceMotion'].filter(k => s.draft[k] !== s[k]).length;
+    const setD = (k, v) => this.setState(x => ({ draft: { ...(x.draft || { theme: x.theme, accent: x.accent, density: x.density, textSize: x.textSize, reduceMotion: x.reduceMotion }), [k]: v } }));
+    const opt = (k, v, label) => ({ label, on: draft[k] === v, pick: () => setD(k, v), style: { minHeight: 44, padding: '0 16px', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 15, border: draft[k] === v ? '2px solid var(--ink)' : '1px solid var(--line-2)', background: 'var(--sheet)' } });
+    const themeOpts = [opt('theme', 'light', 'Light'), opt('theme', 'dark', 'Dark'), opt('theme', 'system', 'Match my device')];
+    const densOpts = [opt('density', 'comfortable', 'Comfortable'), opt('density', 'compact', 'Compact')];
+    const sizeOpts = [opt('textSize', 100, 'Default'), opt('textSize', 112, 'Larger'), opt('textSize', 125, 'Largest')];
+    const accOpts = [['ink', 'Ink', '#1C1B18'], ['harbour', 'Harbour', '#1F5D66'], ['clay', 'Clay', '#8C4A2C'], ['moss', 'Moss', '#3E5A2C']].map(([k, label, hex]) => ({ label, on: draft.accent === k, pick: () => setD('accent', k), sw: { width: 22, height: 22, borderRadius: '50%', background: hex }, style: { display: 'inline-flex', alignItems: 'center', gap: 10, minHeight: 44, padding: '0 14px 0 10px', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 15, border: draft.accent === k ? '2px solid var(--ink)' : '1px solid var(--line-2)', background: 'var(--sheet)' } }));
+    const pAcc = ACCENTS[draft.accent]; const pDark = draft.theme === 'dark';
+    const previewVars = { ...(pDark ? DARK : {}), ...(pAcc ? { '--acc': pAcc[pDark ? 1 : 0], '--acc-ink': pDark ? '#121211' : '#FBFAF7' } : {}), background: 'var(--paper)', color: 'var(--ink)', borderRadius: 16, border: '1px solid var(--line-2)', padding: draft.density === 'compact' ? 14 : 22, display: 'grid', gap: draft.density === 'compact' ? 8 : 14, zoom: draft.textSize / 100 };
+    const homeSecs = s.homeOrder.map((k, i, a) => ({ label: { needs: 'What needs you', overview: 'Running now and this month', clients: 'Every client' }[k], up: () => { if (!i) return; const b = [...a];[b[i - 1], b[i]] = [b[i], b[i - 1]]; this.setState({ homeOrder: b }); }, down: () => { if (i === a.length - 1) return; const b = [...a];[b[i + 1], b[i]] = [b[i], b[i + 1]]; this.setState({ homeOrder: b }); }, upLabel: `Move ${k} up`, downLabel: `Move ${k} down` }));
+    const keys = [['⌘ K', 'Search or run a command'], ['/', 'Search'], ['G then H', 'Go home'], ['G then P', 'Go to projects'], ['N', 'New request'], ['D', 'Switch Simple or Detailed'], ['A', 'Approve (asks first)'], ['?', 'Show these shortcuts'], ['Esc', 'Close a panel']].map(([k, d]) => ({ k, d }));
+    const events = [['Something needs me', 'Approvals, missing details, stops for you'], ['A build finished', 'Ready for approval'], ['A build stopped', 'With the reason and the fix'], ['Spend near the cap', 'At 80% of the month’s cap'], ['Client details supplied', 'When someone adds a file or answer']].map(([e, d], i) => ({ e, d, ch: ['In the app', 'Email', 'Phone'].map((c, j) => ({ c, on: !(i === 4 && j === 2) && !(i === 1 && j === 1), label: `${e}: ${c}` })) }));
+
+    // notifications
+    const inbox = [{ t: 'Harbor Street Bakery stopped and needs one detail', d: 'The checks found a phone number nobody gave us.', w: '10:38', unread: !s.readAll, tone: 'stop', go: go.stopped }, { t: 'Northlight Signs is ready for your approval', d: 'Every check passed. 1 placeholder picture.', w: '09:40', unread: !s.readAll, tone: 'need', go: go.review }, { t: 'Lanternworks Studio: the proposal is ready', d: 'Recommended: Showcase site with motion.', w: '08:15', unread: false, tone: 'need', go: go.proposal }, { t: 'Spend is at 71% of this month’s cap', d: '$14.20 of $20.', w: 'Yesterday', unread: false, tone: 'wait', go: go.costs }].map(n => ({ ...n, chip: this.chip(n.tone, n.tone === 'stop' ? 'Stopped' : n.tone === 'need' ? 'Needs you' : 'For your information'), dot: { width: 9, height: 9, borderRadius: '50%', background: n.unread ? 'var(--need-dot)' : 'transparent', flex: '0 0 9px', marginTop: 9 } }));
+
+    // palette
+    const pq = s.pq.toLowerCase();
+    const palAll = [
+      ...cl.map(c => ({ g: 'Clients', t: c.name, d: `${STEP_NAMES[c.step]} · ${c.next}`, icon: 'ph ph-storefront', run: c.open })),
+      { g: 'Actions', t: 'New request', d: 'N', icon: 'ph ph-plus', run: go.new },
+      { g: 'Actions', t: 'Ask the factory a question', d: 'Answered in plain words in Activity', icon: 'ph ph-chat-circle-text', run: () => { this.setState({ palette: false }); this.toast('Question sent. The answer appears in Activity, usually within a minute.'); } },
+      { g: 'Actions', t: `Switch to ${detailed ? 'Simple' : 'Detailed'}`, d: 'D', icon: 'ph ph-sliders-horizontal', run: () => this.setState({ detail: detailed ? 'simple' : 'detailed', palette: false }) },
+      { g: 'Actions', t: 'Watch the running build', d: 'Summit Line Roofing', icon: 'ph ph-play-circle', run: go.build },
+      { g: 'Actions', t: `Switch to ${dark ? 'light' : 'dark'} appearance`, d: '', icon: 'ph ph-moon', run: () => this.setState({ theme: dark ? 'light' : 'dark', palette: false }) },
+      { g: 'Go to', t: 'Costs', d: 'G then C', icon: 'ph ph-coins', run: go.costs },
+      { g: 'Go to', t: 'Activity', d: 'G then A', icon: 'ph ph-list-bullets', run: go.activity },
+      { g: 'Settings', t: 'Notifications and quiet hours', d: '', icon: 'ph ph-bell', run: () => this.go('settings', { setTab: 'notify' }) },
+      { g: 'Settings', t: 'Keyboard shortcuts', d: '?', icon: 'ph ph-keyboard', run: () => this.go('settings', { setTab: 'keys' }) },
+    ].filter(x => !pq || `${x.t} ${x.d} ${x.g}`.toLowerCase().includes(pq));
+    const palGroups = ['Clients', 'Actions', 'Go to', 'Settings'].map(g => ({ g, items: palAll.filter(x => x.g === g) })).filter(g => g.items.length);
+
+    const t2 = s.toast;
+    return {
+      rootRef: this.rootRef, themeVars, desk: !P, phone: P, is, go, me, nav, soon, tabs, crumb, detailed, detailSimple: !detailed, detailDetailed: detailed,
+      setSimple: () => this.setState({ detail: 'simple' }), setDetailed: () => this.setState({ detail: 'detailed' }), segSimple: segBtn(!detailed), segDetailed: segBtn(detailed),
+      zoomStyle: { zoom: s.textSize / 100 }, canStart: canRun, unread: !s.readAll, bellLabel: s.readAll ? 'Notifications' : 'Notifications, 2 unread',
+      openPalette: () => this.setState({ palette: true, pq: '' }), closePalette: () => this.setState({ palette: false }), palette: s.palette, pq: s.pq, setPq: e => this.setState({ pq: e.target.value }), palGroups, palEmpty: palGroups.length === 0, palRunFirst: e => { e.preventDefault(); palAll[0]?.run(); },
+      today: 'Wednesday 14 October', home, needs, clients: cl, runChip: this.chip('run', 'Live'), runSegs: this.segs(3, 'run', 8).map((g, i) => i === 3 ? g : g), skel: [{ width: '70%', height: 20, borderRadius: 6, background: 'var(--sunk)', animation: 'wfpulse 1.6s ease-in-out infinite' }, { width: '55%', height: 20, borderRadius: 6, background: 'var(--sunk)', animation: 'wfpulse 1.6s ease-in-out infinite' }, { width: '62%', height: 20, borderRadius: 6, background: 'var(--sunk)', animation: 'wfpulse 1.6s ease-in-out infinite' }],
+      query: s.query, setQuery: e => this.setState({ query: e.target.value }), clearQuery: () => this.setState({ query: '' }), filters, shown, proj, listRow,
+      reqText: s.reqText, setReqText: e => this.setState({ reqText: e.target.value }), reqName: s.reqName, setReqName: e => this.setState({ reqName: e.target.value }), reqUrl: s.reqUrl, setReqUrl: e => this.setState({ reqUrl: e.target.value }), reqLogoMissing: !s.reqLogo, reqLogoAdded: s.reqLogo, addReqLogo: () => this.setState(x => ({ reqLogo: !x.reqLogo })),
+      sending: s.sending, sendLabel: s.sending ? 'Reading the request…' : 'Send to the factory',
+      submitRequest: e => { e.preventDefault(); if (s.sending) return; this.setState({ sending: true }); setTimeout(() => { this.setState(x => ({ sending: false, flow: 'proposal', screen: 'proposal', sup: x.reqLogo ? { ...x.sup, logo: 'f' } : x.sup })); this.toast('The proposal for Harbor Street Bakery is ready.'); }, 2200); },
+      nextSteps: [{ n: '01', t: 'The factory writes a proposal', d: 'What the site is, its pages, the kind of site it recommends and any open questions. Usually 2 to 4 min, about $0.04.' }, { n: '02', t: 'You approve it, or ask for changes', d: 'You choose the kind of site. Takes as long as you need.' }, { n: '03', t: 'You add anything missing', d: 'The logo, pictures, contact details. Skip what you do not have; nothing is made up.' }, { n: '04', t: 'The factory builds and checks it', d: 'Usually 15 to 25 min and about $0.70. It stops itself at $2.00.' }, { n: '05', t: 'You approve the finished site', d: 'A person launches it, outside the Cockpit.' }],
+      pj, strip, pages: [{ name: 'Home' }, { name: "Today's bakes" }, { name: 'Custom cakes' }, { name: 'Visit us' }, { name: 'About' }], needItems, needsCount, needGroups, needSegs, noBuilds: builds.length === 0, builds, decisions, pjTech,
+      logoIn, startLine, startDisabled: !logoIn, needsCountNum: sup.done, stopProp: e => e.stopPropagation(),
+      startBuild: () => this.ask('Start the build?', 'This starts a new build. It usually costs about $0.70 and takes 15 to 25 minutes. It stops itself before it spends more than $2.00.', 'Start the build', () => { this.setState({ flow: 'building', run: { t: 0, phase: 'running', fixed: false }, screen: 'build' }); this.toast('The build has started. You can leave; we will tell you when it needs you.'); }),
+      answerText: s.answerText, setAnswer: e => this.setState({ answerText: e.target.value }), cancelAnswer: () => this.setState({ answering: null }),
+      kindFast: s.kind === 'fast', kindShow: s.kind === 'show', pickFast: () => this.setState({ kind: 'fast' }), pickShow: () => this.setState({ kind: 'show' }),
+      kindFastStyle: { textAlign: 'left', display: 'grid', gap: 12, alignContent: 'start', padding: 22, borderRadius: 16, cursor: 'pointer', background: 'var(--sheet)', border: s.kind === 'fast' ? '2px solid var(--ink)' : '1px solid var(--line-2)', boxShadow: s.kind === 'fast' ? '0 0 0 4px var(--sunk)' : 'none' },
+      kindShowStyle: { textAlign: 'left', display: 'grid', gap: 12, alignContent: 'start', padding: 22, borderRadius: 16, cursor: 'pointer', background: 'var(--sheet)', border: s.kind === 'show' ? '2px solid var(--ink)' : '1px solid var(--line-2)', boxShadow: s.kind === 'show' ? '0 0 0 4px var(--sunk)' : 'none' },
+      fastRadio: s.kind === 'fast' ? 'ph-fill ph-radio-button' : 'ph ph-circle', showRadio: s.kind === 'show' ? 'ph-fill ph-radio-button' : 'ph ph-circle',
+      approveLabel: `Approve as ${s.kind === 'fast' ? 'a Fast local site' : 'a Showcase site with motion'}`, canApproveProposal: canDecide, cannotApproveProposal: !canDecide, proposalDone: hs >= 2, proposalOpen: hs < 2,
+      approveProposal: () => this.ask('Approve the proposal?', `The site will be a ${s.kind === 'fast' ? 'Fast local site' : 'Showcase site with motion'}. Next, the factory lists anything the site still needs. Nothing is built or spent until you start the build.`, 'Approve the proposal', () => { this.setState({ flow: 'needs', screen: 'needs' }); this.toast('Approved. Here is what the site still needs.', 'Changed my mind', () => this.setState({ flow: 'proposal', screen: 'proposal' })); }),
+      askChanges: s.askChanges, toggleChanges: () => this.setState(x => ({ askChanges: !x.askChanges })), changeNote: s.changeNote, setChangeNote: e => this.setState({ changeNote: e.target.value }), sendChanges: () => { this.setState({ askChanges: false, changeNote: '' }); this.toast('Sent. The factory is writing proposal 2 from your note. Usually 2 to 4 min.'); },
+      rows, build, buildTech, stop, phoneFix: s.phoneFix, setPhoneFix: e => this.setState({ phoneFix: e.target.value }), modeAdd: phoneMode === 'add', modeWithout: phoneMode === 'without', pickAdd: () => this.setState({ phoneMode: 'add' }), pickWithout: () => this.setState({ phoneMode: 'without' }), addRadio: phoneMode === 'add' ? 'ph-fill ph-radio-button' : 'ph ph-circle', withoutRadio: phoneMode === 'without' ? 'ph-fill ph-radio-button' : 'ph ph-circle',
+      seeFix: go.stopped,
+      pageTabs, review, placeholders, reviewChecks, reviewAsk: s.reviewAsk, toggleReviewAsk: () => this.setState(x => ({ reviewAsk: !x.reviewAsk })), reviewNote: s.reviewNote, setReviewNote: e => this.setState({ reviewNote: e.target.value }), sendReview: () => this.ask('Send these changes?', 'This starts a small round of changes from your note. It usually costs about $0.20 and takes about 8 minutes.', 'Send the changes', () => { this.setState({ reviewAsk: false, reviewNote: '' }); this.toast('Sent. The factory is making your changes.'); }), canDecide,
+      actTypes, actDays, actEmpty: actDays.length === 0, actClients: [{ v: 'all', l: 'All clients' }, ...CLIENTS.map(c => ({ v: c.name, l: c.name }))], actClient: s.actClient, setActClient: e => this.setState({ actClient: e.target.value }),
+      months, perClient, capSteps, modelRows, isOwner: canDecide, notOwner: !canDecide,
+      people, roles,
+      setGroups, setQ: s.setQ, setSetQ: e => this.setState({ setQ: e.target.value }), tab: { appearance: st === 'appearance', detail: st === 'detail', home: st === 'home', notify: st === 'notify', views: st === 'views', keys: st === 'keys', budget: st === 'budget', region: st === 'region', defaults: st === 'defaults' },
+      themeOpts, densOpts, sizeOpts, accOpts, previewVars, dirty: !!dirty, dirtyText: `${dirty} unsaved change${dirty === 1 ? '' : 's'}. The preview shows them; nothing changes until you save.`, saveDraft: () => { this.setState(x => ({ ...x.draft, theme: x.draft.theme === 'system' ? 'light' : x.draft.theme, draft: null })); this.toast('Saved.', 'Undo', () => this.setState({ theme: s.theme, accent: s.accent, density: s.density, textSize: s.textSize })); }, discardDraft: () => this.setState({ draft: null }), motionOn: !draft.reduceMotion, toggleMotion: () => setD('reduceMotion', !draft.reduceMotion), motionLabel: draft.reduceMotion ? 'On: movement is kept to a minimum' : 'Off: progress and changes move gently',
+      homeSecs, keys, events,
+      notifInbox: s.notifTab === 'inbox', notifPrefs: s.notifTab === 'prefs', toInbox: () => this.setState({ notifTab: 'inbox' }), toPrefs: () => this.setState({ notifTab: 'prefs' }), inboxBtn: segBtn(s.notifTab === 'inbox'), prefsBtn: segBtn(s.notifTab === 'prefs'), inbox, markAll: () => this.setState({ readAll: true }),
+      soonName: s.soonName || 'This room', soonWhat: { System: 'Factory health in one place: whether the worker, database and AI services are up, how many builds are waiting, and when the last backup ran.', Agents: 'Every part of the factory, what it is doing now and how often it succeeds, with a path from any stop to the exact check.', Memory: 'What the factory has learned, facts that contradict each other, and old facts to review.', Business: 'Client self-editing, closing reports and care plans.' }[s.soonName] || '',
+      moreLinks: [['Costs', 'ph ph-coins', go.costs], ['Team and access', 'ph ph-users-three', go.team], ['Notifications', 'ph ph-bell', go.notifications], ['Settings', 'ph ph-gear-six', go.settings]].map(([l, i, g]) => ({ l, i, g })),
+      confirm: !!s.confirm, cf: s.confirm || {}, cfYes: () => { const f = s.confirm?.fn; this.setState({ confirm: null }); f && f(); }, cfNo: () => this.setState({ confirm: null }),
+      toast: !!t2, toastMsg: t2?.msg || '', toastAct: !!t2?.act, toastActLabel: t2?.act || '', toastDo: () => { const f = t2?.fn; this.setState({ toast: null }); f && f(); }, toastClose: () => this.setState({ toast: null }),
+      protoNote: this.props.interactive !== false, galleryNote: this.props.interactive === false,
+    };
+  }
+}
+</script>
+</body>
+</html>

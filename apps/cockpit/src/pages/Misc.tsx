@@ -106,11 +106,6 @@ export function Settings() {
   const [theme, setTheme] = useState<ThemePref>(readThemePref());
   function choose(t: ThemePref) {
     setTheme(t);
-    try {
-      localStorage.setItem("cockpit-theme", t);
-    } catch {
-      /* private mode: the choice lasts for this visit */
-    }
     applyTheme(t);
   }
   return (
@@ -144,12 +139,12 @@ export function Settings() {
         <Plate title="Appearance">
           <fieldset className="plate-body tracks" style={{ maxWidth: 520 }}>
             <legend>Theme</legend>
-            {(["system", "dark", "light"] as ThemePref[]).map((t) => (
+            {(["light", "dark", "system"] as ThemePref[]).map((t) => (
               <label key={t} className={`track${theme === t ? " is-chosen" : ""}`}>
                 <input type="radio" name="theme" checked={theme === t} onChange={() => choose(t)} />
                 <span>
-                  <b>{t === "system" ? "Match this device" : t === "dark" ? "Dark" : "Light"}</b>
-                  <span className="muted">{t === "system" ? "Dark or light, following the device setting." : t === "dark" ? "The default panel, for dim rooms." : "The daylight panel."}</span>
+                  <b>{t === "system" ? "Match my device" : t === "dark" ? "Dark" : "Light"}</b>
+                  <span className="muted">{t === "system" ? "Light or dark, following the device setting." : t === "dark" ? "For dim rooms." : "The default."}</span>
                 </span>
               </label>
             ))}

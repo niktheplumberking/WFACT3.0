@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Atkinson+Hyperlegible+Next:wght@400;600&family=Overpass+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#E7E4DD}*{box-sizing:border-box}a{color:#1C1B18}a:hover{color:#46433D}</style>
+</helmet>
+<div style="padding:64px;display:grid;gap:96px;font-family:'Atkinson Hyperlegible Next',system-ui,sans-serif;color:#1C1B18">
+  <header style="display:grid;gap:10px;max-width:900px">
+    <p style="margin:0;font:600 12px 'Overpass Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#625E55">WFACT Cockpit · screens {{ range }}</p>
+    <h1 style="margin:0;font:400 64px/1 Newsreader,Georgia,serif;letter-spacing:-0.02em">{{ title }}</h1>
+    <p style="margin:0;font-size:18px;color:#46433D">Every frame is the same live component as the prototype, frozen in a state. Desktop 1440, phone 375. Sample clients are the repo's test clients; figures are design content until wired to real rows.</p>
+  </header>
+  <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="3">
+  <section id="{{ sec.id }}" style="display:grid;gap:24px">
+    <div style="display:flex;flex-wrap:wrap;gap:12px 32px;align-items:baseline;max-width:1900px">
+      <span style="font:600 14px 'Overpass Mono',monospace;padding:4px 10px;border-radius:999px;background:#1C1B18;color:#FBFAF7">{{ sec.id }}</span>
+      <h2 style="margin:0;font:500 40px/1.1 Newsreader,Georgia,serif">{{ sec.name }}</h2>
+      <p style="margin:0;flex:1 1 600px;font-size:16px;color:#46433D;max-width:110ch">{{ sec.note }}</p>
+    </div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <sc-for list="{{ sec.frames }}" as="f">
+      <figure style="margin:0;display:grid;gap:10px;flex:0 0 auto">
+        <figcaption style="font:600 13px 'Overpass Mono',monospace;color:#46433D">{{ f.label }}</figcaption>
+        <div style="{{ f.box }}">
+          <dc-import name="Cockpit" screen="{{ f.screen }}" device="{{ f.device }}" flow="{{ f.flow }}" variant="{{ f.variant }}" stop-case="{{ f.stopCase }}" build-at="{{ f.buildAt }}" fixed="{{ f.fixed }}" why="{{ f.why }}" role="{{ f.role }}" theme="{{ f.theme }}" detail="{{ f.detail }}" set-tab="{{ f.setTab }}" interactive="{{ false }}" hint-size="100%,900px"></dc-import>
+        </div>
+      </figure>
+      </sc-for>
+    </div>
+  </section>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;part&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1,&quot;min&quot;:1,&quot;max&quot;:2,&quot;tsType&quot;:&quot;number&quot;}}">class Component extends DCLogic {
+  renderVals() {
+    const D = (label, o = {}) => ({ label: `${label} · 1440`, device: 'desktop', box: { width: 1440, borderRadius: 14, overflow: 'hidden', background: '#F4F2ED', boxShadow: '0 1px 0 #C7C1B5, 0 20px 50px -24px rgba(0,0,0,.25)' }, ...o });
+    const P = (label, o = {}) => ({ label: `${label} · 375`, device: 'phone', box: { width: 375, borderRadius: 28, overflow: 'hidden', background: '#F4F2ED', boxShadow: '0 0 0 8px #1C1B18, 0 20px 50px -24px rgba(0,0,0,.35)', margin: 8 }, ...o });
+    const part = this.props.part ?? 1;
+    const A = [
+      { id: '01', name: 'Home: what needs me', note: 'Data: attention list (plans pending, inputs missing, gate results, failed jobs) ordered stopped, then approvals, then missing details; Running now from active jobs; spend from cost rollups vs spend-caps.json. A11y: h1 is the status sentence; the list is an ol; each row has one button whose label names the action; PMs see who decides instead of a button.', frames: [D('Needs you', { screen: 'home' }), P('Needs you', { screen: 'home' }), D('Nothing needs you', { screen: 'home', variant: 'clear' }), P('Loading', { screen: 'home', variant: 'loading' }), D('Empty: no clients yet', { screen: 'home', variant: 'empty' }), P('Project manager view', { screen: 'home', role: 'pm' })] },
+      { id: '02', name: 'Projects', note: 'Data: projects + latest plan + latest job per client. Filters are pressed-state toggles; search covers name, kind and who it waits on; pinned first. List view is a role=table with column headers on desktop and stacked cells on phone.', frames: [D('Grid', { screen: 'projects' }), P('Grid', { screen: 'projects' }), D('List', { screen: 'projects', variant: 'list' }), P('List', { screen: 'projects', variant: 'list' }), D('No match', { screen: 'projects', variant: 'none' })] },
+      { id: '03', name: 'New request', note: 'Data: writes an intake job (request text, client name, live address, optional logo checked by brandUpload). One primary button. “What happens next” uses medians of past runs; costs are list prices. Sending state is a polite live region.', frames: [D('Ready to send', { screen: 'new' }), P('Ready to send', { screen: 'new' }), D('Sending', { screen: 'new', variant: 'sending' })] },
+      { id: '04', name: 'Project page', note: 'Progress strip: six steps; the current step is aria-current="step" and carries a glyph plus words, never colour alone. Exactly one primary action, derived from the step. Data: plan, plan_inputs, jobs for the plan, cost rollup, audit trail for the decisions timeline. Technical details folded unless Detailed.', frames: [D('Details needed', { screen: 'project', flow: 'needs' }), P('Building', { screen: 'project', flow: 'building', buildAt: 20, fixed: true }), D('Approved, waiting for launch', { screen: 'project', flow: 'approved' }), P('Stopped', { screen: 'project', flow: 'stopped' })] },
+      { id: '05', name: 'Proposal review', note: 'Data: plan direction summary, the client quote (verbatim from the request), recommended track and reasons, pages, open questions. The kind of site is a radiogroup of two large cards. Approve and Ask for changes sit in a sticky bar within thumb reach.', frames: [D('Waiting for approval', { screen: 'proposal', flow: 'proposal' }), P('Waiting for approval', { screen: 'proposal', flow: 'proposal' }), D('Asking for changes', { screen: 'proposal', flow: 'proposal', variant: 'changes' })] },
+      { id: '06', name: 'Live build', note: 'Data: deriveTimeline() over the run’s audit rows; usual durations from stepMedians() of past runs (needs 3 or more, else “not enough builds to say”). The hidden status announces each step change, not each second. Time left is rounded to minutes.', frames: [D('Running: browser checks', { screen: 'build', flow: 'building', buildAt: 27, fixed: true }), P('Running: round of fixes', { screen: 'build', flow: 'building', buildAt: 37, fixed: true }), D('Detailed mode', { screen: 'build', flow: 'building', buildAt: 20, fixed: true, detail: 'detailed' }), P('Stopped', { screen: 'build', flow: 'stopped' })] },
+      { id: '07', name: 'Stopped build and its fix', note: 'Data: diagnoseJob() + continueOptions() from recovery.ts. What happened, money, what was tried, then one primary fix and quiet alternatives. Why? shows evidence (failed check, page, crop); the raw log is under Technical details. Money-spending fixes always confirm and offer “Changed my mind”. All eight cases are in section 17.', frames: [D('Why? open', { screen: 'stopped', flow: 'stopped', stopCase: 1, why: true }), P('Phone', { screen: 'stopped', flow: 'stopped', stopCase: 1 })] },
+      { id: '08', name: 'Needs from the client', note: 'Data: plan_inputs (append-only, newest per key), preflight needs, media placeholder slots each with what the picture must show. Each row: upload, answer, or build without it, plus one line on why. The meter is a progressbar with a text count.', frames: [D('2 of 7 supplied', { screen: 'needs', flow: 'needs' }), P('2 of 7 supplied', { screen: 'needs', flow: 'needs' })] },
+    ];
+    const B = [
+      { id: '09', name: 'Finished site review', note: 'Data: preview URL from the gate result, pages from the plan, placeholder slots from content.placeholder-media, checks from verification.decision. Approve is disabled until placeholders are added or knowingly accepted. Approval records a decision; it never deploys.', frames: [D('Ready, 1 placeholder', { screen: 'review', flow: 'ready' }), P('Ready, 1 placeholder', { screen: 'review', flow: 'ready' }), D('Detailed', { screen: 'review', flow: 'ready', detail: 'detailed' })] },
+      { id: '10', name: 'Activity', note: 'Data: audit trail, translated by one phrase table (never raw action slugs). Filters by client, person and type; saved views.', frames: [D('All', { screen: 'activity' }), P('All', { screen: 'activity' })] },
+      { id: '11', name: 'Costs', note: 'Data: cost rollups by day, run and client; caps from spend-caps.json. Leads with sentences; the chart has a text alternative; the per-model table sits under Technical details, with estimated costs labelled as estimates.', frames: [D('This month', { screen: 'costs' }), P('This month', { screen: 'costs' }), D('Technical details open', { screen: 'costs', detail: 'detailed' })] },
+      { id: '12', name: 'Team and access', note: 'Data: accounts, account requests, PM assignments. Roles explained in plain words; money and launch stay owner-only (RLS enforces it too).', frames: [D('Team', { screen: 'team' }), P('Team', { screen: 'team' })] },
+      { id: '13', name: 'Settings and personalisation', note: 'Searchable groups in plain words. Appearance changes show in a live preview with a sticky “unsaved changes” bar; nothing applies until Save, with Undo after.', frames: [D('Appearance', { screen: 'settings' }), P('Notifications', { screen: 'settings', setTab: 'notify' }), D('Home sections', { screen: 'settings', setTab: 'home' }), P('Keyboard', { screen: 'settings', setTab: 'keys' })] },
+      { id: '14', name: 'Notifications', note: 'Inbox from the same attention source as Home, plus per-event, per-channel preferences, quiet hours and a digest.', frames: [D('Inbox', { screen: 'notifications' }), P('Preferences', { screen: 'notifications', variant: 'prefs' })] },
+      { id: '15', name: 'Search and command palette', note: '⌘K or Ctrl+K from anywhere. Groups: clients, actions, go to, settings. role=dialog with a labelled input; Esc closes; Enter runs the first match.', frames: [D('Open over Home', { screen: 'palette' }), P('Open', { screen: 'palette' })] },
+      { id: '16', name: 'Dark appearance', note: 'Same tokens, dark values. Status colours keep their meaning and pass AA on dark sheets.', frames: [D('Home, dark', { screen: 'home', theme: 'dark' }), P('Live build, dark', { screen: 'build', flow: 'building', buildAt: 27, fixed: true, theme: 'dark' })] },
+      { id: '17', name: 'Every stop, and its fix', note: 'The eight real cases from recovery.ts, each with what happened, whether money was spent, what was tried, one recommended fix and quiet alternatives. Shown on phone so all eight sit side by side.', frames: [0, 1, 2, 3, 4, 5, 6, 7].map(i => P(`Case ${i + 1}`, { screen: 'stopped', flow: 'stopped', stopCase: i, why: true })) },
+    ];
+    return { sections: part === 2 ? B : A, title: part === 2 ? 'Review, running and personal' : 'The path, end to end', range: part === 2 ? '09 to 17' : '01 to 08' };
+  }
+}</script>
+</body>
+</html>
