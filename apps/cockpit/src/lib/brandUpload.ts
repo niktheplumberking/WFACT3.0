@@ -120,3 +120,70 @@ export function checkSiteUrl(raw: string): { ok: true; value: string } | { ok: f
 export function isTestAddress(url: string): boolean {
   return /\.(example|test|invalid|localhost)$|\.vercel\.app$|^https:\/\/localhost/i.test(url.replace(/\/+$/, ""));
 }
+
+/* ---- Build-quality Package 3: the client's photos for media slots (migration 0023) ---- */
+
+export const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+export type ImageType = (typeof IMAGE_TYPES)[number];
+export const IMAGE_MAX_BYTES = 2 * 1024 * 1024;
+const IMAGE_EXT: Record<ImageType, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+
+export interface ImageRecord {
+  path: string;
+  mime: ImageType;
+  sha256: string;
+  bytes: number;
+  width: number;
+  height: number;
+}
+
+/** JPEG size from its first frame header (same rule as packages/frontend-loop/src/media.ts jpegSize). */
+export function jpegSize(b: Uint8Array): { width: number; height: number } | null {
+  if (b.length < 4 || b[0] !== 0xff || b[1] !== 0xd8) return null;
+  const u16 = (o: number) => (b[o]! << 8) | b[o + 1]!;
+  let i = 2;
+  while (i + 9 < b.length) {
+    if (b[i] !== 0xff) return null;
+    const marker = b[i + 1]!;
+    if (marker === 0xd8 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) {
+      i += 2;
+      continue;
+    }
+    if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) return { height: u16(i + 5), width: u16(i + 7) };
+    i += 2 + u16(i + 2);
+  }
+  return null;
+}
+
+function imageTypeOf(file: File): ImageType | null {
+  if ((IMAGE_TYPES as readonly string[]).includes(file.type)) return file.type as ImageType;
+  const ext = file.name.toLowerCase().split(".").pop();
+  return ext === "jpg" || ext === "jpeg" ? "image/jpeg" : ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : null;
+}
+
+/** Checks a chosen photo with the build's rules; returns its record without the storage path, or a plain reason. */
+export async function inspectImageFile(file: File): Promise<{ ok: true; record: Omit<ImageRecord, "path"> } | { ok: false; reason: string }> {
+  const type = imageTypeOf(file);
+  if (!type) return { ok: false, reason: "Pictures must be JPEG, PNG or WebP files." };
+  if (file.size === 0) return { ok: false, reason: "That file is empty." };
+  if (file.size > IMAGE_MAX_BYTES) return { ok: false, reason: `That file is ${(file.size / 1024 / 1024).toFixed(1)} MB; the limit is 2 MB. Export a smaller version (about 2000 px wide is plenty).` };
+  const buf = await file.arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  const size = type === "image/jpeg" ? jpegSize(bytes) : rasterSize(bytes, type as LogoType);
+  if (!size) return { ok: false, reason: `That file is not a valid ${type === "image/jpeg" ? "JPEG" : type === "image/png" ? "PNG" : "WebP"} image.` };
+  if (size.width < 1 || size.height < 1 || size.width > 12000 || size.height > 12000) return { ok: false, reason: "That image's size is not usable." };
+  return { ok: true, record: { mime: type, sha256: await sha256Hex(buf), bytes: file.size, width: size.width, height: size.height } };
+}
+
+/** Uploads a checked photo to the private bucket (the uploader's own folder, named by its fingerprint) and returns its record. */
+export async function uploadImage(file: File): Promise<{ ok: true; record: ImageRecord } | { ok: false; reason: string }> {
+  const checked = await inspectImageFile(file);
+  if (!checked.ok) return checked;
+  const { data } = await supabase.auth.getUser();
+  const userId = data.user?.id;
+  if (!userId) return { ok: false, reason: "You're signed out. Sign in again, then add the picture." };
+  const path = `uploads/${userId}/${checked.record.sha256}.${IMAGE_EXT[checked.record.mime]}`;
+  const { error } = await supabase.storage.from("client-assets").upload(path, file, { contentType: checked.record.mime, upsert: false });
+  if (error && !/already exists|duplicate/i.test(error.message)) return { ok: false, reason: `The picture didn't upload: ${error.message}. Nothing was saved; try again.` };
+  return { ok: true, record: { ...checked.record, path } };
+}

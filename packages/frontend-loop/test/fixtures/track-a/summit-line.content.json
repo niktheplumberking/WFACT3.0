@@ -1,6 +1,6 @@
 {
   "_doc": "SYNTHETIC Track A content fixture (Step 4B M3), hand-written by the coding agent from clients/summit-line-roofing/brief.json (itself a synthetic provisional brief). Not builder output and not a real client. Used to prove the starter renders a clean multi-page site that passes rendered QA without a model call.",
-  "schemaVersion": "track-a/1",
+  "schemaVersion": "track-a/2",
   "business": {
     "name": "Summit Line Roofing",
     "tagline": "Roof and gutter repair, replacement and care for local homes.",
@@ -48,6 +48,12 @@
               "A plain list of what can wait and what cannot",
               "Which package fits, if any"
             ]
+          },
+          "media": {
+            "kind": "placeholder",
+            "alt": "A Summit Line crew finishing a roof",
+            "aspect": "16:9",
+            "note": "A photo of a recent roof replacement"
           }
         },
         {

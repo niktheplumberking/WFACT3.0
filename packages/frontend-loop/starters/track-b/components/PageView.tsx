@@ -40,7 +40,7 @@ export function PageView({ slug }: { slug: string }) {
       <SiteHeader name={content.business.name} items={items} current={slug} action={{ label: content.primaryAction.label, href: actionHref() }} />
       <main id="main" tabIndex={-1}>
         {page.sections.map((s, i) => (
-          <SectionView key={s.id} section={s} first={i === 0} />
+          <SectionView key={s.id} section={s} first={i === 0} page={slug} />
         ))}
       </main>
       <SiteFooter current={slug} />

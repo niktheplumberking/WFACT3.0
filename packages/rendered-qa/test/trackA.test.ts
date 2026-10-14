@@ -140,8 +140,9 @@ test("Step 7: the Track A starter passes the registry gate at preview (advisorie
   // MVP M5: the starter ships 404.html, robots.txt and llms.txt always; the sitemap, canonical and og:image need the
   // production address, which only the owner supplies, so without it exactly those fail at launch.
   const launch = runChecks({ ...ctx, stage: "launch" }, registryGateChecks());
-  assert.deepEqual(launch.filter(gates).map((r) => r.checkId), ["tells.sitemap", "tells.canonical", "tells.og-image"]);
+  // Package 3: the fixture's home hero is a labelled placeholder, a real launch blocker until the client's photo is in.
+  assert.deepEqual(launch.filter(gates).map((r) => r.checkId), ["content.placeholders-launch", "tells.sitemap", "tells.canonical", "tells.og-image"]);
   const live = renderSite(content, { siteUrl: "https://summitline.co" });
-  const atLaunch = runChecks({ ...ctx, html: live.files["index.html"]!, site: { files: live.files, pages: live.pages, binary: live.binary }, stage: "launch" }, registryGateChecks());
+  const atLaunch = runChecks({ ...ctx, html: live.files["index.html"]!, site: { files: live.files, pages: live.pages, binary: live.binary }, stage: "launch", launchWithPlaceholders: true }, registryGateChecks());
   assert.deepEqual(atLaunch.filter(gates).map((r) => r.checkId), [], atLaunch.filter(gates).flatMap((r) => r.details).join("\n"));
 });

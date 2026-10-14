@@ -304,4 +304,26 @@ describe("gates and tidying", () => {
     start("/approvals");
     expect(await screen.findByRole("heading", { level: 1, name: "Decisions" }, T)).toBeInTheDocument();
   });
+
+  it("a passing build with placeholder pictures says it is not ready to launch, and the owner can knowingly tick 'launch with placeholders' (Package 3)", async () => {
+    const fx = fixtures();
+    const job = fx.jobs!.find((j) => j.id === JOB_VERIFIED)!;
+    job.result = {
+      ...(job.result as object),
+      needsFromClient: ["Image still needed from the client for the home page (hero): A photo of a recent roof"],
+      placeholders: [
+        { slot: "index.hero", page: "index", section: "hero", note: "A photo of a recent roof" },
+        { slot: "work.work.1", page: "work", section: "work", note: "Project image for the Hill St job" },
+      ],
+      launchWithPlaceholders: false,
+    };
+    const t = start(`/activity/${JOB_VERIFIED}`, "owner", fx);
+    expect(await screen.findByText("Not ready to launch: 2 pictures are still needed.", undefined, T)).toBeInTheDocument();
+    expect(screen.getByLabelText("Add the picture for Home page: A photo of a recent roof")).toBeInTheDocument();
+    await t.click(screen.getByRole("checkbox", { name: /Launch with placeholders/ }));
+    expect(t.calls()).toContainEqual(
+      expect.objectContaining({ op: "insert", table: "plan_inputs", values: [expect.objectContaining({ key: "launch.placeholders_ok", value: "yes", waived: false, plan_id: PLAN_APPROVED })] }),
+    );
+    expect(await screen.findByText("You chose to launch with 2 placeholder pictures.", undefined, T)).toBeInTheDocument();
+  });
 });

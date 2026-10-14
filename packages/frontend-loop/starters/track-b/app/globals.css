@@ -1102,6 +1102,10 @@ html:has(.menu-panel[open]) {
       animation-name: reveal-lift;
       animation-range: entry 0% cover 40%;
     }
+    [data-reveal="media"] {
+      animation-name: reveal-media;
+      animation-range: entry 0% cover 35%;
+    }
     [data-reveal="panel"] {
       animation-name: reveal-panel;
       animation-range: entry 0% cover 30%;
@@ -1153,9 +1157,138 @@ html:has(.menu-panel[open]) {
       transform: translateY(64px) scale(0.96);
     }
   }
+  @keyframes reveal-media {
+    from {
+      transform: scale(0.96);
+    }
+  }
   @keyframes reveal-panel {
     from {
       transform: scale(0.94);
     }
   }
+}
+
+/* ---- track-b-starter 1.5.0 (Build-quality Package 3): media slots, placeholder cards, team ---- */
+.media {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  width: 100%;
+  background: var(--surface);
+}
+.media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* The placeholder card: the brand's own tints only, its space reserved, a quiet corner mark, and the words a visitor and
+   the owner both read: "Image to come". Listed by the launch check through data-placeholder. */
+.media-placeholder {
+  display: grid;
+  align-content: end;
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  color: var(--ink);
+  background:
+    repeating-linear-gradient(135deg, transparent 0 22px, color-mix(in oklab, var(--ink) 5%, transparent) 22px 23px),
+    var(--surface);
+  border: 1px solid var(--hairline);
+}
+.media-mark {
+  position: absolute;
+  top: clamp(1rem, 2.5vw, 1.75rem);
+  left: clamp(1rem, 2.5vw, 1.75rem);
+  width: 1.75rem;
+  height: 1.75rem;
+  border-top: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  opacity: 0.55;
+}
+.media-placeholder figcaption {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 40ch;
+}
+.media-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.media-note {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+.tone-deep .media-placeholder,
+.tone-panel .media-placeholder {
+  color: var(--on-deep);
+  background:
+    repeating-linear-gradient(135deg, transparent 0 22px, color-mix(in oklab, var(--on-deep) 8%, transparent) 22px 23px),
+    transparent;
+  border-color: color-mix(in oklab, var(--on-deep) 30%, transparent);
+}
+.hero-media {
+  grid-column: 1 / -1;
+  max-height: 70dvh;
+}
+.panel-media {
+  max-height: 42%;
+}
+/* In the stacked (non-panning) reel a full-width 4:3 picture is taller than the screen; cap it so the project still reads. */
+.reel:not(.is-panning) .panel-media {
+  max-height: min(56vh, 30rem);
+}
+.service-media {
+  margin-bottom: 0.75rem;
+  max-width: 28rem;
+}
+.prose-media {
+  max-width: 66ch;
+}
+@media (min-width: 900px) {
+  .prose-media {
+    grid-column: 1 / 8;
+  }
+}
+.team {
+  padding-block: var(--section-y);
+}
+.team-grid {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+}
+.team-head {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 60ch;
+}
+.team-list {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+.team-member {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hairline);
+}
+@media (min-width: 900px) {
+  .team-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+  }
+  .team-head {
+    grid-column: 1 / 7;
+  }
+  .team-media {
+    grid-column: 7 / 13;
+  }
+  .team-list {
+    grid-column: 1 / -1;
+  }
+}
+.reel-panel:has(.panel-media) {
+  grid-template-rows: auto auto 1fr auto;
 }

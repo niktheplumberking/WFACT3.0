@@ -491,3 +491,19 @@ test("request lookup follows a re-plan back to the first plan (the one the intak
   const store = { get: async (id: string) => (plans.get(id) ?? null) as never, insertPending: async () => "" };
   assert.equal(await rootPlanId("c", store), "a");
 });
+
+// ---- Build-quality Package 3: supplied images and the launch-with-placeholders tick ----
+
+test("briefForBuild: an image input lands on its slot, waived ones are dropped, the launch tick is read, none become copy facts", () => {
+  const brief = { clientSlug: "lanternworks-studio", entitySlug: "bennett-co", projectName: "x", goal: "x", requiredSections: [], brandNotes: "x", source: "intake-planner" as const, pageScope: "multi" as const };
+  const intake = { entitySlug: "bennett-co", leadType: "new_website", requestSource: "intake-raw", clientName: "Lanternworks Studio" };
+  const sha = "a".repeat(64);
+  const record = { path: `uploads/0b7c3f7e-1d2a-4c55-9e8f-2a1b3c4d5e6f/${sha}.jpg`, mime: "image/jpeg", sha256: sha, bytes: 1000, width: 1600, height: 900 };
+  const at = new Date().toISOString();
+  const input = (key: string, value: string | null, waived = false) => ({ planId: "p", kind: "fact" as const, key, label: key, value, waived, createdAt: at });
+  const b = briefForBuild({ brief, intake }, [input("asset.image.index.hero", JSON.stringify(record)), input("asset.image.work.work.1", null, true), input("launch.placeholders_ok", "yes")]);
+  assert.deepEqual(b.images, [{ slot: "index.hero", image: record }]);
+  assert.equal(b.launchWithPlaceholders, true);
+  assert.equal(b.ownerFacts, undefined, "images and the launch tick are settings, not facts for the copy");
+  assert.throws(() => briefForBuild({ brief, intake }, [input("asset.image.index.hero", "{bad")]), /not a readable image record/);
+});

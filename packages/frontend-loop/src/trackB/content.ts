@@ -21,10 +21,24 @@ import { pageScopeOf, type PilotBrief } from "../brief.js";
 import { briefFactText, extractJson, inBrief, missingRequiredMessage, waivedSocialProof } from "../trackA/content.js";
 import { buildTrackBPalette } from "./palette.js";
 import { collectStrings, floorErrors, metaCopyErrors, requestCoverageErrors } from "../request.js";
+import { MediaSchema, mediaSlots } from "../media.js";
 
 export { extractJson };
 
-export const CONTENT_SCHEMA_VERSION = "track-b/1";
+/**
+ * track-b/2 (Build-quality Package 3): optional `media` on hero, work items, services items and prose, and a `team`
+ * section. track-b/1 content (every stored build before 2026-10-14) is upgraded on read (upgradeTrackBContent): all new
+ * fields are optional, so the upgrade only renames the version.
+ */
+export const CONTENT_SCHEMA_VERSION = "track-b/2";
+export const PREVIOUS_SCHEMA_VERSIONS = ["track-b/1"] as const;
+
+/** track-b/1 -> track-b/2. Anything that is not an object with an older version is returned unchanged for the schema to judge. */
+export function upgradeTrackBContent(raw: unknown): unknown {
+  if (typeof raw !== "object" || raw === null) return raw;
+  const r = raw as { schemaVersion?: unknown };
+  return (PREVIOUS_SCHEMA_VERSIONS as readonly unknown[]).includes(r.schemaVersion) ? { ...r, schemaVersion: CONTENT_SCHEMA_VERSION } : raw;
+}
 
 const Slug = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/, "lowercase letters, digits and hyphens, starting with a letter");
 const Text = (max: number) => z.string().trim().min(1).max(max);
@@ -37,7 +51,7 @@ export type Fact = z.infer<typeof FactSchema>;
 export const TYPE_PAIRINGS = ["studio", "editorial", "technical"] as const;
 export const MOTION_LEVELS = ["measured", "expressive"] as const;
 
-const Hero = z.object({ type: z.literal("hero"), id: Slug, heading: Text(90), intro: Text(200), showAction: z.boolean() });
+const Hero = z.object({ type: z.literal("hero"), id: Slug, heading: Text(90), intro: Text(200), showAction: z.boolean(), media: MediaSchema.optional() });
 const Statement = z.object({ type: z.literal("statement"), id: Slug, label: Text(40), text: Text(420) });
 const Work = z.object({
   type: z.literal("work"),
@@ -45,7 +59,7 @@ const Work = z.object({
   heading: Text(60),
   intro: Text(200).optional(),
   items: z
-    .array(z.object({ title: Text(40), client: Text(60), summary: Text(200), disciplines: z.array(Text(30)).min(1).max(4), source: Source }))
+    .array(z.object({ title: Text(40), client: Text(60), summary: Text(200), disciplines: z.array(Text(30)).min(1).max(4), source: Source, media: MediaSchema.optional() }))
     .min(2)
     .max(6),
 });
@@ -54,7 +68,7 @@ const Services = z.object({
   id: Slug,
   heading: Text(60),
   intro: Text(240).optional(),
-  items: z.array(z.object({ name: Text(50), summary: Text(220), details: z.array(Text(60)).max(5) })).min(2).max(8),
+  items: z.array(z.object({ name: Text(50), summary: Text(220), details: z.array(Text(60)).max(5), media: MediaSchema.optional() })).min(2).max(8),
 });
 const Process = z.object({
   type: z.literal("process"),
@@ -87,12 +101,23 @@ const Prose = z.object({
   heading: Text(90),
   paragraphs: z.array(Text(600)).min(1).max(5),
   aside: z.object({ heading: Text(50), text: Text(260) }).optional(),
+  media: MediaSchema.optional(),
+});
+/** The people behind the business: names and roles only from the client's request or the owner's facts, never invented. */
+const Team = z.object({
+  type: z.literal("team"),
+  id: Slug,
+  heading: Text(60),
+  intro: Text(300),
+  members: z.array(z.object({ name: Text(60), role: Text(60).optional() })).max(12).default([]),
+  /** A group photo slot (a placeholder card until the client supplies one). */
+  media: MediaSchema.optional(),
 });
 const Cta = z.object({ type: z.literal("cta"), id: Slug, heading: Text(70), text: Text(200) });
 
-export const SectionSchema = z.discriminatedUnion("type", [Hero, Statement, Work, Services, Process, Quote, Faq, Contact, Prose, Cta]);
+export const SectionSchema = z.discriminatedUnion("type", [Hero, Statement, Work, Services, Process, Quote, Faq, Contact, Prose, Team, Cta]);
 export type Section = z.infer<typeof SectionSchema>;
-export const SECTION_TYPES = ["hero", "statement", "work", "services", "process", "quote", "faq", "contact", "prose", "cta"] as const;
+export const SECTION_TYPES = ["hero", "statement", "work", "services", "process", "quote", "faq", "contact", "prose", "team", "cta"] as const;
 
 export const PageSchema = z.object({
   slug: Slug,
@@ -141,7 +166,7 @@ export const MAX_SINGLE_PAGE_SECTIONS = 8;
 /** Pages in a multi-page site. */
 export const MIN_SITE_PAGES = 3;
 /** Section types that open a page with its h1. Any other first section would leave the page without one. */
-const H1_TYPES = new Set(["hero", "prose", "contact"]);
+const H1_TYPES = new Set(["hero", "prose", "contact", "team"]);
 /** Layouts that read as a list; three in a row is one repeated rhythm. */
 const LISTLIKE = new Set(["services", "process", "faq"]);
 /** Element ids and route names the starter itself uses. */
@@ -153,7 +178,7 @@ const RESERVED_SLUGS = new Set(["api", "fonts", "not-found", "_next"]);
  * builder (each names the JSON path), never a half-valid site.
  */
 export function validateSiteContent(raw: unknown, brief: PilotBrief): { content: SiteContent | null; errors: string[] } {
-  const parsed = SiteContentSchema.safeParse(raw);
+  const parsed = SiteContentSchema.safeParse(upgradeTrackBContent(raw));
   if (!parsed.success) {
     return { content: null, errors: parsed.error.issues.slice(0, 25).map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`) };
   }
@@ -189,7 +214,7 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
     const types = page.sections.map((s) => s.type);
     const ids = page.sections.map((s) => s.id);
     for (const dup of ids.filter((s, i) => ids.indexOf(s) !== i)) errors.push(`${where}: section id "${dup}" is used twice on one page.`);
-    if (!H1_TYPES.has(types[0]!)) errors.push(`${where}: the first section must be a hero, prose or contact section (it carries the page's h1); got "${types[0]}".`);
+    if (!H1_TYPES.has(types[0]!)) errors.push(`${where}: the first section must be a hero, prose, contact or team section (it carries the page's h1); got "${types[0]}".`);
     if (types.filter((t) => t === "hero").length > 1 || (types.includes("hero") && types[0] !== "hero")) errors.push(`${where}: at most one hero, and only as the first section.`);
     for (const once of ["statement", "work", "cta", "contact"] as const) {
       if (types.filter((t) => t === once).length > 1) errors.push(`${where}: more than one "${once}" section; one per page.`);
@@ -229,6 +254,7 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
   const target = c.pages.find((p) => p.slug === c.primaryAction.page);
   if (target && !target.sections.some((s) => s.type === "contact")) errors.push(`primaryAction.page "${c.primaryAction.page}" has no "contact" section for the action to land on.`);
   errors.push(...requestChecks(c, brief, single));
+  errors.push(...mediaChecks(c, brief, briefText));
   return { content: errors.length ? null : c, errors };
 }
 
@@ -256,4 +282,35 @@ function requestChecks(c: SiteContent, brief: PilotBrief, single: boolean): stri
       openQuestions: c.openQuestions,
     }),
   ];
+}
+
+/**
+ * Build-quality Package 3: media slots. The builder never sets an image source and never asks for a generated image; it may
+ * mark a slot "supplied" only when the owner uploaded an image for it. The home hero and every work item need a slot, so a
+ * site always shows where the client's pictures go. Team names and roles come only from the client's own words.
+ */
+function mediaChecks(c: SiteContent, brief: PilotBrief, briefText: string): string[] {
+  const errors: string[] = [];
+  const supplied = new Set((brief.images ?? []).map((i) => i.slot));
+  for (const slot of mediaSlots(c, supplied)) {
+    const m = slot.media;
+    if (m.src !== undefined) errors.push(`media ${slot.slot}: remove "src"; the image is set by code from the owner's uploads, never written by the builder.`);
+    if (m.kind === "generated") errors.push(`media ${slot.slot}: generated images are not available; use kind "placeholder" with a note saying what the picture should show.`);
+    if (m.kind === "supplied" && !supplied.has(slot.slot)) errors.push(`media ${slot.slot}: no image was supplied for this slot; use kind "placeholder".`);
+  }
+  const home = c.pages[0];
+  const hero = home?.sections[0];
+  if (hero?.type === "hero" && !hero.media) errors.push(`pages[0] (index) hero "${hero.id}": add media (the home hero always shows a picture or a labelled placeholder for one).`);
+  c.pages.forEach((p, pi) =>
+    p.sections.forEach((s, si) => {
+      if (s.type === "work") s.items.forEach((it, ii) => !it.media && errors.push(`pages[${pi}].sections[${si}].items[${ii}] (${it.title}): add media; every work item shows a picture or a labelled placeholder.`));
+      if (s.type === "team") {
+        s.members.forEach((mem, mi) => {
+          if (!inBrief(mem.name, briefText)) errors.push(`pages[${pi}].sections[${si}].members[${mi}]: "${mem.name}" is not named in the client's request or the owner's facts; never invent people. Leave members empty and describe the team in the intro.`);
+          if (mem.role && !inBrief(mem.role, briefText)) errors.push(`pages[${pi}].sections[${si}].members[${mi}]: the role "${mem.role}" is not in the client's request or the owner's facts; leave it out.`);
+        });
+      }
+    }),
+  );
+  return errors;
 }

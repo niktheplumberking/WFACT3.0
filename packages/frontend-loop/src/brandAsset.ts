@@ -82,13 +82,13 @@ function svgSize(text: string): { width: number; height: number } | null {
   return null;
 }
 
-function pngSize(b: Buffer): { width: number; height: number } | null {
+export function pngSize(b: Buffer): { width: number; height: number } | null {
   const sig = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
   if (b.length < 24 || !b.subarray(0, 8).equals(sig) || b.toString("ascii", 12, 16) !== "IHDR") return null;
   return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) };
 }
 
-function webpSize(b: Buffer): { width: number; height: number } | null {
+export function webpSize(b: Buffer): { width: number; height: number } | null {
   if (b.length < 30 || b.toString("ascii", 0, 4) !== "RIFF" || b.toString("ascii", 8, 12) !== "WEBP") return null;
   const chunk = b.toString("ascii", 12, 16);
   if (chunk === "VP8X") return { width: 1 + b.readUIntLE(24, 3), height: 1 + b.readUIntLE(27, 3) };

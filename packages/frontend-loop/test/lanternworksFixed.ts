@@ -20,6 +20,10 @@ const ABOUT =
 export function lanternworksFixed(): SiteContent {
   const c = stored();
   c.primaryAction.label = "Book a discovery call";
+  // Package 3: the home hero and every work item carry a media slot (a labelled placeholder until the client supplies one).
+  const hero = c.pages[0]!.sections[0]!;
+  if (hero.type === "hero") hero.media = { kind: "placeholder", alt: "Lanternworks Studio at work", aspect: "16:9", note: "A photo of the studio or a recent brand project" };
+  for (const p of c.pages) for (const s of p.sections) if (s.type === "work") s.items.forEach((it) => (it.media = { kind: "placeholder", alt: it.title, aspect: "4:3", note: `Project image for ${it.title}` }));
   c.openQuestions.push('The client asked for a "rough budget" field on the contact form; the starter\'s enquiry form has none, so a person adds it.');
   for (const page of c.pages) {
     for (const s of page.sections) {

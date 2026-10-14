@@ -42,6 +42,7 @@ import { briefFactSources, type PilotBrief } from "@wfact/frontend-loop/brief";
 import { trackBBrand } from "@wfact/frontend-loop/trackB/brand";
 import { CONTENT_SCHEMA_VERSION as TRACK_B_SCHEMA, type SiteContent as TrackBContent } from "@wfact/frontend-loop/trackB/content";
 import { briefRequiresLogo, loadLogoAsset, LogoError, provideLogoAsset } from "@wfact/frontend-loop/brandAsset";
+import { ImageError, loadImageAsset, mediaSlots, placeholderLine, provideImageAsset } from "@wfact/frontend-loop/media";
 import type { QaInput } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
 
@@ -123,6 +124,22 @@ const isSiteManifest = (artifact: StoredArtifact) => artifact.path.endsWith(`/${
  * Writes every site file, then the manifest that pins their hashes. The manifest is the checkpoint.
  * Track B (M4) adds the built project under _source/ and stores fonts as bytes, not base64 text.
  */
+/** Media slots on the saved content that still show a placeholder card, with the line an owner reads (Package 3). */
+export function placeholdersFor(contentJson: string, brief: PilotBrief): { slot: string; page: string; section: string; note: string; line: string }[] {
+  let content: unknown;
+  try {
+    content = JSON.parse(contentJson);
+  } catch {
+    return [];
+  }
+  const c = content as { pages?: { slug: string; sections: unknown[] }[] };
+  if (!Array.isArray(c?.pages)) return [];
+  const supplied = new Set((brief.images ?? []).map((i) => i.slot));
+  return mediaSlots({ pages: c.pages }, supplied)
+    .filter((s) => s.shows === "placeholder")
+    .map((s) => ({ slot: s.slot, page: s.page, section: s.section, note: s.media.note, line: placeholderLine(s) }));
+}
+
 /** The brand promise for a Track B site's saved content (Build-quality Package 2); nothing for any other content. */
 export function brandPromiseFor(contentJson: string, brief: PilotBrief): { brand: ReturnType<typeof trackBBrand> } | Record<string, never> {
   let content: unknown;
@@ -132,7 +149,7 @@ export function brandPromiseFor(contentJson: string, brief: PilotBrief): { brand
     return {};
   }
   const c = content as Partial<TrackBContent>;
-  if (c?.schemaVersion !== TRACK_B_SCHEMA || !c.brand?.colors || !c.primaryAction?.label) return {};
+  if ((c?.schemaVersion !== TRACK_B_SCHEMA && c?.schemaVersion !== "track-b/1") || !c.brand?.colors || !c.primaryAction?.label) return {};
   return { brand: trackBBrand(c as TrackBContent, brief, !!brief.logo) };
 }
 
@@ -412,6 +429,13 @@ export interface WorkflowResult {
   needsFromClient?: string[];
   /** What the readiness check asked the owner for, when it stopped the run (status needs_input). */
   preflightNeeds?: PreflightNeed[];
+  /**
+   * Build-quality Package 3: media slots on the verified site that still show a placeholder card ("still needed from the
+   * client"). The site is not launch-ready while any remain, unless the owner chose to launch with placeholders.
+   */
+  placeholders?: { slot: string; page: string; section: string; note: string }[];
+  /** The owner ticked "launch with placeholders" (brief.launchWithPlaceholders). */
+  launchWithPlaceholders?: boolean;
 }
 
 interface CheckpointState {
@@ -462,6 +486,7 @@ class Workflow {
    */
   cycleBase = 0;
   private clientNeeds: string[] = [];
+  private placeholders: { slot: string; page: string; section: string; note: string }[] = [];
   private preflightNeeds: PreflightNeed[] = [];
 
   constructor(
@@ -493,6 +518,7 @@ class Workflow {
       ...(this.deps.stageObserver ? { documentationEscalations: [...this.documentationEscalations] } : {}),
       ...(this.clientNeeds.length > 0 ? { needsFromClient: [...this.clientNeeds] } : {}),
       ...(this.preflightNeeds.length > 0 ? { preflightNeeds: [...this.preflightNeeds] } : {}),
+      ...(this.placeholders.length > 0 ? { placeholders: [...this.placeholders], launchWithPlaceholders: this.brief.launchWithPlaceholders === true } : {}),
     };
   }
 
@@ -606,10 +632,23 @@ class Workflow {
         checks.push({ id: "brief.logo", ok: false, detail: why });
         needs.push({ key: "asset.logo", label: "Logo file", reason: `The logo could not be used: ${why} Upload the logo again.` });
       }
-    } else if (briefRequiresLogo(`${this.brief.brandNotes}\n${this.brief.goal}`) && !(this.brief.ownerSkipped ?? []).some((s) => /logo/i.test(s))) {
+    }
+    // Build-quality Package 3: every image the owner supplied for a media slot, fetched and verified like the logo.
+    for (const img of this.brief.images ?? []) {
+      try {
+        if (!this.deps.brandAssets) throw new ImageError("this runner has no brand-asset store configured, so supplied images cannot be placed");
+        provideImageAsset(loadImageAsset(img.image, await this.deps.brandAssets.read(img.image.path)));
+        checks.push({ id: `brief.image.${img.slot}`, ok: true, detail: `image loaded and verified (${img.image.mime}, ${img.image.width}x${img.image.height})` });
+      } catch (err) {
+        const why = err instanceof Error ? err.message : String(err);
+        checks.push({ id: `brief.image.${img.slot}`, ok: false, detail: why });
+        needs.push({ key: `asset.image.${img.slot}`, label: `Image for ${img.slot}`, reason: `The image could not be used: ${why} Upload it again, or remove it so the slot shows a placeholder.` });
+      }
+    }
+    if (!logo && briefRequiresLogo(`${this.brief.brandNotes}\n${this.brief.goal}`) && !(this.brief.ownerSkipped ?? []).some((s) => /logo/i.test(s))) {
       checks.push({ id: "brief.logo", ok: false, detail: "the brief says to use the client's logo, but no logo file is attached" });
       needs.push({ key: "asset.logo", label: "Logo file", reason: "The brief says to use the client's own logo, but no logo file was attached. Upload it (SVG, PNG or WebP), or choose to build without it." });
-    } else {
+    } else if (!logo) {
       checks.push({ id: "brief.logo", ok: true, detail: "no logo required" });
     }
     let providersOk = true;
@@ -776,6 +815,8 @@ class Workflow {
             ...(site ? { site: { files: site.files, pages: site.pages, ...(site.binary ? { binary: site.binary } : {}) } } : {}),
             // Build-quality Package 2: a Track B site's brand promise, from the brief and the saved content (also on a resume).
             ...(site ? brandPromiseFor(site.contentJson, this.brief) : {}),
+            // Package 3: the owner's "launch with placeholders" choice, for the launch-stage placeholder check.
+            ...(this.brief.launchWithPlaceholders ? { launchWithPlaceholders: true } : {}),
           },
         },
         { registry: this.deps.registry, audit: { sink: this.deps.audit }, runId: this.runId },
@@ -789,6 +830,10 @@ class Workflow {
 
       if (verdict.status === "approved") {
         this.clientNeeds = (verdict.evaluator?.notes ?? []).filter((n) => /NEEDS CLIENT INPUT/i.test(n)).map((n) => n.replace(/^.*?NEEDS CLIENT INPUT:?\s*/i, "").trim()).filter(Boolean);
+        // Package 3: every placeholder card still on the site is something the client must supply before launch.
+        const open = site ? placeholdersFor(site.contentJson, this.brief) : [];
+        this.clientNeeds.push(...open.map((p) => p.line));
+        this.placeholders = open.map(({ slot, page, section, note }) => ({ slot, page, section, note }));
         const verified: CheckpointState = { ...cp, stage: "verified" };
         await this.checkpoint(verified);
         await recordAudit(this.ctx, {

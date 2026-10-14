@@ -110,7 +110,7 @@ test("extractJson tolerates a fence around the object and refuses non-JSON", () 
 test("the builder prompt carries the schema, the banned claims and every rulebook rule id", () => {
   const prompt = trackASystemPrompt();
   for (const id of ["DR-THREE-CARD-ROW", "DR-EYEBROW-OVERUSE", "DQ-CONTENT-HIERARCHY"]) assert.ok(prompt.includes(id));
-  assert.match(prompt, /track-a\/1/);
+  assert.match(prompt, /track-a\/2/);
   assert.match(prompt, /warranties, guarantees/);
   assert.match(prompt, /Output ONLY one JSON object/);
 });

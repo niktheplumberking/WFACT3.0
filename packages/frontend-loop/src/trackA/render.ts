@@ -13,10 +13,12 @@ import type { Fact, Page, Section, SiteContent } from "./content.js";
 import { buildPalette, type Palette } from "./palette.js";
 import { OG_IMAGE_FILE, absoluteUrl, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
 import { logoDisplaySize, servedLogoData, type LogoAsset } from "../brandAsset.js";
+import type { ImageAsset, Media } from "../media.js";
 
 // 1.1.0: launch files (404, robots, llms, sitemap, share card, canonical); 1.2.0: client logo + favicon; 1.3.0 (Build-quality
 // Package 2): the logo has an explicit display size and an SVG without one gets it from its viewBox (it collapsed to 0x0).
-export const STARTER_VERSION = "track-a-starter/1.3.0";
+// 1.4.0 (Build-quality Package 3): media slots on hero, services and prose: the owner's verified image, or a labelled card.
+export const STARTER_VERSION = "track-a-starter/1.4.0";
 const STARTER_DIR = path.join(import.meta.dirname, "..", "..", "starters", "track-a");
 const STARTER_CSS = readFileSync(path.join(STARTER_DIR, "styles.css"), "utf-8");
 const STARTER_JS = readFileSync(path.join(STARTER_DIR, "site.js"), "utf-8");
@@ -35,6 +37,8 @@ export interface RenderOptions {
   siteUrl?: string | null;
   /** The client's verified logo (brandAsset.ts). Placed in the header, the footer and as the favicon; absent = the text wordmark. */
   logo?: LogoAsset | null;
+  /** Owner-supplied images by media slot (media.ts imageAssetsFor); a slot without one shows a placeholder card. */
+  images?: ReadonlyMap<string, ImageAsset>;
 }
 
 export class RenderError extends Error {
@@ -137,6 +141,21 @@ interface Ctx {
   content: SiteContent;
   page: Page;
   logo?: LogoAsset | null;
+  images?: ReadonlyMap<string, ImageAsset>;
+}
+
+/**
+ * One media slot (Build-quality Package 3): the owner's verified image, sized and lazy (eager for the home hero), or a
+ * branded placeholder card in the brand's tints, aspect reserved, with the visible words "Image to come: <note>" and
+ * data-placeholder so the launch check and the Cockpit list it. Never an external placeholder service.
+ */
+function mediaFrame(ctx: Ctx, media: Media, slot: string, cls: string, eager = false): string {
+  const ratio = media.aspect.replace(":", " / ");
+  const img = ctx.images?.get(slot);
+  if (img) {
+    return `<figure class="media ${cls}" style="aspect-ratio:${ratio}"><img src="${img.file}" alt="${esc(media.alt)}" width="${img.width}" height="${img.height}" loading="${eager ? "eager" : "lazy"}" decoding="async"${eager ? ' fetchpriority="high"' : ""}></figure>`;
+  }
+  return `<figure class="media media-placeholder ${cls}" style="aspect-ratio:${ratio}" data-placeholder="${esc(slot)}" role="img" aria-label="${esc(`Image to come: ${media.note}`)}"><span class="media-mark" aria-hidden="true"></span><figcaption><span class="media-label">Image to come</span><span class="media-note">${esc(media.note)}</span></figcaption></figure>`;
 }
 
 /** The client's logo as an image: intrinsic size reserved (no layout shift), the business name as its text. */
@@ -188,14 +207,14 @@ function renderSection(s: Section, ctx: Ctx, lvl: Level, tint: boolean): string 
         s.aside
           ? `<aside class="hero-aside" aria-labelledby="${s.id}-aside"><h${sub(lvl)} id="${s.id}-aside">${esc(s.aside.heading)}</h${sub(lvl)}><ul class="checks">${s.aside.points.map((p) => `<li>${icon("check")}<span>${esc(p)}</span></li>`).join("")}</ul></aside>`
           : ""
-      }</div><svg class="ridge" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline points="0,10 64,0 100,10"/></svg></section>`;
+      }</div>${s.media ? `<div class="wrap hero-media-wrap">${mediaFrame(ctx, s.media, `${ctx.page.slug}.${s.id}`, "hero-media", ctx.page.slug === "index")}</div>` : ""}<svg class="ridge" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true" focusable="false"><polyline points="0,10 64,0 100,10"/></svg></section>`;
 
     case "services": {
       const odd = s.items.length % 2 === 1;
       const items = s.items
         .map(
-          (it) =>
-            `<article class="service"><div><h${sub(lvl)}>${esc(it.name)}</h${sub(lvl)}><p>${esc(it.summary)}</p></div><div>${
+          (it, i) =>
+            `<article class="service">${it.media ? mediaFrame(ctx, it.media, `${ctx.page.slug}.${s.id}.${i + 1}`, "service-media") : ""}<div><h${sub(lvl)}>${esc(it.name)}</h${sub(lvl)}><p>${esc(it.summary)}</p></div><div>${
               it.details.length ? `<ul class="detail-list">${it.details.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>` : ""
             }${it.page && it.page !== ctx.page.slug ? `<a class="more" href="${pageFile(it.page)}">More about ${esc(it.name.toLowerCase())}${icon("arrow")}</a>` : ""}</div></article>`,
         )
@@ -240,7 +259,7 @@ function renderSection(s: Section, ctx: Ctx, lvl: Level, tint: boolean): string 
       return `${open()}<div class="wrap contact-grid"><div>${head(s.heading, s.intro)}${s.showDetails ? contactFacts(ctx) : ""}</div><div class="form-panel">${requestForm(ctx, s.formNote)}</div></div></section>`;
 
     case "prose":
-      return `${open()}<div class="wrap prose-grid"><div>${h(lvl, s.heading, headId)}${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join("")}</div>${
+      return `${open()}<div class="wrap prose-grid"><div>${h(lvl, s.heading, headId)}${s.paragraphs.map((p) => `<p>${esc(p)}</p>`).join("")}${s.media ? mediaFrame(ctx, s.media, `${ctx.page.slug}.${s.id}`, "prose-media") : ""}</div>${
         s.aside ? `<aside class="aside-note"><h${sub(lvl)}>${esc(s.aside.heading)}</h${sub(lvl)}><p>${esc(s.aside.text)}</p></aside>` : ""
       }</div></section>`;
 
@@ -349,8 +368,8 @@ function shareTags(content: SiteContent, page: Page, siteUrl: string | null): st
   ];
 }
 
-function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl: string | null, logo: LogoAsset | null): string {
-  const ctx: Ctx = { content, page, logo };
+function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl: string | null, logo: LogoAsset | null, images?: ReadonlyMap<string, ImageAsset>): string {
+  const ctx: Ctx = { content, page, logo, ...(images ? { images } : {}) };
   // One h1 per page: the first section's heading. Plain sections alternate a tint for rhythm; the hero
   // and the call-to-action band are deep brand fields and reset the alternation.
   let tinted = true;
@@ -441,7 +460,7 @@ export function renderSite(content: SiteContent, opts: RenderOptions = {}): Rend
   const pages: string[] = [];
   for (const page of content.pages) {
     const file = pageFile(page.slug);
-    files[file] = renderPage(content, page, palette, siteUrl, logo);
+    files[file] = renderPage(content, page, palette, siteUrl, logo, opts.images);
     pages.push(file);
   }
   files["404.html"] = renderNotFound(content, palette, logo);
@@ -462,6 +481,11 @@ export function renderSite(content: SiteContent, opts: RenderOptions = {}): Rend
       files[logo.file] = logo.data.toString("base64");
       binary.push(logo.file);
     }
+  }
+  // Package 3: the owner's verified images, content-addressed (media/<sha>.<ext>), as binary files.
+  for (const img of opts.images?.values() ?? []) {
+    files[img.file] = img.data.toString("base64");
+    binary.push(img.file);
   }
   return { files, pages, binary };
 }

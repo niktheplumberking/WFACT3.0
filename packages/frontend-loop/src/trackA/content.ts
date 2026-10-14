@@ -17,9 +17,16 @@
 import { z } from "zod";
 import { briefFactSources, pageScopeOf, type PilotBrief } from "../brief.js";
 import { buildPalette } from "./palette.js";
+import { MediaSchema, mediaSlots } from "../media.js";
 import { collectStrings, floorErrors, metaCopyErrors, requestCoverageErrors } from "../request.js";
 
-export const CONTENT_SCHEMA_VERSION = "track-a/1";
+/** track-a/2 (Build-quality Package 3): optional `media` on hero, services items and prose. track-a/1 is upgraded on read. */
+export const CONTENT_SCHEMA_VERSION = "track-a/2";
+export function upgradeTrackAContent(raw: unknown): unknown {
+  if (typeof raw !== "object" || raw === null) return raw;
+  const r = raw as { schemaVersion?: unknown };
+  return r.schemaVersion === "track-a/1" ? { ...r, schemaVersion: CONTENT_SCHEMA_VERSION } : raw;
+}
 
 const Slug = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/, "lowercase letters, digits and hyphens, starting with a letter");
 const Text = (max: number) => z.string().trim().min(1).max(max);
@@ -40,6 +47,7 @@ const Hero = z.object({
   intro: Text(220),
   showPhone: z.boolean(),
   aside: z.object({ heading: Text(60), points: z.array(Text(120)).min(2).max(5) }).optional(),
+  media: MediaSchema.optional(),
 });
 const Services = z.object({
   type: z.literal("services"),
@@ -47,7 +55,7 @@ const Services = z.object({
   heading: Text(80),
   intro: Text(300).optional(),
   items: z
-    .array(z.object({ name: Text(60), summary: Text(220), details: z.array(Text(140)).max(6), page: Slug.optional() }))
+    .array(z.object({ name: Text(60), summary: Text(220), details: z.array(Text(140)).max(6), page: Slug.optional(), media: MediaSchema.optional() }))
     .min(2)
     .max(8),
 });
@@ -93,6 +101,7 @@ const Prose = z.object({
   heading: Text(80),
   paragraphs: z.array(Text(700)).min(1).max(6),
   aside: z.object({ heading: Text(60), text: Text(300) }).optional(),
+  media: MediaSchema.optional(),
 });
 const Areas = z.object({
   type: z.literal("areas"),
@@ -190,7 +199,7 @@ export function briefFactText(brief: PilotBrief): string {
  * builder (each names the JSON path), never a half-valid site.
  */
 export function validateSiteContent(raw: unknown, brief: PilotBrief): { content: SiteContent | null; errors: string[] } {
-  const parsed = SiteContentSchema.safeParse(raw);
+  const parsed = SiteContentSchema.safeParse(upgradeTrackAContent(raw));
   if (!parsed.success) {
     return {
       content: null,
@@ -284,7 +293,22 @@ export function validateSiteContent(raw: unknown, brief: PilotBrief): { content:
     errors.push(`primaryAction.page "${c.primaryAction.page}" has no "contact" section for the action to land on.`);
   }
   errors.push(...requestChecks(c, brief, single));
+  errors.push(...trackAMediaChecks(c, brief));
   return { content: errors.length ? null : c, errors };
+}
+
+/** Package 3: same media rules as Track B (no src, no generated, supplied only where uploaded); the home hero needs a slot. */
+function trackAMediaChecks(c: SiteContent, brief: PilotBrief): string[] {
+  const errors: string[] = [];
+  const supplied = new Set((brief.images ?? []).map((i) => i.slot));
+  for (const slot of mediaSlots(c, supplied)) {
+    if (slot.media.src !== undefined) errors.push(`media ${slot.slot}: remove "src"; the image is set by code from the owner's uploads, never written by the builder.`);
+    if (slot.media.kind === "generated") errors.push(`media ${slot.slot}: generated images are not available; use kind "placeholder" with a note saying what the picture should show.`);
+    if (slot.media.kind === "supplied" && !supplied.has(slot.slot)) errors.push(`media ${slot.slot}: no image was supplied for this slot; use kind "placeholder".`);
+  }
+  const hero = c.pages[0]?.sections[0];
+  if (hero?.type === "hero" && !hero.media) errors.push(`pages[0] (index) hero "${hero.id}": add media (the home hero always shows a picture or a labelled placeholder for one).`);
+  return errors;
 }
 
 /** Form fields the Track A request form holds (render.ts: name, phone, address or suburb, what you need, preferred time). */

@@ -9,6 +9,7 @@
  */
 import { createHash, randomUUID } from "node:crypto";
 import { BRAND_ASSET_PATH_RE } from "@wfact/frontend-loop/brandAsset";
+import { IMAGE_PATH_RE } from "@wfact/frontend-loop/media";
 import { ARTIFACT_PATH_RE, CheckpointIntegrityError, type ArtifactStore, type StoredArtifact } from "./buildAndVerify.js";
 
 const BUCKET = "artifacts";
@@ -36,6 +37,8 @@ const CONTENT_TYPES: Record<string, string> = {
   ico: "image/x-icon",
   png: "image/png",
   webp: "image/webp",
+  // Build-quality Package 3: owner-supplied photos ship in the site (artifacts bucket allows image/jpeg from migration 0023).
+  jpg: "image/jpeg",
 };
 export const contentTypeFor = (relPath: string): string => {
   const type = CONTENT_TYPES[relPath.slice(relPath.lastIndexOf(".") + 1).toLowerCase()];
@@ -132,12 +135,12 @@ export class SupabaseBrandAssetStore {
   }
 
   async read(relPath: string): Promise<Buffer> {
-    if (!BRAND_ASSET_PATH_RE.test(relPath)) throw new Error(`brand asset path ${JSON.stringify(relPath)} is outside uploads/<user>/<sha256>.<svg|png|webp>`);
+    if (!BRAND_ASSET_PATH_RE.test(relPath) && !IMAGE_PATH_RE.test(relPath)) throw new Error(`brand asset path ${JSON.stringify(relPath)} is outside uploads/<user>/<sha256>.<svg|png|webp|jpg>`);
     const res = await this.fetchImpl(`${this.readBase}/${relPath}?fresh=${randomUUID()}`, {
       headers: { apikey: this.serviceKey, Authorization: `Bearer ${this.serviceKey}` },
     });
-    if (res.status === 400 || res.status === 404) throw new Error("the uploaded logo file is missing from storage");
-    if (!res.ok) throw new Error(`logo download failed (HTTP ${res.status})`);
+    if (res.status === 400 || res.status === 404) throw new Error("the uploaded file is missing from storage");
+    if (!res.ok) throw new Error(`brand asset download failed (HTTP ${res.status})`);
     return Buffer.from(await res.arrayBuffer());
   }
 }

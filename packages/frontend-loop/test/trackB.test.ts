@@ -43,7 +43,7 @@ test("content rules: invented facts, a page without an h1 opener, repeated layou
   assert.equal(content, null);
   const text = errors.join("\n");
   assert.match(text, /business\.email: "hello@northfold\.studio" is marked source "brief" but is not in the brief/);
-  assert.match(text, /pages\[1\] \(services\): the first section must be a hero, prose or contact section/);
+  assert.match(text, /pages\[1\] \(services\): the first section must be a hero, prose, contact or team section/);
   assert.match(text, /sections 0 and 1 are both "services" \(DR-REPEATED-RHYTHM\)/);
   assert.match(text, /The brief requires a section with id "work"/);
   assert.match(text, /slug "api" is reserved/);

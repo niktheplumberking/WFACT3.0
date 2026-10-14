@@ -33,8 +33,10 @@ begin
     -- ===== the bucket itself =====
     select public, file_size_limit, allowed_mime_types into b from storage.buckets where id = 'client-assets';
     res := res || jsonb_build_object('t','client-assets is private','expect',false,'got',b.public);
-    res := res || jsonb_build_object('t','client-assets limit is 512 KB','expect',524288,'got',b.file_size_limit);
-    res := res || jsonb_build_object('t','client-assets takes only svg, png, webp','expect','{image/svg+xml,image/png,image/webp}','got',b.allowed_mime_types::text);
+    -- 0023 (Build-quality Package 3): the bucket also holds client photos (JPEG, up to 2 MB). A LOGO is still limited to
+    -- SVG/PNG/WebP and 512 KB by private.valid_logo_record, which the asset.logo checks below exercise.
+    res := res || jsonb_build_object('t','client-assets limit is 2 MB (photos; logos stay 512 KB by their record check)','expect',2097152,'got',b.file_size_limit);
+    res := res || jsonb_build_object('t','client-assets takes only svg, png, webp, jpeg','expect','{image/svg+xml,image/png,image/webp,image/jpeg}','got',b.allowed_mime_types::text);
 
     -- ===== anon and PM cannot upload or read =====
     perform set_config('request.jwt.claims', '{"role":"anon"}', true);
@@ -89,6 +91,8 @@ begin
     res := res || jsonb_build_object('t','logo detail that is not a record','expect','23514','got',r);
     begin insert into public.plan_inputs (plan_id, kind, key, label, value, provided_by) values (p_ok,'fact','asset.logo','Logo file',missing::text,o); r:='ALLOWED'; exception when others then r:=sqlstate; end;
     res := res || jsonb_build_object('t','logo detail pointing at a file that was never uploaded','expect','23514','got',r);
+    begin insert into public.plan_inputs (plan_id, kind, key, label, value, provided_by) values (p_ok,'fact','asset.logo','Logo file',jsonb_set(logo,'{bytes}','600000')::text,o); r:='ALLOWED'; exception when others then r:=sqlstate; end;
+    res := res || jsonb_build_object('t','a logo record over 512 KB (logos keep their own limit)','expect','23514','got',r);
     begin insert into public.plan_inputs (plan_id, kind, key, label, value, provided_by) values (p_ok,'fact','asset.logo','Logo file',(logo || jsonb_build_object('path','uploads/'||o||'/../../etc/passwd'))::text,o); r:='ALLOWED'; exception when others then r:=sqlstate; end;
     res := res || jsonb_build_object('t','logo detail with a path outside the uploads area','expect','23514','got',r);
     begin insert into public.plan_inputs (plan_id, kind, key, label, value, provided_by) values (p_ok,'answer','asset.logo','Logo file',logo::text,o); r:='ALLOWED'; exception when others then r:=sqlstate; end;

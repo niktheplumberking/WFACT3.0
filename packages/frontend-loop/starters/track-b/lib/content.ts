@@ -2,11 +2,14 @@
  * The site's content, as the build wrote it (content/site.json), and the colour tokens derived from the
  * brand colours by reviewed code (content/theme.json). Both are validated in
  * packages/frontend-loop/src/trackB/content.ts before a build starts; these types mirror that schema
- * (track-b/1). The starter never invents content: everything visible comes from here.
+ * (track-b/2). The starter never invents content: everything visible comes from here. content/media.json (written by the
+ * build from the owner's verified uploads, never by the builder) maps a media slot to its image; a slot without one shows
+ * a labelled placeholder card.
  */
 import site from "../content/site.json";
 import theme from "../content/theme.json";
 import launch from "../content/launch.json";
+import mediaFiles from "../content/media.json";
 
 export type Source = "brief" | "sample";
 export interface Fact {
@@ -14,12 +17,20 @@ export interface Fact {
   source: Source;
 }
 
+/** A media slot as the builder described it (track-b/2). The builder never sets the image; media.json does. */
+export interface Media {
+  kind: "supplied" | "placeholder" | "generated";
+  alt: string;
+  aspect: "16:9" | "3:2" | "4:3" | "1:1" | "4:5" | "3:4";
+  note: string;
+}
 export interface Hero {
   type: "hero";
   id: string;
   heading: string;
   intro: string;
   showAction: boolean;
+  media?: Media;
 }
 export interface Statement {
   type: "statement";
@@ -33,14 +44,14 @@ export interface Work {
   id: string;
   heading: string;
   intro?: string;
-  items: { title: string; client: string; summary: string; disciplines: string[]; source: Source }[];
+  items: { title: string; client: string; summary: string; disciplines: string[]; source: Source; media?: Media }[];
 }
 export interface Services {
   type: "services";
   id: string;
   heading: string;
   intro?: string;
-  items: { name: string; summary: string; details: string[] }[];
+  items: { name: string; summary: string; details: string[]; media?: Media }[];
 }
 export interface Process {
   type: "process";
@@ -77,6 +88,15 @@ export interface Prose {
   heading: string;
   paragraphs: string[];
   aside?: { heading: string; text: string };
+  media?: Media;
+}
+export interface Team {
+  type: "team";
+  id: string;
+  heading: string;
+  intro: string;
+  members: { name: string; role?: string }[];
+  media?: Media;
 }
 export interface Cta {
   type: "cta";
@@ -85,7 +105,7 @@ export interface Cta {
   text: string;
 }
 
-export type Section = Hero | Statement | Work | Services | Process | Quote | Faq | Contact | Prose | Cta;
+export type Section = Hero | Statement | Work | Services | Process | Quote | Faq | Contact | Prose | Team | Cta;
 
 export interface Page {
   slug: string;
@@ -167,3 +187,12 @@ export const actionHref = () => {
   const contact = page.sections.find((s) => s.type === "contact");
   return contact ? `${href(page.slug)}#${contact.id}` : href(page.slug);
 };
+
+/** The image the owner supplied for a slot (verified by the build), or null: the slot then shows a placeholder card. */
+export interface SlotImage {
+  src: string;
+  width: number;
+  height: number;
+}
+const slotImages = mediaFiles as Record<string, SlotImage>;
+export const imageForSlot = (slot: string): SlotImage | null => slotImages[slot] ?? null;

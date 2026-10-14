@@ -126,6 +126,7 @@ export function createQaEvaluatorAgent(opts: QaEvaluatorAgentOptions): Agent<QaI
           ...(r.site !== undefined ? { site: parseSite(r.site) } : {}),
           ...(r.stage !== undefined ? { stage: parseStage(r.stage) } : {}),
           ...(r.brand !== undefined ? { brand: parseBrand(r.brand) } : {}),
+          ...(r.launchWithPlaceholders === true ? { launchWithPlaceholders: true } : {}),
         },
         goal: r.goal,
       };

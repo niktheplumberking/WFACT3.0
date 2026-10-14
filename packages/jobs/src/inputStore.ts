@@ -33,8 +33,13 @@ export const LOGO_INPUT_KEY = "asset.logo";
 
 /** What the builder may use: every non-waived value, as facts. Asset records (asset.*) are settings, not copy facts. */
 export function ownerFactsFrom(inputs: PlanInput[]): OwnerFact[] {
-  return inputs.filter((i) => !i.waived && i.value && !i.key.startsWith("asset.")).map((i) => ({ key: i.key, label: i.label, value: i.value! }));
+  return inputs.filter((i) => !i.waived && i.value && !i.key.startsWith("asset.") && !i.key.startsWith("launch.")).map((i) => ({ key: i.key, label: i.label, value: i.value! }));
 }
+
+/** Build-quality Package 3: the plan input that holds an owner-supplied image for one media slot (migration 0023). */
+export const IMAGE_INPUT_PREFIX = "asset.image.";
+/** The owner's "launch with placeholders" tick (value "yes"; migration 0023). */
+export const LAUNCH_PLACEHOLDERS_KEY = "launch.placeholders_ok";
 
 export class SupabasePlanInputStore implements PlanInputStore {
   private readonly endpoint: string;

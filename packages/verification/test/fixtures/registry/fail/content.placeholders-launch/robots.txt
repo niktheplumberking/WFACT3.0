@@ -1,0 +1,4 @@
+# SYNTHETIC TEST FIXTURE (Step 7 registry)
+User-agent: *
+Allow: /
+Sitemap: https://summitlineroofing-synthetic.com/sitemap.xml

@@ -9,3 +9,4 @@
 Redacted before commit: the stored content's contact facts were the owner's test values entered in the Cockpit (a phone
 number, "test@lanternworks.com", "Testing Address"). The phone and address are removed and the email is the request's own
 `hello@lanternworks.example`; nothing else in the file was changed.
+- `hero-sample.jpg`: a SYNTHETIC test photo (a 1200 px JPEG of the Package 2 screenshot), used as an owner-supplied image in the Package 3 media tests.

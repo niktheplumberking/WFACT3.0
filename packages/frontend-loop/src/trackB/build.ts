@@ -22,13 +22,15 @@ import { buildTrackBPalette } from "./palette.js";
 import { probeIsolation, runIsolated, type IsolationMethod, type IsolationProbe } from "./isolate.js";
 import type { SiteContent } from "./content.js";
 import { logoDisplaySize, servedLogoData, type LogoAsset } from "../brandAsset.js";
+import type { ImageAsset } from "../media.js";
 import { OG_IMAGE_FILE, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
 
 // 1.1.0: contact form variants (enquiry | signup), "Location" label. 1.2.0: launch files (robots, llms, sitemap, share card, canonical)
 // 1.3.0: the client's logo (header, footer, favicon). 1.4.0 (Build-quality Package 2): the logo has an explicit display size
 // (it collapsed to 0x0), the accent fills buttons and never panels, a phone action bar, an entrance for every section type,
 // a swipeable work reel on phones, no empty band under the phone hero.
-export const STARTER_VERSION = "track-b-starter/1.4.0";
+// 1.5.0 (Build-quality Package 3): media slots (the owner's verified images, or labelled placeholder cards) and a team section.
+export const STARTER_VERSION = "track-b-starter/1.5.0";
 
 /** Extensions read back as text; everything else in the export is binary (base64). */
 const TEXT_EXT = new Set([".html", ".txt", ".js", ".css", ".json", ".svg", ".xml", ".webmanifest", ".map"]);
@@ -103,6 +105,8 @@ export interface TrackBBuildOptions {
   logo?: LogoAsset | null;
   /** The brief reserves the accent for buttons and links (brand.ts accentForActionsOnly): no decorative accent anywhere. */
   accentActionsOnly?: boolean;
+  /** Owner-supplied images by media slot (media.ts imageAssetsFor), verified; a slot without one shows a placeholder card. */
+  images?: ReadonlyMap<string, ImageAsset>;
 }
 
 export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOptions = {}): Promise<TrackBBuild> {
@@ -114,7 +118,7 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
   // Two simultaneous builds of the same content would share this folder; each runner builds one site at a time.
   const siteUrl = opts.siteUrl ?? null;
   const logo = opts.logo ?? null;
-  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").update(logo?.sha256 ?? "").update(opts.accentActionsOnly ? "actions" : "").digest("hex").slice(0, 16);
+  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").update(logo?.sha256 ?? "").update(opts.accentActionsOnly ? "actions" : "").update([...(opts.images ?? new Map()).entries()].map(([k, v]) => `${k}=${v.sha256}`).sort().join(",")).digest("hex").slice(0, 16);
   const work = path.join(tmpdir(), "wfact-track-b", key);
   rmSync(work, { recursive: true, force: true });
   mkdirSync(work, { recursive: true });
@@ -138,6 +142,14 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
     if (siteUrl) writeFileSync(path.join(work, "public/sitemap.xml"), sitemapXml(siteUrl, content.pages.map((p) => urlPath(p.slug))));
     writeFileSync(path.join(work, "public", OG_IMAGE_FILE), ogImagePng({ deep: palette.deep, accent: palette.accent }));
     if (logo) writeFileSync(path.join(work, "public", logo.file), servedLogoData(logo));
+    // Package 3: the owner's verified images, content-addressed, and the slot map the starter's MediaFrame reads.
+    const slotImages: Record<string, { src: string; width: number; height: number }> = {};
+    for (const [slot, img] of opts.images ?? new Map<string, ImageAsset>()) {
+      mkdirSync(path.join(work, "public", "media"), { recursive: true });
+      writeFileSync(path.join(work, "public", img.file), img.data);
+      slotImages[slot] = { src: `/${img.file}`, width: img.width, height: img.height };
+    }
+    writeFileSync(path.join(work, "content/media.json"), `${JSON.stringify(slotImages, null, 2)}\n`);
 
     const isolation = await probeIsolation(work, opts.method);
     if (isolation.network !== "blocked") throw new TrackBBuildError(`refusing to build: the isolated build could reach the network (${isolation.attempts.join("; ")})`, "");
@@ -167,7 +179,7 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
     for (const p of pages) if (files[p] === undefined) throw new TrackBBuildError(`the export has no ${p}`, build.output);
 
     const source: Record<string, string> = {};
-    for (const rel of [...starterSourceFiles(work), "lib/type.generated.ts", "content/site.json", "content/theme.json", "content/launch.json", ...walk(path.join(work, "app")).filter((f) => f.endsWith("/page.tsx")).map((f) => `app/${f}`)]) {
+    for (const rel of [...starterSourceFiles(work), "lib/type.generated.ts", "content/site.json", "content/theme.json", "content/launch.json", "content/media.json", ...walk(path.join(work, "app")).filter((f) => f.endsWith("/page.tsx")).map((f) => `app/${f}`)]) {
       // Dotfiles (.gitignore) are tooling, not the site's source, and the artifact store refuses them.
       if (rel.split("/").some((seg) => seg.startsWith("."))) continue;
       if (source[rel] === undefined && existsSync(path.join(work, rel))) source[rel] = readFileSync(path.join(work, rel), "utf8");

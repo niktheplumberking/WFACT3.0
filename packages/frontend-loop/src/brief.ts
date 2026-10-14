@@ -9,6 +9,7 @@
 import { readFileSync } from "node:fs";
 import { LogoError, parseBriefLogo, type BriefLogo } from "./brandAsset.js";
 import { parseRequested, REQUEST_TEXT_MAX, type RequestedItems } from "./request.js";
+import { ImageError, parseSuppliedImages, type SuppliedImage } from "./media.js";
 
 export type { RequestedItems } from "./request.js";
 
@@ -64,6 +65,13 @@ export interface PilotBrief {
   requested?: RequestedItems;
   /** "summary-only" when neither the request nor the requested list could be found: the build says so (Cockpit note). */
   briefBasis?: "request" | "summary-only";
+  /**
+   * Images the owner supplied for media slots (Build-quality Package 3; plan inputs `asset.image.<slot>`): pointers and
+   * fingerprints, never bytes. Every other slot shows a labelled placeholder card.
+   */
+  images?: SuppliedImage[];
+  /** The owner ticked "launch with placeholders" (plan input `launch.placeholders_ok`): the launch check then lets them pass. */
+  launchWithPlaceholders?: boolean;
   /** Provenance — never silently treat a placeholder brief as Nick's real one. */
   source: "nick" | "placeholder-2.0-case" | "intake-planner" | "synthetic-provisional-2026-09-30";
 }
@@ -180,6 +188,16 @@ export function parseBrief(raw: unknown): PilotBrief {
     throw new InvalidBriefError('Brief "briefBasis", if present, must be "request" or "summary-only".');
   }
 
+  let images: SuppliedImage[] = [];
+  try {
+    images = parseSuppliedImages(record.images);
+  } catch (e) {
+    throw new InvalidBriefError(e instanceof ImageError ? e.message : String(e));
+  }
+  if (record.launchWithPlaceholders !== undefined && typeof record.launchWithPlaceholders !== "boolean") {
+    throw new InvalidBriefError('Brief "launchWithPlaceholders", if present, must be true or false.');
+  }
+
   const ownerFacts = parseOwnerFacts(record.ownerFacts);
   const ownerSkipped = Array.isArray(record.ownerSkipped) ? (record.ownerSkipped as unknown[]).filter((x): x is string => typeof x === "string" && x.length <= OWNER_FACT_LIMITS.label).slice(0, OWNER_FACT_LIMITS.count) : [];
 
@@ -196,6 +214,8 @@ export function parseBrief(raw: unknown): PilotBrief {
     ...(logo ? { logo } : {}),
     ...(record.requestText !== undefined ? { requestText: record.requestText as string } : {}),
     ...(requested ? { requested } : {}),
+    ...(images.length > 0 ? { images } : {}),
+    ...(record.launchWithPlaceholders === true ? { launchWithPlaceholders: true } : {}),
     ...(record.briefBasis !== undefined ? { briefBasis: record.briefBasis as "request" | "summary-only" } : {}),
     ...(ownerFacts.length > 0 ? { ownerFacts } : {}),
     ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}),

@@ -26,6 +26,7 @@ import { siteUrlOf } from "../launch.js";
 import { CONTENT_FLOORS } from "../request.js";
 import { logoAssetFor } from "../brandAsset.js";
 import { accentForActionsOnly } from "./brand.js";
+import { imageAssetsFor } from "../media.js";
 
 export const TRACK_B_TEMPLATE: PageTemplate = {
   id: "track-b",
@@ -79,7 +80,7 @@ export function trackBSystemPrompt(scope: PageScope = "multi"): string {
         ]
       : [
           "STRUCTURE. pages[0] is the home page with slug \"index\". 3 to 7 pages. Every section id the brief requires must exist on some page.",
-          "Every page starts with a hero, prose or contact section (it carries the page's h1); only the home page should use hero. The home page has",
+          "Every page starts with a hero, prose, contact or team section (it carries the page's h1); only the home page should use hero. The home page has",
           `4 to 6 sections and at least ${CONTENT_FLOORS.homeWords} words; every other page at least 3 sections and ${CONTENT_FLOORS.pageWords} words (thin pages are`,
           "refused). Never two sections of the same type in a row, never three list-like sections",
         ]),
@@ -96,7 +97,17 @@ export function trackBSystemPrompt(scope: PageScope = "multi"): string {
     "  join a list or a waitlist, or hear about an opening; enquiry when they are starting a project or a conversation. formNote must say",
     "  honestly that the form is not connected yet and what to do instead.",
     "- prose: reading column with an optional aside.",
+    "- team: the people behind the business: heading, intro, members (name and role ONLY when the client's request or the owner's",
+    "  facts name them; otherwise leave members empty and describe the team in the intro). No invented people, no invented photos.",
     "- cta: the closing band in the deep colour, a large heading and the primary action.",
+    "",
+    "MEDIA. A media slot is {kind, alt, aspect, note}; the starter shows the client's image there, or until one is supplied a branded",
+    "card that says \"Image to come: <note>\". Put media on the home hero and on EVERY work item (required), and on prose, services",
+    "items or team where a picture helps the visitor. note says what the picture should show, for the client (\"Team photo, the three",
+    "of us at the studio\"); alt describes it for screen readers. aspect is one of 16:9, 3:2, 4:3, 1:1, 4:5, 3:4. kind is",
+    "\"placeholder\" unless the brief lists a supplied image for that exact slot (then \"supplied\"). Never write src, never kind",
+    "\"generated\", never a URL. Slot ids: <page slug>.<section id> for hero, prose and team; <page slug>.<section id>.<n> for work and",
+    "services items (n counts from 1).",
     "",
     "BRAND. Use the brief's colours if it names them: ink = text, paper = page background (a dark paper makes a dark site), accent = actions",
     "and highlights, deep = colour fields and the closing band. Text contrast must reach 4.5:1 (the starter adjusts the accent for text if",
@@ -129,7 +140,7 @@ export class TrackBLoop {
     this.maxRounds = opts.maxRounds ?? 3;
     this.maxValidation = opts.maxValidationAttempts ?? 3;
     this.nowIso = opts.nowIso ?? (() => new Date().toISOString());
-    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b), logo: logoAssetFor(b), accentActionsOnly: accentForActionsOnly(b) }));
+    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b), logo: logoAssetFor(b), accentActionsOnly: accentForActionsOnly(b), images: imageAssetsFor(b) }));
   }
 
   async run(brief: PilotBrief): Promise<FrontendLoopResult> {

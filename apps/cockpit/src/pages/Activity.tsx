@@ -21,6 +21,7 @@ import { fetchRunSpend, money, total } from "../lib/costs";
 import { stageLabel } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
 import { ClientNeedsPanel, RecoveryPanel } from "../components/Recovery";
+import { PlaceholdersPanel } from "../components/Placeholders";
 import { BuildTimeline } from "../components/BuildTimeline";
 import { subjectOf } from "./Home";
 
@@ -496,6 +497,7 @@ export function RunPage() {
             </Notice>
           )}
           {build && j.status === "succeeded" && <ClientNeedsPanel job={j} planId={planId} onStarted={(id) => nav(`/activity/${id}`)} />}
+          {build && j.status === "succeeded" && <PlaceholdersPanel job={j} planId={planId} onStarted={(id) => nav(`/activity/${id}`)} />}
           {superseded && (
             <Notice tone="info">
               A later build of the same plan passed every check ({dateTime(superseded.finished_at ?? superseded.created_at)}). You probably don't need to resume this one.{" "}

@@ -35,12 +35,15 @@ function launchResults(siteUrl: string | null) {
     otherClientSlugs: [],
     site: { files: site.files, pages: site.pages, binary: site.binary },
     stage: "launch",
+    // Package 3: the fixture's home hero is a labelled placeholder; these tests are about launch FILES, so the owner's
+    // "launch with placeholders" tick is set. Without it content.placeholders-launch refuses (test/media.test.ts).
+    launchWithPlaceholders: true,
   };
   return { site, results: runChecks(ctx, gateTextChecks().filter((c) => LAUNCH_IDS.includes(c.id))) };
 }
 
 test("Track A with the production address: every launch-stage check passes", () => {
-  assert.deepEqual([...LAUNCH_IDS].sort(), ["tells.404-page", "tells.canonical", "tells.llms-txt", "tells.og-image", "tells.robots", "tells.sitemap"]);
+  assert.deepEqual([...LAUNCH_IDS].sort(), ["content.placeholders-launch", "tells.404-page", "tells.canonical", "tells.llms-txt", "tells.og-image", "tells.robots", "tells.sitemap"]);
   const { site, results } = launchResults("https://summitline.co");
   assert.equal(results.length, LAUNCH_IDS.length);
   for (const r of results) assert.ok(r.passed && !r.notApplicable, `${r.checkId}: ${r.details.join(" | ")}`);
@@ -74,7 +77,7 @@ test("Track B on a real isolated build: with the address every launch-stage chec
   const nf = validateTrackB(JSON.parse(readFileSync(path.join(FX, "northfold.content.json"), "utf-8")), nfBrief).content!;
   const launchCheck = (b: TrackBBuild) =>
     runChecks(
-      { html: b.files["index.html"]!, clientSlug: nfBrief.clientSlug, requiredSections: [], otherClientSlugs: [], site: { files: b.files, pages: b.pages, binary: b.binary }, stage: "launch" },
+      { html: b.files["index.html"]!, clientSlug: nfBrief.clientSlug, requiredSections: [], otherClientSlugs: [], site: { files: b.files, pages: b.pages, binary: b.binary }, stage: "launch", launchWithPlaceholders: true },
       gateTextChecks().filter((c) => LAUNCH_IDS.includes(c.id)),
     );
   const live = await buildTrackBSite(nf, { siteUrl: "https://northfold.studio" });

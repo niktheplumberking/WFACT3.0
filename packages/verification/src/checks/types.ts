@@ -48,6 +48,8 @@ export interface VerificationContext {
    * engine, never read from the page. Drives the rendered brand checks (logo, phone action, accent usage).
    */
   brand?: BrandPromise;
+  /** Build-quality Package 3: the owner chose to launch with placeholder images (content.placeholders-launch passes). */
+  launchWithPlaceholders?: boolean;
 }
 
 export interface BrandPromise {

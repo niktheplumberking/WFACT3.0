@@ -29,6 +29,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 import { actionHref, content, type Fact, type Section } from "@/lib/content";
 import { ContactForm } from "./ContactForm";
+import { MediaFrame } from "./MediaFrame";
 import { MagneticAction } from "./motion/MagneticAction";
 import { ProgressRule } from "./motion/ProgressRule";
 import { ScrollDrift } from "./motion/ScrollDrift";
@@ -72,8 +73,10 @@ const TONES = ["tone-deep", "tone-surface", "tone-panel"] as const;
 /** Entrance hook for a section's heading block: the first section of a page enters on load, the rest as they scroll in. */
 const headReveal = (first: boolean) => (first ? "load" : "rise");
 
-export function SectionView({ section, first }: { section: Section; first: boolean }) {
+export function SectionView({ section, first, page }: { section: Section; first: boolean; page: string }) {
   const s = section;
+  // Slot ids are code's, never the builder's: <page>.<section> or <page>.<section>.<n> (frontend-loop src/media.ts mediaSlots).
+  const slot = (n?: number) => `${page}.${s.id}${n ? `.${n}` : ""}`;
   switch (s.type) {
     case "hero": {
       const words = s.heading.split(/\s+/).filter(Boolean);
@@ -97,6 +100,7 @@ export function SectionView({ section, first }: { section: Section; first: boole
               {s.showAction && <ActionLink />}
             </div>
             <span className="hero-rule" aria-hidden="true" />
+            {s.media && <MediaFrame media={s.media} slot={slot()} className="hero-media" priority={first} />}
           </div>
         </section>
       );
@@ -122,6 +126,7 @@ export function SectionView({ section, first }: { section: Section; first: boole
           <WorkReel pan={content.brand.motion === "expressive"}>
             {s.items.map((item, i) => (
               <article key={item.title} className={`reel-panel ${TONES[i % TONES.length]}`} data-reveal="panel">
+                {item.media && <MediaFrame media={item.media} slot={slot(i + 1)} className="panel-media" />}
                 <div className="panel-top">
                   <p className="panel-client">{item.client}</p>
                   {item.source === "sample" && <Sample text="SAMPLE project, not real client work" />}
@@ -151,6 +156,7 @@ export function SectionView({ section, first }: { section: Section; first: boole
             <ul className="services-list">
               {s.items.map((it) => (
                 <li key={it.name} className="service" data-reveal="item">
+                  {it.media && <MediaFrame media={it.media} slot={slot(s.items.indexOf(it) + 1)} className="service-media" />}
                   <h3 className="h3">{it.name}</h3>
                   <p>{it.summary}</p>
                   {it.details.length > 0 && <p className="service-details">{it.details.join(" / ")}</p>}
@@ -314,11 +320,34 @@ export function SectionView({ section, first }: { section: Section; first: boole
                 </p>
               ))}
             </div>
+            {s.media && <MediaFrame media={s.media} slot={slot()} className="prose-media" />}
             {s.aside && (
               <aside className="prose-aside" data-reveal="item">
                 <h3 className="h4">{s.aside.heading}</h3>
                 <p>{s.aside.text}</p>
               </aside>
+            )}
+          </div>
+        </section>
+      );
+    case "team":
+      return (
+        <section id={s.id} className="team">
+          <div className="container team-grid">
+            <div className="team-head" data-reveal={headReveal(first)}>
+              {first ? <h1 className="display">{s.heading}</h1> : <h2 className="h2">{s.heading}</h2>}
+              <p className="body-lg">{s.intro}</p>
+            </div>
+            {s.media && <MediaFrame media={s.media} slot={slot()} className="team-media" />}
+            {s.members.length > 0 && (
+              <ul className="team-list">
+                {s.members.map((m) => (
+                  <li key={m.name} className="team-member" data-reveal="item">
+                    <h3 className="h3">{m.name}</h3>
+                    {m.role && <p className="muted">{m.role}</p>}
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </section>

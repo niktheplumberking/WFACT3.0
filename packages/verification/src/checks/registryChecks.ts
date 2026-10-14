@@ -479,6 +479,28 @@ export const ogImageCheck: Check = {
   },
 };
 
+/**
+ * Build-quality Package 3: a site does not launch while it still shows placeholder cards (`data-placeholder`, the
+ * starter's "Image to come" frames), unless the owner chose to launch with them (plan input `launch.placeholders_ok`,
+ * carried as ctx.launchWithPlaceholders). Launch stage only: at preview the placeholders are expected and listed.
+ */
+export const placeholdersLaunchCheck: SiteLevelCheck = {
+  id: "content.placeholders-launch",
+  siteLevel: true,
+  description: "No labelled placeholder image is left on the site at launch, unless the owner ticked 'launch with placeholders'.",
+  run(ctx: VerificationContext): CheckResult {
+    const pages = ctx.site ? ctx.site.pages.map((p) => [p, ctx.site!.files[p] ?? ""] as const) : [["index.html", ctx.html] as const];
+    const found: string[] = [];
+    for (const [page, html] of pages) {
+      for (const m of html.matchAll(/data-placeholder="([^"]+)"/g)) found.push(`${page}: ${m[1]}`);
+    }
+    if (found.length === 0 || ctx.launchWithPlaceholders) return result("content.placeholders-launch", []);
+    return result("content.placeholders-launch", [
+      `${found.length} image(s) still show a placeholder card (${found.slice(0, 8).join(", ")}${found.length > 8 ? ", ..." : ""}); upload the client's images in the Cockpit, or tick "launch with placeholders".`,
+    ]);
+  },
+};
+
 /** Every Step 7 text check by id. The registry (config/eval-registry.json) decides severity, stage and order. */
 export const STEP7_TEXT_CHECKS: Check[] = [
   devUrlsCheck, mixedContentCheck, sourceMapsCheck, targetBlankCheck, duplicateIdsCheck, prerenderedContentCheck,
@@ -486,4 +508,5 @@ export const STEP7_TEXT_CHECKS: Check[] = [
   titleCheck, metaDescriptionCheck, singleH1Check, openGraphCheck, duplicateTitlesCheck, faviconCheck,
   siteInternalLinksCheck,
   notFoundPageCheck, sitemapCheck, robotsCheck, llmsTxtCheck, canonicalCheck, ogImageCheck,
+  placeholdersLaunchCheck,
 ];

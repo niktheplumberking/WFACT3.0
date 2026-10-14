@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "track-b/1",
+  "schemaVersion": "track-b/2",
   "business": {
     "name": "Northfold",
     "tagline": "Brand and digital design studio.",
@@ -34,7 +34,13 @@
           "id": "hero",
           "heading": "Identities with a voice, and websites that move like them.",
           "intro": "We are a small studio. We design the brand and build the site together, so the type, the motion and the words all come from one idea.",
-          "showAction": true
+          "showAction": true,
+          "media": {
+            "kind": "placeholder",
+            "alt": "The Northfold studio at work",
+            "aspect": "16:9",
+            "note": "A wide photo of the studio or a recent project"
+          }
         },
         {
           "type": "statement",
@@ -57,7 +63,13 @@
                 "Wayfinding",
                 "Website"
               ],
-              "source": "sample"
+              "source": "sample",
+              "media": {
+                "kind": "placeholder",
+                "alt": "Tidewater Ferries",
+                "aspect": "4:3",
+                "note": "A picture of Tidewater Ferries"
+              }
             },
             {
               "title": "Loam & Ash",
@@ -68,7 +80,13 @@
                 "Art direction",
                 "Online shop"
               ],
-              "source": "sample"
+              "source": "sample",
+              "media": {
+                "kind": "placeholder",
+                "alt": "Loam & Ash",
+                "aspect": "4:3",
+                "note": "A picture of Loam & Ash"
+              }
             },
             {
               "title": "Field Notes Radio",
@@ -78,7 +96,13 @@
                 "Motion identity",
                 "Website"
               ],
-              "source": "sample"
+              "source": "sample",
+              "media": {
+                "kind": "placeholder",
+                "alt": "Field Notes Radio",
+                "aspect": "4:3",
+                "note": "A picture of Field Notes Radio"
+              }
             }
           ]
         },

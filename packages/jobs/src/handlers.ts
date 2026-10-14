@@ -22,7 +22,8 @@ import type { Plan } from "@wfact/planning/planner";
 import type { PilotBrief } from "@wfact/frontend-loop/brief";
 import { buildAndVerify, recordedBuilderTemplate, resumeBuildAndVerify, qaFailureToIssues, runIdOfError, runProgress, type ContinueFrom, type ReopenRequest, type WorkflowDeps, type WorkflowResult } from "@wfact/workflow";
 import type { Job } from "./jobStore.js";
-import { LOGO_INPUT_KEY, ownerFactsFrom, type PlanInput, type PlanInputStore } from "./inputStore.js";
+import { IMAGE_INPUT_PREFIX, LAUNCH_PLACEHOLDERS_KEY, LOGO_INPUT_KEY, ownerFactsFrom, type PlanInput, type PlanInputStore } from "./inputStore.js";
+import { parseImageRecord, SLOT_RE, type SuppliedImage } from "@wfact/frontend-loop/media";
 import { parseBriefLogo } from "@wfact/frontend-loop/brandAsset";
 
 export interface HandlerDeps {
@@ -129,6 +130,9 @@ function workflowOutcome(r: WorkflowResult, extra: Record<string, unknown> = {})
       workflowRunId: r.workflowRunId,
       // Step 4D: what the run asked of the client, so the Cockpit can list it instead of burying it in an audit row.
       needsFromClient: r.needsFromClient ?? [],
+      // Build-quality Package 3: placeholder images still on the site, and whether the owner chose to launch with them.
+      placeholders: r.placeholders ?? [],
+      launchWithPlaceholders: r.launchWithPlaceholders === true,
       cycles: r.cycles,
       lastCheckpoint: r.lastCheckpoint,
       qaIssues: r.qaFailure ? qaFailureToIssues(r.qaFailure) : [],
@@ -431,11 +435,26 @@ export function briefForBuild(plan: Pick<Plan, "brief" | "intake">, inputs: Plan
     }
   }
   const siteUrl = inputs.find((i) => i.key === "site_url" && !i.waived && i.value)?.value;
+  // Package 3: images the owner supplied per media slot (checked by the database when added, and again by the build).
+  const images: SuppliedImage[] = [];
+  for (const i of inputs) {
+    if (!i.key.startsWith(IMAGE_INPUT_PREFIX) || i.waived || !i.value) continue;
+    const slot = i.key.slice(IMAGE_INPUT_PREFIX.length);
+    if (!SLOT_RE.test(slot)) continue;
+    try {
+      images.push({ slot, image: parseImageRecord(JSON.parse(i.value)) });
+    } catch {
+      throw new Error(`the image the owner added for ${slot} is not a readable image record; upload it again`);
+    }
+  }
+  const launchWithPlaceholders = inputs.some((i) => i.key === LAUNCH_PLACEHOLDERS_KEY && !i.waived && i.value === "yes");
   return {
     ...base,
     ...(ownerFacts.length > 0 ? { ownerFacts } : {}),
     ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}),
     ...(logo ? { logo } : {}),
     ...(siteUrl && /^https:\/\/[^/\s]+\/?$/i.test(siteUrl) ? { siteUrl } : {}),
+    ...(images.length > 0 ? { images } : {}),
+    ...(launchWithPlaceholders ? { launchWithPlaceholders: true } : {}),
   };
 }
