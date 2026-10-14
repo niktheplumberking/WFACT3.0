@@ -17,9 +17,8 @@ import { parseBrief } from "../../frontend-loop/src/brief.js";
 import { validateSiteContent, type SiteContent } from "../../frontend-loop/src/trackB/content.js";
 import { buildTrackBSite, type TrackBBuild } from "../../frontend-loop/src/trackB/build.js";
 import { trackBBrand } from "../../frontend-loop/src/trackB/brand.js";
-import { inspectImage, loadImageAsset } from "../../frontend-loop/src/media.js";
+import { inspectImage, loadImageAsset, placeholdersFor } from "../../frontend-loop/src/media.js";
 import { lanternworksFixed, LANTERNWORKS_REQUEST } from "../../frontend-loop/test/lanternworksFixed.js";
-import { placeholdersFor } from "../../workflow/src/buildAndVerify.js";
 import { placeholderMediaCheck, placeholdersLaunchCheck } from "../../verification/src/checks/registryChecks.js";
 import { runRenderedQa, TRACK_B_BUDGET } from "../src/rendered.js";
 

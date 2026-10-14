@@ -42,7 +42,7 @@ import { briefFactSources, type PilotBrief } from "@wfact/frontend-loop/brief";
 import { trackBBrand } from "@wfact/frontend-loop/trackB/brand";
 import { CONTENT_SCHEMA_VERSION as TRACK_B_SCHEMA, type SiteContent as TrackBContent } from "@wfact/frontend-loop/trackB/content";
 import { briefRequiresLogo, loadLogoAsset, LogoError, provideLogoAsset } from "@wfact/frontend-loop/brandAsset";
-import { ImageError, loadImageAsset, mediaSlots, placeholderLine, provideImageAsset } from "@wfact/frontend-loop/media";
+import { ImageError, loadImageAsset, placeholdersFor, provideImageAsset } from "@wfact/frontend-loop/media";
 import type { QaInput } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
 
@@ -124,21 +124,8 @@ const isSiteManifest = (artifact: StoredArtifact) => artifact.path.endsWith(`/${
  * Writes every site file, then the manifest that pins their hashes. The manifest is the checkpoint.
  * Track B (M4) adds the built project under _source/ and stores fonts as bytes, not base64 text.
  */
-/** Media slots on the saved content that still show a placeholder card, with the line an owner reads (Package 3). */
-export function placeholdersFor(contentJson: string, brief: PilotBrief): { slot: string; page: string; section: string; note: string; line: string }[] {
-  let content: unknown;
-  try {
-    content = JSON.parse(contentJson);
-  } catch {
-    return [];
-  }
-  const c = content as { pages?: { slug: string; sections: unknown[] }[] };
-  if (!Array.isArray(c?.pages)) return [];
-  const supplied = new Set((brief.images ?? []).map((i) => i.slot));
-  return mediaSlots({ pages: c.pages }, supplied)
-    .filter((s) => s.shows === "placeholder")
-    .map((s) => ({ slot: s.slot, page: s.page, section: s.section, note: s.media.note, line: placeholderLine(s) }));
-}
+/** Media slots on the saved content that still show a placeholder card (Package 3; frontend-loop media.ts). */
+export { placeholdersFor };
 
 /** The brand promise for a Track B site's saved content (Build-quality Package 2); nothing for any other content. */
 export function brandPromiseFor(contentJson: string, brief: PilotBrief): { brand: ReturnType<typeof trackBBrand> } | Record<string, never> {

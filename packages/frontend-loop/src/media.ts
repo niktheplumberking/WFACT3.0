@@ -183,6 +183,22 @@ export function mediaSlots(content: { pages: { slug: string; sections: unknown[]
   return out;
 }
 
+/** Media slots on saved content (any track) that still show a placeholder card, with the line an owner reads. */
+export function placeholdersFor(contentJson: string, brief: { images?: SuppliedImage[] }): { slot: string; page: string; section: string; note: string; line: string }[] {
+  let content: unknown;
+  try {
+    content = JSON.parse(contentJson);
+  } catch {
+    return [];
+  }
+  const c = content as { pages?: { slug: string; sections: unknown[] }[] };
+  if (!Array.isArray(c?.pages)) return [];
+  const supplied = new Set((brief.images ?? []).map((i) => i.slot));
+  return mediaSlots({ pages: c.pages }, supplied)
+    .filter((s) => s.shows === "placeholder")
+    .map((s) => ({ slot: s.slot, page: s.page, section: s.section, note: s.media.note, line: placeholderLine(s) }));
+}
+
 /** The plain line an owner reads for a slot that still needs the client's picture. */
 export function placeholderLine(s: MediaSlot): string {
   return `Image still needed from the client for ${s.page === "index" ? "the home page" : `the ${s.page} page`} (${s.section}): ${s.media.note}`;
