@@ -37,6 +37,7 @@ const ROUTES: { re: RegExp; title: string; parent?: { label: string; to: string 
   { re: /^\/$/, title: "Home" },
   { re: /^\/projects\/new/, title: "New request", parent: { label: "Projects", to: "/projects" } },
   { re: /^\/projects\/.+/, title: "Project", parent: { label: "Projects", to: "/projects" } },
+  { re: /^\/clients\/.+/, title: "Project", parent: { label: "Projects", to: "/projects" } },
   { re: /^\/projects/, title: "Projects" },
   { re: /^\/decisions\/plans\//, title: "Proposal", parent: { label: "Projects", to: "/projects" } },
   { re: /^\/decisions\/accounts/, title: "Team and access" },
@@ -195,7 +196,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const nav: NavEntry[] = [
     { to: "/", label: "Home", icon: House, end: true, count: attention.length },
-    { to: "/projects", label: "Projects", icon: SquaresFour, also: /^\/(projects|decisions\/plans)/ },
+    { to: "/projects", label: "Projects", icon: SquaresFour, also: /^\/(projects|clients|decisions\/plans)/ },
     ...(decider ? [{ to: "/activity", label: "Activity", icon: ListBullets }] : []),
     ...(owner ? [{ to: "/costs", label: "Costs", icon: Coins }] : []),
     ...(decider ? [{ to: "/team", label: "Team", icon: UsersThree, also: /^\/decisions\/accounts/ }] : []),

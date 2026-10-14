@@ -158,6 +158,8 @@ interface Factory {
   projects: ProjectRow[] | null;
   /** Every client with its six-step path (lib/clients.ts). */
   clients: ClientRow[] | null;
+  /** Detail rows (plan_inputs, owner/admin), every revision; use currentInputs() per proposal. */
+  inputs: PlanInputRow[] | null;
   attention: AttentionItem[];
   decisions: number;
   /** The owner's first name, or "the owner" when it cannot be read. */
@@ -198,6 +200,7 @@ export function FactoryProvider({ children }: { children: ReactNode }) {
       accounts: d?.accounts ?? null,
       projects: d?.projects ?? null,
       clients,
+      inputs: d?.inputs ?? null,
       attention,
       decisions: attention.filter((i) => i.isDecision).length,
       decider: deciderName,

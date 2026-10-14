@@ -8,15 +8,19 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { BookmarkSimple, MagnifyingGlass, Plus, PushPin, Rows, SquaresFour } from "@phosphor-icons/react";
 import { supabase } from "../supabaseClient";
 import { requestJob } from "../jobsClient";
-import { dateTime, type RoundRow } from "../lib/model";
+import { dateTime, shortDate, type PlanRow, type RoundRow } from "../lib/model";
 import { canDecide, useFactory, useLoad, useMe, useToast } from "../lib/state";
 import { stageLabel } from "../stages";
-import { ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, Plate, RouteLine } from "../components/ui";
-import { fetchProjects } from "./Home";
+import { ConfirmDialog, LoadError, Loading, Notice } from "../components/ui";
 import { Button, ButtonLink, EmptyState, PathSegments, Segmented, StatusChip, StatusGlyph, TechDetails, type StatusTone } from "../components/kit";
 import { buildStopLine, capped, fetchCostData, fetchRequestCost, money, runSpend } from "../lib/costs";
 import { estimate, formatMs, median } from "../lib/timeline";
-import { STEP_NAMES } from "../lib/path";
+import { STEP_NAMES, buildsOf, knownNeeds, stripSteps } from "../lib/path";
+import { ProgressStrip } from "../components/flow";
+import { currentInputs } from "../lib/inputs";
+import { eventsFor, fetchPeople, fetchPersonEvents, phrase } from "../lib/phrases";
+import { asStopped, diagnoseJob } from "../lib/recovery";
+import { isActive, type JobRow } from "../jobsClient";
 import type { ClientRow } from "../lib/clients";
 import { StageMove } from "./Decisions";
 import { LogoUpload } from "../components/LogoUpload";
@@ -422,58 +426,239 @@ async function fetchProjectRounds(id: string): Promise<RoundRow[]> {
   return (res.data ?? []) as unknown as RoundRow[];
 }
 
+async function fetchProjectManager(clientId: string | undefined): Promise<string | null> {
+  if (!clientId) return null;
+  const res = await supabase.from("profile_clients").select("profile_id,profiles(full_name,role)").eq("client_id", clientId);
+  if (res.error || !res.data) return null;
+  const pm = (res.data as unknown as { profiles: { full_name: string | null; role: string } | null }[]).find((r) => r.profiles?.role === "pm");
+  return pm?.profiles?.full_name ?? null;
+}
+
+/**
+ * The client's page (Cockpit v2 "Project page"): title and meta, the six-step progress strip with its one next action,
+ * then the proposal, details and files, and builds; beside them cost so far (owner: the cost views are owner-only
+ * under RLS), the decisions timeline from the audit trail, and Technical details. /projects/:id and /clients/:slug both
+ * land here.
+ */
 export function ProjectPage() {
-  const { id = "" } = useParams();
+  const { id, slug } = useParams();
   const me = useMe();
-  const projects = useLoad(fetchProjects, []);
-  const rounds = useLoad(() => fetchProjectRounds(id), [id]);
-  const p = projects.data?.find((x) => x.id === id);
-  if (projects.error) return <LoadError what="this project" error={projects.error} onRetry={projects.reload} />;
-  if (!projects.data) return <Loading rows={3} label="Loading the project" />;
-  if (!p) return <Empty title="This project doesn't exist, or your role can't see it.">PMs see only the clients they're assigned to. <Link to="/projects">Back to Projects</Link></Empty>;
+  const f = useFactory();
+  const nav = useNavigate();
+  const decider = canDecide(me.role);
+  const owner = me.role === "owner";
+  const client = (f.clients ?? []).find((c) => (id ? c.project?.id === id : c.key === slug));
+  const plan = client?.plan ?? null;
+  const path = client?.path ?? null;
+  const planIds = useMemo(() => new Set((f.plans ?? []).filter((p) => p.client_slug === plan?.client_slug).map((p) => p.id)), [f.plans, plan?.client_slug]);
+  const builds = useMemo(() => (plan ? [...buildsOf(plan.id, f.jobs ?? [])].sort((x, y) => y.created_at.localeCompare(x.created_at)) : []), [plan, f.jobs]);
+  const events = useLoad(async () => (decider ? fetchPersonEvents() : []), [decider]);
+  const people = useLoad(async () => (decider ? fetchPeople() : {}), [decider]);
+  const costs = useLoad(async () => (owner ? fetchCostData() : null), [owner]);
+  const pmName = useLoad(() => fetchProjectManager(client?.project?.client_id), [client?.project?.client_id]);
+  const rounds = useLoad(async () => (client?.project ? fetchProjectRounds(client.project.id) : []), [client?.project?.id]);
+
+  if (f.error) return <LoadError what="this client" error={f.error} onRetry={f.reload} />;
+  if (!f.clients) return <Loading rows={3} label="Loading the client" />;
+  if (!client) return <EmptyState title="This client isn't here, or your role can't see it." action={<ButtonLink to="/projects">Back to Projects</ButtonLink>}>Project managers see only the clients they are assigned to.</EmptyState>;
+
+  const brief = plan?.plan.plan.brief as (PlanRow["plan"]["plan"]["brief"] & { requested?: { pages?: string[] } }) | undefined;
+  const pages = brief?.requested?.pages ?? [];
+  const openQs = (plan?.plan.plan.openQuestions.length ?? 0) + (plan?.plan.direction?.openQuestions?.length ?? 0);
+  const needs = plan ? knownNeeds(plan, path?.build ?? null) : [];
+  const current = plan ? currentInputs((f.inputs ?? []).filter((i) => i.plan_id === plan.id)) : [];
+  const stateOf = (key: string) => {
+    const r = current.find((c) => c.key === key);
+    return !r ? "need" : r.waived ? "skip" : (r.value ?? "").trim() ? "done" : "need";
+  };
+  const supplied = needs.filter((n) => stateOf(n.key) === "done").length;
+  const runCost = new Map((costs.data?.runs ?? []).map((r) => [r.run_id, capped(runSpend(r))]));
+  const costOf = (j: JobRow) => runCost.get(String(j.result?.workflowRunId ?? ""));
+  const spentOnBuilds = builds.reduce((sum, j) => sum + (costOf(j) ?? 0), 0);
+  const jobIds = new Set(builds.map((j) => j.id));
+  const timeline = events.data && people.data ? phrase(eventsFor(events.data, planIds, jobIds), people.data, me.userId).slice(0, 12) : null;
+
+  const buildWord = (j: JobRow): { tone: StatusTone; what: string; chip: string } => {
+    if (isActive(j)) return { tone: "run", what: "Running now", chip: "Running" };
+    if (j.status === "succeeded" && j.result?.status === "awaiting_launch_approval") {
+      const cycles = typeof j.result?.cycles === "number" ? (j.result.cycles as number) : 1;
+      const rounds = Math.max(0, cycles - 1);
+      return { tone: "done", what: `Passed every check${rounds ? `, ${rounds} ${rounds === 1 ? "round" : "rounds"} of fixes` : ""}`, chip: "Passed" };
+    }
+    return { tone: "stop", what: `Stopped: ${diagnoseJob(asStopped(j), builds, { planId: plan?.id }).headline}`, chip: "Stopped" };
+  };
+
   return (
-    <>
-      <PageHead
-        kicker={`${p.clients?.name ?? "No client"}, ${p.clients?.entities?.name ?? "no entity"}`}
-        title={p.name}
-        lead={`At ${stageLabel(p.stage)}. ${p.status === "active" ? "Active" : `Status: ${p.status}`}. Created ${dateTime(p.created_at)}.`}
-      />
-      <div className="stack">
-        <Plate title="Where it is">
-          <div className="plate-body stack-tight">
-            <RouteLine stage={p.stage} name={p.name} />
-            {canDecide(me.role) && (
-              <div className="actions">
-                <StageMove project={p} onMoved={projects.reload} />
+    <div className="client-page">
+      <header className="client-head">
+        <p className="t-small quiet client-meta">
+          <span>{plan ? client.kind ?? "Kind of site not chosen yet" : "No proposal on file"}</span>
+          {pmName.data && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>Project manager: {pmName.data}</span>
+            </>
+          )}
+        </p>
+        <h1 className="t-display">{client.name}</h1>
+      </header>
+
+      {path && plan ? (
+        <ProgressStrip
+          step={path.step}
+          tone={path.tone === "need" || path.tone === "run" || path.tone === "stop" || path.tone === "done" ? path.tone : "wait"}
+          stepWord={path.chipWord}
+          steps={stripSteps(path, plan, { receivedAt: client.since })}
+          nextLine={path.nextLine}
+          next={path.nextAction.href ? { label: path.nextAction.label, onClick: () => nav(path.nextAction.href!) } : undefined}
+        />
+      ) : (
+        <p className="coming-later">{decider ? "There is no proposal on file for this client, so there is no progress to show." : "Its progress isn't shared with project managers yet."}</p>
+      )}
+
+      <div className="client-grid">
+        <div className="client-main">
+          {plan && (
+            <section aria-labelledby="pp-h" className="client-section">
+              <div className="section-head">
+                <h2 id="pp-h" className="t-section">
+                  The proposal
+                </h2>
+                <Link className="quiet-link" to={`/decisions/plans/${plan.id}`}>
+                  Read it
+                </Link>
+              </div>
+              <p className="t-lead">{brief?.goal}</p>
+              {pages.length > 0 && (
+                <ul className="page-pills" aria-label="Pages">
+                  {pages.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
+                </ul>
+              )}
+              <p className="t-small muted">
+                {plan.status === "approved"
+                  ? `Approved${client.kind ? ` as a ${client.kind}` : ""}${plan.decided_at ? ` on ${shortDate(plan.decided_at)}` : ""}.${openQs ? ` ${openQs} open ${openQs === 1 ? "question" : "questions"} moved to the details list.` : ""}`
+                  : plan.status === "pending"
+                    ? `Waiting for approval.${openQs ? ` ${openQs} ${openQs === 1 ? "question is" : "questions are"} still open.` : ""}`
+                    : "Not approved."}
+              </p>
+            </section>
+          )}
+          {plan && plan.status === "approved" && (
+            <section aria-labelledby="pd-h" className="client-section">
+              <div className="section-head">
+                <h2 id="pd-h" className="t-section">
+                  Details and files
+                </h2>
+                <span className="t-small muted">
+                  {supplied} of {needs.length} supplied
+                </span>
+              </div>
+              <ul className="detail-list">
+                {needs.map((n) => {
+                  const st = stateOf(n.key);
+                  return (
+                    <li key={n.key}>
+                      <span>{n.label}</span>
+                      <StatusChip tone={st === "done" ? "done" : st === "skip" ? "skip" : "need"}>{st === "done" ? "Supplied" : st === "skip" ? "Left out" : n.kind === "file" ? "Needs a file" : "Needs an answer"}</StatusChip>
+                    </li>
+                  );
+                })}
+              </ul>
+              {decider && <ButtonLink to={`/decisions/plans/${plan.id}`}>Open the details list</ButtonLink>}
+            </section>
+          )}
+          {plan && (
+            <section aria-labelledby="pb-h" className="client-section">
+              <h2 id="pb-h" className="t-section">
+                Builds
+              </h2>
+              {builds.length === 0 ? (
+                <p className="muted no-builds">No build yet. The first one starts from the details list once the proposal is approved.</p>
+              ) : (
+                <ul className="build-list">
+                  {builds.map((j, i) => {
+                    const w = buildWord(j);
+                    const cost = costOf(j);
+                    return (
+                      <li key={j.id}>
+                        <span className="fig quiet build-n">Build {builds.length - i}</span>
+                        <span className="build-what">
+                          <span className="t-label">{w.what}</span>
+                          <span className="t-small muted">Started {dateTime(j.started_at ?? j.created_at)}</span>
+                        </span>
+                        {owner && cost !== undefined && <span className="t-figure">{money(cost)}</span>}
+                        <StatusChip tone={w.tone}>{w.chip}</StatusChip>
+                        <Link className="quiet-link" to={`/activity/${j.id}`} aria-label={`Open build ${builds.length - i}`}>
+                          Open
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+          )}
+        </div>
+        <aside className="client-side" aria-label="About this client">
+          {owner && plan && (
+            <section aria-labelledby="pc-h" className="cost-card">
+              <h2 id="pc-h" className="t-label muted">
+                Cost so far
+              </h2>
+              <p className="cost-big">{costs.data ? money(spentOnBuilds) : "…"}</p>
+              <p className="t-small muted">{builds.length ? `Builds of this client, from the cost records. ${buildStopLine()}` : `No build yet. ${buildStopLine()}`}</p>
+            </section>
+          )}
+          {decider && (
+            <section aria-labelledby="pt-h" className="client-section">
+              <h2 id="pt-h" className="t-item">
+                Decisions
+              </h2>
+              {events.error ? (
+                <p className="t-small muted">The decisions could not be read: {events.error}</p>
+              ) : !timeline ? (
+                <Loading rows={2} label="Loading the decisions" />
+              ) : timeline.length === 0 ? (
+                <p className="t-small muted">No decisions recorded yet.</p>
+              ) : (
+                <ol className="timeline">
+                  {timeline.map((t) => (
+                    <li key={t.key}>
+                      <span>{t.text}</span>
+                      <span className="t-small quiet">{dateTime(t.at)}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+          )}
+          <TechDetails
+            items={[
+              ...(plan ? [{ k: "proposal", v: `${plan.id} · rev ${plan.revision}` }, { k: "client folder", v: `clients/${plan.client_slug}` }, ...(plan.build_track ? [{ k: "track", v: plan.build_track }] : [])] : []),
+              ...(builds[0] ? [{ k: "latest build", v: builds[0].id }, ...(builds[0].result?.workflowRunId ? [{ k: "run", v: String(builds[0].result.workflowRunId) }] : [])] : []),
+              ...(client.project ? [{ k: "project", v: client.project.id }, { k: "internal stage", v: client.project.stage }] : []),
+            ]}
+          >
+            {client.project && decider && (
+              <div className="tech-extra">
+                <StageMove project={client.project} onMoved={f.reload} />
+                {rounds.data && rounds.data.length > 0 && (
+                  <ul className="tech-rounds">
+                    {rounds.data.map((r) => (
+                      <li key={r.id}>
+                        Round {r.round_number}: {r.issue} ({stageLabel(r.stage)}, {dateTime(r.created_at)})
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             )}
-          </div>
-        </Plate>
-        <Plate title="Fix rounds" note="Each time a check or a person sent work back.">
-          {rounds.error && <div className="plate-body"><LoadError what="fix rounds" error={rounds.error} onRetry={rounds.reload} /></div>}
-          {!rounds.data && !rounds.error && <Loading rows={2} label="Loading fix rounds" />}
-          {rounds.data && rounds.data.length === 0 && <Empty title="No fix rounds logged for this project." />}
-          {rounds.data && rounds.data.length > 0 && (
-            <ul className="rows">
-              {rounds.data.map((r) => (
-                <li key={r.id}>
-                  <span className="aspect idle">Round {r.round_number}</span>
-                  <div>
-                    <p className="why" style={{ color: "var(--ink)" }}>{r.issue}</p>
-                    <p className="why">
-                      {stageLabel(r.stage)}. Flagged by {r.flagged_by}
-                      {r.fixed_by ? `, fixed by ${r.fixed_by}` : ""}.
-                    </p>
-                  </div>
-                  <span className="when fig">{dateTime(r.created_at)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Plate>
-        <Notice tone="info">Builds are linked to plans, not yet to projects, so they're listed on each plan and in Activity.</Notice>
+          </TechDetails>
+        </aside>
       </div>
-    </>
+    </div>
   );
 }
 

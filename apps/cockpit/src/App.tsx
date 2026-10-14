@@ -78,6 +78,7 @@ export function CockpitRoutes() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/new" element={<NewRequest />} />
         <Route path="/projects/:id" element={<ProjectPage />} />
+        <Route path="/clients/:slug" element={<ProjectPage />} />
         <Route path="/activity" element={<Activity />} />
         <Route path="/activity/fixes" element={<FixRounds />} />
         <Route path="/activity/:jobId" element={<RunPage />} />

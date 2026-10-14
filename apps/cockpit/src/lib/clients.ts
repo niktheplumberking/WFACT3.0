@@ -20,7 +20,7 @@ export interface ClientRow {
   project: ProjectRow | null;
   /** null when the viewer cannot read the rows that decide it (a PM under RLS, or a project with no proposal). */
   path: PathResult | null;
-  /** Where the client's name links to: its project page when there is one, else its proposal. */
+  /** The client's page: /projects/:id when it has a project, else /clients/:slug (same page, keyed by the client). */
   href: string;
   /** When the client first appeared (the first proposal or the project). */
   since: string;
@@ -64,7 +64,7 @@ export function clientsOf({ plans, projects, jobs, inputs, viewer, decider, now 
       plan,
       project,
       path,
-      href: project ? `/projects/${project.id}` : `/decisions/plans/${plan.id}`,
+      href: project ? `/projects/${project.id}` : `/clients/${slug}`,
       since: sorted[sorted.length - 1]!.created_at,
     });
   }

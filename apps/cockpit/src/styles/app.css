@@ -579,3 +579,29 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
 .logo-added { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--sheet); }
 .logo-added img, .logo-added-blank { width: 44px; height: 44px; border-radius: var(--r-sm); object-fit: contain; background: var(--sunk); flex-shrink: 0; }
 .logo-added-text { flex: 1; display: grid; min-width: 0; overflow-wrap: anywhere; }
+
+/* ---------- Project page (v2) ---------- */
+.client-page { display: grid; gap: 32px; }
+.client-head { display: grid; gap: 10px; }
+.client-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.client-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 32px; align-items: start; }
+@media (max-width: 1100px) { .client-grid { grid-template-columns: minmax(0, 1fr); } }
+.client-main, .client-side { display: grid; gap: 32px; min-width: 0; align-content: start; }
+.client-section { display: grid; gap: 12px; }
+.client-section .btn { justify-self: start; }
+.page-pills { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.page-pills li { padding: 6px 12px; border-radius: var(--r-pill); border: 1px solid var(--line-2); font-size: var(--fs-small); }
+.detail-list, .build-list { list-style: none; margin: 0; padding: 0; }
+.detail-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 12px 0; border-top: 1px solid var(--line); }
+.detail-list li > span:first-child { flex: 1 1 200px; overflow-wrap: anywhere; }
+.build-list li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 14px 0; border-top: 1px solid var(--line); }
+.build-n { width: 64px; font-size: 13px; }
+.build-what { flex: 1 1 220px; display: grid; min-width: 0; }
+.no-builds { padding: 16px 0; border-top: 1px solid var(--line); }
+.cost-card { padding: 22px; border-radius: 16px; background: var(--sunk); display: grid; gap: 6px; }
+.cost-big { font: 400 40px/1 var(--face-display); }
+.timeline { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 1px solid var(--line-2); display: grid; gap: 16px; }
+.timeline li { position: relative; display: grid; gap: 2px; font-size: var(--fs-label); }
+.timeline li::before { content: ""; position: absolute; left: -19px; top: 7px; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); }
+.tech-extra { display: grid; gap: 12px; margin-top: 12px; }
+.tech-rounds { margin: 0; padding-left: 18px; font-size: var(--fs-small); color: var(--ink-2); display: grid; gap: 6px; }
