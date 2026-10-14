@@ -20,7 +20,8 @@ and deployed (`3e493f6`, CI `38569635936`; migration 0022 live, attack test 11/1
 phone action, motion; four new rendered checks) green in CI and deployed (`d112f62`); Package 3 (image slots and labelled
 placeholders, migration 0023 live) built and verified locally (`7e30b09`); Package 4 (Cockpit v2 rebuild to the locked design in
 `docs/design/cockpit-v2/`) phases 1–4 of 9 built: tokens `4a50b22` and components `a8fa3cf` CI-green and deployed (CI `38588413325`),
-shell `8532f4e`, the six-step path `fd020a5`, Home `00ec210` and Projects verified locally (the shell's first CI failed on a test race,
+shell `8532f4e` and the six-step path `fd020a5` CI-green and deployed (CI `38593657465`); Home `00ec210`, Projects `2cd7f6b` and
+New request `9513166` verified locally (the shell's first CI failed on a test race,
 fixed); Package 5 open.
 A caps conflict, three role conflicts (design vs RLS) and a missing site-approval record wait on Nick (`BLOCKED-ON-NICK.md`).
 
@@ -1362,7 +1363,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–6 built, 1–2 CI-green and deployed
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1–3 of 5 built and verified; Package 4 phases 1–7 built, 1–4 CI-green and deployed
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1414,11 +1415,11 @@ Track A 1.4.0, content `track-b/2` and `track-a/2`, both upgraded from v1 on rea
   workflow 44, jobs 34, planning 42, Cockpit 124 plus build. Screenshots at 1440 and 375.
 - Not done: no live build; an uploaded image's real use in a paid build is proven only in Package 5.
 
-**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–6 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
+**Package 4 — Cockpit v2 rebuild to the locked design: phases 1–7 built** (`4a50b22`, `a8fa3cf`: CI `38588413325` green on
 every job and deployed, live Cockpit serves v2, `theme-color #F4F2ED`, HTTP 200; `8532f4e` phase 3 pushed in `a87e6db`, whose CI
 `38591851925` FAILED in the Cockpit job on a test race (sign-out test read the button before the lazy Settings page loaded), fixed in
-the test; `fd020a5` phase 4, pushed in `b3a3707`, CI `38593657465`: the Cockpit job passed, Rendered QA still running at this
-sync; `00ec210` phase 5, local). Source of truth: `docs/design/cockpit-v2/` (locked 2026-10-14); the build prompt is
+the test; `fd020a5` phase 4, pushed in `b3a3707`, CI `38593657465` green on every job and deployed (phases 3–4 live); `00ec210`
+phase 5 and `2cd7f6b` phase 6 pushed, CI `38595375699` and `38596185659` running at this sync; `9513166` phase 7, local). Source of truth: `docs/design/cockpit-v2/` (locked 2026-10-14); the build prompt is
 `docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md` (phases: tokens, components, shell, `path.ts`, then each screen).
 - Phase 1 tokens (`4a50b22`): v2 light/dark values, four accents, density, type scale, motion, reduced motion (device or in-app),
   text-size zoom; `lib/appearance.ts`; Newsreader. `tokens.test.ts` proves the locked values and 4.5:1 for every text, status and
@@ -1459,13 +1460,20 @@ sync; `00ec210` phase 5, local). Source of truth: `docs/design/cockpit-v2/` (loc
   Grid/List, pins, list as role=table (stacked on phones, headers kept for screen readers), ids in a Technical details drawer.
   Deviation: "Add a client or project by hand" kept (closed, owner/admin) because a client needs a project before "Record that
   it is live" can work. Evidence: 212 tests (`projects.test.tsx` 7); axe 0 grid and list, light/dark, 1440/375; `scrollWidth` 375.
-- Not done: the remaining screens (New request, Project page, Proposal, Needs, Live build, Stopped, Finished site, Activity,
+- Phase 7 New request (`9513166`): the client's words, business name (sent as a labelled first line: intake reads only the
+  text), live address, logo drop zone (a real focusable file input), one primary "Send to the factory" with the cost beside it,
+  "What happens next", sending state. Money confirms (hard rule; the design shows only the cost line): an alertdialog with the
+  rough cost (owner: live average of past intake, planner and direction runs; otherwise "a few cents") and the live per-build
+  stop. Deviation kept: "Re-check a built page" (closed; the only way to start a verify job). Fixed on the way: the large-button
+  class `page` collided with the main wrapper's `.page`, renamed `btn-page`. Evidence: 217 tests (`newrequest.test.tsx` 5); axe 0
+  light and dark at 1440 and 375 and with the confirm open; keyboard run text, drop zone, send, confirm.
+- Not done: the remaining screens ( Project page, Proposal, Needs, Live build, Stopped, Finished site, Activity,
   Costs, Team, Settings, Notifications preferences); no Lighthouse run yet.
 
-**Next action**: Huraira reviews the Package 4 phase 6 report (Projects) and gives GO for the next screen (New request).
+**Next action**: Huraira reviews the Package 4 phase 7 report (New request) and gives GO for the next screen (the Project page).
 Confirm CI green on the latest push. Nick answers the caps, role and site-approval questions. Package 5: see the source doc.
 
-Continuation prompt — updated 2026-10-14, after phase 6 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
+Continuation prompt — updated 2026-10-14, after phase 7 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
 ```
 You are a senior front-end engineer in the WFACT 3.0 monorepo, branch huraira-work. Read CLAUDE.md, then
 docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md (the full brief: hard rules, locked decisions, tokens,
@@ -1492,10 +1500,11 @@ ALREADY DONE (do not redo):
 - Phase 5 Home, 00ec210: pages/Home.tsx; lib/clients.ts (clientsOf: one list of clients with their path); lib/attention.ts
   rebuilt on it (groups stopped / approval / details, design words); FactoryProvider exposes clients, projects and decider.
   Next screens read useFactory().clients and .attention; never re-derive.
-- Phase 6 Projects: default export Projects in pages/Work.tsx (ProjectPage and NewRequest there are still pre-v2).
+- Phase 6 Projects: default export Projects in pages/Work.tsx. Phase 7 New request: NewRequest in pages/Work.tsx
+  (ProjectPage there is still pre-v2). Large buttons use size="page" -> class btn-page (never "page").
 
 LEFT, in order (each a separate commit, then /step-close 28 and STOP for GO):
-5–9. Screens in the brief's order (§6), starting at 3. New request (Home and Projects are done), each with empty, loading, running, waiting, stopped and success states; the 8 stop
+5–9. Screens in the brief's order (§6), starting at 4. Project page (Home, Projects, New request are done), each with empty, loading, running, waiting, stopped and success states; the 8 stop
    cases mapped to diagnoseJob().cause; owner-only gates; PM view.
 Every phase: npm test green; screenshots at 1440x900 and 375x812, light and dark, beside the matching frame in
 Cockpit Screens*.dc.html; axe 0 per room; at 375 px scrollWidth === 375; banned-word grep of the DOM outside <details>;
@@ -1675,7 +1684,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | not started | | |
 | 26 | Quality calibration | **PARTIAL**: item 1 built (`67033f7`, Anthropic screenshot reviewer, local live review passed 32 s / $0.071); Cockpit trace row pending | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
-| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09` (+ CI fixes `301e6d6`, `ba3c41c`), CI `38585878100` green and deployed: image slots, placeholder cards, migration 0023 live, attack test 19/19. Package 4 (Cockpit v2 to the locked design): tokens `4a50b22` and components `a8fa3cf`, CI `38588413325` green and deployed (live serves v2); shell `8532f4e` (its CI `38591851925` failed on a test race, fixed `1278a29`), path `fd020a5`, Home `00ec210` and Projects (212 tests, axe 0 owner/admin/PM, light/dark, 1440/375). Remaining screens and Package 5 open; caps, role and site-approval questions with Nick) | 2026-10-14 | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, CI `38574380444` green and deployed: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Package 3 `7e30b09` (+ CI fixes `301e6d6`, `ba3c41c`), CI `38585878100` green and deployed: image slots, placeholder cards, migration 0023 live, attack test 19/19. Package 4 (Cockpit v2 to the locked design): tokens `4a50b22` and components `a8fa3cf`, CI `38588413325` green and deployed (live serves v2); shell `8532f4e` (its CI `38591851925` failed on a test race, fixed `1278a29`), path `fd020a5`, Home `00ec210`, Projects `2cd7f6b` and New request `9513166` (217 tests, axe 0 owner/admin/PM, light/dark, 1440/375). Remaining screens and Package 5 open; caps, role and site-approval questions with Nick) | 2026-10-14 | |
 
 **Goal tracker (Blueprint §16K)**
 
