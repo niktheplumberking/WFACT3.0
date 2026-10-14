@@ -974,11 +974,23 @@ export async function resumeBuildAndVerify(
   });
 
   if (progress.state === "gate") return finished("run already reached its launch gate — not re-opened");
-  // Where to continue. "revise" needs a saved site and the findings that stopped it; without them it is a plain re-check.
-  let fromStep: ContinueFrom = opts.fromStep ?? "qa";
+  // Where to continue. The owner's chosen step survives a crash or a readiness stop (needs_input, provider_unavailable):
+  // without a new choice, the last continue's step is kept, as long as nothing was saved since it was chosen.
+  const lastReopenRow = [...workflowRows].reverse().find((r) => r.action === "workflow.reopen");
+  let inherited: ContinueFrom | undefined;
+  if (!opts.fromStep && lastReopenRow && (progress.state === "running" || progress.haltStatus === "needs_input" || progress.haltStatus === "provider_unavailable")) {
+    const savedSince = workflowRows.slice(workflowRows.indexOf(lastReopenRow) + 1).some((r) => r.action === "workflow.checkpoint");
+    const v = lastReopenRow.payload?.fromStep;
+    if (!savedSince && (v === "qa" || v === "revise" || v === "rebuild")) inherited = v;
+  }
+  // "revise" needs a saved site and the findings that stopped it; without them it is a plain re-check.
+  let fromStep: ContinueFrom = opts.fromStep ?? inherited ?? "qa";
   const findings = lastQaFindings(rows);
   if (fromStep === "revise" && (!lastCp || !findings)) fromStep = "qa";
   if (fromStep === "qa" && !lastCp) fromStep = "rebuild";
+  // The revision budget restarts from here. A fresh build is its own first cycle, so it gets the full budget after it;
+  // recorded on the reopen row so a crash and a later resume keep the same budget.
+  const baseCycle = !lastCp ? 0 : fromStep === "rebuild" ? lastCp.cycle + 1 : lastCp.cycle;
   if (progress.state === "halted") {
     if (!opts.reopen) return finished("run already ended with workflow.halt — not re-opened");
     if (progress.haltStatus === "checkpoint_corrupt") {
@@ -996,20 +1008,20 @@ export async function resumeBuildAndVerify(
           reason: opts.reopen.reason,
           by: opts.reopen.by,
           fromStatus: progress.haltStatus,
-          baseCycle: lastCp ? lastCp.cycle : 0,
+          baseCycle,
           fromStep,
           ...(opts.reopen.brief !== undefined ? { brief } : {}),
         },
       },
     );
-    wf.cycleBase = lastCp ? lastCp.cycle : 0;
+    wf.cycleBase = baseCycle;
   } else if (opts.reopen?.brief !== undefined) {
     // A crashed (never halted) run continued with new facts: recorded, so the next resume keeps this brief and its revision budget.
     await recordAudit(
       { sink: deps.audit, actor: `workflow:${WORKFLOW_ID}`, runId, taskId: start.taskId, entitySlug: brief.entitySlug },
-      { action: "workflow.reopen", outcome: "info", payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, reason: opts.reopen.reason, by: opts.reopen.by, fromStatus: null, baseCycle: lastCp ? lastCp.cycle : 0, fromStep, brief } },
+      { action: "workflow.reopen", outcome: "info", payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, reason: opts.reopen.reason, by: opts.reopen.by, fromStatus: null, baseCycle, fromStep, brief } },
     );
-    wf.cycleBase = lastCp ? lastCp.cycle : 0;
+    wf.cycleBase = baseCycle;
   } else {
     const reopens = workflowRows.filter((r) => r.action === "workflow.reopen");
     wf.cycleBase = reopens.length ? Number(reopens.at(-1)!.payload?.baseCycle ?? 0) : 0;
@@ -1023,7 +1035,7 @@ export async function resumeBuildAndVerify(
     if (fromStep === "rebuild" || !lastCp) {
       // Nothing saved, or the owner asked for a fresh build: build again under the same run id, with a full revision budget.
       const cycle = lastCp ? lastCp.cycle + 1 : 0;
-      wf.cycleBase = cycle;
+      wf.cycleBase = Math.max(wf.cycleBase, cycle);
       return await wf.buildFrom(cycle, lastCp);
     }
     if (fromStep === "revise") {

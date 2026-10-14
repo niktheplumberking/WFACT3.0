@@ -69,25 +69,37 @@ test("refuses empty, oversized and sizeless files", () => {
 test("an SVG that could run code or load something is refused, whatever its case or spacing", () => {
   const svg = (inner: string, attrs = "") => Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"${attrs}>${inner}</svg>`);
   const bad: [Buffer, RegExp][] = [
-    [svg("<script>alert(1)</script>"), /a script/],
-    [svg("<SCRIPT >alert(1)</SCRIPT>"), /a script/],
+    [svg("<script>alert(1)</script>"), /not allowed in a logo \(<script>\)/],
+    [svg("<SCRIPT >alert(1)</SCRIPT>"), /<script>/],
     [svg("", ' onload="alert(1)"'), /event handler/],
     [svg('<rect ONCLICK = "x()"/>'), /event handler/],
-    [svg('<foreignObject><div xmlns="http://www.w3.org/1999/xhtml">hi</div></foreignObject>'), /foreignObject/],
-    [svg('<image href="https://evil.example/x.png"/>'), /outside file/],
-    [svg('<use href="//evil.example/s.svg#a"/>'), /outside file/],
-    [svg('<rect style="fill:url(https://evil.example/p)"/>'), /outside file in a style/],
+    [svg('<foreignObject><div xmlns="http://www.w3.org/1999/xhtml">hi</div></foreignObject>'), /<foreignobject>/],
+    [svg('<image href="https://evil.example/x.png"/>'), /<image>/],
+    [svg('<use href="//evil.example/s.svg#a"/>'), /outside the file/],
+    [svg('<use xlink:href="https://evil.example/s.svg#a"/>'), /outside the file/],
+    [svg('<rect style="fill:url(https://evil.example/p)"/>'), /style reference to something outside/],
     [svg("<style>@import url(x.css);</style>"), /style import/],
     [svg('<a href="javascript:alert(1)"><rect/></a>'), /script link/],
-    [svg('<a href="/x"><rect/></a>'), /link or animation/],
-    [svg('<set attributeName="href" to="javascript:alert(1)"/>'), /script link/],
+    [svg('<a href="#x"><rect/></a>'), /<a>/],
+    [svg('<set attributeName="href" to="#x"/>'), /<set>/],
     [Buffer.from('<?xml version="1.0"?><!DOCTYPE svg [<!ENTITY x "y">]><svg viewBox="0 0 1 1"></svg>'), /DOCTYPE/],
-    [Buffer.from('<html><svg viewBox="0 0 1 1"></svg></html>'), /single <svg> element/],
+    [Buffer.from('<html><svg viewBox="0 0 1 1"></svg></html>'), /<html>/],
+    // Independent review 2026-10-14 (all accepted by the first, ban-list version):
+    [svg("<x:script>alert(1)</x:script>"), /namespaced element <x:script>/],
+    [svg('<x:foreignObject><div/></x:foreignObject>'), /namespaced element/],
+    [svg('<x:set attributeName="href" to="javascript:alert(1)"/>'), /namespaced|script link/],
+    [svg('<use href="&#104;ttps://evil.test/p.png"/>'), /encoded characters/],
+    [svg("<style>@\\69mport url(x)</style>"), /escaped characters/],
+    [svg('<rect style="fill:url(\\68ttps://evil.test)"/>'), /escaped characters/],
+    [svg('<use href="data:image/svg+xml;base64,PHN2Zy8+"/>'), /data: URL/],
+    [svg("<![CDATA[<script>x</script>]]>"), /CDATA/],
   ];
   for (const [data, why] of bad) assert.throws(() => inspectLogo(data, "image/svg+xml"), (e: unknown) => e instanceof LogoError && why.test(e.message), data.toString());
 });
 
 test("an SVG with an XML declaration, a comment and an internal #fragment reference is fine", () => {
+  const withUse = Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 10 10"><defs><symbol id="s"><path d="M0 0h1"/></symbol></defs><use xlink:href="#s"/><text>A &amp; B</text></svg>');
+  assert.equal(inspectLogo(withUse, "image/svg+xml").width, 10, "internal <use>, xlink, and &amp; are fine");
   const ok = Buffer.from('<?xml version="1.0" encoding="UTF-8"?>\n<!-- exported -->\n<svg xmlns="http://www.w3.org/2000/svg" width="120" height="40"><defs><linearGradient id="g"/></defs><rect fill="url(#g)" width="120" height="40"/></svg>\n');
   assert.equal(inspectLogo(ok, "image/svg+xml").width, 120);
 });
@@ -150,4 +162,15 @@ test("briefRequiresLogo reads the brief's own words", () => {
   assert.equal(briefRequiresLogo("Warm, plain-spoken tone. Orange accent."), false);
   assert.equal(briefRequiresLogo("We do not have a logo yet."), false);
   assert.equal(briefRequiresLogo("Design a logo-free, type-led look."), false);
+  // Independent review 2026-10-14: these halted a good run before it started.
+  assert.equal(briefRequiresLogo("Don't use a logo."), false);
+  assert.equal(briefRequiresLogo("Use warm tones; logo to be designed"), false);
+  assert.equal(briefRequiresLogo("We need a new logo."), false);
+  assert.ok(briefRequiresLogo("Their logo should appear in the header."));
+});
+
+test("the Cockpit's browser check uses the very same SVG policy file (byte-identical copy)", () => {
+  const build = readFileSync(path.join(ROOT, "packages", "frontend-loop", "src", "svgPolicy.ts"), "utf-8");
+  const cockpit = readFileSync(path.join(ROOT, "apps", "cockpit", "src", "lib", "svgPolicy.ts"), "utf-8");
+  assert.equal(cockpit, build, "copy packages/frontend-loop/src/svgPolicy.ts to apps/cockpit/src/lib/svgPolicy.ts");
 });

@@ -8,6 +8,7 @@
  * stops the build before any paid step, with a plain reason the owner can act on.
  */
 import { createHash } from "node:crypto";
+import { svgProblem } from "./svgPolicy.js";
 
 export const LOGO_MIME_TYPES = ["image/svg+xml", "image/png", "image/webp"] as const;
 export type LogoMime = (typeof LOGO_MIME_TYPES)[number];
@@ -70,21 +71,6 @@ export function parseBriefLogo(raw: unknown): BriefLogo {
   return { path: r.path as string, mime: r.mime as LogoMime, sha256: r.sha256 as string, bytes: r.bytes as number, width: r.width as number, height: r.height as number };
 }
 
-// Anything that can run code, load something from elsewhere or expand entities. Matching is on the lowercased
-// text, so case tricks do not help; anything unusual is refused rather than cleaned.
-const SVG_BANNED: [RegExp, string][] = [
-  [/<!doctype|<!entity|<\?xml-stylesheet/, "a DOCTYPE, entity or stylesheet declaration"],
-  [/<script[\s>/]/, "a script"],
-  [/<foreignobject[\s>/]/, "embedded HTML (foreignObject)"],
-  [/<(iframe|embed|object|audio|video|canvas|handler|listener)[\s>/]/, "an embedded document or media element"],
-  [/[\s"'/]on[a-z]+\s*=/, "an event handler attribute"],
-  [/javascript:|vbscript:|data:text\/html/, "a script link"],
-  [/(href|src)\s*=\s*["']\s*(https?:|\/\/|file:)/, "a link to an outside file"],
-  [/url\(\s*["']?\s*(https?:|\/\/|file:)/, "a link to an outside file in a style"],
-  [/@import/, "a style import"],
-  [/<(a|animate|set|animatetransform|animatemotion)[\s>/]/, "a link or animation element"],
-];
-
 function svgSize(text: string): { width: number; height: number } | null {
   const tag = /<svg\b[^>]*>/i.exec(text)?.[0];
   if (!tag) return null;
@@ -128,9 +114,8 @@ export function inspectLogo(data: Buffer, mime: string): Omit<BriefLogo, "path">
     if (text.includes("�")) throw new LogoError("The SVG logo is not valid text (UTF-8).");
     const lower = text.toLowerCase();
     // Banned content first, so the owner hears the specific reason.
-    for (const [re, what] of SVG_BANNED) {
-      if (re.test(lower)) throw new LogoError(`The SVG logo contains ${what}, which is not allowed on a client site. Export a plain SVG and upload it again.`);
-    }
+    const problem = svgProblem(text);
+    if (problem) throw new LogoError(`The SVG logo contains ${problem}, which is not allowed on a client site. Export a plain SVG and upload it again.`);
     if (!/^﻿?\s*(<\?xml[^>]*\?>\s*)?(<!--[\s\S]*?-->\s*)*<svg[\s>]/.test(lower) || !lower.trimEnd().endsWith("</svg>")) {
       throw new LogoError("The SVG logo must be a single <svg> element.");
     }
@@ -164,9 +149,21 @@ export function logoDisplaySize(logo: Pick<BriefLogo, "width" | "height">): { wi
  * would fail on it (Lanternworks e2a204fb, 3 of 3 rounds).
  */
 export function briefRequiresLogo(text: string): boolean {
-  const t = text.toLowerCase();
-  return /\b(logo|logomark|brand mark)\b/.test(t) &&
-    /\b(provided|supplied|attached|existing|use[ds]?|as-is|as is|fixed|locked|our|their|client'?s)\b[^.]{0,60}\b(logo|logomark|brand mark)\b|\b(logo|logomark|brand mark)\b[^.]{0,60}\b(provided|supplied|attached|as-is|as is|fixed|locked|no redraw)/.test(t);
+  // Sentence by sentence, so "Don't use a logo. Our tone is warm." never joins words across sentences.
+  for (const raw of text.toLowerCase().split(/[.;!?\n]+/)) {
+    const t = raw.trim();
+    if (!/\b(logo|logomark|brand mark)\b/.test(t)) continue;
+    // Not a supplied logo: none yet, to be designed, or a request not to use one.
+    if (/\b(no|without|don'?t|do not|not|never|new|design|create|redesign|draw|make)\b[\w\s'-]{0,25}\b(logo|logomark|brand mark)\b|\b(logo|logomark|brand mark)\b[\w\s'-]{0,25}\b(to be designed|tbd|later|needed|wanted)\b/.test(t)) continue;
+    if (
+      /\b(provided|supplied|attached|existing|current|our|their|client'?s|the client'?s)\s+(own\s+)?(svg\s+|png\s+)?(logo|logomark|brand mark)\b/.test(t) ||
+      /\b(logo|logomark|brand mark)\b(\.svg|\.png)?[\w\s'-]{0,20}\b(provided|supplied|attached|fixed|locked|as-is|as is|no redrawing|unchanged)\b/.test(t) ||
+      /\buse\s+(the\s+|our\s+|their\s+)?(provided\s+|supplied\s+|existing\s+)?(logo|logomark)\b/.test(t)
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // The verified logo bytes for the build running in this process, keyed by fingerprint. The workflow fetches and

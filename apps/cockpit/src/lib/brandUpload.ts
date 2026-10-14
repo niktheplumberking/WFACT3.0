@@ -6,6 +6,8 @@
  * fingerprint, and is never changed afterwards.
  */
 import { supabase } from "../supabaseClient";
+// The same policy file the build uses (packages/frontend-loop/src/svgPolicy.ts), kept byte-identical by a test.
+import { svgProblem } from "./svgPolicy";
 
 export const LOGO_TYPES = ["image/svg+xml", "image/png", "image/webp"] as const;
 export type LogoType = (typeof LOGO_TYPES)[number];
@@ -21,20 +23,6 @@ export interface LogoRecord {
   width: number;
   height: number;
 }
-
-// Mirrors brandAsset.ts SVG_BANNED (keep in step; the build re-checks with that list).
-const SVG_BANNED: [RegExp, string][] = [
-  [/<!doctype|<!entity|<\?xml-stylesheet/, "a DOCTYPE, entity or stylesheet declaration"],
-  [/<script[\s>/]/, "a script"],
-  [/<foreignobject[\s>/]/, "embedded HTML"],
-  [/<(iframe|embed|object|audio|video|canvas|handler|listener)[\s>/]/, "an embedded document or media element"],
-  [/[\s"'/]on[a-z]+\s*=/, "an event handler"],
-  [/javascript:|vbscript:|data:text\/html/, "a script link"],
-  [/(href|src)\s*=\s*["']\s*(https?:|\/\/|file:)/, "a link to an outside file"],
-  [/url\(\s*["']?\s*(https?:|\/\/|file:)/, "a link to an outside file in a style"],
-  [/@import/, "a style import"],
-  [/<(a|animate|set|animatetransform|animatemotion)[\s>/]/, "a link or animation element"],
-];
 
 function typeOf(file: File): LogoType | null {
   if ((LOGO_TYPES as readonly string[]).includes(file.type)) return file.type as LogoType;
@@ -91,7 +79,8 @@ export async function inspectLogoFile(file: File): Promise<{ ok: true; record: O
     const text = new TextDecoder("utf-8").decode(bytes);
     if (text.includes("�")) return { ok: false, reason: "That SVG is not valid text." };
     const lower = text.toLowerCase();
-    for (const [re, what] of SVG_BANNED) if (re.test(lower)) return { ok: false, reason: `That SVG contains ${what}, which is not allowed on a client site. Export a plain SVG and try again.` };
+    const problem = svgProblem(text);
+    if (problem) return { ok: false, reason: `That SVG contains ${problem}, which is not allowed on a client site. Export a plain SVG and try again.` };
     if (!/^﻿?\s*(<\?xml[^>]*\?>\s*)?(<!--[\s\S]*?-->\s*)*<svg[\s>]/.test(lower) || !lower.trimEnd().endsWith("</svg>")) return { ok: false, reason: "That file is not a single SVG image." };
     size = svgSize(text);
     if (!size) return { ok: false, reason: "That SVG has no size (viewBox). Export it again with one." };

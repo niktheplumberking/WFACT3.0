@@ -200,3 +200,31 @@ test("lastQaFindings skips a later readiness stop and never reaches past the sav
   assert.equal(lastQaFindings([row("workflow.halt", { stage: "qa", qaFailure }), row("workflow.checkpoint")]), null, "findings about an older site are stale");
   assert.equal(lastQaFindings([]), null);
 });
+
+test("review M3/L2: the owner's chosen step survives a crash mid-revise and a readiness stop; rebuild records its real budget (M2)", async () => {
+  const sink = new InMemoryAuditSink();
+  const store = new MemoryArtifactStore();
+  const h = await buildAndVerify(brief, setup({ firstPage: BROKEN, maxQaRevisions: 0, sink, store }).deps);
+  assert.equal(h.status, "failed_verification");
+
+  // "Fix and continue", but the builder's provider is down: a readiness stop, nothing spent.
+  const down = setup({ firstPage: CLEAN, sink, store, probes: async () => [{ id: "provider.agent37", ok: false, detail: "unreachable" }] });
+  const stopped = await resumeBuildAndVerify(h.workflowRunId, down.deps, { reopen: { reason: "fix and continue", by: "u" }, fromStep: "revise" });
+  assert.equal(stopped.status, "provider_unavailable");
+  // Pressed again with no step given: the chosen step (revise) is kept, so the failing site is not re-checked first.
+  const up = setup({ firstPage: BROKEN, revisedPage: CLEAN, sink, store });
+  const before = sink.events.length;
+  const r = await resumeBuildAndVerify(h.workflowRunId, up.deps, { reopen: { reason: "try again", by: "u" } });
+  assert.equal(sink.events.slice(before).find((e) => e.action === "agent.spawn")?.payload?.role, "front-end-builder");
+  assert.equal(sink.events.slice(before).find((e) => e.action === "workflow.reopen")?.payload?.fromStep, "revise");
+  assert.equal(r.status, "awaiting_launch_approval");
+
+  // Rebuild: the reopen row records the base after the fresh build (full budget survives a crash and a later resume).
+  const s3 = new InMemoryAuditSink();
+  const st3 = new MemoryArtifactStore();
+  const h3 = await buildAndVerify(brief, setup({ firstPage: BROKEN, maxQaRevisions: 0, sink: s3, store: st3 }).deps);
+  await resumeBuildAndVerify(h3.workflowRunId, setup({ firstPage: BROKEN, maxQaRevisions: 0, sink: s3, store: st3 }).deps, { reopen: { reason: "build again", by: "u" }, fromStep: "rebuild" });
+  const reopen = s3.events.find((e) => e.action === "workflow.reopen")!;
+  assert.equal(reopen.payload?.fromStep, "rebuild");
+  assert.equal(reopen.payload?.baseCycle, 1, "fresh build is cycle 1, and the budget counts from there");
+});

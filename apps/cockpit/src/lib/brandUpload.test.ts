@@ -22,10 +22,11 @@ describe("the logo is checked in the browser with the build's own rules", () => 
   });
 
   it.each([
-    ["<script>alert(1)</script>", /a script/],
+    ["<script>alert(1)</script>", /<script>/],
     ['<rect onclick="x()"/>', /event handler/],
-    ['<image href="https://evil.example/x.png"/>', /outside file/],
-    ["<foreignObject><div>hi</div></foreignObject>", /embedded HTML/],
+    ['<use href="https://evil.example/x.svg#a"/>', /outside the file/],
+    ["<foreignObject><div>hi</div></foreignObject>", /foreignobject/],
+    ["<x:script>alert(1)</x:script>", /namespaced element/],
   ])("refuses an SVG containing %s", async (inner, why) => {
     const r = await inspectLogoFile(file(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">${inner}</svg>`, "x.svg", "image/svg+xml"));
     expect(r.ok).toBe(false);
