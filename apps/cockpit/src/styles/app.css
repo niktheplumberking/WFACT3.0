@@ -191,3 +191,56 @@ form.ask:focus-within { outline: 2px solid var(--caution); outline-offset: 1px; 
   .auth-side { display: none; }
   .preview iframe { height: 420px; }
 }
+
+/* ---------- build timeline (build progress UX): the run's steps on one track ----------
+   Rail of state marks joined by a track line. The line is "proven" (solid ink) between steps that are done, idle grey
+   ahead. State is icon + word, colour only reinforces it. */
+.tl-wrap { display: grid; gap: var(--s-5); }
+.tl-now { display: grid; gap: var(--s-2); padding: var(--s-4); background: var(--plate-sunk); border: 1px solid var(--seam); border-radius: var(--r-control); }
+.tl-wait { display: flex; align-items: baseline; gap: var(--s-3); font: 700 var(--t-md)/1.35 var(--face-plate); font-variant-numeric: tabular-nums; }
+.tl-wait .tl-lamp { flex: none; transform: translateY(-1px); }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; }
+.timeline > li.tl { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: var(--s-3); padding-bottom: var(--s-5); }
+.timeline > li.tl:last-child { padding-bottom: 0; }
+.timeline > li.tl::after { content: ""; position: absolute; left: 10px; top: 24px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--track-idle); }
+.timeline > li.tl:last-child::after { display: none; }
+.timeline > li.tl.done::after { background: var(--track-proven); opacity: 0.55; }
+.tl-mark { width: 22px; height: 22px; display: grid; place-items: center; font-size: 22px; line-height: 0; color: var(--ink-3); position: relative; z-index: 1; background: var(--plate); border-radius: 50%; }
+.tl.done .tl-mark { color: var(--clear); }
+.tl.failed .tl-mark { color: var(--stop); }
+.tl.pending .tl-mark, .tl.skipped .tl-mark { color: var(--track-idle); }
+.tl-lamp { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--caution); box-shadow: 0 0 0 4px var(--caution-wash); }
+.tl-body { min-width: 0; padding-top: 1px; }
+.tl-head { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--s-3); row-gap: 2px; }
+.tl-head b { font: 700 var(--t-md)/1.35 var(--face-plate); }
+.tl.pending .tl-head b, .tl.skipped .tl-head b { color: var(--ink-3); font-weight: 600; }
+.tl-state { font: 700 var(--t-xs)/1 var(--face-plate); letter-spacing: 0.02em; padding: 4px 7px; border-radius: 3px; }
+.tl.running .tl-state { color: var(--caution); background: var(--caution-wash); }
+.tl.failed .tl-state { color: var(--stop); background: var(--stop-wash); }
+.tl-time { margin-left: auto; display: inline-flex; gap: var(--s-2); color: var(--ink-3); font-size: var(--t-xs); white-space: nowrap; }
+.tl-dur { color: var(--ink-2); }
+.tl.running .tl-time { color: var(--ink); font-size: var(--t-sm); }
+.tl-detail { color: var(--ink-2); font-size: var(--t-sm); margin-top: 3px; max-width: 68ch; }
+.tl-problems { margin: var(--s-2) 0 0; padding-left: 18px; font-size: var(--t-sm); color: var(--ink-2); display: grid; gap: 2px; }
+.tl.failed .tl-problems { color: var(--ink); }
+.tl-slot { margin-top: var(--s-4); padding: var(--s-4); border: 1px solid color-mix(in srgb, var(--stop) 35%, var(--seam)); border-radius: var(--r-plate); background: var(--plate-2); }
+.tl-seg { display: flex; align-items: center; gap: var(--s-3); margin: 0 0 var(--s-5); font: 700 var(--t-sm)/1.3 var(--face-plate); color: var(--ink-2); }
+.tl-seg::before, .tl-seg::after { content: ""; height: 1px; flex: 1; background: var(--seam-strong); }
+.tl-seg::before { flex: 0 0 14px; }
+.tl-options { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-4); }
+.tl-options li { display: grid; gap: 6px; justify-items: start; }
+.tl-options .hint { color: var(--ink-3); font-size: var(--t-sm); max-width: 60ch; margin: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .tl.running .tl-lamp, .tl-wait .tl-lamp { animation: tl-breathe 2.4s var(--ease-out) infinite; }
+  @keyframes tl-breathe { 50% { box-shadow: 0 0 0 7px transparent; } }
+}
+@media (max-width: 600px) {
+  .tl-time { margin-left: 0; flex-basis: 100%; }
+  .tl-slot { padding: var(--s-3); margin-left: calc(-1 * var(--s-6)); }
+  .tl-options .btn { width: 100%; white-space: normal; text-align: left; justify-content: flex-start; min-height: 44px; padding-block: 10px; line-height: 1.25; }
+}
+.tl.found .tl-mark { color: var(--caution); }
+
+/* The chosen client logo, on a light chip: logos are drawn for light pages, and the Cockpit is dark. */
+.logo-chip { display: inline-flex; align-items: center; padding: var(--s-2) var(--s-3); background: var(--ink); border: 1px solid var(--seam-strong); border-radius: 6px; }
+.logo-chip img { display: block; max-height: 40px; max-width: 200px; width: auto; height: auto; }

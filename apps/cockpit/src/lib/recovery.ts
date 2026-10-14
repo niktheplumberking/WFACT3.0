@@ -27,7 +27,8 @@ export interface Need {
   multiline: boolean;
   /** Why the factory asks (shown in the owner's words). */
   why: string;
-  kind: "fact" | "answer";
+  /** "file" needs an upload (the logo, key asset.logo): the details form takes it with the logo upload control. */
+  kind: "fact" | "answer" | "file";
 }
 
 export interface Diagnosis {
@@ -134,6 +135,19 @@ export function detectNeeds(j: Pick<JobRow, "result" | "error">): Need[] {
   if (/testimonial|customer words|social proof/i.test(text) && /(missing|requires|required|no quotes|without)/i.test(text)) {
     add(slotNeed("quotes", "The site is meant to show customer words, and the factory never invents them."));
   }
+  // The readiness check (workflow.preflight, read by runInfo into result.preflight) names exactly what is missing.
+  const pre = r.preflight as { ok?: boolean; needs?: unknown } | null | undefined;
+  if (pre && pre.ok === false && Array.isArray(pre.needs)) {
+    for (const x of pre.needs as Record<string, unknown>[]) {
+      const key = typeof x?.key === "string" ? x.key : "";
+      if (!key) continue;
+      const label = typeof x.label === "string" && x.label ? x.label : key;
+      const why = typeof x.reason === "string" ? x.reason : "";
+      if (SLOT_BY_KEY.has(key)) add(slotNeed(key, why));
+      else if (key === "asset.logo" || key === "logo") add({ key: "asset.logo", label, hint: "SVG, PNG or WebP, up to 512 KB. It is used exactly as supplied.", multiline: false, why, kind: "file" });
+      else add({ key, label, hint: "Type it exactly as it should appear on the site.", multiline: true, why, kind: "answer" });
+    }
+  }
   // The evaluator's own words about what the client still has to supply: each becomes a question.
   for (const line of strArr(r.needsFromClient)) {
     const label = line.length > 120 ? `${line.slice(0, 117)}...` : line;
@@ -152,12 +166,14 @@ export function unansweredNeeds(needs: Need[], current: PlanInputRow[]): Need[] 
 function classify(j: JobRow, needs: Need[]): Cause {
   const r = resultOf(j);
   const status = typeof r.status === "string" ? r.status : "";
-  const text = `${j.error ?? ""}\n${strArr(r.qaIssues).join("\n")}`;
+  const text = `${j.error ?? ""}\n${typeof r.haltReason === "string" ? r.haltReason : ""}\n${strArr(r.qaIssues).join("\n")}`;
   if (MONEY.test(text)) return "money";
+  // A model service failed its readiness probe before anything was paid for: money when it names credits, else a hiccup.
+  if (status === "provider_unavailable") return "temporary";
   if (SPEND.test(text)) return "setup";
   if (SETUP.test(text) && !/a required review could not run/i.test(text)) return "setup";
   if (status === "checkpoint_corrupt") return "temporary";
-  if (needs.length > 0) return "info";
+  if (needs.length > 0 || status === "needs_input") return "info";
   if (status === "crashed" || TEMPORARY.test(text)) return "temporary";
   if (FACTORY.test(text)) return "factory";
   if (status === "failed_verification" || FIXABLE.test(text)) return "fixable";
@@ -192,9 +208,15 @@ export function diagnoseJob(j: JobRow, siblings: JobRow[] = [], opts: { planId?:
 
   switch (cause) {
     case "info":
-      headline = "it needs a few details";
-      happened =
-        "The factory built what it could, then found it was missing details only you or the client can give (a phone number, real customer quotes). It will not invent them, because a made-up fact on a client's site is a real problem.";
+      if (status === "needs_input") {
+        headline = "it needs details before it can start";
+        happened =
+          "Before paying for anything, the factory checked it had everything the site needs. Some details are missing, so it did not start. Nothing was spent. It will not invent them, because a made-up fact on a client's site is a real problem.";
+      } else {
+        headline = "it needs a few details";
+        happened =
+          "The factory built what it could, then found it was missing details only you or the client can give (a phone number, real customer quotes). It will not invent them, because a made-up fact on a client's site is a real problem.";
+      }
       label = "Save the details and continue";
       break;
     case "money":
@@ -212,9 +234,18 @@ export function diagnoseJob(j: JobRow, siblings: JobRow[] = [], opts: { planId?:
       label = "Try again (after it's set up)";
       break;
     case "temporary":
-      headline = status === "checkpoint_corrupt" ? "the saved copy of the site didn't match" : base.headline === "something went wrong" ? "a connection dropped" : base.headline;
-      happened =
+      headline =
         status === "checkpoint_corrupt"
+          ? "the saved copy of the site didn't match"
+          : status === "provider_unavailable"
+            ? "a service it needs wasn't ready"
+            : base.headline === "something went wrong"
+              ? "a connection dropped"
+              : base.headline;
+      happened =
+        status === "provider_unavailable"
+          ? "Before paying for anything, the factory checked the services it uses. One of them (the site builder, the design reviewer or the evaluator) didn't answer properly, so it did not start. Nothing was spent and nothing new was saved."
+          : status === "checkpoint_corrupt"
           ? "The factory saved the site, but when it went back to check it, the saved files no longer matched. It refuses to check something that changed, by design. The site has to be built again."
           : status === "crashed"
             ? "Something outside the factory stopped it partway (a dropped connection, a service that did not answer, or GitHub running out of time). Nothing is wrong with the plan."
@@ -262,7 +293,7 @@ export function diagnoseJob(j: JobRow, siblings: JobRow[] = [], opts: { planId?:
     headline,
     happened,
     saved,
-    savedText: SAVED_TEXT[saved],
+    savedText: status === "needs_input" || status === "provider_unavailable" ? "Nothing was built and nothing was spent. Carrying on starts the build from the approved plan." : SAVED_TEXT[saved],
     carryOn,
     carryOnLabel: label,
     needs,
@@ -279,12 +310,23 @@ function sameStop(a: JobRow, b: JobRow): boolean {
 }
 
 /** What goes to the job queue when the owner presses the button. Always an ordinary request; the database checks who may ask. */
-export function carryOnRequest(j: JobRow, d: Diagnosis, planId: string | null): { kind: JobRow["kind"]; params: Record<string, unknown> } | null {
+export function carryOnRequest(
+  j: JobRow,
+  d: Pick<Diagnosis, "carryOn" | "headline">,
+  planId: string | null,
+  fromStep?: FromStep,
+): { kind: JobRow["kind"]; params: Record<string, unknown> } | null {
   const r = resultOf(j);
   if (d.carryOn === "continue" && typeof r.workflowRunId === "string") {
     return {
       kind: "resume",
-      params: { workflowRunId: r.workflowRunId, ...(planId ? { planId } : {}), reopen: true, reason: `Continued from the Cockpit after: ${d.headline}`.slice(0, 200) },
+      params: {
+        workflowRunId: r.workflowRunId,
+        ...(planId ? { planId } : {}),
+        reopen: true,
+        reason: `Continued from the Cockpit after: ${d.headline}`.slice(0, 200),
+        ...(fromStep ? { fromStep } : {}),
+      },
     };
   }
   if (d.carryOn === "rerun") {
@@ -312,4 +354,144 @@ export function reportText(j: JobRow, d: Diagnosis, planName: string | null): st
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+/* ---------------- where to continue from (build progress UX) ---------------- */
+
+/** The engine's resume points: run the checks again, fix the saved site, or write it again from the plan. */
+export type FromStep = "qa" | "revise" | "rebuild";
+
+export interface ContinueOption {
+  id: "details" | "revise" | "qa" | "rebuild" | "auto" | "rerun" | "retry";
+  /** Sent as the resume job's `fromStep`; omitted lets the engine pick. "rerun" requests a new build of the plan instead. */
+  fromStep?: FromStep;
+  label: string;
+  /** What pressing it does, and what it saves, in one honest sentence. */
+  hint: string;
+  primary: boolean;
+  /** A full-cost move: ask first. */
+  confirm?: { title: string; body: string; confirmLabel: string };
+  /** The details form comes first (missing details); its save button continues. */
+  needsDetails?: boolean;
+  toast: string;
+}
+
+export interface ContinueInput {
+  /** The run's halt status (or the job result's status). null = it stopped without one (crashed). */
+  haltStatus: string | null;
+  /** Where it stopped, when the run's own record says. */
+  stoppedIn: "preflight" | "build" | "qa" | null;
+  saved: Saved;
+  /** The run can be reopened (a resume job): Diagnosis.carryOn === "continue". */
+  canReopen: boolean;
+  /** A new build of the same plan can be requested: Diagnosis.carryOn === "rerun". */
+  canRerun: boolean;
+  /** Unanswered details the owner can fill in first. */
+  hasNeeds?: boolean;
+  /** Money and setup stops keep their own button words ("I've added credits, continue"). */
+  cause?: Cause;
+  causeLabel?: string;
+  /** The `fromStep` the stopped job itself was started with (its params), for "Try again" after a service wasn't ready. */
+  jobFromStep?: FromStep | null;
+}
+
+const REBUILD_CONFIRM = {
+  title: "Write the site again from the plan?",
+  body: "This starts the builder from the approved plan, so it costs a full build. Nothing is published, and the run's history is kept.",
+  confirmLabel: "Build again",
+};
+
+/**
+ * Which ways to carry on make sense for this stop. Pure and tested; never offers a move the engine would refuse
+ * (fixing or re-checking a site that was never saved).
+ */
+export function continueOptions(c: ContinueInput): ContinueOption[] {
+  const status = c.haltStatus;
+  if (status === "awaiting_launch_approval" || c.saved === "verified") return [];
+  if (!c.canReopen) {
+    if (!c.canRerun) return [];
+    return [
+      {
+        id: "rerun",
+        label: status === "checkpoint_corrupt" ? "Build it again" : "Build again",
+        hint: "Starts a new build of the same plan. It costs a full build.",
+        primary: true,
+        confirm: REBUILD_CONFIRM,
+        toast: "Started a new build.",
+      },
+    ];
+  }
+  const built = c.saved === "built";
+  const own = c.cause === "money" || c.cause === "setup" ? c.causeLabel : undefined;
+  const rebuild = (label = "Build again"): ContinueOption => ({
+    id: "rebuild",
+    fromStep: "rebuild",
+    label: own ?? label,
+    hint: "Nothing was saved to work from, so the site is written again from the approved plan. It costs a full build.",
+    primary: true,
+    confirm: REBUILD_CONFIRM,
+    toast: "Building again from the plan.",
+  });
+  const revise = (label: string): ContinueOption => ({
+    id: "revise",
+    fromStep: "revise",
+    label: own ?? label,
+    hint: "The builder fixes the saved site using what the checks found, then the checks run again. This saves a full rebuild.",
+    primary: true,
+    needsDetails: !!c.hasNeeds,
+    toast: "Fixing the saved site.",
+  });
+  const recheck = (label: string, primary: boolean): ContinueOption => ({
+    id: "qa",
+    fromStep: "qa",
+    label,
+    hint: "Runs the quality checks on the saved site again, with no builder cost. Use it when a check or a service was wrong, not the site.",
+    primary,
+    toast: "Checking the saved site again.",
+  });
+  const auto: ContinueOption = {
+    id: "auto",
+    label: own ?? "Continue from where it stopped",
+    hint: "The factory picks up from the last step its own record shows as saved.",
+    primary: true,
+    needsDetails: !!c.hasNeeds,
+    toast: "Continuing from the saved step.",
+  };
+
+  if (status === "provider_unavailable") {
+    return [
+      {
+        id: "retry",
+        ...(c.jobFromStep ? { fromStep: c.jobFromStep } : {}),
+        label: c.cause === "money" && c.causeLabel ? c.causeLabel : "Try again",
+        hint: "Nothing was spent. It repeats the same request once the service answers again.",
+        primary: true,
+        toast: "Trying again.",
+      },
+    ];
+  }
+  if (status === "needs_input" || (!status && c.stoppedIn === "preflight")) {
+    return [{ id: "details", label: "Save the details and continue", hint: "Nothing was spent yet. It starts once the details are in.", primary: true, needsDetails: !!c.hasNeeds, toast: "Starting with your details." }];
+  }
+  if (status === "checkpoint_corrupt") return [rebuild("Build it again")];
+  if (status === "failed_verification") {
+    if (!built) return [rebuild()];
+    return [revise(c.hasNeeds ? "Save the details and continue" : "Fix and continue"), recheck("Check again without changes", false)];
+  }
+  if (status === "not_verified_no_evaluator" || status === "qa_failed" || (!status && c.stoppedIn === "qa")) {
+    if (built) return [recheck(own ?? "Run the quality checks again", true)];
+    return c.saved === "unknown" ? [auto] : [rebuild()];
+  }
+  if (status === "build_failed" || (!status && c.stoppedIn === "build")) {
+    if (built) return [revise("Continue from the saved site")];
+    return c.saved === "unknown" ? [auto] : [rebuild()];
+  }
+  // Anything else (an old run, a status this Cockpit does not know): let the engine pick from its own record.
+  return [auto];
+}
+
+/** The `fromStep` a resume job was started with (none for a first build or an older resume). */
+export function jobFromStep(j: Pick<JobRow, "params">): FromStep | null {
+  const f = j.params?.fromStep;
+  return f === "qa" || f === "revise" || f === "rebuild" ? f : null;
 }

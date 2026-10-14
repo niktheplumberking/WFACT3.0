@@ -20,6 +20,7 @@ import { createPlannerAgent, PLANNER_DEFINITION, PLANNER_ROLE, type Plan } from 
 import { createDirectionAgent, DIRECTION_DEFINITION, DIRECTION_ROLE, type DirectionResult } from "./direction.js";
 import type { JsonModelClient } from "./modelClient.js";
 import type { PlanStore } from "./planStore.js";
+import { parseBrief } from "@wfact/frontend-loop/brief";
 
 export function registryWithPlanning(): AgentRegistry {
   const registry = createSeedRegistry();
@@ -91,6 +92,27 @@ async function directionFor(
   return { direction: run.output, note: null, run };
 }
 
+/**
+ * What the owner attached to the request in the Cockpit: the live address and the logo record (uploaded file, checked
+ * by the database and again by the build). Set on the brief by code, never by a model, and carried into a re-plan.
+ */
+export interface OwnerAssets {
+  siteUrl?: string;
+  logo?: unknown;
+}
+
+function withOwnerAssets(plan: Plan, assets: OwnerAssets | null): Plan {
+  if (!assets || (assets.siteUrl === undefined && assets.logo === undefined)) return plan;
+  return {
+    ...plan,
+    brief: parseBrief({
+      ...plan.brief,
+      ...(assets.siteUrl !== undefined ? { siteUrl: assets.siteUrl } : {}),
+      ...(assets.logo !== undefined ? { logo: assets.logo } : {}),
+    }),
+  };
+}
+
 async function planFrom(
   intake: IntakeResult,
   deps: PlanningDeps,
@@ -99,6 +121,7 @@ async function planFrom(
   intakeRun: AgentRun<IntakeResult> | null,
   replanOf: { id: string; note: string } | null,
   dir: { direction: DirectionResult | null; note: string | null; run: AgentRun<DirectionResult> | null },
+  assets: OwnerAssets | null = null,
 ): Promise<PlanningResult> {
   const plannerTaskId = randomUUID();
   const plannerRun = await runAgent(
@@ -118,6 +141,12 @@ async function planFrom(
   if (plannerRun.status !== "completed" || !plannerRun.output) {
     return { status: "plan_failed", runId, planId: null, plan: null, intake, ...d, reason: `planner ${plannerRun.status}: ${plannerRun.reason}`, runs };
   }
+  let plan: Plan;
+  try {
+    plan = withOwnerAssets(plannerRun.output, assets);
+  } catch (err) {
+    return { status: "plan_failed", runId, planId: null, plan: null, intake, ...d, reason: `the attached logo or live address is not usable: ${err instanceof Error ? err.message : String(err)}`, runs };
+  }
   // Step 6: the pipeline writes plan_approvals on the Planner's behalf, so the Planner's scope decides: insert
   // (and update, to supersede a pending predecessor) on plan_approvals, for the run's own entity only.
   const gate = permissionGateFor(registry, PLANNER_ROLE, {
@@ -128,14 +157,14 @@ async function planFrom(
     audit: deps.audit,
   });
   try {
-    await gate.authorize({ kind: "db", table: "plan_approvals", op: "insert", entitySlug: plannerRun.output.brief.entitySlug });
-    if (replanOf) await gate.authorize({ kind: "db", table: "plan_approvals", op: "update", entitySlug: plannerRun.output.brief.entitySlug });
+    await gate.authorize({ kind: "db", table: "plan_approvals", op: "insert", entitySlug: plan.brief.entitySlug });
+    if (replanOf) await gate.authorize({ kind: "db", table: "plan_approvals", op: "update", entitySlug: plan.brief.entitySlug });
   } catch (err) {
     if (!(err instanceof PermissionDeniedError)) throw err;
     return { status: "plan_failed", runId, planId: null, plan: null, intake, ...d, reason: err.message, runs };
   }
   const planId = await deps.store.insertPending({
-    plan: plannerRun.output,
+    plan,
     intake,
     revision: replanOf ? 2 : 1,
     supersedes: replanOf?.id ?? null,
@@ -143,10 +172,10 @@ async function planFrom(
     direction: dir.direction,
     directionNote: dir.note,
   });
-  return { status: "awaiting_owner_approval", runId, planId, plan: plannerRun.output, intake, ...d, reason: null, runs };
+  return { status: "awaiting_owner_approval", runId, planId, plan, intake, ...d, reason: null, runs };
 }
 
-export async function intakeAndPlan(raw: unknown, deps: PlanningDeps): Promise<PlanningResult> {
+export async function intakeAndPlan(raw: unknown, deps: PlanningDeps, assets: OwnerAssets | null = null): Promise<PlanningResult> {
   const registry = deps.registry ?? registryWithPlanningAndDirection();
   const runId = randomUUID();
   const intakeRun = await runAgent(
@@ -163,7 +192,7 @@ export async function intakeAndPlan(raw: unknown, deps: PlanningDeps): Promise<P
     return { status: "intake_escalated", runId, planId: null, plan: null, intake: intakeRun.output, ...noDir, reason: intakeRun.reason, runs: none };
   }
   const dir = await directionFor(intakeRun.output, rawTextOf(raw), deps, registry, runId);
-  return planFrom(intakeRun.output, deps, registry, runId, intakeRun, null, dir);
+  return planFrom(intakeRun.output, deps, registry, runId, intakeRun, null, dir, assets);
 }
 
 /** Blueprint §5: "Re-plan once on rejection, escalate on second rejection." */
@@ -185,5 +214,7 @@ export async function replan(rejectedPlanId: string, deps: PlanningDeps): Promis
   }
   // The request did not change, so its direction does not either: reuse it rather than pay again.
   const dir = { direction: prev.direction, note: prev.directionNote, run: null };
-  return planFrom(prev.intake, deps, registry, runId, null, { id: prev.id, note: prev.decisionNote ?? "" }, dir);
+  // What the owner attached to the request (live address, logo) is kept: a re-plan changes the plan, not the client's assets.
+  const kept: OwnerAssets = { ...(prev.plan.brief.siteUrl ? { siteUrl: prev.plan.brief.siteUrl } : {}), ...(prev.plan.brief.logo ? { logo: prev.plan.brief.logo } : {}) };
+  return planFrom(prev.intake, deps, registry, runId, null, { id: prev.id, note: prev.decisionNote ?? "" }, dir, kept);
 }

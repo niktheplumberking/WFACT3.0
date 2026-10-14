@@ -133,6 +133,17 @@ export const content = site as SiteContent;
 export const palette = theme as Theme;
 /** The live site's https origin, from the owner (never the builder); null until it is known. */
 export const siteUrl = (launch as { siteUrl: string | null }).siteUrl;
+/**
+ * The client's own logo, written to public/ by the build from the owner's verified upload (never the builder);
+ * null when none was supplied. width/height are the display size, so the space is reserved (no layout shift).
+ */
+export const logo = ((launch as { logo?: Logo | null }).logo ?? null) as Logo | null;
+export interface Logo {
+  src: string;
+  mime: string;
+  width: number;
+  height: number;
+}
 /** The share card the build writes to public/ (src/launch.ts). */
 export const OG_IMAGE = "/og-image.png";
 

@@ -13,6 +13,7 @@ import path from "node:path";
 const contentHash = createHash("sha256")
   .update(readFileSync(path.join(import.meta.dirname, "content/site.json")))
   .update(readFileSync(path.join(import.meta.dirname, "content/theme.json")))
+  .update(readFileSync(path.join(import.meta.dirname, "content/launch.json")))
   .digest("hex")
   .slice(0, 20);
 

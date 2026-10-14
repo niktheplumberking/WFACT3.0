@@ -14,6 +14,8 @@ import { stageLabel } from "../stages";
 import { Empty, LoadError, Loading, Notice, PageHead, Plate, RouteLine } from "../components/ui";
 import { ClientLines, fetchProjects } from "./Home";
 import { StageMove } from "./Decisions";
+import { LogoUpload } from "../components/LogoUpload";
+import { checkSiteUrl, isTestAddress, type LogoRecord } from "../lib/brandUpload";
 
 /* ---------------- add client / project ---------------- */
 
@@ -237,6 +239,10 @@ export function NewRequest() {
   const toast = useToast();
   const f = useFactory();
   const [text, setText] = useState("");
+  // What the request text cannot carry: the logo file and the live address (set on the brief by code, never by a model).
+  const [logo, setLogo] = useState<LogoRecord | null>(null);
+  const [siteUrl, setSiteUrl] = useState("");
+  const [siteUrlTouched, setSiteUrlTouched] = useState(false);
   const [question, setQuestion] = useState("");
   const [goal, setGoal] = useState("");
   const [goalTouched, setGoalTouched] = useState(false);
@@ -264,6 +270,9 @@ export function NewRequest() {
   }
 
   const goalError = goalTouched && !goal.trim() ? "Say what the page is for, so the checks know what to judge." : null;
+  const site = siteUrl.trim() ? checkSiteUrl(siteUrl) : null;
+  const siteUrlError = siteUrlTouched && site && !site.ok ? site.reason : null;
+  const siteUrlNote = site?.ok && isTestAddress(site.value) ? "That is a test address, so the site is built without search and share tags until the real address is added." : null;
 
   return (
     <>
@@ -279,7 +288,16 @@ export function NewRequest() {
             className="plate-body stack-tight"
             onSubmit={(e) => {
               e.preventDefault();
-              if (text.trim()) go("intake", { text }, "Reading the request. The plan will appear in Decisions.");
+              if (!text.trim()) return;
+              if (site && !site.ok) {
+                setSiteUrlTouched(true);
+                return;
+              }
+              go(
+                "intake",
+                { text, ...(site?.ok ? { siteUrl: site.value } : {}), ...(logo ? { logo } : {}) },
+                "Reading the request. The plan will appear in Decisions.",
+              );
             }}
           >
             <div className="field">
@@ -287,6 +305,26 @@ export function NewRequest() {
               <textarea id="req" className="textarea" rows={10} maxLength={20000} value={text} onChange={(e) => setText(e.target.value)} aria-describedby="req-hint" />
               <span id="req-hint" className="hint">
                 The request is treated as information, never as instructions. <span className="fig">{text.length.toLocaleString()} / 20,000</span> characters.
+              </span>
+            </div>
+            <LogoUpload value={logo} onChange={setLogo} disabled={!!busy} />
+            <div className="field">
+              <label htmlFor="req-site">Live site address (optional)</label>
+              <input
+                id="req-site"
+                className="input"
+                inputMode="url"
+                autoComplete="url"
+                placeholder="https://bennettandco.com"
+                maxLength={200}
+                value={siteUrl}
+                onChange={(e) => setSiteUrl(e.target.value)}
+                onBlur={() => setSiteUrlTouched(true)}
+                aria-invalid={!!siteUrlError}
+                aria-describedby="req-site-h"
+              />
+              <span id="req-site-h" className="hint" role={siteUrlError ? "alert" : undefined} style={siteUrlError ? { color: "var(--stop)" } : undefined}>
+                {siteUrlError ?? siteUrlNote ?? "Where the finished site will live. Search engines and share cards need it; you can add it later from the plan."}
               </span>
             </div>
             <div className="actions">

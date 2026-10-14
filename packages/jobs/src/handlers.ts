@@ -17,9 +17,10 @@ import { intakeAndPlan, replan, type PlanningDeps, type PlanningResult } from "@
 import type { PlanStore } from "@wfact/planning/planStore";
 import type { Plan } from "@wfact/planning/planner";
 import type { PilotBrief } from "@wfact/frontend-loop/brief";
-import { buildAndVerify, recordedBuilderTemplate, resumeBuildAndVerify, qaFailureToIssues, runIdOfError, runProgress, type ReopenRequest, type WorkflowDeps, type WorkflowResult } from "@wfact/workflow";
+import { buildAndVerify, recordedBuilderTemplate, resumeBuildAndVerify, qaFailureToIssues, runIdOfError, runProgress, type ContinueFrom, type ReopenRequest, type WorkflowDeps, type WorkflowResult } from "@wfact/workflow";
 import type { Job } from "./jobStore.js";
-import { ownerFactsFrom, type PlanInput, type PlanInputStore } from "./inputStore.js";
+import { LOGO_INPUT_KEY, ownerFactsFrom, type PlanInput, type PlanInputStore } from "./inputStore.js";
+import { parseBriefLogo } from "@wfact/frontend-loop/brandAsset";
 
 export interface HandlerDeps {
   planning: PlanningDeps;
@@ -47,7 +48,8 @@ export interface HandlerDeps {
   /**
    * Step 4D: when a finished build stopped only because the design reviewer was unreachable (everything else passed),
    * the runner waits and continues it by itself, a bounded number of times, instead of asking a person. Defaults:
-   * 60 s then 180 s, and never after 18 minutes of the job's 30. Tests pass zero delays.
+   * 60 s then 180 s, and only while a retry plus a full quality pass still fits inside the job's 26-minute step (a retry is
+   * not started after 15 minutes). Tests pass zero delays.
    */
   autoHeal?: { delaysMs: number[]; maxElapsedMs: number };
   sleep?: (ms: number) => Promise<void>;
@@ -185,7 +187,9 @@ export function isTransientReviewerOutage(o: JobOutcome): boolean {
  * already saved, so each retry re-runs the checks and the review and nothing else. Each retry is recorded on the run.
  */
 async function autoHeal(first: JobOutcome, wf: WorkflowDeps, extra: Record<string, unknown>, deps: HandlerDeps, startedAt: number): Promise<JobOutcome> {
-  const cfg = deps.autoHeal ?? { delaysMs: [60_000, 180_000], maxElapsedMs: 18 * 60_000 };
+  // 15 min: the wait, then a quality pass (worst case ~8 min since the reviewer's time cap) must end before the 26-minute
+  // step limit. At 18 min a retry could be killed mid-check (jobs 63278e56, b880a7d5 ended within 40 s of the limit).
+  const cfg = deps.autoHeal ?? { delaysMs: [60_000, 180_000], maxElapsedMs: 15 * 60_000 };
   const sleep = deps.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   let outcome = first;
   let attempts = 0;
@@ -210,8 +214,15 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
   const startedAt = Date.now();
   const p = job.params ?? {};
   switch (job.kind) {
-    case "intake":
-      return planningOutcome(await intakeAndPlan({ text: str(p, "text", 20_000), source: "intake-raw" }, deps.planning));
+    case "intake": {
+      // The live address and the logo record the owner attached (the jobs trigger checked both, and that the file was
+      // uploaded); set on the brief by code, never by a model. The build checks the logo's bytes again.
+      const assets = {
+        ...(typeof p.siteUrl === "string" ? { siteUrl: p.siteUrl } : {}),
+        ...(p.logo !== undefined ? { logo: p.logo } : {}),
+      };
+      return planningOutcome(await intakeAndPlan({ text: str(p, "text", 20_000), source: "intake-raw" }, deps.planning, assets));
+    }
 
     case "replan":
       return planningOutcome(await replan(uuid(p, "planId"), deps.planning));
@@ -269,8 +280,17 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
         const reason = typeof p.reason === "string" && p.reason.trim() ? p.reason.trim().slice(0, 200) : "continued from the Cockpit";
         reopen = { reason, by: job.createdBy, ...(brief !== undefined ? { brief } : {}) };
       }
+      // Where to continue (the Cockpit's step-targeted buttons): re-check the saved site, revise it with the last findings, or build again.
+      const fromStep: ContinueFrom | undefined = p.fromStep === "qa" || p.fromStep === "revise" || p.fromStep === "rebuild" ? p.fromStep : undefined;
+      if (fromStep) extra.fromStep = fromStep;
       try {
-        return await autoHeal(await finishWorkflow(await resumeBuildAndVerify(runId, wf, reopen ? { reopen } : {}), wf, extra), wf, extra, deps, startedAt);
+        return await autoHeal(
+          await finishWorkflow(await resumeBuildAndVerify(runId, wf, { ...(reopen ? { reopen } : {}), ...(fromStep ? { fromStep } : {}) }), wf, extra),
+          wf,
+          extra,
+          deps,
+          startedAt,
+        );
       } catch (err) {
         return crashed(err, runId, wf, extra);
       }
@@ -351,10 +371,30 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
   }
 }
 
-/** The brief a plan is built from. Plans approved before 2026-10-06 carry no page scope; their lead type says it. */
+/**
+ * The brief a plan is built from. Plans approved before 2026-10-06 carry no page scope; their lead type says it.
+ * Two owner details are not facts for the copy but settings the starters use: `asset.logo` (the uploaded logo record,
+ * checked by the database when it was added and by the build when it runs) and `site_url` (the live address).
+ */
 export function briefForBuild(plan: Pick<Plan, "brief" | "intake">, inputs: PlanInput[] = []): PilotBrief {
   const base: PilotBrief = plan.brief.pageScope ? plan.brief : { ...plan.brief, pageScope: plan.intake.leadType === "landing_page" ? "single" : "multi" };
   const ownerFacts = ownerFactsFrom(inputs);
   const ownerSkipped = inputs.filter((i) => i.waived).map((i) => i.label);
-  return { ...base, ...(ownerFacts.length > 0 ? { ownerFacts } : {}), ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}) };
+  const logoInput = inputs.find((i) => i.key === LOGO_INPUT_KEY && !i.waived && i.value);
+  let logo: PilotBrief["logo"];
+  if (logoInput) {
+    try {
+      logo = parseBriefLogo(JSON.parse(logoInput.value!));
+    } catch {
+      throw new Error("the logo the owner added to this plan is not a readable logo record; upload it again");
+    }
+  }
+  const siteUrl = inputs.find((i) => i.key === "site_url" && !i.waived && i.value)?.value;
+  return {
+    ...base,
+    ...(ownerFacts.length > 0 ? { ownerFacts } : {}),
+    ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}),
+    ...(logo ? { logo } : {}),
+    ...(siteUrl && /^https:\/\/[^/\s]+\/?$/i.test(siteUrl) ? { siteUrl } : {}),
+  };
 }

@@ -23,6 +23,7 @@ import { BANNED_CLAIMS, briefBlock } from "../trackA/loop.js";
 import { CONTENT_SCHEMA_VERSION, SITE_CONTENT_JSON_SCHEMA, extractJson, validateSiteContent, type SiteContent } from "./content.js";
 import { buildTrackBSite, STARTER_VERSION, TrackBBuildError, type TrackBBuild } from "./build.js";
 import { siteUrlOf } from "../launch.js";
+import { logoAssetFor } from "../brandAsset.js";
 
 export const TRACK_B_TEMPLATE: PageTemplate = {
   id: "track-b",
@@ -122,7 +123,7 @@ export class TrackBLoop {
     this.maxRounds = opts.maxRounds ?? 3;
     this.maxValidation = opts.maxValidationAttempts ?? 3;
     this.nowIso = opts.nowIso ?? (() => new Date().toISOString());
-    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b) }));
+    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b), logo: logoAssetFor(b) }));
   }
 
   async run(brief: PilotBrief): Promise<FrontendLoopResult> {

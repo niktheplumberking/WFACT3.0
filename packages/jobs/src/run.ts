@@ -31,7 +31,7 @@ import { modelIdentity } from "@wfact/verification/crossModel";
 import { knownClientSlugs } from "@wfact/verification/paths";
 import { ClaudeJsonClient } from "@wfact/planning/modelClient";
 import { planStoreFromEnv } from "@wfact/planning/planStore";
-import { SupabaseArtifactStore } from "@wfact/workflow/supabaseArtifacts";
+import { SupabaseArtifactStore, SupabaseBrandAssetStore } from "@wfact/workflow/supabaseArtifacts";
 import { createDocumentationAgent, createDocumentationObserver, FileMemoryStore, registerDocumentationAgent, SupabaseRunRecordReader } from "@wfact/documentation";
 import { productionQaOptions } from "@wfact/rendered-qa/production";
 import { TRACK_B_BUDGET } from "@wfact/rendered-qa/rendered";
@@ -39,6 +39,8 @@ import { SupabaseJobStore } from "./jobStore.js";
 import { SupabasePlanInputStore } from "./inputStore.js";
 import { handleJob, type HandlerDeps } from "./handlers.js";
 import { askHermesGated } from "./hermesAsk.js";
+import { providerProbes } from "./providerProbes.js";
+import { readFileSync } from "node:fs";
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..", "..");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -111,6 +113,14 @@ function buildDeps(): HandlerDeps {
     artifacts,
     knownClientSlugs: slugs,
     stageObserver,
+    // 2026-10-14: the owner's uploaded logo (client-assets bucket) and the readiness probes run before any paid step.
+    brandAssets: new SupabaseBrandAssetStore(url, serviceKey),
+    providerProbes: providerProbes({
+      anthropicKey: apiKey,
+      anthropicModel: (JSON.parse(readFileSync(path.join(REPO_ROOT, "packages", "rendered-qa", "config", "reviewer.json"), "utf-8")) as { model: string }).model,
+      agent37BaseUrl: process.env.AGENT37_BASE_URL,
+      agent37Key: process.env.AGENT37_API_KEY,
+    }),
   };
 
   return {

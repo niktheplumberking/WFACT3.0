@@ -199,3 +199,21 @@ test("replan refuses a plan that wasn't rejected", async () => {
   const first = await intakeAndPlan(RAW_EMAIL, d);
   await assert.rejects(() => replan(first.planId!, d), /only an owner-rejected plan/);
 });
+
+test("pipeline: the owner's attached live address and logo are set on the brief by code and survive a re-plan; a bad one fails the plan", async () => {
+  const logo = { path: `uploads/0b7c3f7e-1d2a-4c55-9e8f-2a1b3c4d5e6f/${"a".repeat(64)}.svg`, mime: "image/svg+xml", sha256: "a".repeat(64), bytes: 466, width: 240, height: 48 };
+  const { d, store } = deps();
+  const first = await intakeAndPlan(RAW_EMAIL, d, { siteUrl: "https://northlightsigns.com", logo });
+  assert.equal(first.status, "awaiting_owner_approval");
+  const row = await store.get(first.planId!);
+  assert.equal(row?.plan.brief.siteUrl, "https://northlightsigns.com");
+  assert.deepEqual(row?.plan.brief.logo, logo);
+  store.decide(first.planId!, "rejected", "Add pricing.");
+  const second = await replan(first.planId!, d);
+  assert.deepEqual((await store.get(second.planId!))?.plan.brief.logo, logo, "a re-plan keeps the client's logo");
+  assert.equal((await store.get(second.planId!))?.plan.brief.siteUrl, "https://northlightsigns.com");
+
+  const bad = await intakeAndPlan(RAW_EMAIL, deps().d, { logo: { ...logo, path: "../etc/passwd" } });
+  assert.equal(bad.status, "plan_failed");
+  assert.match(bad.reason ?? "", /logo or live address is not usable/);
+});

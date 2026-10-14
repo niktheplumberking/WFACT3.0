@@ -2,14 +2,16 @@
  * Activity: everything the factory did, and for any run, why it failed and what to do next.
  * Results come from the jobs table (written by the worker), never from this page's own claims.
  */
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Archive, ArrowCounterClockwise, ArrowSquareOut, Play, XCircle } from "@phosphor-icons/react";
 import { supabase } from "../supabaseClient";
 import { archiveJob, cancelJob, dispatchJob, isActive, isFinished, isStaleQueued, isStaleRunning, type JobRow } from "../jobsClient";
 import { latestBuildByPlan, planIdOfJob } from "../lib/attention";
 import { asStopped, diagnoseJob } from "../lib/recovery";
-import { enrichFromRun } from "../lib/runInfo";
+import { enrichWithRows, loadRun } from "../lib/runInfo";
+import { deriveTimeline, progressHint, stoppedAtFromJob, type Timeline } from "../lib/timeline";
+import { loadBuildStats } from "../lib/buildStats";
 import {
   KIND_LABEL, clock, dateTime, duration, explainJobError, jobState, planName, shortId,
   type PlanRow, type RoundRow,
@@ -19,6 +21,7 @@ import { fetchRunSpend, money, total } from "../lib/costs";
 import { stageLabel } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
 import { ClientNeedsPanel, RecoveryPanel } from "../components/Recovery";
+import { BuildTimeline } from "../components/BuildTimeline";
 import { subjectOf } from "./Home";
 
 /* ---------------- list ---------------- */
@@ -76,7 +79,13 @@ export default function Activity() {
                       {KIND_LABEL[j.kind]}
                       {subject ? `: ${subject}` : ""}
                     </Link>
-                    {j.status === "failed" && <p className="why">{diagnoseJob(j).headline}</p>}
+                    {isActive(j) && (j.kind === "build_plan" || j.kind === "resume") && <RunningHint j={j} />}
+                    {j.status === "failed" && (
+                      <p className="why">
+                        {stoppedAtFromJob(j) ? `${stoppedAtFromJob(j)}: ` : ""}
+                        {diagnoseJob(j).headline}
+                      </p>
+                    )}
                   </div>
                   <span className="when fig">
                     {dateTime(j.created_at)}
@@ -90,6 +99,15 @@ export default function Activity() {
       </Plate>
     </>
   );
+}
+
+/** A running build's list row says which step it is on ("Quality checks, round 2 of 3"), refreshed while it runs. */
+function RunningHint({ j }: { j: JobRow }) {
+  const always = useCallback(() => true, []);
+  const run = useLoad(() => loadRun(j), [j.id, j.status], { pollMs: 5000, pollWhile: always });
+  if (!run.data) return null;
+  const hint = progressHint(deriveTimeline({ rows: run.data.rows, job: j, active: isActive(j) }));
+  return hint ? <p className="why">Now: {hint}</p> : null;
 }
 
 /* ---------------- fix rounds ---------------- */
@@ -340,16 +358,31 @@ export function RunPage() {
   const f = useFactory();
   const nav = useNavigate();
   const toast = useToast();
-  const job = useLoad(() => fetchJob(jobId), [jobId], { pollMs: 5000, pollWhile: (j) => !!j && isActive(j) });
+  const me = useMe();
+  const jobActive = useCallback((j: JobRow | null) => !!j && isActive(j), []);
+  const job = useLoad(() => fetchJob(jobId), [jobId], { pollMs: 5000, pollWhile: jobActive });
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
 
-  // A run that stopped is read together with the run's own record: which run it was, and what it had saved.
+  // A build is read together with the run's own record: every step it took, what it saved, how it ended. Polled (about
+  // every 5 s) only while the job is active; a finished run is read once.
   const stopped = job.data ? asStopped(job.data) : null;
-  const rich = useLoad(() => (stopped && stopped.status === "failed" ? enrichFromRun(stopped) : Promise.resolve(stopped)), [stopped?.id, stopped?.status, stopped?.finished_at]);
+  const isBuildJob = !!stopped && (stopped.kind === "build_plan" || stopped.kind === "resume");
+  const activeRef = useRef(false);
+  activeRef.current = !!job.data && isActive(job.data);
+  const runPoll = useCallback(() => activeRef.current, []);
+  const run = useLoad(() => (stopped && isBuildJob ? loadRun(stopped) : Promise.resolve(null)), [stopped?.id, stopped?.status, stopped?.finished_at, isBuildJob], {
+    pollMs: 5000,
+    pollWhile: runPoll,
+  });
   const j = job.data;
+  const planIdEarly = j ? planIdOfJob(j, f.jobs ?? []) : null;
+  const planEarly = planIdEarly ? f.plans?.find((p) => p.id === planIdEarly) : undefined;
+  const track = planEarly?.build_track ?? null;
+  const live = !!j && isBuildJob && isActive(j);
+  const stats = useLoad(() => (live ? loadBuildStats(f.jobs ?? [], f.plans ?? [], track, j?.id) : Promise.resolve(null)), [live, track, f.jobs?.length ?? 0]);
   if (job.error) return <LoadError what="this run" error={job.error} onRetry={job.reload} />;
   if (job.loading && !j) return <Loading rows={4} label="Loading the run" />;
   if (!j) return <Empty title="This run doesn't exist, or your role can't see it.">Runs are visible to owners and admins. <Link to="/activity">Back to Activity</Link></Empty>;
@@ -363,8 +396,21 @@ export function RunPage() {
   const superseded = build && j.status === "failed" && latest && latest.id !== j.id && latest.status === "succeeded" ? latest : null;
   const siblings = planId ? jobs.filter((x) => planIdOfJob(x, jobs) === planId).sort((a, b) => b.created_at.localeCompare(a.created_at)) : [];
   // A stop that a later build of the same plan already fixed needs no button; the pointer below says so.
-  const jv = rich.data && stopped && rich.data.id === stopped.id ? rich.data : stopped ?? j;
-  const showRecovery = jv.status === "failed" && !superseded && !j.archived_at && !rich.loading;
+  const runData = run.data && stopped && run.data.runId && run.data.jobId === stopped.id ? run.data : null;
+  const jv = runData && stopped ? enrichWithRows(stopped, runData.runId!, runData.rows) : stopped ?? j;
+  const runReady = !isBuildJob || run.data?.jobId === j.id;
+  const timeline: Timeline | null = isBuildJob
+    ? deriveTimeline({
+        rows: runData?.rows ?? [],
+        job: jv,
+        plan: plan ? { decidedAt: plan.decided_at ?? null, track: plan.build_track ?? null } : null,
+        names: runData?.names,
+        meId: me.userId,
+        active: isActive(j),
+        neverStarted: isStaleQueued(j),
+      })
+    : null;
+  const showRecovery = jv.status === "failed" && !superseded && !j.archived_at && runReady && !!timeline;
 
   async function act(fn: () => Promise<string | null>, ok: string) {
     setBusy(true);
@@ -432,6 +478,7 @@ export function RunPage() {
               siblings={siblings}
               planId={planId}
               planName={plan ? planName(plan) : null}
+              timeline={timeline!}
               onChanged={async () => {
                 await Promise.all([job.reload(), f.reload()]);
               }}
@@ -461,11 +508,24 @@ export function RunPage() {
             </Notice>
           )}
           {actionError && <Notice tone="stop" title="That didn't work.">{actionError} Nothing changed.</Notice>}
-          <Plate title="What the factory did">
-            <div className="plate-body">
-              <Steps j={j} />
-            </div>
-          </Plate>
+          {timeline && !runReady ? (
+            <Plate title="What the factory did">
+              <Loading rows={3} label="Reading the build's steps" />
+            </Plate>
+          ) : timeline && !showRecovery ? (
+            <Plate title={live ? "Build progress" : "What the factory did"} note={timeline.fromAudit ? undefined : "From the job's own record"}>
+              <div className="plate-body">
+                <BuildTimeline timeline={timeline} stats={stats.data} startedAt={j.started_at ?? j.created_at} />
+                {run.data?.error && <p className="quiet fine" style={{ marginTop: 12 }}>The run's step-by-step record couldn't be read just now (“{run.data.error}”), so this shows what the job itself reported. Nothing changed.</p>}
+              </div>
+            </Plate>
+          ) : !timeline ? (
+            <Plate title="What the factory did">
+              <div className="plate-body">
+                <Steps j={j} />
+              </div>
+            </Plate>
+          ) : null}
           <Results j={j} />
         </div>
         <Plate title="Technical details">

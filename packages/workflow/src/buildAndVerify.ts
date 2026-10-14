@@ -39,12 +39,13 @@ import {
 import type { FrontendBuildInput } from "@wfact/frontend-loop/agent";
 import type { FrontendLoopResult } from "@wfact/frontend-loop/loop";
 import { briefFactSources, type PilotBrief } from "@wfact/frontend-loop/brief";
+import { briefRequiresLogo, loadLogoAsset, LogoError, provideLogoAsset } from "@wfact/frontend-loop/brandAsset";
 import type { QaInput } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
 
 export const WORKFLOW_ID = "build-and-verify";
 /** Versioned per Blueprint §3 ("every workflow definition versioned ... referenced in every run"). */
-export const WORKFLOW_VERSION = "1.0.0";
+export const WORKFLOW_VERSION = "1.1.0"; // 1.1.0: readiness check before any paid step; continue from a chosen step
 const DEFAULT_MAX_QA_REVISIONS = 2;
 
 // ---------------------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ const sha256 = (s: string | Buffer) => (typeof s === "string" ? createHash("sha2
  * with the extensions a static site and its source use; never "..", never a dotfile.
  */
 export const ARTIFACT_PATH_RE =
-  /^clients\/[a-z][a-z0-9-]*\/(pages\/[a-z0-9-]+\.html|sites\/[a-z0-9-]+\/(?!.*\.\.)[A-Za-z0-9_][A-Za-z0-9_.-]*(\/[A-Za-z0-9_][A-Za-z0-9_.-]*)*\.(html|json|txt|xml|js|mjs|css|svg|woff2|ico|png|webmanifest|ts|tsx))$/;
+  /^clients\/[a-z][a-z0-9-]*\/(pages\/[a-z0-9-]+\.html|sites\/[a-z0-9-]+\/(?!.*\.\.)[A-Za-z0-9_][A-Za-z0-9_.-]*(\/[A-Za-z0-9_][A-Za-z0-9_.-]*)*\.(html|json|txt|xml|js|mjs|css|svg|woff2|ico|png|webp|webmanifest|ts|tsx))$/;
 
 function assertSafeRelPath(relPath: string): void {
   const normalized = path.posix.normalize(relPath);
@@ -336,7 +337,31 @@ export interface WorkflowDeps {
    * Cockpit job to the run, so a job that the runner never got to finish (GitHub timeout, crash) can still be continued.
    */
   onRunStart?: (runId: string) => Promise<void>;
+  /** Reads an owner-uploaded brand asset (the logo) by its path in the private client-assets bucket. Absent: a brief with a logo stops at the readiness check. */
+  brandAssets?: { read(path: string): Promise<Buffer> };
+  /**
+   * Cheap readiness probes of the model providers this run will pay (builder, reviewer, evaluator), run before any paid
+   * step. A failed probe stops the run with nothing spent (`provider_unavailable`) instead of failing 5-28 minutes in.
+   */
+  providerProbes?: () => Promise<PreflightCheck[]>;
 }
+
+/** One readiness check (workflow.preflight row). */
+export interface PreflightCheck {
+  id: string;
+  ok: boolean;
+  detail: string;
+}
+
+/** Something only the owner can supply; the Cockpit asks for it, then the run continues. */
+export interface PreflightNeed {
+  key: string;
+  label: string;
+  reason: string;
+}
+
+/** Where a continued run starts: the quality checks on the saved site, a revision with the last findings, or a fresh build. */
+export type ContinueFrom = "qa" | "revise" | "rebuild";
 
 export type WorkflowStatus =
   | "awaiting_launch_approval" // verified; the launch gate is a human's call
@@ -345,6 +370,8 @@ export type WorkflowStatus =
   | "build_failed" // builder escalated or was rejected
   | "qa_failed" // QA agent itself was rejected/escalated (not a verdict)
   | "checkpoint_corrupt" // artifact changed since its checkpoint — refused
+  | "needs_input" // the readiness check found something only the owner can supply (e.g. the logo the brief names); nothing was spent
+  | "provider_unavailable" // a model provider failed its readiness probe (credits, unreachable); nothing was spent
   | "already_finished"; // resume of a run that already reached a terminal row
 
 export interface QaFailure {
@@ -368,6 +395,8 @@ export interface WorkflowResult {
   documentationEscalations?: { stage: "build" | "qa"; cycle: number; reason: string }[];
   /** Step 4D: what the evaluator says the client still has to supply ("NEEDS CLIENT INPUT" notes on an approval). */
   needsFromClient?: string[];
+  /** What the readiness check asked the owner for, when it stopped the run (status needs_input). */
+  preflightNeeds?: PreflightNeed[];
 }
 
 interface CheckpointState {
@@ -418,6 +447,7 @@ class Workflow {
    */
   cycleBase = 0;
   private clientNeeds: string[] = [];
+  private preflightNeeds: PreflightNeed[] = [];
 
   constructor(
     private readonly deps: WorkflowDeps,
@@ -447,6 +477,7 @@ class Workflow {
       builderRounds: this.builderRounds,
       ...(this.deps.stageObserver ? { documentationEscalations: [...this.documentationEscalations] } : {}),
       ...(this.clientNeeds.length > 0 ? { needsFromClient: [...this.clientNeeds] } : {}),
+      ...(this.preflightNeeds.length > 0 ? { preflightNeeds: [...this.preflightNeeds] } : {}),
     };
   }
 
@@ -540,6 +571,55 @@ class Workflow {
     });
   }
 
+  /**
+   * The readiness check, before any paid step (on a start and on every continue, since a new runner has none of the
+   * last one's memory). It loads and verifies the logo the brief names (the starters need its bytes), stops when the
+   * brief's own words require a logo that was never attached (the builder cannot invent it, so every QA round would
+   * fail on it: Lanternworks 4c35703b, 3 of 3), and probes the model providers. Returns the halt when the run cannot go on.
+   */
+  async preflight(cycles: number, cp: CheckpointState | null): Promise<WorkflowResult | null> {
+    const checks: PreflightCheck[] = [];
+    const needs: PreflightNeed[] = [];
+    const logo = this.brief.logo;
+    if (logo) {
+      try {
+        if (!this.deps.brandAssets) throw new LogoError("this runner has no brand-asset store configured, so the logo cannot be placed");
+        provideLogoAsset(loadLogoAsset(logo, await this.deps.brandAssets.read(logo.path)));
+        checks.push({ id: "brief.logo", ok: true, detail: `logo loaded and verified (${logo.mime}, ${logo.width}x${logo.height})` });
+      } catch (err) {
+        const why = err instanceof Error ? err.message : String(err);
+        checks.push({ id: "brief.logo", ok: false, detail: why });
+        needs.push({ key: "asset.logo", label: "Logo file", reason: `The logo could not be used: ${why} Upload the logo again.` });
+      }
+    } else if (briefRequiresLogo(`${this.brief.brandNotes}\n${this.brief.goal}`) && !(this.brief.ownerSkipped ?? []).some((s) => /logo/i.test(s))) {
+      checks.push({ id: "brief.logo", ok: false, detail: "the brief says to use the client's logo, but no logo file is attached" });
+      needs.push({ key: "asset.logo", label: "Logo file", reason: "The brief says to use the client's own logo, but no logo file was attached. Upload it (SVG, PNG or WebP), or choose to build without it." });
+    } else {
+      checks.push({ id: "brief.logo", ok: true, detail: "no logo required" });
+    }
+    let providersOk = true;
+    if (needs.length === 0 && this.deps.providerProbes) {
+      // Only worth probing when nothing else stops the run: the owner fixes the brief first.
+      let probes: PreflightCheck[];
+      try {
+        probes = await this.deps.providerProbes();
+      } catch (err) {
+        probes = [{ id: "provider.probe", ok: false, detail: `the readiness probe itself failed: ${err instanceof Error ? err.message : String(err)}` }];
+      }
+      checks.push(...probes);
+      providersOk = probes.every((p) => p.ok);
+    }
+    const ok = needs.length === 0 && providersOk;
+    await recordAudit(this.ctx, { action: "workflow.preflight", outcome: ok ? "success" : "failure", payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, ok, needs, checks } });
+    if (ok) return null;
+    if (needs.length > 0) {
+      this.preflightNeeds = needs;
+      return this.halt("needs_input", "preflight", cycles, cp, `Needs the owner before building: ${needs.map((n) => n.label).join(", ")}. Nothing was spent.`);
+    }
+    const failed = checks.filter((c) => !c.ok).map((c) => `${c.id}: ${c.detail}`).join("; ");
+    return this.halt("provider_unavailable", "preflight", cycles, cp, `A model provider is not ready (${failed}). Nothing was spent; try again once it is.`);
+  }
+
   async start(): Promise<WorkflowResult> {
     await recordAudit(this.ctx, {
       action: "workflow.start",
@@ -556,6 +636,8 @@ class Workflow {
       },
     });
     await this.deps.onRunStart?.(this.runId);
+    const stop = await this.preflight(0, null);
+    if (stop) return stop;
     return this.buildFrom(0, null);
   }
 
@@ -611,6 +693,31 @@ class Workflow {
     await this.stageEnded("build", cycle, buildTaskId, "checkpointed");
     this.templateSections = run.output.template.requiredSections;
     return { cp };
+  }
+
+  /**
+   * Continue with fixes: send the findings that stopped the run (plus whatever the owner added to the brief since) straight
+   * to the builder, starting from the saved site, then check again. Skips re-checking a site that is already known to fail
+   * (about 5 minutes and a review's cost each time).
+   */
+  async reviseFrom(cp: CheckpointState, issues: string[]): Promise<WorkflowResult> {
+    // Read back exactly as the revision loop does: on the QA role's behalf (the builder's scope writes, it does not read).
+    const reader = gatedArtifactStore(this.deps.artifacts, this.gateFor(this.deps.qaAgent.role, randomUUID()));
+    let revision: { html: string; issues: string[]; contentJson?: string };
+    try {
+      if (isSiteManifest(cp.artifact)) {
+        const site = await readSiteVerified(reader, cp.artifact);
+        revision = { html: site.files[site.pages[0]!]!, issues, contentJson: site.contentJson };
+      } else {
+        revision = { html: await reader.readVerified(cp.artifact), issues };
+      }
+    } catch (err) {
+      const status: WorkflowStatus = err instanceof PermissionDeniedError ? "build_failed" : "checkpoint_corrupt";
+      return this.halt(status, "build", cp.cycle + 1, cp, err instanceof Error ? err.message : String(err));
+    }
+    const rebuilt = await this.build(cp.cycle + 1, revision, cp);
+    if ("halted" in rebuilt) return rebuilt.halted;
+    return this.verifyLoop(rebuilt.cp);
   }
 
   /** Stage 2 (+ bounded revisions): QA the checkpointed artifact; bounce specifics back on failure. */
@@ -806,7 +913,28 @@ export function runProgress(rows: AuditRecord[]): RunProgress {
  * address. A run that reached the launch gate is never reopened, and one whose saved site no longer
  * matches its hash (`checkpoint_corrupt`) cannot be: it needs a fresh build.
  */
-export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps, opts: { reopen?: ReopenRequest } = {}): Promise<WorkflowResult> {
+/**
+ * The quality-check findings about the saved site: from the newest halt that carries them, looking back no further than the
+ * last checkpoint (findings about an older site are stale). A later halt without findings (a readiness stop) is skipped.
+ */
+export function lastQaFindings(rows: AuditRecord[]): string[] | null {
+  for (const r of [...rows].reverse()) {
+    if (r.actor !== `workflow:${WORKFLOW_ID}`) continue;
+    if (r.action === "workflow.checkpoint") return null;
+    if (r.action !== "workflow.halt") continue;
+    const f = r.payload?.qaFailure as QaFailure | null | undefined;
+    if (!f || !Array.isArray(f.failedChecks) || !Array.isArray(f.evaluatorIssues)) continue;
+    const issues = qaFailureToIssues(f);
+    return issues.length > 0 ? issues : null;
+  }
+  return null;
+}
+
+export async function resumeBuildAndVerify(
+  runId: string,
+  deps: WorkflowDeps,
+  opts: { reopen?: ReopenRequest; fromStep?: ContinueFrom } = {},
+): Promise<WorkflowResult> {
   const rows: AuditRecord[] = await deps.reader.listByRun(runId);
   const workflowRows = rows.filter((r) => r.actor === `workflow:${WORKFLOW_ID}`);
   const start = workflowRows.find((r) => r.action === "workflow.start");
@@ -846,6 +974,11 @@ export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps, op
   });
 
   if (progress.state === "gate") return finished("run already reached its launch gate — not re-opened");
+  // Where to continue. "revise" needs a saved site and the findings that stopped it; without them it is a plain re-check.
+  let fromStep: ContinueFrom = opts.fromStep ?? "qa";
+  const findings = lastQaFindings(rows);
+  if (fromStep === "revise" && (!lastCp || !findings)) fromStep = "qa";
+  if (fromStep === "qa" && !lastCp) fromStep = "rebuild";
   if (progress.state === "halted") {
     if (!opts.reopen) return finished("run already ended with workflow.halt — not re-opened");
     if (progress.haltStatus === "checkpoint_corrupt") {
@@ -864,6 +997,7 @@ export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps, op
           by: opts.reopen.by,
           fromStatus: progress.haltStatus,
           baseCycle: lastCp ? lastCp.cycle : 0,
+          fromStep,
           ...(opts.reopen.brief !== undefined ? { brief } : {}),
         },
       },
@@ -873,7 +1007,7 @@ export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps, op
     // A crashed (never halted) run continued with new facts: recorded, so the next resume keeps this brief and its revision budget.
     await recordAudit(
       { sink: deps.audit, actor: `workflow:${WORKFLOW_ID}`, runId, taskId: start.taskId, entitySlug: brief.entitySlug },
-      { action: "workflow.reopen", outcome: "info", payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, reason: opts.reopen.reason, by: opts.reopen.by, fromStatus: null, baseCycle: lastCp ? lastCp.cycle : 0, brief } },
+      { action: "workflow.reopen", outcome: "info", payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, reason: opts.reopen.reason, by: opts.reopen.by, fromStatus: null, baseCycle: lastCp ? lastCp.cycle : 0, fromStep, brief } },
     );
     wf.cycleBase = lastCp ? lastCp.cycle : 0;
   } else {
@@ -881,12 +1015,21 @@ export async function resumeBuildAndVerify(runId: string, deps: WorkflowDeps, op
     wf.cycleBase = reopens.length ? Number(reopens.at(-1)!.payload?.baseCycle ?? 0) : 0;
   }
   try {
-    if (!lastCp) {
-      // Nothing was saved: the build starts again under the same run id (Blueprint §3's rollback target is "the last checkpoint" — none).
-      return await wf.buildFrom(0, null);
-    }
+    // Readiness before any paid step: this runner must load the logo itself, and the providers must answer.
+    const stop = await wf.preflight(lastCp ? lastCp.cycle + 1 : 0, lastCp);
+    if (stop) return stop;
     // Template sections come from the brief's template choice, exactly as the builder derives them.
     wf.templateSections = deps.frontEndAgent.parseInput({ brief }).template.requiredSections;
+    if (fromStep === "rebuild" || !lastCp) {
+      // Nothing saved, or the owner asked for a fresh build: build again under the same run id, with a full revision budget.
+      const cycle = lastCp ? lastCp.cycle + 1 : 0;
+      wf.cycleBase = cycle;
+      return await wf.buildFrom(cycle, lastCp);
+    }
+    if (fromStep === "revise") {
+      const extra = opts.reopen?.brief !== undefined ? ["[owner] The owner added or changed details since the last check: use every owner-confirmed fact in the brief."] : [];
+      return await wf.reviseFrom({ ...lastCp, stage: "build" }, [...findings!, ...extra]);
+    }
     // A "verified" checkpoint without its gate row is re-verified rather than gated on trust.
     return await wf.verifyLoop({ ...lastCp, stage: "build" });
   } catch (err) {

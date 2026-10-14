@@ -31,6 +31,16 @@ export function createFake(tables: Record<string, Row[]>) {
         rows = rows.filter((r) => r[k] === undefined || r[k] === v);
         return api;
       },
+      // SQL LIKE with % wildcards (enough for "workflow.%").
+      like: (k: string, pattern: string) => {
+        const re = new RegExp(`^${pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/%/g, ".*")}$`);
+        rows = rows.filter((r) => typeof r[k] === "string" && re.test(r[k] as string));
+        return api;
+      },
+      neq: (k: string, v: unknown) => {
+        rows = rows.filter((r) => r[k] !== v);
+        return api;
+      },
       in: (k: string, v: unknown[]) => {
         rows = rows.filter((r) => v.includes(r[k]));
         return api;

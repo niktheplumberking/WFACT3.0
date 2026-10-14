@@ -75,6 +75,7 @@ test("clean build: build → checkpoint → QA → verified checkpoint → launc
   assert.equal(result.lastCheckpoint?.stage, "verified");
   assert.deepEqual(actions((sink as InMemoryAuditSink).events, result.workflowRunId), [
     "workflow.start",
+    "workflow.preflight",
     "workflow.checkpoint",
     "workflow.checkpoint",
     "workflow.gate",

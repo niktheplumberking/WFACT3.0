@@ -5,7 +5,7 @@
  */
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { content, palette, siteUrl } from "@/lib/content";
+import { content, logo, palette, siteUrl } from "@/lib/content";
 import { displayFace, textFace } from "@/lib/type.generated";
 import { MotionRoot } from "@/components/motion/MotionRoot";
 
@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   title: { default: content.business.name, template: `%s | ${content.business.name}` },
   // Makes the page-level canonical, og:url and og:image absolute (components/PageView.tsx).
   ...(siteUrl ? { metadataBase: new URL(siteUrl) } : {}),
+  // The client's logo doubles as the favicon (track-b-starter 1.3.0).
+  ...(logo ? { icons: { icon: [{ url: logo.src, type: logo.mime }] } } : {}),
 };
 
 const lum = (hex: string) => {

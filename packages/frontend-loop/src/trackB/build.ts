@@ -21,10 +21,11 @@ import { TRACK_B_STARTER_DIR } from "../paths.js";
 import { buildTrackBPalette } from "./palette.js";
 import { probeIsolation, runIsolated, type IsolationMethod, type IsolationProbe } from "./isolate.js";
 import type { SiteContent } from "./content.js";
+import { logoDisplaySize, type LogoAsset } from "../brandAsset.js";
 import { OG_IMAGE_FILE, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
 
 // 1.1.0: contact form variants (enquiry | signup), "Location" label. 1.2.0: launch files (robots, llms, sitemap, share card, canonical)
-export const STARTER_VERSION = "track-b-starter/1.2.0";
+export const STARTER_VERSION = "track-b-starter/1.3.0"; // 1.3.0: the client's logo (header, footer, favicon)
 
 /** Extensions read back as text; everything else in the export is binary (base64). */
 const TEXT_EXT = new Set([".html", ".txt", ".js", ".css", ".json", ".svg", ".xml", ".webmanifest", ".map"]);
@@ -95,6 +96,8 @@ export interface TrackBBuildOptions {
   method?: IsolationMethod;
   /** The live site's https origin (launch.ts siteUrlOf). Without it there is no canonical, og:url, og:image or sitemap. */
   siteUrl?: string | null;
+  /** The client's verified logo (brandAsset.ts), written to public/; absent = the text wordmark. */
+  logo?: LogoAsset | null;
 }
 
 export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOptions = {}): Promise<TrackBBuild> {
@@ -105,7 +108,8 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
   // so a random temp name made two builds of the same content differ (found by the determinism test).
   // Two simultaneous builds of the same content would share this folder; each runner builds one site at a time.
   const siteUrl = opts.siteUrl ?? null;
-  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").digest("hex").slice(0, 16);
+  const logo = opts.logo ?? null;
+  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").update(logo?.sha256 ?? "").digest("hex").slice(0, 16);
   const work = path.join(tmpdir(), "wfact-track-b", key);
   rmSync(work, { recursive: true, force: true });
   mkdirSync(work, { recursive: true });
@@ -117,7 +121,8 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
     mkdirSync(path.join(work, "content"));
     writeFileSync(path.join(work, "content/site.json"), `${JSON.stringify(content, null, 2)}\n`);
     writeFileSync(path.join(work, "content/theme.json"), `${JSON.stringify(palette, null, 2)}\n`);
-    writeFileSync(path.join(work, "content/launch.json"), `${JSON.stringify({ siteUrl }, null, 2)}\n`);
+    const logoInfo = logo ? { src: `/${logo.file}`, mime: logo.mime, ...logoDisplaySize(logo) } : null;
+    writeFileSync(path.join(work, "content/launch.json"), `${JSON.stringify({ siteUrl, logo: logoInfo }, null, 2)}\n`);
     // Launch files (MVP M5): Next copies public/ into the export as is.
     mkdirSync(path.join(work, "public"));
     writeFileSync(path.join(work, "public/robots.txt"), robotsTxt(siteUrl));
@@ -127,6 +132,7 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
     );
     if (siteUrl) writeFileSync(path.join(work, "public/sitemap.xml"), sitemapXml(siteUrl, content.pages.map((p) => urlPath(p.slug))));
     writeFileSync(path.join(work, "public", OG_IMAGE_FILE), ogImagePng({ deep: palette.deep, accent: palette.accent }));
+    if (logo) writeFileSync(path.join(work, "public", logo.file), logo.data);
 
     const isolation = await probeIsolation(work, opts.method);
     if (isolation.network !== "blocked") throw new TrackBBuildError(`refusing to build: the isolated build could reach the network (${isolation.attempts.join("; ")})`, "");

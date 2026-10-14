@@ -9,6 +9,7 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
+import { BrandMark } from "./BrandMark";
 
 export interface NavItem {
   slug: string;
@@ -34,7 +35,7 @@ export function SiteHeader({ name, items, current, action }: { name: string; ite
     <header className="site-header">
       <div className="container header-row">
         <Link href="/" className="wordmark" aria-current={current === "index" ? "page" : undefined}>
-          {name}
+          <BrandMark name={name} />
         </Link>
         <nav aria-label="Main" className="nav-desktop">
           <ul>
@@ -59,7 +60,9 @@ export function SiteHeader({ name, items, current, action }: { name: string; ite
       </div>
       <dialog ref={dialog} className="menu-panel" aria-label={`${name} menu`} data-lenis-prevent="">
         <div className="container header-row">
-          <p className="wordmark">{name}</p>
+          <p className="wordmark">
+            <BrandMark name={name} />
+          </p>
           <button type="button" className="menu-button" onClick={close} autoFocus>
             <X size={20} strokeWidth={1.75} aria-hidden="true" />
             <span>Close</span>

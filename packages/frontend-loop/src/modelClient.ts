@@ -107,6 +107,14 @@ export const AGENT37_MAX_OUTPUT_TOKENS = 32_000;
 
 class TransientGatewayError extends Error {}
 
+/** AbortSignal.timeout fires a TimeoutError (or AbortError on older runtimes); undici reports header/body timeouts by code. */
+function isTimeout(err: unknown): boolean {
+  const e = err as { name?: string; code?: string; cause?: { name?: string; code?: string } } | null;
+  const names = [e?.name, e?.cause?.name];
+  const codes = [e?.code, e?.cause?.code];
+  return names.some((n) => n === "TimeoutError" || n === "AbortError") || codes.some((c) => c === "UND_ERR_HEADERS_TIMEOUT" || c === "UND_ERR_BODY_TIMEOUT");
+}
+
 export class Agent37ModelClient implements ModelClient {
   readonly name = "agent37";
   private readonly baseUrl: string;
@@ -169,6 +177,11 @@ export class Agent37ModelClient implements ModelClient {
         }),
       });
     } catch (err) {
+      // A call that ran to the timeout is NOT retried: the gateway may still be working on (and billing) it, and four
+      // 6-minute attempts would outlast the job's 26-minute limit. Fast failures (a dropped connection) are retried.
+      if (isTimeout(err)) {
+        throw new Error(`Agent 37 request failed: no answer within ${Math.round(this.timeoutMs / 1000)} s (timed out; not retried, a timed-out call may still be billed)`);
+      }
       throw new TransientGatewayError(`Agent 37 request failed: no response (${err instanceof Error ? err.message : String(err)})`);
     }
     if (!res.ok) {

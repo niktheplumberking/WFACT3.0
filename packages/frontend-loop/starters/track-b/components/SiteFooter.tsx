@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { content, href } from "@/lib/content";
 import { FactLine } from "./Sections";
+import { BrandMark } from "./BrandMark";
 
 export function SiteFooter({ current }: { current: string }) {
   const b = content.business;
@@ -16,6 +17,7 @@ export function SiteFooter({ current }: { current: string }) {
   return (
     <footer className="site-footer">
       <div className="container footer-grid">
+        <BrandMark name={b.name} footer />
         <p className="footer-name" aria-hidden="true">
           {b.name}
         </p>

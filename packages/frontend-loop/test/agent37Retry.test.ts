@@ -46,7 +46,9 @@ test("a 4xx and an unusable 200 are not retried", async () => {
   assert.deepEqual([...bad.slept, ...empty.slept], []);
 });
 
-test("Step 4D: a call that hangs is cut off by the timeout and retried like a dropped connection", async () => {
+test("a call that hangs is cut off by the timeout and NOT retried (it may still be billed, and retries would outlast the job)", async () => {
+  // Changed 2026-10-14: Step 4D retried a timed-out call like a dropped connection. Four 6-minute attempts can run ~24
+  // minutes, past the job's 26-minute step limit, and a timed-out call may still be billed. Fast failures still retry.
   const slept: number[] = [];
   let calls = 0;
   const c = new Agent37ModelClient("https://gw.example/v1/", "k", {
@@ -54,17 +56,14 @@ test("Step 4D: a call that hangs is cut off by the timeout and retried like a dr
     fetchImpl: ((_url: string, init: RequestInit) => {
       calls += 1;
       // AbortSignal.timeout's timer does not keep the process alive on its own; hold the loop open until the abort fires.
-      if (calls === 1) {
-        const keepAlive = setTimeout(() => {}, 5_000);
-        return new Promise((_res, rej) => init.signal!.addEventListener("abort", () => { clearTimeout(keepAlive); rej(init.signal!.reason); }));
-      }
-      return Promise.resolve(ok("page"));
+      const keepAlive = setTimeout(() => {}, 5_000);
+      return new Promise((_res, rej) => init.signal!.addEventListener("abort", () => { clearTimeout(keepAlive); rej(init.signal!.reason); }));
     }) as unknown as typeof fetch,
     sleep: async (ms) => void slept.push(ms),
   });
-  assert.equal(await c.complete(REQ), "page");
-  assert.equal(calls, 2);
-  assert.deepEqual(slept, [AGENT37_RETRY_DELAYS_MS[0]]);
+  await assert.rejects(c.complete(REQ), /no answer within 0 s \(timed out; not retried/);
+  assert.equal(calls, 1);
+  assert.deepEqual(slept, []);
 });
 
 test("MVP M6: every call carries the output ceiling; an answer cut off at it throws (tokens still counted), never retried", async () => {

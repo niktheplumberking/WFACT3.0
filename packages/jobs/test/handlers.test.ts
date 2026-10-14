@@ -343,3 +343,86 @@ test("Step 4D: a build links its Cockpit job to the run the moment it starts (so
   assert.equal(link!.taskId, j.id);
   assert.equal(link!.runId, out.result.workflowRunId);
 });
+
+// ---- 2026-10-14: logo and live address, continue from a chosen step, readiness probes ----
+
+import { providerProbes } from "../src/providerProbes.js";
+import { inspectLogo } from "@wfact/frontend-loop/brandAsset";
+
+const LOGO_SVG = readFileSync(path.join(import.meta.dirname, "..", "..", "..", "clients", "lanternworks-studio", "logo.svg"));
+const logoRecord = () => {
+  const r = inspectLogo(LOGO_SVG, "image/svg+xml");
+  return { ...r, path: `uploads/0b7c3f7e-1d2a-4c55-9e8f-2a1b3c4d5e6f/${r.sha256}.svg` };
+};
+
+test("intake job: the attached live address and logo land on the plan's brief", async () => {
+  const { d, planStore } = deps(CLEAN);
+  const logo = logoRecord();
+  const out = await handleJob(job("intake", { text: "Hi DreamSign, Northlight Signs needs a homepage.", siteUrl: "https://northlightsigns.com", logo }), d);
+  assert.equal(out.ok, true, out.reason ?? "");
+  const stored = await planStore.get(out.result.planId as string);
+  assert.equal(stored?.plan.brief.siteUrl, "https://northlightsigns.com");
+  assert.deepEqual(stored?.plan.brief.logo, logo);
+});
+
+test("briefForBuild: a logo or live address added after approval becomes a brief setting, never a copy fact", () => {
+  const brief = { clientSlug: "harbor-street-bakery", entitySlug: "bennett-co", projectName: "x", goal: "x", requiredSections: [], brandNotes: "x", source: "intake-planner" as const, pageScope: "multi" as const };
+  const intake = { entitySlug: "bennett-co", leadType: "new_website", requestSource: "cockpit", clientName: "Harbor" };
+  const logo = logoRecord();
+  const at = "2026-10-14T10:00:00Z";
+  const b = briefForBuild({ brief, intake } as never, [
+    { planId: "p", kind: "fact", key: "asset.logo", label: "Logo file", value: JSON.stringify(logo), waived: false, createdAt: at },
+    { planId: "p", kind: "fact", key: "site_url", label: "Live site address", value: "https://harborstreet.com", waived: false, createdAt: at },
+    { planId: "p", kind: "fact", key: "phone", label: "Phone", value: "0400 111 222", waived: false, createdAt: at },
+  ]);
+  assert.deepEqual(b.logo, logo);
+  assert.equal(b.siteUrl, "https://harborstreet.com");
+  assert.ok(!(b.ownerFacts ?? []).some((f) => f.key === "asset.logo"), "the logo record is not text for the page");
+  // Waiving the logo is recorded as skipped, so the readiness check lets the build go ahead without it.
+  const w = briefForBuild({ brief, intake } as never, [{ planId: "p", kind: "fact", key: "asset.logo", label: "Logo file", value: null, waived: true, createdAt: at }]);
+  assert.equal(w.logo, undefined);
+  assert.deepEqual(w.ownerSkipped, ["Logo file"]);
+  assert.throws(() => briefForBuild({ brief, intake } as never, [{ planId: "p", kind: "fact", key: "asset.logo", label: "Logo file", value: "{not json", waived: false, createdAt: at }]), /upload it again/);
+});
+
+test("resume job: fromStep 'revise' sends the stored findings to the builder first and is recorded on the result", async () => {
+  const { d, planStore, audit } = deps(BROKEN);
+  const planId = await approvedPlan(d, planStore);
+  const failed = await handleJob(job("build_plan", { planId }), d);
+  assert.equal(failed.result.status, "failed_verification");
+  const runId = failed.result.workflowRunId as string;
+  d.workflow = { ...d.workflow, frontEndAgent: createFrontendBuilderAgent({ builderModel: new BuilderMock(() => CLEAN), evaluatorModel: new BuilderMock(() => "VERDICT: APPROVED") }) };
+  const before = audit.events.length;
+  const fixed = await handleJob(job("resume", { workflowRunId: runId, planId, reopen: true, reason: "fix and continue", fromStep: "revise" }), d);
+  assert.equal(fixed.ok, true, fixed.reason ?? "");
+  assert.equal(fixed.result.fromStep, "revise");
+  assert.equal(audit.events.slice(before).find((e) => e.action === "agent.spawn")?.payload?.role, "front-end-builder");
+  // An unknown value is ignored (the database refuses it first); the engine's default applies.
+  const odd = await handleJob(job("resume", { workflowRunId: runId, planId, reopen: true, fromStep: "deploy" }), d);
+  assert.equal(odd.result.fromStep, undefined);
+});
+
+test("readiness probes: credits, refused keys and silence stop the run; busy providers and a gateway without a models list do not", async () => {
+  const respond = (status: number, body = "") => async () => new Response(body, { status });
+  const run = async (anth: () => Promise<Response>, a37: () => Promise<Response>) =>
+    providerProbes({
+      anthropicKey: "k",
+      anthropicModel: "claude-sonnet-5",
+      agent37BaseUrl: "https://gw.example/v1/",
+      agent37Key: "k",
+      fetchImpl: (async (url: string) => (String(url).includes("anthropic") ? anth() : a37())) as unknown as typeof fetch,
+    })();
+  const ok = await run(respond(200, "{}"), respond(200, "{}"));
+  assert.ok(ok.every((c) => c.ok));
+  const credits = await run(respond(400, '{"error":{"message":"Your credit balance is too low to access the Anthropic API."}}'), respond(200));
+  assert.equal(credits.find((c) => c.id === "provider.anthropic")!.ok, false);
+  assert.match(credits.find((c) => c.id === "provider.anthropic")!.detail, /credits exhausted/);
+  const a37 = await run(respond(200), respond(402, "AI credits exhausted"));
+  assert.match(a37.find((c) => c.id === "provider.agent37")!.detail, /credits exhausted/);
+  const busy = await run(respond(529, "overloaded"), respond(404, "not found"));
+  assert.ok(busy.every((c) => c.ok), "busy and no-models-list both answered");
+  const down = await run(respond(200), async () => { throw new TypeError("fetch failed"); });
+  assert.equal(down.find((c) => c.id === "provider.agent37")!.ok, false);
+  const noKey = await providerProbes({ anthropicModel: "claude-sonnet-5" })();
+  assert.deepEqual(noKey.map((c) => [c.id, c.ok]), [["provider.anthropic", false]], "no Agent 37 configured: only Anthropic is probed");
+});

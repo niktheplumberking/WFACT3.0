@@ -7,6 +7,7 @@
  * "placeholder-2.0-case"` so nothing downstream can mistake it for a real, Nick-approved brief.
  */
 import { readFileSync } from "node:fs";
+import { LogoError, parseBriefLogo, type BriefLogo } from "./brandAsset.js";
 
 export type PageScope = "single" | "multi";
 
@@ -45,6 +46,11 @@ export interface PilotBrief {
    * sitemap and og:image need it; without it they are left out and the launch-stage checks say so. See launch.ts.
    */
   siteUrl?: string;
+  /**
+   * The client's logo file, uploaded by the owner in the Cockpit: a pointer and fingerprint, never the bytes
+   * (brandAsset.ts). The starters place it in the header, footer and favicon; the builder model only knows it exists.
+   */
+  logo?: BriefLogo;
   /** Provenance — never silently treat a placeholder brief as Nick's real one. */
   source: "nick" | "placeholder-2.0-case" | "intake-planner" | "synthetic-provisional-2026-09-30";
 }
@@ -99,7 +105,12 @@ export function ownerFactLines(brief: PilotBrief): string[] {
 
 /** Every text a page fact may be sourced from: the brief's own words and the facts the owner added. */
 export function briefFactSources(brief: PilotBrief): string[] {
-  return [brief.goal, brief.brandNotes, ...ownerFactLines(brief)];
+  return [brief.goal, brief.brandNotes, ...ownerFactLines(brief), ...(brief.logo ? [logoFactLine(brief.logo)] : [])];
+}
+
+/** What the builder and the reviewers are told about a supplied logo (never its bytes). */
+export function logoFactLine(logo: BriefLogo): string {
+  return `Logo: the client's own logo file is supplied and placed by the site template in the header, footer and favicon, used as-is (${logo.mime === "image/svg+xml" ? "SVG" : logo.mime === "image/png" ? "PNG" : "WebP"}, ${logo.width}x${logo.height}). Do not draw, describe or replace it.`;
 }
 
 export function parseBrief(raw: unknown): PilotBrief {
@@ -132,6 +143,15 @@ export function parseBrief(raw: unknown): PilotBrief {
     throw new InvalidBriefError('Brief "siteUrl", if present, must be the live site\'s https:// address with no path.');
   }
 
+  let logo: BriefLogo | undefined;
+  if (record.logo !== undefined) {
+    try {
+      logo = parseBriefLogo(record.logo);
+    } catch (e) {
+      throw new InvalidBriefError(e instanceof LogoError ? e.message : String(e));
+    }
+  }
+
   const ownerFacts = parseOwnerFacts(record.ownerFacts);
   const ownerSkipped = Array.isArray(record.ownerSkipped) ? (record.ownerSkipped as unknown[]).filter((x): x is string => typeof x === "string" && x.length <= OWNER_FACT_LIMITS.label).slice(0, OWNER_FACT_LIMITS.count) : [];
 
@@ -145,6 +165,7 @@ export function parseBrief(raw: unknown): PilotBrief {
     templatePreference: record.templatePreference as string | undefined,
     ...(record.pageScope !== undefined ? { pageScope: record.pageScope as PageScope } : {}),
     ...(record.siteUrl !== undefined ? { siteUrl: record.siteUrl as string } : {}),
+    ...(logo ? { logo } : {}),
     ...(ownerFacts.length > 0 ? { ownerFacts } : {}),
     ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}),
     source: record.source as PilotBrief["source"],

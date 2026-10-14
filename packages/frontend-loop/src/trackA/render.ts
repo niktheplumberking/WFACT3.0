@@ -12,8 +12,9 @@ import path from "node:path";
 import type { Fact, Page, Section, SiteContent } from "./content.js";
 import { buildPalette, type Palette } from "./palette.js";
 import { OG_IMAGE_FILE, absoluteUrl, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
+import { logoDisplaySize, type LogoAsset } from "../brandAsset.js";
 
-export const STARTER_VERSION = "track-a-starter/1.1.0"; // 1.1.0: launch files (404, robots, llms, sitemap, share card, canonical)
+export const STARTER_VERSION = "track-a-starter/1.2.0"; // 1.1.0: launch files (404, robots, llms, sitemap, share card, canonical); 1.2.0: client logo + favicon
 const STARTER_DIR = path.join(import.meta.dirname, "..", "..", "starters", "track-a");
 const STARTER_CSS = readFileSync(path.join(STARTER_DIR, "styles.css"), "utf-8");
 const STARTER_JS = readFileSync(path.join(STARTER_DIR, "site.js"), "utf-8");
@@ -30,6 +31,8 @@ export interface RenderedSite {
 export interface RenderOptions {
   /** The live site's https origin (launch.ts siteUrlOf). Without it there is no canonical, og:url, og:image or sitemap. */
   siteUrl?: string | null;
+  /** The client's verified logo (brandAsset.ts). Placed in the header, the footer and as the favicon; absent = the text wordmark. */
+  logo?: LogoAsset | null;
 }
 
 export class RenderError extends Error {
@@ -131,6 +134,17 @@ function rootTokens(p: Palette, c: SiteContent): string {
 interface Ctx {
   content: SiteContent;
   page: Page;
+  logo?: LogoAsset | null;
+}
+
+/** The client's logo as an image: intrinsic size reserved (no layout shift), the business name as its text. */
+function logoImg(logo: LogoAsset, name: string, cls: string): string {
+  const { width, height } = logoDisplaySize(logo);
+  return `<img class="${cls}" src="${logo.file}" alt="${esc(name)}" width="${width}" height="${height}" decoding="async">`;
+}
+
+function faviconLink(logo: LogoAsset | null | undefined): string {
+  return logo ? `<link rel="icon" href="${logo.file}" type="${logo.mime}">` : "";
 }
 
 function primaryHref(ctx: Ctx): string {
@@ -268,7 +282,11 @@ function header(ctx: Ctx): string {
   const nav = content.pages
     .map((p) => `<li><a href="${pageFile(p.slug)}"${p.slug === page.slug ? ' aria-current="page"' : ""}>${esc(p.navLabel)}</a></li>`)
     .join("");
-  return `<header class="site-header"><div class="wrap"><a class="brand" href="index.html"><svg class="icon brand-mark" viewBox="0 0 30 22" aria-hidden="true" focusable="false"><polyline points="2,20 15,4 28,20"/></svg><span class="brand-name">${esc(content.business.name)}</span></a>${
+  return `<header class="site-header"><div class="wrap"><a class="brand" href="index.html">${
+    ctx.logo
+      ? logoImg(ctx.logo, content.business.name, "brand-logo")
+      : `<svg class="icon brand-mark" viewBox="0 0 30 22" aria-hidden="true" focusable="false"><polyline points="2,20 15,4 28,20"/></svg><span class="brand-name">${esc(content.business.name)}</span>`
+  }</a>${
     phone ? `<a class="header-call" href="${telHref(phone.value)}" aria-label="Call ${esc(phone.value)}${phone.source === "sample" ? " (SAMPLE number)" : ""}">${icon("phone")}</a>` : ""
   }<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr-only">Menu</span>${icon("menu", "icon-open")}${icon("close", "icon-close")}</button><nav class="site-nav" id="site-nav" aria-label="Main"><ul class="nav-list">${nav}</ul>${primaryButton(ctx)}</nav>${primaryButton(ctx)}</div></header>`;
 }
@@ -283,7 +301,10 @@ function footer(ctx: Ctx): string {
     b.email ? `<li><a href="mailto:${esc(b.email.value)}">${esc(b.email.value)}</a>${b.email.source === "sample" ? sampleTag() : ""}</li>` : "",
     b.address ? `<li>${fact(b.address)}</li>` : "",
   ].join("");
-  return `<footer class="site-footer on-deep"><div class="wrap"><div class="footer-grid"><div><p class="brand-name">${esc(b.name)}</p>${b.tagline ? `<p>${esc(b.tagline)}</p>` : ""}</div>${
+  return `<footer class="site-footer on-deep"><div class="wrap"><div class="footer-grid"><div>${
+    // The footer is the deep brand field, where a dark logo would vanish: the logo sits on a paper chip.
+    ctx.logo ? `<p class="brand-logo-chip">${logoImg(ctx.logo, b.name, "brand-logo")}</p>` : `<p class="brand-name">${esc(b.name)}</p>`
+  }${b.tagline ? `<p>${esc(b.tagline)}</p>` : ""}</div>${
     // A single landing page has no other pages to list.
     content.pages.length > 1
       ? `<nav aria-label="Footer"><h2>Pages</h2><ul>${content.pages.map((p) => `<li><a href="${pageFile(p.slug)}">${esc(p.navLabel)}</a></li>`).join("")}</ul></nav>`
@@ -326,8 +347,8 @@ function shareTags(content: SiteContent, page: Page, siteUrl: string | null): st
   ];
 }
 
-function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl: string | null): string {
-  const ctx: Ctx = { content, page };
+function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl: string | null, logo: LogoAsset | null): string {
+  const ctx: Ctx = { content, page, logo };
   // One h1 per page: the first section's heading. Plain sections alternate a tint for rhythm; the hero
   // and the call-to-action band are deep brand fields and reset the alternation.
   let tinted = true;
@@ -354,6 +375,7 @@ function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl:
     `<meta name="theme-color" content="${palette.deep}">`,
     `<meta name="generator" content="WFACT ${STARTER_VERSION}">`,
     ...shareTags(content, page, siteUrl),
+    faviconLink(logo),
     `<style>${rootTokens(palette, content)}\n${STARTER_CSS}</style>`,
     isHome ? jsonLd(content) : "",
     isHome ? content.openQuestions.map(comment).join("\n") : "",
@@ -377,9 +399,9 @@ function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl:
  * The 404 page: the site's header and footer around a plain message and a way home. A host serves it at any
  * depth, so its page links are made root-relative ("/services.html"); in-page anchors stay as they are.
  */
-function renderNotFound(content: SiteContent, palette: Palette): string {
+function renderNotFound(content: SiteContent, palette: Palette, logo: LogoAsset | null): string {
   const page: Page = { slug: "404", navLabel: "Not found", title: `Page not found | ${content.business.name}`, description: "This page does not exist.", sections: [] };
-  const ctx: Ctx = { content, page };
+  const ctx: Ctx = { content, page, logo };
   const html = [
     "<!doctype html>",
     '<html lang="en">',
@@ -390,6 +412,7 @@ function renderNotFound(content: SiteContent, palette: Palette): string {
     '<meta name="robots" content="noindex">',
     `<meta name="theme-color" content="${palette.deep}">`,
     `<meta name="generator" content="WFACT ${STARTER_VERSION}">`,
+    faviconLink(logo),
     `<style>${rootTokens(palette, content)}\n${STARTER_CSS}</style>`,
     "</head>",
     "<body>",
@@ -403,7 +426,7 @@ function renderNotFound(content: SiteContent, palette: Palette): string {
     "</html>",
     "",
   ].join("\n");
-  return html.replace(/href="(?!#|\/|[a-z]+:)/g, 'href="/');
+  return html.replace(/href="(?!#|\/|[a-z]+:)/g, 'href="/').replace(/src="(?!\/|[a-z]+:)/g, 'src="/');
 }
 
 /** Renders every page and the launch files. Throws RenderError only for content that validateSiteContent would also reject. */
@@ -411,14 +434,15 @@ export function renderSite(content: SiteContent, opts: RenderOptions = {}): Rend
   const { palette, problems } = buildPalette(content.brand.colors);
   if (!palette) throw new RenderError(problems.join(" "));
   const siteUrl = opts.siteUrl ?? null;
+  const logo = opts.logo ?? null;
   const files: Record<string, string> = {};
   const pages: string[] = [];
   for (const page of content.pages) {
     const file = pageFile(page.slug);
-    files[file] = renderPage(content, page, palette, siteUrl);
+    files[file] = renderPage(content, page, palette, siteUrl, logo);
     pages.push(file);
   }
-  files["404.html"] = renderNotFound(content, palette);
+  files["404.html"] = renderNotFound(content, palette, logo);
   files["robots.txt"] = robotsTxt(siteUrl);
   files["llms.txt"] = llmsTxt({
     name: content.business.name,
@@ -428,5 +452,14 @@ export function renderSite(content: SiteContent, opts: RenderOptions = {}): Rend
   });
   if (siteUrl) files["sitemap.xml"] = sitemapXml(siteUrl, content.pages.map((p) => pagePath(p.slug)));
   files[OG_IMAGE_FILE] = ogImagePng({ deep: palette.deep, accent: palette.accent }).toString("base64");
-  return { files, pages, binary: [OG_IMAGE_FILE] };
+  const binary = [OG_IMAGE_FILE];
+  if (logo) {
+    // An SVG is text (the artifact store keeps it as text); a PNG or WebP is base64 like the share card.
+    if (logo.mime === "image/svg+xml") files[logo.file] = logo.data.toString("utf-8");
+    else {
+      files[logo.file] = logo.data.toString("base64");
+      binary.push(logo.file);
+    }
+  }
+  return { files, pages, binary };
 }

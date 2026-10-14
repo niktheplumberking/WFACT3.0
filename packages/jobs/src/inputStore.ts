@@ -28,9 +28,12 @@ export function currentInputs(rows: PlanInput[]): PlanInput[] {
   return [...byKey.values()];
 }
 
-/** What the builder may use: every non-waived value, as facts. */
+/** The plan input that carries the owner's uploaded logo record (JSON); validated by migration 0021. */
+export const LOGO_INPUT_KEY = "asset.logo";
+
+/** What the builder may use: every non-waived value, as facts. Asset records (asset.*) are settings, not copy facts. */
 export function ownerFactsFrom(inputs: PlanInput[]): OwnerFact[] {
-  return inputs.filter((i) => !i.waived && i.value).map((i) => ({ key: i.key, label: i.label, value: i.value! }));
+  return inputs.filter((i) => !i.waived && i.value && !i.key.startsWith("asset.")).map((i) => ({ key: i.key, label: i.label, value: i.value! }));
 }
 
 export class SupabasePlanInputStore implements PlanInputStore {

@@ -243,3 +243,17 @@ test("a required social-proof section without brief quotes: left out with an ope
   c.openQuestions = [...c.openQuestions, "Real customer feedback for social-proof: can the studio share quotes?"];
   assert.deepEqual(validateSiteContent(c, needs).errors, []);
 });
+
+test("the client's logo ships in the export and is placed by the starter (header, footer, favicon), never by the builder", { timeout: 300_000 }, async () => {
+  const { inspectLogo, loadLogoAsset } = await import("../src/brandAsset.js");
+  const svg = readFileSync(path.join(import.meta.dirname, "..", "..", "..", "clients", "lanternworks-studio", "logo.svg"));
+  const r = inspectLogo(svg, "image/svg+xml");
+  const logo = loadLogoAsset({ ...r, path: `uploads/0b7c3f7e-1d2a-4c55-9e8f-2a1b3c4d5e6f/${r.sha256}.svg` }, svg);
+  const b = await buildTrackBSite(valid(), { logo });
+  assert.equal(b.files["logo.svg"], svg.toString("utf-8"), "the exact uploaded bytes");
+  const home = b.files["index.html"]!;
+  assert.match(home, /<img class="brand-logo" src="\/logo.svg" alt="[^"]+" width="160" height="32"/, "header logo with its space reserved");
+  assert.match(home, /class="brand-logo-footer"/, "footer logo");
+  assert.match(home, /<link rel="icon" href="\/logo.svg" type="image\/svg\+xml"\/?>/, "favicon");
+  assert.notEqual(b.record.outputHash, (await realBuild()).record.outputHash, "a different logo is a different build");
+});

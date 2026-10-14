@@ -8,6 +8,7 @@
  * Service-role only (writes and reads). The Cockpit reads via RLS (owner/admin) for previews.
  */
 import { createHash, randomUUID } from "node:crypto";
+import { BRAND_ASSET_PATH_RE } from "@wfact/frontend-loop/brandAsset";
 import { ARTIFACT_PATH_RE, CheckpointIntegrityError, type ArtifactStore, type StoredArtifact } from "./buildAndVerify.js";
 
 const BUCKET = "artifacts";
@@ -34,6 +35,7 @@ const CONTENT_TYPES: Record<string, string> = {
   woff2: "font/woff2",
   ico: "image/x-icon",
   png: "image/png",
+  webp: "image/webp",
 };
 export const contentTypeFor = (relPath: string): string => {
   const type = CONTENT_TYPES[relPath.slice(relPath.lastIndexOf(".") + 1).toLowerCase()];
@@ -115,5 +117,27 @@ export class SupabaseArtifactStore implements ArtifactStore {
       throw new CheckpointIntegrityError(`checkpointed artifact ${artifact.path} no longer matches its checkpoint hash — refusing to verify a changed file`);
     }
     return content;
+  }
+}
+
+/**
+ * Owner-uploaded brand assets (the logo) in the private `client-assets` bucket (migration 0021), read with the service
+ * role. The bytes are checked against the brief's fingerprint by the caller (brandAsset.ts loadLogoAsset); this only
+ * refuses a path outside the uploads area and reports a missing object plainly.
+ */
+export class SupabaseBrandAssetStore {
+  private readonly readBase: string;
+  constructor(url: string, private readonly serviceKey: string, private readonly fetchImpl: typeof fetch = fetch) {
+    this.readBase = `${url.replace(/\/+$/, "")}/storage/v1/object/authenticated/client-assets`;
+  }
+
+  async read(relPath: string): Promise<Buffer> {
+    if (!BRAND_ASSET_PATH_RE.test(relPath)) throw new Error(`brand asset path ${JSON.stringify(relPath)} is outside uploads/<user>/<sha256>.<svg|png|webp>`);
+    const res = await this.fetchImpl(`${this.readBase}/${relPath}?fresh=${randomUUID()}`, {
+      headers: { apikey: this.serviceKey, Authorization: `Bearer ${this.serviceKey}` },
+    });
+    if (res.status === 400 || res.status === 404) throw new Error("the uploaded logo file is missing from storage");
+    if (!res.ok) throw new Error(`logo download failed (HTTP ${res.status})`);
+    return Buffer.from(await res.arrayBuffer());
   }
 }

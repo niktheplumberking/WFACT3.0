@@ -167,11 +167,15 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(screen.getByText(/Adding credits to Agent 37 is a spending decision/)).toBeInTheDocument();
     expect(screen.getByText(/Nothing was saved before it stopped/)).toBeInTheDocument();
     await t.click(screen.getByRole("button", { name: "I've added credits, continue" }));
+    // Nothing was saved, so continuing writes the site again: a full build, confirmed first, and nothing starts before that.
+    expect(screen.getByText(/costs a full build\. Nothing is published/)).toBeInTheDocument();
+    expect(t.calls().some((c) => c.op === "insert")).toBe(false);
+    await t.click(screen.getByRole("button", { name: "Build again" }));
     expect(t.calls()).toContainEqual(
       expect.objectContaining({
         op: "insert",
         table: "jobs",
-        values: expect.objectContaining({ kind: "resume", params: expect.objectContaining({ workflowRunId: RUN_FAILED, planId: PLAN_APPROVED, reopen: true }) }),
+        values: expect.objectContaining({ kind: "resume", params: expect.objectContaining({ workflowRunId: RUN_FAILED, planId: PLAN_APPROVED, reopen: true, fromStep: "rebuild" }) }),
       }),
     );
   });
@@ -234,6 +238,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
       return q;
     }) as typeof realFrom;
     await t.click(await screen.findByRole("button", { name: "I've added credits, continue" }, T));
+    await t.click(await screen.findByRole("button", { name: "Build again" }, T));
     expect(await screen.findByText(/This build is already running/)).toBeInTheDocument();
   });
 

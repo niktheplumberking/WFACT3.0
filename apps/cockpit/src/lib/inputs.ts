@@ -22,6 +22,7 @@ export const SLOTS: Slot[] = [
   { key: "pricing", label: "Prices or from-prices", hint: "Only if the client wants prices on the site.", multiline: true },
   { key: "quotes", label: "Real customer quotes", hint: "Word for word, one per line, with the customer's first name. The factory never invents these.", multiline: true },
   { key: "opening_date", label: "Opening date", hint: "For a new business: the day it opens.", multiline: false },
+  { key: "site_url", label: "Live site address", hint: "Where the finished site will live, starting with https:// and nothing after the domain. Search engines and share cards need it.", multiline: false },
 ];
 
 export interface PlanInputRow {

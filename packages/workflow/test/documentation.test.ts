@@ -93,7 +93,7 @@ test("after a clean run: one entry per stage (build, QA), written by the agent, 
   // The workflow's own trail is unchanged by documentation (same four rows as before Step 5).
   assert.deepEqual(
     sink.events.filter((e) => e.runId === result.workflowRunId && e.actor === "workflow:build-and-verify").map((e) => e.action),
-    ["workflow.start", "workflow.checkpoint", "workflow.checkpoint", "workflow.gate"],
+    ["workflow.start", "workflow.preflight", "workflow.checkpoint", "workflow.checkpoint", "workflow.gate"],
   );
 });
 
