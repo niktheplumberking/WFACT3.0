@@ -31,7 +31,10 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-14, 18:30 +05, `/step-close 28`)**:
+**Status summary (2026-10-14, 21:30 +05, `/step-close 28`)**:
+- **Step 28 IN PROGRESS**: Package 2 built and verified locally (`d112f62`). Track B starter 1.4.0 shows the client's logo (it rendered 0x0), fills buttons with the client's orange, keeps the action in reach on phones, removes the empty band under the phone hero, and gives every section an entrance. Four new rendered checks fail on 1.3.0 and pass on 1.4.0.
+
+**Status summary (2026-10-14, 18:30 +05, superseded)**:
 - **Step 28 IN PROGRESS** (new, from the Lanternworks audit): Package 1 built and verified locally (`3e493f6`). The builder now gets the client's request and a checked list of what they asked for; content that misses a requested service, step, CTA label, page or form field, is thin, or talks about the website itself is refused before any build. The stored Lanternworks content went from 0 errors to 19. Packages 2–5 wait for GO.
 
 **Status summary (2026-10-14, 17:00 +05, `/progress-sync`, superseded)**:
@@ -73,7 +76,12 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-14, 18:30 +05):
+**Next up** (2026-10-14, 21:30 +05):
+1. **Huraira**: review the Step 28 Package 2 report and screenshots; GO for Package 3 (image slots and labelled placeholders).
+2. **Huraira**: the 4B M4 screenshot review and the deployed site preview check (unchanged).
+3. **Nick**: the Bennett & Co brief (Step 25).
+
+**Next up** (2026-10-14, 18:30 +05, superseded):
 1. **Huraira**: review the Step 28 Package 1 report; GO for Package 2 (Track B starter: logo, accent, phone CTA, motion). Push when ready (CI has not run on `3e493f6`).
 2. **Huraira**: the 4B M4 screenshot review and the deployed site preview check (unchanged).
 3. **Nick**: the Bennett & Co brief (Step 25).
@@ -1143,7 +1151,7 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - Met live 2026-10-14: a build wrote estimated rows and reviewer rows (run `4c35703b`).
 - Not yet proven live: the Run page and a live cap refusal.
 
-## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-14 — Package 1 of 5 built and verified)
+## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-14 — Packages 1 and 2 of 5 built and verified)
 
 Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one at a time, GO between) and Part D Step 28 of the plan.
 
@@ -1153,7 +1161,12 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 - [x] P1.4 Content floors 4/180 home, 3/120 other pages, measured and documented in `request.ts`. Summit and Northfold fixtures extended to meet them.
 - [x] P1.5 Reviewers get the request and check coverage and site-talk; "do not invent requirements" kept.
 - [x] P1.6 Section synonyms collapse; build task named for the whole site; direction re-run alone (job kind `direction`, migration 0022 applied live 2026-10-14, `scripts/rls_attack_test_direction.sql` 11/11 after, 9 wrong before; Cockpit button and test).
-- [ ] Packages 2–5 (Track B starter, image slots, Cockpit UX, paid Lanternworks proof).
+- [x] P2.1 Logo explicit size, SVG sized from its viewBox when served (Track B 1.4.0, Track A 1.3.0). `render.logo-visible` on 1.3.0: "the header logo is 0x0 px" at 1440 and 375; on 1.4.0 passes on 6 pages (`d112f62`).
+- [x] P2.2 Accent: buttons filled with #F26B38 (ink text 5.28:1), no accent panels, no decorative accent when reserved for actions. `render.accent-usage` on 1.3.0: "article.reel-panel.tone-accent #A34826" and "filled with #A34826, not the brand accent"; passes on 1.4.0.
+- [x] P2.3 Phones: action bar, no hero gap, swipeable reel. `render.mobile-action-visible` on 1.3.0: no visible action at the middle/bottom; passes on 1.4.0.
+- [x] P2.4 Motion per section type, reduced motion respected, inside the motion and JS budgets (Northfold clean test with Lighthouse passes). `render.motion-coverage` on 1.3.0: e.g. "4 of 4 section(s) show no motion" on services; passes on 1.4.0.
+- [x] P2.5 Registry 1.2.0 entries with planted fixtures (each fails only its own check); screenshots at 1280 and 375, before and after.
+- [ ] Packages 3–5 (image slots, Cockpit UX, paid Lanternworks proof).
 
 **Verification**: suites green locally (frontend-loop 115, planning 42, jobs 33, workflow 42, verification 113, agent-runtime 39, hermes 55, rendered-qa 79, Cockpit 123); typecheck clean. Independent agent review: 6 defects in the new checks, all fixed with tests that failed first. Not pushed, so no CI run; no live build (Package 1 forbids one).
 

@@ -16,7 +16,8 @@ parallel with Steps 5-8 because it only touches `apps/cockpit`.
 Part D; open steps carry a **Next action** line and a continuation or verification prompt.
 **Status as of 2026-10-14 (later)**: **Step 28** (build quality and Cockpit plain-language UX, added 2026-10-14 from
 `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md`) is **IN PROGRESS**: Package 1 (the builder sees the whole request) built and verified
-locally (`3e493f6`; migration 0022 applied live, attack test 11/11); Packages 2–5 open, each waiting for Huraira's GO.
+and deployed (`3e493f6`, CI `38569635936`; migration 0022 live, attack test 11/11); Package 2 (Track B starter 1.4.0: logo, accent,
+phone action, motion; four new rendered checks) built and verified locally (`d112f62`); Packages 3–5 open, each waiting for GO.
 
 **Status as of 2026-10-14**: the evidence moved on Steps 4D, 12 and 26, but no status changed:
 - **Step 4D**: the one-press continue is proven live on Summit `63278e56` and Lanternworks `e2a204fb`. The missing-facts form is still unproven live.
@@ -1356,7 +1357,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Package 1 of 5 built and verified
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-14, Packages 1 and 2 of 5 built and verified
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1377,8 +1378,23 @@ REPORT in the Part C format, then STOP.
   (separate agent) found 6 defects in the new checks; all fixed with tests that failed first.
 - Not done: no live build (by design); CI not run (not pushed); Track A has no form-field "openQuestions" path beyond the check.
 
-**Next action**: Huraira reviews the Package 1 report and gives GO for Package 2 (Track B starter defects). Packages 2–5: see the
-source doc; prompt unchanged.
+**Package 2 — Track B starter defects: built and verified locally** (`d112f62`, starter `track-b-starter/1.4.0`, Track A 1.3.0):
+- Logo: explicit display size; an SVG with only a viewBox is served with width/height (`servedLogoData`; fingerprint still checked
+  on the uploaded bytes). On 1.3.0 the Lanternworks header logo rendered **0x0 px** at 1440 and 375; Track A had the same CSS.
+- Accent: buttons are the client's accent (`palette.action`; ink on #F26B38 is 5.28:1), never a panel fill; when the brief reserves
+  the accent for actions (`accentForActionsOnly`) the rules, step numbers and closing button stop wearing a darkened accent.
+- Phones: an action bar under 960 px with its height reserved (body and scroll padding); no empty band under the hero; the work reel
+  swipes with scroll snap. Motion: an entrance per section type (CSS scroll-driven, IntersectionObserver fallback, transform only).
+- New rendered checks `render.logo-visible`, `render.mobile-action-visible`, `render.accent-usage`, `render.motion-coverage`
+  (registry 1.2.0, planted fixtures in `packages/rendered-qa/test/trackBBrand.test.ts`). On 1.3.0 all four FAIL on the clean
+  Lanternworks site; on 1.4.0 all pass on every page and each planted fixture fails only its own check. Brand promise computed by
+  code (`trackB/brand.ts`, workflow `brandPromiseFor`, also on a resume).
+- Suites: rendered-qa 85, frontend-loop 118, workflow 44, verification 113, jobs 33. Screenshots at 1280 and 375, before and after.
+- Not done: Lighthouse on the Lanternworks build (the Northfold build's LCP/CLS pass); the phone bar and the hero button both show at
+  the top of the home page; the meta-copy check misses "replaced our single page site with six"; no live build.
+
+**Next action**: Huraira reviews the Package 2 report and gives GO for Package 3 (image slots and labelled placeholders).
+Packages 3–5: see the source doc; prompt unchanged.
 
 ### STEP 27 — Track A motion budget (P0, added 2026-10-07, decision D1) — NOT STARTED
 
@@ -1549,7 +1565,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | not started | | |
 | 26 | Quality calibration | **PARTIAL**: item 1 built (`67033f7`, Anthropic screenshot reviewer, local live review passed 32 s / $0.071); Cockpit trace row pending | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
-| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 built and verified locally, `3e493f6`: request carried into the build, coverage/floors/meta-copy checks, direction re-run with migration 0022 live and attack test 11/11; not pushed, no CI; Packages 2–5 open) | 2026-10-14 | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (Package 1 `3e493f6`, CI `38569635936` green on rerun and deployed: request carried into the build, coverage/floors/meta-copy checks, direction re-run, migration 0022 live, attack test 11/11. Package 2 `d112f62`, verified locally: Track B starter 1.4.0, four new rendered checks fail on 1.3.0 and pass on 1.4.0. Packages 3–5 open) | 2026-10-14 | |
 
 **Goal tracker (Blueprint §16K)**
 
