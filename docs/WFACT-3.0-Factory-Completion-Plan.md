@@ -12,8 +12,9 @@ redesign), and the **design-quality rule** in Part C. Both new steps sit between
 parallel with Steps 5-8 because it only touches `apps/cockpit`.
 **Realigned 2026-10-07**: product-and-solution alignment pass (`docs/HANDOFF.md` is the orientation; `docs/archive/MANIFEST.md` lists what moved). Changes to this plan: closed steps (1, 2, 3, 3A, 4, 4C, 5, 6, 7) keep their heading, status and evidence but their long agent prompts moved to the archived pre-realignment copy; open steps keep full prompts; Steps 12, 20 and 21 gained the verified gaps found in the audit; Part F lists proposed, UNAPPROVED additions (agency scope) and the decisions that gate them. The execution order was re-set on 2026-10-07 (see "Execution order" after Part B); Steps 25 and 26 were added. The step table, headings and Part E remain machine-checked by `scripts/check-trackers.mjs`.
 **Last synced 2026-10-15 (night +05)** via `/progress-sync`: every step re-checked against git (HEAD `3b5a94c`; `origin/main` = `origin/huraira-work` = `2a64471`, 16 local commits unpushed), CI (`38706155999` and `38711602641` green on `2a64471`, incl. the Cockpit deploy) and the live database (read-only SQL: 34 jobs, `caa201f1` cancelled, `e6a71046` failed, 177 `model_traces`, 5 `leads`, 0 `account_requests`, latest migration 20261015103026). No step changed status and none newly qualifies for Closed (3A: still 0 sign-ups; 4C, 21, 25, 28: live checks pending). Fixed stale notes: `8e6e09d` and `b8d240f` are pushed (were "local"); Harbor Street's live continue result recorded under Step 28. Added work found in git but cited nowhere: `a6f64cd` and `dde68a5` (Step 28), `3c79212` and `892c468` (Step 12), `e11c1ea` (Step 21). **Synced 2026-10-15 (13:30 +05)** via `/progress-sync`: re-synced after `626667a` (pushed; CI `38695633253` running at sync) and `8e6e09d` (brand-colour rule, local). Huraira decided the palette rule (tints and shades on-brief, CTAs in the true accent at 4.5:1). Step 28 updated; no step changed status and none newly qualifies for Closed (3A still 0 `account_requests`; 4C and 21 still need their live checks). The Part B table gained a **Depends on / waiting for** column, rows 3A, 4B, 12 and 26 were realigned, and the missing 4D row was added; Part E rows 3A, 4B, 12, 26 and 28 were refreshed. Live (read-only SQL): 33 jobs, `d3c45995` failed, `caa201f1` queued and never dispatched; 165 `model_traces`; 31 `plan_inputs`; latest migration 20261014140027. **Updated 2026-10-15 (12:10 +05)** via `/step-close 28`: Step 28 stays IN PROGRESS; build-failure guards added (`b8d240f`, local, `docs/BUILD-FAILURE-DIAGNOSIS.md`). **Last synced 2026-10-14 (17:00 +05)** via `/progress-sync`: Step 4D closed (exit check met live, `55ddba7c`); Steps 4B, 25, 26 updated from the first passing build since 2026-10-01; CI `38554457540` green on `8271858`, `38557714567` on `caf42bc` running at sync (all jobs green except Rendered QA, still running). Previous sync 2026-10-14 (00:45 +05) via `/progress-sync`: every step re-checked against git (`92fd4ac`; `a9b271f` and `92fd4ac` local only, remotes at `d5129e0`), CI (`38452956084` on `d5129e0` FAILED in Rendered QA only, fixed by `a9b271f`, unpushed) and the live database (Cockpit continue `e2a204fb` reached a real QA verdict with the Anthropic reviewer). No status changed. No step newly qualifies for Closed: 3A still lacks its live sign-up (0 `account_requests` rows). The step table row for 4B is fixed (its columns were misaligned) and the Part E rows for 3A, 4B, 4D, 12 and 26 are refreshed. Previous sync 2026-10-13 via `/progress-sync`: every step re-checked against git (`76e9d6c`, no code since `c97e329`), CI (`38437214851`, `38438423293` green incl. deploy) and the live database (no build since 2026-10-12); no status changed. Previous full re-audit 2026-10-12 (no commits since `072b391`,
-2026-10-07), CI and the live database. Closed steps (DONE with citable evidence: 1, 2, 3, 5, 6, 7) moved to **"Closed steps"** at the end of
+2026-10-07), CI and the live database. Closed steps (DONE with citable evidence: 1, 2, 3, 5, 6, 7; 3A added 2026-10-15) moved to **"Closed steps"** at the end of
 Part D; open steps carry a **Next action** line and a continuation or verification prompt.
+**Status as of 2026-10-15 (`/step-close 3A`)**: Step 3A is **DONE and closed**: the live sign-up was proven end to end (sign-up → owner approval as `pm` with audit row → password sign-in after approval in the Auth logs → role-limited view; attack test 32/32). Moved to Closed steps. No other step changed status. Open verification prompts remain for 4C and 21.
 **Status as of 2026-10-15 (night, `/progress-sync`)**: no status changed. Open steps that need only a live check or a sign-off keep their verification prompts (3A, 4C, 21). The next move is Huraira's push of the 16 local commits, then the Harbor Street continue (Step 28) and Nick's CRM and brief answers (Step 25).
 **Status as of 2026-10-15 (`/step-close 25`, live)**: Step 25 is **PARTIAL**: MVP M4 (contact form that saves leads) is met live on synthetic data (migrations 0025/0026 applied, attack test 43/43, `submit-lead` deployed, JS and no-JS submits on both tracks stored as rows); not pushed. The real-client run waits on Nick's brief. Step 28 stays IN PROGRESS. No other step changed status.
 **Status as of 2026-10-15 (`/step-close 28`)**: Step 28 stays **IN PROGRESS**. Added: the brief consistency check (`fd67328`: two owner answers on one topic halt at the readiness check before any paid call; the owner's pick clears it; the Planner asks each known topic once; eval E6) and two synthetic example clients (`52f7088`, `docs/EXAMPLE-CLIENTS.md`). Local, not pushed; not proven on a live build. No other step changed status.
@@ -98,7 +99,7 @@ and checks. Keep it current at every sync.
 | 1 | Fix Cockpit → GitHub dispatch | Confirms the dispatch token, gets a Cockpit job to run through GitHub Actions | Every Cockpit action depends on it; it has never worked | First successful `Cockpit job` run; queued plan built | P0 | None. Closed. |
 | 2 | Write pilot brief and business rules | Drafts a realistic fictional client brief and provisional business rules | Unblocks Stage 7 and the real-memory test | `brief.json` and `memory/context.md`, both flagged provisional | P0 | None. Closed; its inputs stay provisional until Nick supplies the real brief and rules (Step 22). |
 | 3 | Retire plaintext secrets (Huraira acts, agent verifies) | Deletes `.env.local` files, rotates keys, revokes the leaked Doppler token | Stage 1 is unmet and a token is exposed | The plan's `grep` check passes | P0 | None. Closed. |
-| 3A | Password sign-in and approval-gated accounts (added 2026-09-30) | Password sign-in with sign-up requests an owner approves; no account works until approved | Magic links alone were awkward and anyone could request access | **DONE** (`2223344`, `856e483`), 32/32 attack checks; live end-to-end sign-up still unproven (0 `account_requests` rows, re-checked 2026-10-15) | P0 | **Waits on Huraira**: one live sign-up end to end (sign up, confirm email, approve, sign in), then the verification prompt. No step dependency. |
+| 3A | Password sign-in and approval-gated accounts (added 2026-09-30) | Password sign-in with sign-up requests an owner approves; no account works until approved | Magic links alone were awkward and anyone could request access | **DONE** (`2223344`, `856e483`), 32/32 attack checks; live end-to-end sign-up proven 2026-10-15 | P0 | Closed. |
 | 4 | Full run on the pilot brief | Intake → plan → approval → build → verify → human Launch | Proves the factory end to end; measures corrections | Verified live page, correction count, audit and trace rows | P0 | Steps 1 and 2 (done). What is left (a live preview) is superseded by **Step 4B M6**, so it closes with 4B. |
 | 4B | Front-end upgrade: two build tracks | Track A (template, multi-page) and Track B (Next.js, motion-rich), chosen per client by a direction step; rendered QA and a screenshot reviewer | 2.0-quality sites were visually flat; one track cannot serve both local businesses and premium clients | **IN PROGRESS**: design approved 2026-10-01; M0 6 of 7 inputs; M1, M2, M3 done; M4: Track B live pass 2026-10-14 (Lanternworks `55ddba7c`, SYNTHETIC), human screenshot review and the Track A continue of `63278e56` pending; M5 blocked (Higgsfield credits); M6 not started (D3) | P0 | Step 4 (done enough). **M4 waits on Huraira**: the human screenshot review of `55ddba7c` and pressing continue on Track A `63278e56`. **M5 waits on Huraira/Nick**: Higgsfield credits and a key rotation. M6 waits on its turn (D3/D4 order). |
 | 4C | Cockpit UI/UX redesign | Information architecture, navigation, design system, plain copy, every factory action reachable, accessible and responsive | The Cockpit is the control room; today it grew room by room | A redesigned Cockpit verified in the browser at desktop and phone, with a usability walkthrough | P1 | **Needs verification**: Huraira's live signed-in walkthrough. Step 28 Package 4 (Cockpit v2) rebuilds most rooms, so check the v2 rooms when it lands. |
@@ -228,43 +229,6 @@ Part C above; if the agent has not been given this file, paste Part C first.
 done or blocked step has a **Continuation prompt** (paste it instead of the original, which would restart the step), and a step that
 looks done but lacks independent proof has a **Verification prompt**. DONE steps with citable evidence sit in **Closed steps** at the
 end of this part. `/progress-sync` (Step 4) and `/step-close` keep this current.
-
----
-
-### STEP 3A — Password sign-in and approval-gated accounts (P0, added 2026-09-30) — DONE 2026-09-30
-
-**Status: DONE** (`2223344`, `856e483`; CI `36698432470`, `36699308136`). Migration `0010_account_requests`: a sign-up creates a pending
-request and no profile, so it sees nothing until approved; owners approve any role, admins only `pm`; every decision audited; the
-older policy that let an admin promote themselves to owner was replaced with owner-only profile writes. Cockpit: password sign-in,
-"Create an account", "Forgot password?" and choose-new-password screens, magic link kept for existing accounts only, and an Account
-requests panel in Approvals. `scripts/rls_attack_test_accounts.sql`: 32/32. **Not yet proven live**: a real new account signed up,
-confirmed by email, approved and signed in (needs Huraira); the Supabase Auth settings below are Huraira's.
-
-**Kept open (2026-10-12 sync)**: approved as DONE by Huraira, but the live end-to-end sign-up is still unproven, so the step is not moved to
-Closed until the verification below has run. Not on the MVP path (D3); do it when Huraira has five minutes.
-**Next action**: Huraira creates one test account in the live Cockpit (sign up → confirm email → approve → sign in); then run the prompt below. (Re-checked 2026-10-14: `account_requests` has 0 rows, so the live sign-up has still never run.)
-
-Verification prompt — updated 2026-10-12:
-```
-You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/ on branch huraira-work. Follow Part C of
-docs/WFACT-3.0-Factory-Completion-Plan.md. Do ONLY the verification of Step 3A. Do not rebuild anything.
-
-ALREADY DONE (do not redo): password sign-in, account requests, approval, forgot-password, owner-only profile
-writes (`2223344`, `856e483`; migration 0010_account_requests; CI 36698432470, 36699308136);
-scripts/rls_attack_test_accounts.sql 32/32.
-
-VERIFY FIRST
-1. Ask Huraira for the test account's email (never a password). Confirm by read-only SQL on project
-   mcaxxhgjptwowwrluhra: an account_requests row for it, its decision row and audit row, then a profiles row
-   created only after approval, with the approved role.
-2. Ask Huraira to sign in with it in the live Cockpit and confirm it sees only what its role allows; confirm
-   the sign-in in Supabase Auth logs.
-3. Re-run scripts/rls_attack_test_accounts.sql in a rolled-back transaction: expect 32/32.
-REPORT what passed and what did not. Fix only gaps found (with tests). Then run `/step-close 3A`; if every check
-passed, move the Step 3A block into "Closed steps" at the end of Part D. Then STOP and wait for GO.
-```
-
-*The original agent prompt for this step is retired from the live plan. It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
 
 ---
 
@@ -1689,6 +1653,28 @@ is **listed as not verified** (a fresh CLI login exists; confirm in the Doppler 
 
 ---
 
+### STEP 3A — Password sign-in and approval-gated accounts (P0, added 2026-09-30) — DONE 2026-09-30, verified live 2026-10-15
+
+**Status: DONE** (`2223344`, `856e483`; CI `36698432470`, `36699308136`). Migration `0010_account_requests`: a sign-up creates a pending
+request and no profile, so it sees nothing until approved; owners approve any role, admins only `pm`; every decision audited; the
+older policy that let an admin promote themselves to owner was replaced with owner-only profile writes. Cockpit: password sign-in,
+"Create an account", "Forgot password?" and choose-new-password screens, magic link kept for existing accounts only, and an Account
+requests panel in Approvals.
+
+**Verified live 2026-10-15** (read-only SQL and Auth logs on `mcaxxhgjptwowwrluhra`): Huraira's test account
+(user `60114a00`) signed up 11:13:33 UTC → `account_requests` row `pending`, no profile → approved by an owner as `pm` at 11:14:32
+(`audit_log` `account.approved` `4ffd872c`, actor = decider, `decider_role` owner) → `profiles` row `pm` created at that same instant.
+Auth logs: `/logout` 11:16:27, then a password sign-in (`/token`, `grant_type=password`) 11:16:33, after approval. Role view measured
+under RLS as that user: profiles 1 of 2, account_requests 1 of 1, jobs 0 of 34, clients 0 of 2, audit_log 0 of 700, model_traces 0 of 177,
+plan_approvals 0 of 8 (a `pm` sees only assigned clients and no jobs: `clients_select`, `jobs_select`). `scripts/rls_attack_test_accounts.sql`
+re-run in a rolled-back transaction: 32/32, 0 leftover test users.
+**Noted, not a step gap**: Supabase email confirmation is off in the live project (email confirmed 35 ms after sign-up, `immediate_login_after_signup`);
+the approval gate still holds (no profile, so no data, until approved). Whether to turn confirmation on is Huraira's Auth setting.
+
+*The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
+
+---
+
 ### STEP 4D — Build recovery: why a build stopped, and carry on from where it left off (P0, added 2026-10-07) — DONE 2026-10-14, exit check met live (`63278e56`, `e2a204fb`, `55ddba7c`)
 
 **Status: DONE** (closed 2026-10-14 by `/progress-sync`). Design: `docs/BUILD-RECOVERY-DESIGN.md`. Code `a3198d8`…`a643d2d` (reopen, seven-bucket
@@ -1749,7 +1735,7 @@ last continuation prompt was retired at close.*
 | 1 | Fix Cockpit → GitHub dispatch | **DONE** (job `b952aaba`, run `36455639903`; browser leg job `1dd90f25`) | 2026-09-30 | yes |
 | 2 | Pilot brief and business rules | **DONE**, provisional inputs (`2c188d0`) | 2026-09-30 | yes |
 | 3 | Retire plaintext secrets | **DONE** (`f74b0bc`); old CLI token listed as not verified, per the step's acceptance | 2026-09-30 | yes |
-| 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); live end-to-end sign-up still to prove (0 `account_requests` rows, re-checked 2026-10-15), so kept open with a verification prompt | 2026-09-30 | yes |
+| 3A | Password sign-in and approval-gated accounts | **DONE** (`2223344`, `856e483`); verified live 2026-10-15: test account signed up, owner-approved as `pm` (audit `4ffd872c`), signed in with password after approval (Auth logs 11:16:33 UTC), RLS view limited to own rows, attack test 32/32; moved to Closed steps | 2026-09-30 | yes |
 | 4 | Full run on the pilot brief | **PARTIAL**: built and QA-approved (job `81c8607b`), human review found defects; preview superseded by Step 4B M6 | 2026-09-30 | |
 | 4B | Front-end upgrade: two build tracks | **IN PROGRESS**: design approved; M0 6 of 7 inputs decided; M1, M2 and M3 done; M4 partial: Track B live pass 2026-10-14 (Lanternworks `55ddba7c`, SYNTHETIC, launch gate), human screenshot review pending, Track A continue of `63278e56` pending; M5 groundwork `4bbd4bc` (live run blocked: no Higgsfield credits); M6 not started (D3) | 2026-10-14 | 2026-10-01 (design) |
 | 4C | Cockpit UI/UX redesign | **BUILT AND DEPLOYED** (`e76cff2`, CI `36905237284`; redeploy `fb08be3`, CI `36907274448`): new IA and design system, every room migrated, migration 0013 (cancel stuck jobs, 17/17 attack test), 23 tests, axe 0 / Lighthouse a11y 100 on every room; live signed-in check pending Huraira | 2026-10-01 | 2026-10-01 (Phase 1 + D1–D8) |
