@@ -21,3 +21,6 @@ Read at session start. Each item was paid for in a real incident (see `PROGRESS.
 9. **Synthetic inputs must stay labelled.** `clients/summit-line-roofing` and `clients/dreamsign-pilot` are provisional
    stand-ins, not real clients. Do not let them count toward Blueprint goal 1.
 10. **Do not trust a doc over the code or the Blueprint.** Where docs disagree, `docs/HANDOFF.md` section 2 says which governs.
+11. **Other sessions work in this checkout at the same time.** On 2026-10-01 one committed another agent's uncommitted
+    `PROGRESS.md` edit (`03138d9`) and pushed `main`, deploying a commit nobody meant to ship (`eaea97b`). Stage named paths only,
+    leave no shared-file edits uncommitted, and check `git reflog show origin/main` before and after committing.

@@ -49,7 +49,8 @@ heading instead of rewriting its prompt.
 ## 3. Update `PROGRESS.md` (five places)
 
 1. **`Last synced:`** line: today's date and time (+05), "via `/step-close <id>`", the commit range,
-   CI run id if any. Move the old line into "Previous syncs".
+   CI run id if any. Move the old line into "Previous sync"; keep at most two "Previous sync" lines and append older ones
+   to the archived sync log named in the pointer line under them (`.claude/rules/context-and-tokens.md`).
 2. **`**Status summary**`**: the step's new status in the same words as Part E.
 3. **`**Next up**`**: at most 3 items, the first being what Huraira must do or approve next (usually
    "review the Step <id> report and GO for Step <next>").

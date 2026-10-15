@@ -15,7 +15,7 @@ time-sensitive (model IDs, pricing, credentials) before relying on it.
 
 1. `docs/wfact-3.0-blueprint.html`: scope source of truth (13 build phases, Cockpit §9, Definition of Done §16K).
 2. `docs/WFACT-3.0-Continuation-Build-Plan.md`: Stages 1–7.
-3. `docs/WFACT-3.0-Factory-Completion-Plan.md`: Steps 1–27 with one agent prompt per step and the Standard
+3. `docs/WFACT-3.0-Factory-Completion-Plan.md`: Steps 1–28 with one agent prompt per step and the Standard
    Operating Rules (Part C). Follow its **Execution order** table (re-set 2026-10-07: Step 26 quality calibration, Step 27 Track A
    motion budget, Step 25 real-client run, then the Step 8/12/20 reliability bundle), not numeric order. One step at a time, report
    back, wait for Huraira's GO. Step 4B is described in
@@ -23,6 +23,7 @@ time-sensitive (model IDs, pricing, credentials) before relying on it.
 
 **MVP override (Decision D3, 2026-10-10)**: until Wed 2026-10-14 the work is a Website Build Module MVP proven on Bennett & Co
 (websites only, no e-commerce). Scope fence, schedule and cost cap: `docs/MVP-CUTLINE.md`. It overrides the Execution order above.
+The window was due 2026-10-14; the current order of work is the "Next up" list at the top of `PROGRESS.md`.
 
 A consolidated, verified orientation (goals, current state, backlog, next task) is `docs/HANDOFF.md`; read it first.
 Live status is in `PROGRESS.md`; everything waiting on Nick is in `BLOCKED-ON-NICK.md`. The document index is
@@ -114,7 +115,7 @@ clicked. Existing in the 2.0 repo is not itself a reason to inherit something in
   memory (lessons ledger, context). `docs/` = the planning documents this file summarizes — read them
   for anything this file doesn't cover.
 - Trunk-based, short-lived feature branches. CI gates block merge on registry/check failure, not advisory.
-- Nothing is marked done in `PROGRESS.md` until its exit check (per the Operator's Manual) actually
+- Nothing is marked done in `PROGRESS.md` until its exit check (the step's entry in the Factory Completion Plan) actually
   passed — not attempted, passed.
 
 ## 8. If you're an AI agent picking up a task here
@@ -127,6 +128,14 @@ clicked. Existing in the 2.0 repo is not itself a reason to inherit something in
 4. Log anything genuinely new you learned (a real lesson, not a routine fact) as a proposal to
    `memory/lessons-ledger.md` — proposals only, a human approves before it lands, per the owner-veto
    design carried over from 2.0.
+
+## 9. Working rules (auto-loaded from `.claude/rules/`)
+
+- `context-and-tokens.md`: what to load and how to read the big trackers (never whole), search before read, delegate fan-out.
+- `agent-workflow.md`: concurrent-session git safety, smallest diff, measured facts, archive-not-delete, stop conditions.
+- `quality-bar.md`: the verification ladder and the output standard for client sites, the Cockpit and code.
+
+They add to Part C of the Factory Completion Plan; Part C wins on conflict. Non-Claude agents start at `AGENTS.md`.
 
 ---
 
@@ -168,8 +177,6 @@ clicked. Existing in the 2.0 repo is not itself a reason to inherit something in
 
 ---
 
-**Last Updated**: 2026-09-10
-**Optimized with**: [Claude Token Optimizer](https://github.com/nadimtuhin/claude-token-optimizer)
 
 ## graphify
 

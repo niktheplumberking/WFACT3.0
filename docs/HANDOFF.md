@@ -1,6 +1,20 @@
 # WFACT 3.0 — Agent Handoff
 
 **Written**: 2026-10-07, branch `huraira-work` at `1323cbe` (= `origin/main` and `origin/huraira-work`). Product and solution alignment pass.
+**Refreshed**: 2026-10-15 (cleanup pass). Sections 1, 2, 4 to 6 and 8 to 9 still hold. Section 3 rows and section 10 were corrected
+against Part E of the Factory Completion Plan. For anything time-sensitive (step status, next task), `PROGRESS.md` ("Status summary",
+"Next up") and Part E win over this file.
+
+**What changed since 2026-10-07** (from Part E and `PROGRESS.md`, 2026-10-15):
+- Step **4D** (build recovery) is **DONE**: exit check met live (continues `63278e56`, `e2a204fb`, `55ddba7c`).
+- Step **28** (build quality and plain-language Cockpit, `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md`) is **IN PROGRESS**: Packages
+  1–3 built and verified, Package 4 (Cockpit v2 to the locked design in `docs/design/cockpit-v2/`) phases 1–13 done, build-failure
+  guards (`docs/BUILD-FAILURE-DIAGNOSIS.md`) and the brand-colour rule in code; live proof pending.
+- Steps **12** (cost caps $5/build, $20/7 days, `docs/AI-COST-AUDIT.md`), **21** (launch files) and **26** (item 1: independent
+  reviewer call live) are **PARTIAL**.
+- The MVP window (Decision D3, `docs/MVP-CUTLINE.md`, due 2026-10-14) has passed; check `PROGRESS.md` for what was proven.
+- Verification registry is v1.3.0 with **53** checks (`packages/verification/config/eval-registry.json`). Migrations run to `0023`.
+
 **Purpose**: let a coding agent continue the build without reconstructing the project's history. Self-contained; the documents
 it points to are the detail, this is the orientation.
 **Evidence rule**: every status below was checked in this pass unless marked *(reported)*, meaning it comes from `PROGRESS.md`
@@ -77,7 +91,7 @@ pilot client (synthetic); the governance table; the entity list.
 
 1. `docs/wfact-3.0-blueprint.html` — scope source of truth (13 phases, Cockpit §9, Definition of Done §16K). `docs/WFACT-3.0-Ecosystem-Blueprint.md` is its text copy.
 2. `CLAUDE.md` — the law (verification, governance, architecture rules). Where it disagrees with the Blueprint, fix `CLAUDE.md`.
-3. `docs/WFACT-3.0-Continuation-Build-Plan.md` (Stages 1–7) and `docs/WFACT-3.0-Factory-Completion-Plan.md` (Steps 1–27, Execution order after Part B, Standard Operating Rules in Part C — **read Part C before any step**).
+3. `docs/WFACT-3.0-Continuation-Build-Plan.md` (Stages 1–7) and `docs/WFACT-3.0-Factory-Completion-Plan.md` (Steps 1–28, Execution order after Part B, Standard Operating Rules in Part C — **read Part C before any step**).
 4. Step designs: `docs/FRONTEND-UPGRADE-DESIGN.md` (4B), `docs/BUILD-RECOVERY-DESIGN.md` (4D), `docs/AGENT-PERMISSIONS.md` (6), `docs/COCKPIT-JOBS.md`, `docs/SECRETS.md`; `PRODUCT.md` for the Cockpit's design constraints.
 5. Live state: `PROGRESS.md`, `BLOCKED-ON-NICK.md` (top table is current; below it is sprint-era record).
 6. Reference only: Playbook (pillars, 2.0 carry-over), SOPs/Factory Book PDFs.
@@ -98,17 +112,18 @@ Known conflicts and how they resolve: PROGRESS.md "Status summary" said 4D was u
 | Intake → Direction → Planner | **Complete** | `packages/planning`, 32 tests; synthetic inputs only |
 | Builder/evaluator loop, Track A (static multi-page) and Track B (Next.js, motion) | **Partial** | Track B live build passes all but a simulated-LCP check missing 2.5 s by 0.02–0.08 s *(reported)*; Track A last live re-run failed on a dropped connection, retry added. M4 not closed |
 | Rendered QA (screenshots, axe, Lighthouse, design rulebook) | **Complete, CI-verified** | reviewer is same vendor as builder |
-| Verification registry (48 checks) + evaluator | **Complete for what exists** | 78-check / 50-point lists missing; OpenAI evaluator never made a live call (429) |
+| Verification registry (53 checks, v1.3.0) + evaluator | **Complete for what exists** | 78-check / 50-point lists missing; OpenAI evaluator never made a live call (429) |
 | Agent permissions (default-deny) | **Complete** *(reported live)* | Step 6; Hermes-lite reads `clients/<entitySlug>/memory.md` (slug misuse) |
 | Documentation agent / episodic memory | **Complete** *(reported live)* | Step 5 |
-| Build recovery (stopped build → plain diagnosis → continue) | **Partial** | Built, migration 0018 applied, deployed; the continue button never pressed on a real stopped build |
+| Build recovery (stopped build → plain diagnosis → continue) | **Complete, verified live** | Step 4D DONE 2026-10-14; continues `63278e56`, `e2a204fb`, `55ddba7c` |
 | Cockpit rooms: Home, Decisions, Projects, Activity, Costs, Settings, More | **Complete** (real data, no mocks) | signed-in live check pending; 3 test files for ~5k LOC |
 | Cockpit rooms: System, Agents, Memory, Business | **Placeholders** ("Coming in Step N", honest) | Steps 9, 10, 14, 23 |
 | Hermes-lite controller | **Partial, live** | read-only `ask` jobs; `KNOWN_ENTITIES` hard-coded (`packages/hermes/src/controller.ts:19`) |
 | `packages/media` (Seedance/Higgsfield) | **Orphaned groundwork** | no importer, no CI job; M5 blocked on Higgsfield credits |
 | Task/event queue, durable execution | **Missing** | Step 8; jobs table + GH Actions only |
-| Cost governance per client, alerts, DR drill, 3-client test, Owner's Key | **Missing** | Steps 12, 17, 19, 18, 23 (real-client run: 25; calibration: 26; Track A motion: 27) |
-| Launch files in starters (sitemap, robots, canonical, og:image; Track A 404) | **Missing** | Step 7 launch checks fail on them |
+| Cost caps per build / per 7 days | **Partial, live** | Step 12 MVP slice; Run page and live cap refusal pending |
+| Alerts, DR drill, 3-client test, Owner's Key | **Missing** | Steps 17, 19, 18, 23 (real-client run: 25; calibration: 26; Track A motion: 27) |
+| Launch files in starters (sitemap, robots, canonical, og:image; Track A 404) | **Partial** | Step 21: built in `9968019`; verification pending |
 | Hosting on Hostinger | **Blocked/descoped** | no live Hostinger deploy exists |
 
 No TODO/FIXME markers in shipped source. Placeholders are explicit and labelled (SAMPLE content, synthetic provenance).
@@ -223,9 +238,7 @@ Supabase project `mcaxxhgjptwowwrluhra` is canonical (BLOCKED-ON-NICK.md). There
 
 ## 10. Exact next task
 
-**Task: Step 26, part 1 — prove one live call on a different vendor from the builder.** (Steps before it are Huraira's actions in §7 item 1.)
-
-*Precondition*: ask Huraira whether M4 is closed and whether OpenAI credits are in place. If not, report BLOCKED and stop; do not substitute the builder's vendor.
-*Do*: follow Step 26 in the Factory Completion Plan Part D, item 1 only: one successful live call from the evaluator and one from the screenshot reviewer on a non-Agent-37 vendor, with trace rows; record the vendor in `packages/rendered-qa/config/reviewer.json`; report cost per review.
-*Expected outcome*: independent review is real, not same-vendor.
-*Done when*: two `model_traces` rows (checked with SQL) show the second vendor, existing suites pass unchanged, `node scripts/check-trackers.mjs` prints OK, and the report is in the Part C format. Then STOP and wait for GO before items 2–4 of the step.
+The next task is the **"Next up"** list at the top of `PROGRESS.md`, not this file (it is kept current by `/step-close` and
+`/progress-sync`; this file is refreshed only on alignment passes). Pick its first item that does not wait on a human, read that
+step's Part D prompt and Part C, and stop for Huraira's GO after the report. The 2026-10-07 version of this section (Step 26 part 1)
+was met live on 2026-10-14 (`67033f7`).

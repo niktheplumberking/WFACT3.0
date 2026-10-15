@@ -1,22 +1,40 @@
-# Task completion documents
+# Advisory list of paths agents should not read unless the task names them (Claude Code does not enforce this file;
+# see .claude/rules/context-and-tokens.md). Generated, binary, history and dependency content only.
+
+# Dependencies and build output
+node_modules/
+**/node_modules/
+.pnpm-store/
+dist/
+build/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+package-lock.json
+
+# History (read only when restoring or auditing)
 .claude/completions/**
-
-# Session files
 .claude/sessions/**
-
-# Archived documentation
+.claude/worktrees/**
 docs/archive/**
 
-# User-facing docs (not needed during dev sessions — devs have CLAUDE.md)
-CHANGELOG.md
-README.md
-CONTRIBUTING.md
-GEMINI.md
-AGENTS.md
-.cursorrules
-.windsurfrules
-.clinerules
-.roomodes
+# Generated knowledge-graph internals (use `graphify query`, not raw reads)
+graphify-out/cache/**
+graphify-out/20*/**
+graphify-out/graph.html
+graphify-out/graph.json
+graphify-out/manifest.json
+
+# Binary evidence and design exports (open only when a task names them)
+docs/step-4c/before/**
+docs/step-4c/after/**
+docs/step-4c/mockups/**
+docs/WFACT SOPS/*.pdf
+**/*.png
+**/*.jpg
+**/*.webp
+**/*.pdf
 
 # Git
 .git/**
@@ -32,4 +50,3 @@ logs/**
 
 # OS
 .DS_Store
-

@@ -41,3 +41,28 @@ Restore with `git mv <archive path> <original path>`. Rounds are in date order.
 ## Removed (not archived) 2026-10-07
 
 Two leftover git worktrees `.claude/worktrees/agent-ac3844b…` and `agent-ad14ed1…` and their branches `worktree-agent-*`: every commit was already in `huraira-work` (checked with `merge-base --is-ancestor`), so nothing was lost. `.claude/worktrees/` is now in `.gitignore`. Stray `.DS_Store` files were deleted (already git-ignored).
+
+## Round 3 — 2026-10-15 (cleanup pass)
+
+| Original path | Archive path | Reason |
+|---|---|---|
+| `PROGRESS.md` "Previous sync" lines 5–37 | `docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md` | 33 very long sync-log lines at the top of a file every agent reads; the latest "Last synced" and one "Previous sync" stay |
+| `PROGRESS.md` Continuation Plan CI table, Stages 1–5, Cockpit jobs | `docs/archive/2026-10-15-cleanup/PROGRESS-continuation-stages-1-5.md` | All MET by 2026-09-30; history. A pointer remains in `PROGRESS.md` |
+| `PROGRESS.md` sections Step 6, Step 5, Step 7, Step 4D | `docs/archive/2026-10-15-cleanup/PROGRESS-closed-steps-6-5-7-4D.md` | All DONE with evidence; status stays in the plan's Part E. `check-trackers.mjs` printed OK after the move. Net: `PROGRESS.md` 1,198 → 789 lines, 142 KB → 96 KB |
+| `docs/COCKPIT-CLAUDE-DESIGN-PROMPT.md` | `docs/archive/2026-10-15-cleanup/COCKPIT-CLAUDE-DESIGN-PROMPT.md` | One-shot prompt for Claude Design; its output is locked in `docs/design/cockpit-v2/`. No references |
+| `docs/reports/wfact-mvp-progress-2026-10-12.html` | `docs/archive/old-reports/wfact-mvp-progress-2026-10-12.html` | Dated client-style report; no references |
+| `.claude/hooks/*.sh` except `stop-tracker-guard.sh` (12 files) | `docs/archive/2026-10-15-cleanup/claude-hooks-unregistered/` | Never registered in `.claude/settings.json` (checked, and not in user settings either), so they never ran |
+
+**Removed, not archived (2026-10-15)**
+
+- Untracked root folder `Design - WFACT Cockpit Control Room/`: a duplicate of `docs/design/cockpit-v2/` (`diff -rq`: identical, minus one
+  build-prompt file that only the tracked copy has). Moved to the macOS Trash, not deleted.
+- Worktree `.claude/worktrees/agent-aa666c5a80254fd81` and branch `worktree-agent-aa666c5a80254fd81`: `git cherry` showed all 3 commits
+  already on `huraira-work` as equivalent patches; no uncommitted changes. Restore: `git branch worktree-agent-aa666c5a80254fd81 a02046e`.
+- `packages/.gitkeep` (the folder has 12 packages); stray `.DS_Store`; empty `.claude/templates/` and `docs/reports/`.
+- Untracked from git (files kept on disk, now git-ignored): `graphify-out/cache/` (248 files) and the dated snapshots
+  `graphify-out/2026-10-*/`. Both are regenerable by `graphify update .` and made every commit noisy.
+
+**Kept on purpose (2026-10-15)**: worktrees `agent-a8907207a63a55715` (1 commit not on `huraira-work`: live build step timeline) and
+`objective-engelbart-d65df7` (migration 0024, awaiting Huraira's review); `docs/step-4c/{before,after,mockups}` (cited as evidence by
+`PROGRESS.md`, the plan and `app.css`); every doc still referenced from code, CI or the trackers.
