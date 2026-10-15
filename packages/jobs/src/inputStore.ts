@@ -3,6 +3,7 @@
  * it was approved. The newest row per key is the current one; a waived row means "build without it".
  */
 import type { OwnerFact } from "@wfact/frontend-loop/brief";
+import { resolveOwnerFacts } from "@wfact/workflow/briefConsistency";
 
 export interface PlanInput {
   planId: string;
@@ -31,9 +32,13 @@ export function currentInputs(rows: PlanInput[]): PlanInput[] {
 /** The plan input that carries the owner's uploaded logo record (JSON); validated by migration 0021. */
 export const LOGO_INPUT_KEY = "asset.logo";
 
-/** What the builder may use: every non-waived value, as facts. Asset records (asset.*) are settings, not copy facts. */
+/**
+ * What the builder may use: every non-waived value, as facts. Asset records (asset.*) are settings, not copy facts. The
+ * owner's pick for two answers that disagreed (`resolve.<topic>`, asked by the readiness check) replaces them, and an answer
+ * whose label still says "unclear" or "not provided" is given a neutral label (workflow/briefConsistency.ts).
+ */
 export function ownerFactsFrom(inputs: PlanInput[]): OwnerFact[] {
-  return inputs.filter((i) => !i.waived && i.value && !i.key.startsWith("asset.") && !i.key.startsWith("launch.")).map((i) => ({ key: i.key, label: i.label, value: i.value! }));
+  return resolveOwnerFacts(inputs.filter((i) => !i.key.startsWith("asset.") && !i.key.startsWith("launch.")));
 }
 
 /** Build-quality Package 3: the plan input that holds an owner-supplied image for one media slot (migration 0023). */

@@ -43,6 +43,7 @@ import { trackBBrand } from "@wfact/frontend-loop/trackB/brand";
 import { CONTENT_SCHEMA_VERSION as TRACK_B_SCHEMA, type SiteContent as TrackBContent } from "@wfact/frontend-loop/trackB/content";
 import { briefRequiresLogo, loadLogoAsset, LogoError, provideLogoAsset } from "@wfact/frontend-loop/brandAsset";
 import { ImageError, loadImageAsset, placeholdersFor, provideImageAsset } from "@wfact/frontend-loop/media";
+import { checkBriefConsistency, conflictNeed } from "./briefConsistency.js";
 import type { QaInput } from "@wfact/verification/agent";
 import type { VerificationResult } from "@wfact/verification/verificationLoop";
 
@@ -685,7 +686,8 @@ class Workflow {
    * The readiness check, before any paid step (on a start and on every continue, since a new runner has none of the
    * last one's memory). It loads and verifies the logo the brief names (the starters need its bytes), stops when the
    * brief's own words require a logo that was never attached (the builder cannot invent it, so every QA round would
-   * fail on it: Lanternworks 4c35703b, 3 of 3), and probes the model providers. Returns the halt when the run cannot go on.
+   * fail on it: Lanternworks 4c35703b, 3 of 3), stops when two owner facts on one topic disagree (Harbor Street e6a71046), and
+   * probes the model providers. Returns the halt when the run cannot go on.
    */
   async preflight(cycles: number, cp: CheckpointState | null): Promise<WorkflowResult | null> {
     const checks: PreflightCheck[] = [];
@@ -720,6 +722,18 @@ class Workflow {
     } else if (!logo) {
       checks.push({ id: "brief.logo", ok: true, detail: "no logo required" });
     }
+    // Owner facts that contradict each other (two opening dates, two offers) cannot both be on the page, so every QA round
+    // fails on them and each is paid for (Harbor Street e6a71046). The owner picks one first; leftovers are only reported.
+    const consistency = checkBriefConsistency(this.brief);
+    for (const c of consistency.conflicts) needs.push(conflictNeed(c));
+    const leftoverNote = consistency.leftovers.length > 0 ? `; answered but labelled unresolved: ${consistency.leftovers.map((l) => l.key).join(", ")}` : "";
+    checks.push({
+      id: "brief.consistency",
+      ok: consistency.ok,
+      detail: consistency.ok
+        ? `owner facts agree${leftoverNote}`
+        : `${consistency.conflicts.map((c) => `${c.topic}: ${c.facts.map((f) => f.key).join("/")} disagree (${c.values.map((v) => JSON.stringify(v)).join(" vs ")})`).join("; ")}${leftoverNote}`,
+    });
     let providersOk = true;
     if (needs.length === 0 && this.deps.providerProbes) {
       // Only worth probing when nothing else stops the run: the owner fixes the brief first.

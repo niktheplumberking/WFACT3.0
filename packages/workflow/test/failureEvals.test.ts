@@ -12,6 +12,9 @@
  *                 contrast (and filled CTAs with a darkened accent), which a judge reading the brief literally never accepts.
  *                 Rule (Huraira, 2026-10-15): tints and shades of brief colours are on-brief; buttons use the true accent
  *                 wherever its text reads at 4.5:1, else a shade of it. Engine, evaluator and reviewer must hold that one rule.
+ *   E6  e6a71046  the owner's answers disagreed (opening date q2 "15 December 2026" vs q7 "20 December 2026"; offer q3 vs q8),
+ *                 so no page could pass and both paid revisions failed. The readiness check now asks the owner to pick
+ *                 before any paid call, and the pick clears it.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -38,6 +41,8 @@ import {
   MemoryArtifactStore,
   type WorkflowDeps,
 } from "../src/buildAndVerify.js";
+import { resolveOwnerFacts } from "../src/briefConsistency.js";
+import { HARBOR_STREET_FACTS } from "./harborStreetFacts.js";
 
 const FIXTURES = path.join(import.meta.dirname, "..", "..", "verification", "test", "fixtures");
 const BROKEN = readFileSync(path.join(FIXTURES, "broken.html"), "utf-8");
@@ -311,4 +316,62 @@ test("E5: the evaluator and the screenshot reviewer are told the same rule the e
   const system = String(messages.find((m) => m.role === "system")!.content);
   assert.ok(system.includes(BRAND_COLOUR_RULE), "screenshot reviewer carries the same brand-colour rule");
   assert.ok(JSON.stringify(messages).includes(LANTERNWORKS_NOTES), "and still sees the client's own words");
+});
+
+// ---- E6: owner answers that contradict each other halt before anything is paid -----------------------------------------
+
+const harbor = { ...brief, ownerFacts: HARBOR_STREET_FACTS };
+const preflightRow = (sink: InMemoryAuditSink, runId: string) => rows(sink, runId, "workflow.preflight").at(-1)?.payload as
+  | { ok: boolean; needs: { key: string; reason: string }[]; checks: { id: string; ok: boolean; detail: string }[] }
+  | undefined;
+
+test("E6 e6a71046: a brief whose owner answers disagree halts at the readiness check, no builder or reviewer call", async () => {
+  const shared = fresh();
+  const r0 = rig(CLEAN, shared);
+  const r = await buildAndVerify(harbor, r0.deps);
+  assert.equal(r.status, "needs_input");
+  assert.match(r.reason ?? "", /Nothing was spent/);
+  assert.equal(r0.builder.calls.length, 0, "no builder call");
+  assert.equal(r0.qaModel.calls.length, 0, "no reviewer call");
+  assert.deepEqual(r.preflightNeeds?.map((n) => n.key), ["resolve.opening_date", "resolve.offer"]);
+  assert.match(r.preflightNeeds![0]!.reason, /^Two answers for the opening date: 15 December 2026 and 20 December 2026\. Which is right\? \(answers q2 and q7\)/);
+  const row = preflightRow(shared.sink, r.workflowRunId);
+  const check = row?.checks.find((c) => c.id === "brief.consistency");
+  assert.equal(check?.ok, false, "the conflict is on the audit record");
+  assert.match(check?.detail ?? "", /answered but labelled unresolved: q1, q2, q3, q4, q6/);
+});
+
+test("E6: after the owner picks, the continue passes the readiness check and builds", async () => {
+  const shared = fresh();
+  const halted = await buildAndVerify(harbor, rig(CLEAN, shared).deps);
+  assert.equal(halted.status, "needs_input");
+  // What the Cockpit stores (one answer per need, under the need's key) and the jobs runner turns into owner facts.
+  const picked = resolveOwnerFacts([
+    ...HARBOR_STREET_FACTS.map((f) => ({ ...f, waived: false })),
+    { key: "resolve.opening_date", label: "Opening date: which is right?", value: "20 December 2026", waived: false },
+    { key: "resolve.offer", label: "Opening offer: which is right?", value: "Main primary service at 20% off", waived: false },
+  ]);
+  const next = rig(CLEAN, shared);
+  const r = await resumeBuildAndVerify(halted.workflowRunId, next.deps, { reopen: { reason: "owner picked", by: "user-1", brief: { ...brief, ownerFacts: picked } } });
+  assert.equal(r.status, "awaiting_launch_approval");
+  assert.ok(next.builder.calls.length >= 1, "the build ran");
+  assert.equal(preflightRow(shared.sink, halted.workflowRunId)?.checks.find((c) => c.id === "brief.consistency")?.ok, true);
+});
+
+test("E6: a consistent brief (one date written two ways, one fact per other topic) is not stopped", async () => {
+  const shared = fresh();
+  const r0 = rig(CLEAN, shared);
+  const consistent = {
+    ...brief,
+    ownerFacts: [
+      { key: "opening_date", label: "Opening date", value: "20 December 2026" },
+      { key: "q7", label: "What is the confirmed opening date?", value: "20 Dec 2026" },
+      { key: "hours", label: "Opening hours", value: "Tue to Sat 7am to 3pm" },
+      { key: "q8", label: "What does the opening-day offer include?", value: "A free coffee with any pastry" },
+    ],
+  };
+  const r = await buildAndVerify(consistent, r0.deps);
+  assert.equal(r.status, "awaiting_launch_approval");
+  const check = preflightRow(shared.sink, r.workflowRunId)?.checks.find((c) => c.id === "brief.consistency");
+  assert.deepEqual(check && { ok: check.ok, detail: check.detail }, { ok: true, detail: "owner facts agree" });
 });

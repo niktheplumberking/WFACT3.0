@@ -16,6 +16,7 @@ import { z } from "zod";
 import { AgentInputError, defineScope, guardModelClient, type Agent, type AgentDefinition, type AgentRegistry } from "@wfact/agent-runtime";
 import { parseBrief, type PilotBrief } from "@wfact/frontend-loop/brief";
 import { HAND_PICKED_TEMPLATES } from "@wfact/frontend-loop/templates";
+import { mergeOpenQuestions } from "./factTopics.js";
 import { IntakeResultSchema, type IntakeResult } from "./intake.js";
 import { toApiSchema, type JsonModelClient } from "./modelClient.js";
 
@@ -263,7 +264,8 @@ export function assemblePlan(intake: IntakeResult, out: ModelPlan, registry: Age
     templateRationale: out.templateRationale,
     tasks: out.tasks.map((t, i) => ({ order: i + 1, ...t, ...(t.role === "front-end-builder" ? { title: buildTaskTitle(t.title, single, intake.requested?.pages ?? []) } : {}) })),
     risks: out.risks,
-    openQuestions: [...intake.ambiguities, ...out.openQuestions],
+    // Once per topic: the Cockpit keys answers by position (q1, q2, ...), so a topic asked twice is answered twice (e6a71046).
+    openQuestions: mergeOpenQuestions(intake.ambiguities, out.openQuestions),
     intake: { entitySlug: intake.entitySlug!, leadType: intake.leadType, requestSource: intake.requestSource, clientName: intake.clientName },
   });
 }
