@@ -183,5 +183,6 @@ test("Step 7: the Track B build passes the registry gate at preview; every launc
   const failing = launch.filter(gates).map((r) => r.checkId);
   console.log(`Track B @ preview advisory ${JSON.stringify(preview.filter((r) => r.advisory).map((r) => r.checkId))}; @ launch failing ${JSON.stringify(failing)}, advisory ${JSON.stringify(launch.filter((r) => r.advisory).map((r) => r.checkId))}`);
   // Package 3: placeholder pictures are the other launch-stage blocker (the fixture's hero and work items are placeholders).
-  for (const id of failing) assert.match(id, /^(tells\.|content\.placeholders-launch$)/, `${id} failed at launch but is not a launch-stage check`);
+  // Step 25 / MVP M4: the starter's form is built without a lead site here, so it is not connected and refuses launch.
+  for (const id of failing) assert.match(id, /^(tells\.|content\.placeholders-launch$|launch\.form-connected$)/, `${id} failed at launch but is not a launch-stage check`);
 });

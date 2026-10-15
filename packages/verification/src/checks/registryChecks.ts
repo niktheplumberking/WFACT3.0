@@ -501,6 +501,44 @@ export const placeholdersLaunchCheck: SiteLevelCheck = {
   },
 };
 
+/** The submit-lead Edge Function (Step 25 / MVP M4; frontend-loop src/leadForm.ts has the same shape). */
+const LEAD_ENDPOINT = /^https:\/\/[a-z0-9]{20}\.supabase\.co\/functions\/v1\/submit-lead$/;
+const SITE_KEY = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+/**
+ * Step 25 / MVP M4: a site does not launch with a dead form. At launch every form (a search form aside) must post to the
+ * submit-lead endpoint with the site's key, its form variant and the honeypot field, which is what both starters render
+ * when the runner wired the client's lead site. Launch stage only: rehearsals and previews keep their honest
+ * "not connected" forms.
+ */
+export const formConnectedCheck: SiteLevelCheck = {
+  id: "launch.form-connected",
+  siteLevel: true,
+  description: "Every form on the site posts to the submit-lead endpoint with a site key, a form variant and a honeypot.",
+  run(ctx: VerificationContext): CheckResult {
+    if (!ctx.site) return siteOnly("launch.form-connected");
+    const details: string[] = [];
+    for (const page of ctx.site.pages) {
+      root(ctx.site.files[page] ?? "").querySelectorAll("form").forEach((f, i) => {
+        if ((f.getAttribute("role") ?? "").toLowerCase() === "search") return;
+        const input = (name: string) => f.querySelectorAll("input").find((el) => el.getAttribute("name") === name);
+        const action = f.getAttribute("action") ?? "";
+        const problems: string[] = [];
+        if (!action) problems.push("has no action, so it is not connected and a visitor's message goes nowhere");
+        else if (!LEAD_ENDPOINT.test(action)) problems.push(`posts to "${short(action, 60)}", not the submit-lead endpoint`);
+        if ((f.getAttribute("method") ?? "").toLowerCase() !== "post") problems.push('is not method="post"');
+        if (!SITE_KEY.test(input("site_key")?.getAttribute("value") ?? "")) problems.push("has no site_key");
+        if (!(input("variant")?.getAttribute("value") ?? "")) problems.push("has no form variant");
+        if (!input("website")) problems.push("has no honeypot field");
+        // A button's formaction would send the form somewhere else than its action.
+        for (const b of f.querySelectorAll("[formaction]")) problems.push(`has a ${b.tagName.toLowerCase()} with formaction="${short(b.getAttribute("formaction") ?? "", 60)}"`);
+        if (problems.length) details.push(`${page}: form ${f.id ? `#${f.id}` : `${i + 1}`} ${problems.join("; ")}. Add the client's lead site in the database so the build wires it.`);
+      });
+    }
+    return result("launch.form-connected", details);
+  },
+};
+
 /** Every Step 7 text check by id. The registry (config/eval-registry.json) decides severity, stage and order. */
 export const STEP7_TEXT_CHECKS: Check[] = [
   devUrlsCheck, mixedContentCheck, sourceMapsCheck, targetBlankCheck, duplicateIdsCheck, prerenderedContentCheck,
@@ -508,5 +546,5 @@ export const STEP7_TEXT_CHECKS: Check[] = [
   titleCheck, metaDescriptionCheck, singleH1Check, openGraphCheck, duplicateTitlesCheck, faviconCheck,
   siteInternalLinksCheck,
   notFoundPageCheck, sitemapCheck, robotsCheck, llmsTxtCheck, canonicalCheck, ogImageCheck,
-  placeholdersLaunchCheck,
+  placeholdersLaunchCheck, formConnectedCheck,
 ];

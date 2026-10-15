@@ -119,7 +119,7 @@
         <li>Email: <a href="mailto:hello@summitlineroofing.example">hello@summitlineroofing.example</a> (SAMPLE address)</li>
       </ul>
     </div>
-    <form aria-label="Inspection request" onsubmit="event.preventDefault()">
+    <form aria-label="Inspection request" action="https://abcdefghijklmnopqrst.supabase.co/functions/v1/submit-lead" method="post" onsubmit="event.preventDefault()"><input type="hidden" name="site_key" value="0b7d3c1e-2a4f-4e6b-9c8d-1f2e3a4b5c6d"><input type="hidden" name="variant" value="request"><input type="hidden" name="page" value="/"><div hidden><label for="f-website">Leave this field empty</label><input id="f-website" name="website" tabindex="-1" autocomplete="off"></div>
       <label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required>
       <label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required>
       <label for="f-area">Address or suburb</label><input id="f-area" name="area" autocomplete="street-address">

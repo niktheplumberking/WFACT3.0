@@ -141,8 +141,10 @@ test("Step 7: the Track A starter passes the registry gate at preview (advisorie
   // production address, which only the owner supplies, so without it exactly those fail at launch.
   const launch = runChecks({ ...ctx, stage: "launch" }, registryGateChecks());
   // Package 3: the fixture's home hero is a labelled placeholder, a real launch blocker until the client's photo is in.
-  assert.deepEqual(launch.filter(gates).map((r) => r.checkId), ["content.placeholders-launch", "tells.sitemap", "tells.canonical", "tells.og-image"]);
-  const live = renderSite(content, { siteUrl: "https://summitline.co" });
+  // Step 25 / MVP M4: with no lead site the contact form is not connected, which also refuses launch.
+  assert.deepEqual(launch.filter(gates).map((r) => r.checkId), ["content.placeholders-launch", "launch.form-connected", "tells.sitemap", "tells.canonical", "tells.og-image"]);
+  const lead = { endpoint: "https://abcdefghijklmnopqrst.supabase.co/functions/v1/submit-lead", siteKey: "0b7d3c1e-2a4f-4e6b-9c8d-1f2e3a4b5c6d" }; // SYNTHETIC
+  const live = renderSite(content, { siteUrl: "https://summitline.co", leadForm: lead });
   const atLaunch = runChecks({ ...ctx, html: live.files["index.html"]!, site: { files: live.files, pages: live.pages, binary: live.binary }, stage: "launch", launchWithPlaceholders: true }, registryGateChecks());
   assert.deepEqual(atLaunch.filter(gates).map((r) => r.checkId), [], atLaunch.filter(gates).flatMap((r) => r.details).join("\n"));
 });
