@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-15 (night, later +05), via `/step-close 25` (live): MVP M4 met live on synthetic data. Migrations 0025/0026 applied (20261015102916, 20261015103026; 0026 `2154fda` fixes a page_path check that made every insert fail, caught by the attack test), attack test 43/43 live, advisors: nothing new; `submit-lead` v1 deployed (verify_jwt false), LEAD_IP_SALT set by Huraira; 4 browser submits (Track A/B, JS and no-JS) = 4 `leads` rows; curl refusals as designed. rendered-qa 89/89. Not pushed.
+Last synced: 2026-10-15 (night, latest +05), via `/progress-sync` — re-synced against git (HEAD `3b5a94c`; `origin/main` = `origin/huraira-work` = `2a64471`; 16 local commits `dde68a5`…`3b5a94c` unpushed), CI (`38706155999`, `38711602641` green on `2a64471` incl. the Cockpit deploy) and live SQL (34 jobs, `caa201f1` cancelled, `e6a71046` failed, 177 `model_traces`, 5 `leads`, 0 `account_requests`, latest migration 20261015103026). No step changed status; none newly closes. Stale notes fixed (`8e6e09d` is pushed; the v6 dispatch fix is proven by a real press). Work found in git but cited nowhere is now recorded (`a6f64cd`, `dde68a5`, `3c79212`, `892c468`, `e11c1ea`, `7286b54`, `ece5995`). PROGRESS "Closed steps" block moved below the open steps.
+Previous sync: 2026-10-15 (night, later +05), via `/step-close 25` (live): MVP M4 met live on synthetic data. Migrations 0025/0026 applied (20261015102916, 20261015103026; 0026 `2154fda` fixes a page_path check that made every insert fail, caught by the attack test), attack test 43/43 live, advisors: nothing new; `submit-lead` v1 deployed (verify_jwt false), LEAD_IP_SALT set by Huraira; 4 browser submits (Track A/B, JS and no-JS) = 4 `leads` rows; curl refusals as designed. rendered-qa 89/89. Not pushed.
 Previous sync: 2026-10-15 (night +05), via `/step-close 25` (MVP M4 contact form that saves leads): `1da9a5a`, `60061b7`, `b1cd762`, `f8b1bf7`, `b7989d3`, local, not pushed (no CI run). Locally: verification 122/122, frontend-loop 130/130, jobs 38/38, workflow 89/89, submit-lead 19/19 (Node), typecheck clean in all; rendered-qa launch tests 11/11 (full rendered-qa run still running at sync). Mutation-checked twice. Migration 0025 NOT applied, `submit-lead` NOT deployed, `LEAD_IP_SALT` not set: all wait on Huraira's GO.
-Previous sync: 2026-10-15 (evening +05), via `/step-close 28` (brief consistency check + example clients): `fd67328`, `52f7088`, local, not pushed (no CI run). Locally: workflow 89/89 (E6 adds 3, each mutation-checked; briefConsistency 10; exampleClients 10), jobs 38/38, planning 45/45; typecheck clean in all three. Dry run, no model calls: the stored Harbor Street `e6a71046` owner facts halt at preflight with 2 conflicts (opening date q2/q7, offer q3/q8) and 5 unresolved labels (q1, q2, q3, q4, q6), 0 builder calls; both example briefs pass. Step 28 stays IN PROGRESS. Not done: push, live run.
 Older sync entries (2026-09-28 to 2026-10-15): `docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md`. Keep at most two "Previous sync" lines here; move older ones there.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
@@ -22,11 +22,11 @@ steps; this file tracks the Continuation Stages.
 - **Step 28 IN PROGRESS** (the current step). Package 4, the Cockpit v2 rebuild, has phases 1–13 CI-green and deployed: about 13 of
   ~18 pieces. Left: Activity, Costs, Team, Settings, Notifications preferences and the cleanup; then Package 5, the paid proof.
 - **Build failures** (`docs/BUILD-FAILURE-DIAGNOSIS.md`): both known rule contradictions are fixed in code. Testimonials: `b8d240f`,
-  pushed. Palette: `8e6e09d`, local, after Huraira's rule. Stuck runs now halt early, and a no-change continue is refused unpaid.
+  pushed. Palette: `8e6e09d`, pushed (CI `38706155999` green), after Huraira's rule. Stuck runs now halt early, and a no-change continue is refused unpaid.
   None of this is proven on a live build yet.
 - **Brief consistency check and example clients** (`/step-close 28`, 2026-10-15): built, local, not pushed (`fd67328`, `52f7088`).
   Owner answers that disagree now halt at preflight unpaid and the owner's pick clears them; `docs/EXAMPLE-CLIENTS.md`.
-- **Biggest blockers**: (1) Huraira: push `8e6e09d`, then the live continue on Harbor Street (cancel `caa201f1` first). (2) Nick:
+- **Biggest blockers**: (1) Huraira: push the 16 local commits, then the live continue on Harbor Street (`caa201f1` is cancelled; `e6a71046` failed on contradictory owner answers). (2) Nick:
   the Cockpit v2 decisions in `BLOCKED-ON-NICK.md`, and the real brief Step 25 needs (no `clients/bennett*` in the repo).
 
 **Earlier (2026-10-14)**:
@@ -58,8 +58,8 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-15, night, `/step-close 25`, live):
-1. **Huraira**: GO to push the M4 commits (`1da9a5a`..`2154fda`) with `fd67328`/`52f7088`; CI then runs the new `submit-lead` Deno job for the first time.
+**Next up** (2026-10-15, night, `/progress-sync`):
+1. **Huraira**: GO to push the 16 local commits (`dde68a5`…`3b5a94c`: v6 dispatch fix, `fd67328`/`52f7088`, the M4 work `1da9a5a`..`2154fda`); CI then runs the new `submit-lead` Deno job for the first time.
 2. **Nick**: the CRM target and whether a lead notifies him (BLOCKED-ON-NICK); for Bennett & Co, a real `clients` + `lead_sites` row with the live origin.
 3. **Huraira**: continue Harbor Street `e6a71046`; GO for Step 28 Package 4 phase 14 (Activity).
 
@@ -82,13 +82,13 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 - **A `synthetic-example` brief source** would separate the 2026-10-15 examples from the 2026-09-30 synthetic pilots; adding it
   touches `packages/frontend-loop/src/brief.ts` (off limits during the lead-form session), so the examples reuse
   `synthetic-provisional-2026-09-30`.
-- **Palette contradiction**: **resolved in code 2026-10-15** (`8e6e09d`, not pushed). Huraira's rule: tints and shades are on-brief, and CTAs use the true accent at 4.5:1. The engines already complied; the evaluator and the screenshot reviewer now quote one `BRAND_COLOUR_RULE` (eval E5). The general fix is still open: a contract test that every content fixture the builder's validator accepts also passes the deterministic gate (`docs/BUILD-FAILURE-DIAGNOSIS.md` §5.3).
+- **Palette contradiction**: **resolved in code 2026-10-15** (`8e6e09d`, pushed in `2a64471`). Huraira's rule: tints and shades are on-brief, and CTAs use the true accent at 4.5:1. The engines already complied; the evaluator and the screenshot reviewer now quote one `BRAND_COLOUR_RULE` (eval E5). The general fix is still open: a contract test that every content fixture the builder's validator accepts also passes the deterministic gate (`docs/BUILD-FAILURE-DIAGNOSIS.md` §5.3).
 - **A Cockpit continue can stay `queued` for ever** (2026-10-15): job `caa201f1` never reached `dispatch-job` (no `dispatched_at`; cause: an unlisted Cockpit alias, fixed in v6). Nothing is spent, but nothing tells the owner. A queued job with no dispatch after a few minutes should say "never reached GitHub" and offer to press again.
 - **Only `render.perf` and `render.design-review` count as variable** for the stuck breaker and the same-stop refusal (2026-10-15). If another rendered check proves flaky, add it to `VARIABLE_CHECK` in `buildAndVerify.ts`.
 - Cockpit v2 (Step 28 P4): the design's "Test client" badge has no data source (no test flag on clients or projects); not shown until one exists.
 - Cockpit v2 (Step 28 P4): no table or column records a site approval, so "Approved, waiting for launch" cannot be reached; logged for Nick, then Huraira. Phase 13 shows "Approve the site" switched off with the reason until it exists.
 - Cockpit v2 (Step 28 P4, phase 13): "Ask for changes" on the finished site has no runner input that reaches the builder; not offered (BLOCKED-ON-NICK).
-- Cockpit v2 (Step 28 P4, phase 13): "launch with placeholders" is owner-only in the UI but any owner or admin can insert it in the database; fix written as migration 0024 (`562c5ae`), not applied.
+- Cockpit v2 (Step 28 P4, phase 13): "launch with placeholders" is owner-only in the UI but any owner or admin can insert it in the database; fix written as migration 0024 (`562c5ae`), not applied, and only on the unmerged worktree branch `claude/objective-engelbart-d65df7` (2 commits ahead of `huraira-work`, checked 2026-10-15 night).
 - Cockpit v2 (Step 28 P4): three role rules in the design are wider than RLS allows (PM Activity, admin Costs, PM cost so far on project pages); the UI follows RLS; logged for Nick, then Huraira (policies plus attack tests).
 - Cockpit v2 (Step 28 P4): the design's caps ($2.00 per build, $20 a month, monthly cap stops new builds only) disagree with the live caps ($5 per build, $20 per rolling 7 days, checked before every call); logged for Nick. Until he decides the Cockpit reads `spend-caps.json`.
 - Cockpit v2: pre-v2 rules still render through a temporary alias block in `tokens.css`; the old breathing lamp in the build timeline still loops and the app icon is still the signal-lamp tile; all go in phases 3–7.
@@ -189,6 +189,19 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 - **`parseBrief` allows a new provenance value** (`2c188d0`): `synthetic-provisional-2026-09-30` was added
   to the allowed brief `source` values in `packages/frontend-loop/src/brief.ts`, with a test, so the
   Step 2 synthetic brief can be labelled honestly instead of posing as `placeholder-2.0-case`.
+- **Found in git 2026-10-15 night, cited in neither tracker before** (each now also noted under its step in the Completion Plan):
+  - `a6f64cd` (2026-10-14, pushed): the Cockpit's "What was built" previews the built site itself (pages, styles, fonts, logo via
+    signed links, page switcher, links caught in a sandboxed frame) instead of a file list; advisory findings show as non-blocking notes.
+    Step 28 territory.
+  - `dde68a5` (2026-10-15, local): `dispatch-job` v6, the CORS alias fix in "Incidents & regressions"; deployed and proven by `e6a71046`.
+  - `e11c1ea` (2026-10-15, pushed): repo cleanup round 3 (archive moves with MANIFEST rows, PROGRESS slimmed 1,198 -> 789 lines,
+    `.claude/rules/`, `AGENTS.md`); recorded under Step 21.
+  - `3c79212` (2026-10-13, pushed): MVP M6 caps switched on ($5 per build, $20 per 7 days; Nick approved); Step 12.
+  - `892c468` (2026-10-07): per-run cost ceilings from live `model_traces` (worst case per pipeline $10 -> $2.05); Step 12.
+  - `7286b54` (2026-10-07): builders' open-question cap 10x300 -> 25x800 after Cockpit job `4d6e1abb` failed on it.
+  - `ece5995` (2026-10-07): Track B starter 1.1.0 contact form variants (enquiry | signup), from Cockpit job `6f68adbd`.
+  - Unmerged worktree branch `worktree-agent-a8907207a63a55715` (`84bd4e6`, Cockpit build timeline): same change set size as `8b3caed`,
+    which landed; superseded, not merged. Safe to remove once Huraira confirms.
 - **Knowledge graph** (`77680c7`): `graphify-out/` plus a `.gitleaks.toml` allowlisting only its cache
   file.
 - **From the sprint era**:
@@ -204,7 +217,7 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
   did not know. Its log named it ("CORS refused origin"), the browser dropped the POST, and Harbor Street continues `caa201f1` and
   `e6a71046` stayed `queued` with no `dispatched_at`; nothing was spent. Fixed by listing the alias: `dispatch-job` v6 (2026-10-15,
   `verify_jwt` on). Checked with curl after deploy: new and old aliases get the CORS header, `evil.example.com` does not, an unsigned
-  POST gets 401. Not yet proven by a real press (Start on `e6a71046`).
+  POST gets 401. Proven by a real press: `e6a71046` dispatched and ran (GitHub run `38711602641`). The fix commit `dde68a5` is still local.
 - **Builds paid again for failures no revision could fix (2026-10-01 to 2026-10-14).** Two factory rules contradicted the builder.
   The claims gate demanded SAMPLE labels on real quotes the rulebook forbids labelling (Harbor Street `d3c45995`). A judge read
   "only the three brand colours" against a palette engine that derives tints for contrast (Lanternworks `e2a204fb`). Every
@@ -705,11 +718,6 @@ reason; the walkthrough passes; accessibility and responsiveness proven with evi
 the Cockpit and is blocked as a stage move), except that every room has only been checked with copied data, not with a live signed-in
 session. The phone layout shift on Projects (0.118, measured on the copied-data build) is also still open.
 
-## Closed steps (DONE, evidence archived)
-
-Steps 6 (2026-10-06), 5 (2026-10-07), 7 (2026-10-07) and 4D (2026-10-14) are DONE; their checklists, verification and exit-check
-evidence moved verbatim to `docs/archive/2026-10-15-cleanup/PROGRESS-closed-steps-6-5-7-4D.md`. Status lives in the plan's Part E.
-
 ## Step 21 — Housekeeping (PARTIAL 2026-10-12 — launch files (MVP M5) built in `9968019`; verification pending)
 
 - [ ] **Intake logo and live address (D4 Tier 2 slice, 2026-10-14)**: built in `8b3caed` and `a444a3d` (local, not pushed). Evidence: brandAsset tests 10, workflow readiness/continue tests 8, jobs 4, planning 1, Cockpit logo checks 9; a real isolated Track B build with the logo passes; migration 0021 dry run 28/28 on the live database, rolled back, nothing persisted (SQL-checked). Independent review: 1 HIGH (SVG `<x:script>` bypass) and 5 MEDIUM, fixed in `9597103`. Migration 0021 applied live 2026-10-14 (20261014110708, Huraira's GO); attack script on the applied migration 28/28. QA reliability fixes merged (`8857819`, `380bfd2`, `e921c6d`). Full suite green (rendered-qa 79, verification 113, frontend-loop 98, workflow 42, jobs 28, planning 34, documentation 18, hermes 55, agent-runtime 39, audit 14, media 8, Cockpit 116). CI `38554457540` green incl. deploy. **Live 2026-10-14**: Lanternworks "Fix and continue" with the uploaded logo (job `55ddba7c`) passed the readiness check, revised first, and reached the launch gate in 14 min for ~$0.68, the first passing build since 2026-10-01 (SYNTHETIC; Step 25 still needs a real client). Open: a human screenshot review; the Track B starter's 23 px contact links (cost one round). Found by Huraira on the live run: the Cockpit previewed the site's file list (site.manifest.json) instead of the site, and showed an advisory finding as a warning; both fixed (site preview with page switcher; notes marked not blocking). The preview shows pages as built; motion plays only on a real preview link (Step 4B M6).
@@ -769,7 +777,7 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - Met live 2026-10-14: a build wrote estimated rows and reviewer rows (run `4c35703b`).
 - Not yet proven live: the Run page and a live cap refusal.
 
-## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-15 — Packages 1–3 of 5 built and verified; Package 4 phases 1–13 CI-green and deployed; build-failure guards pushed, brand-colour rule local; live proof pending)
+## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-15 — Packages 1–3 of 5 built and verified; Package 4 phases 1–13 CI-green and deployed; build-failure guards and brand-colour rule pushed; live proof pending)
 
 Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one at a time, GO between) and Part D Step 28 of the plan.
 
@@ -807,7 +815,7 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 - [x] P4 phases 7–12 shipped: CI green on every job incl. the deploy for each push: `38599509988` (`d65c5b9`), `38600629357` (`2d53fbe`), `38601154434` (`49e6843`), `38602080530` (`f45c83d`, phase 11), `38604205509` (`56e545f`, phase 12; deploy smoke check HTTP 200). Live URL not probed directly this sync (it is held in Doppler).
 - [x] P4 phase 13, Finished site review (`a01dbbf`): 248/248; axe 0 at 1440 and 375. Approve is off (no record); Ask for changes not offered. Re-run at the 2026-10-15 05:30 sync: 248/248, typecheck clean. CI `38605626110` (`47a2da4`) green incl. Deploy Cockpit to Vercel (re-checked 2026-10-15), so phase 13 is deployed.
 - [x] Build-failure guards (`b8d240f`, 2026-10-15; `docs/BUILD-FAILURE-DIAGNOSIS.md`): claims gate accepts word-for-word supplied quotes (invented ones still need SAMPLE); stuck breaker in `verifyLoop`; `wouldRepeat` refuses a no-change continue (`repeat_refused`, `workflow.reopen_refused`, `force` overrides); halts record fingerprint, brief digest and `GITHUB_SHA`; Cockpit leads stuck stops with the report. `packages/workflow/test/failureEvals.test.ts` 18/18; each guard switched off turns its evals red. Pushed (`origin/main` at `626667a`; CI `38695633253` running at the 13:30 sync); live proof pending (continue on Harbor Street after deploy).
-- [x] Brand-colour rule (`8e6e09d`, 2026-10-15, local, not pushed): Huraira's decision. Tints and shades of brief colours are on-brief; CTAs use the true accent at 4.5:1, else a shade of it. `packages/verification/src/brandColours.ts` `BRAND_COLOUR_RULE` is quoted by the evaluator RUBRIC and the screenshot reviewer prompt. Eval E5 (4 cases) passes; 5 mutants each turn it red (rule removed from either judge, CTAs darkened, blended hue with or without the refusal, loosened `dim` contrast). Suites: verification 116, workflow 66, frontend-loop 125, rendered-qa 88, jobs 34; typecheck clean. Live proof pending (a Lanternworks continue).
+- [x] Brand-colour rule (`8e6e09d`, 2026-10-15, pushed; CI `38706155999` green): Huraira's decision. Tints and shades of brief colours are on-brief; CTAs use the true accent at 4.5:1, else a shade of it. `packages/verification/src/brandColours.ts` `BRAND_COLOUR_RULE` is quoted by the evaluator RUBRIC and the screenshot reviewer prompt. Eval E5 (4 cases) passes; 5 mutants each turn it red (rule removed from either judge, CTAs darkened, blended hue with or without the refusal, loosened `dim` contrast). Suites: verification 116, workflow 66, frontend-loop 125, rendered-qa 88, jobs 34; typecheck clean. Live proof pending (a Lanternworks continue).
 - [x] Brief consistency check (`fd67328`, 2026-10-15, local, not pushed): `packages/workflow/src/briefConsistency.ts` and `packages/planning/src/factTopics.ts`; preflight halts `needs_input` with one `resolve.<topic>` need per conflict, nothing spent; `ownerFactsFrom` applies the pick and neutral labels; `planner.ts` asks each known topic once. Evals E6 (3), each red with its mutation (guard off; date normalisation off; pick ignored). Dry run on stored `e6a71046` facts: 2 conflicts, 0 builder calls.
 - [x] Example clients (`52f7088`): `clients/example-agency-studio` (Track B), `clients/example-local-trade` (Track A); `exampleClients.test.ts` 10/10; `docs/EXAMPLE-CLIENTS.md`. Not run live.
 - [ ] P4 remaining screens: Activity (phase 14), then Costs, Team, Settings (appearance, per-person settings, Home order) and Notifications preferences; final cleanup (remove the `tokens.css` alias block, the old fonts and icon); Lighthouse a11y ≥ 95 per room; banned-word DOM grep. Done so far: Home, Projects, New request, the client's page, Proposal review, Needs, Live build, Stopped build, Finished site review (phases 5–13 above).
@@ -839,3 +847,7 @@ live SQL and curl as above. Independent review (separate instance, same vendor):
 **Exit check** (M4): "Form submission lands in the CRM capture in a live test". MET for capture in our own database (live, synthetic); the hand-off to a
 CRM is NOT MET because Nick has not named one (BLOCKED-ON-NICK).
 
+## Closed steps (DONE, evidence archived)
+
+Steps 6 (2026-10-06), 5 (2026-10-07), 7 (2026-10-07) and 4D (2026-10-14) are DONE; their checklists, verification and exit-check
+evidence moved verbatim to `docs/archive/2026-10-15-cleanup/PROGRESS-closed-steps-6-5-7-4D.md`. Status lives in the plan's Part E.
