@@ -59,6 +59,11 @@ begin
     res := res || jsonb_build_object('t','a lead that stores a raw IP instead of a hash','expect','23514','got',r);
     begin insert into public.leads (lead_site_id, client_id, form_variant, page_path, fields, ip_hash) values (s1, c1, 'enquiry', '/', jsonb_build_object('message', repeat('x', 13000)), h); r:='ALLOWED'; exception when others then r:=sqlstate; end;
     res := res || jsonb_build_object('t','a lead whose fields are over the size cap','expect','23514','got',r);
+    -- 0026: the page check works at all (0025's '{0,299}' made every insert fail with 2201B), refuses "//" and > 300 chars.
+    begin insert into public.leads (lead_site_id, client_id, form_variant, page_path, fields, ip_hash) values (s1, c1, 'enquiry', '//evil.example.test/x', '{}', h); r:='ALLOWED'; exception when others then r:=sqlstate; end;
+    res := res || jsonb_build_object('t','a lead whose page starts with // (0026)','expect','23514','got',r);
+    begin insert into public.leads (lead_site_id, client_id, form_variant, page_path, fields, ip_hash) values (s1, c1, 'enquiry', '/'||repeat('a', 300), '{}', h); r:='ALLOWED'; exception when others then r:=sqlstate; end;
+    res := res || jsonb_build_object('t','a lead whose page is over 300 characters (0026)','expect','23514','got',r);
 
     -- ===== anon: no insert, no select, no RPC =====
     perform set_config('request.jwt.claims', '{"role":"anon"}', true);
