@@ -1,7 +1,7 @@
 {
   ".claude/launch.json": {
-    "mtime": 1792058278.6944785,
-    "seen": 1792060078.204671,
+    "mtime": 1792061477.444669,
+    "seen": 1792061526.104749,
     "ast_hash": "9cdeea98f7dd583115dbd0f8d54089a9",
     "semantic_hash": ""
   },
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1792060062.1490319,
-    "seen": 1792060078.2109702,
-    "ast_hash": "2300c8f3ede0d7f53850a4a09f7f92f4",
+    "mtime": 1792061517.0817487,
+    "seen": 1792061526.111615,
+    "ast_hash": "4de289447e91984002e212453e006b38",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1158,9 +1158,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1792060042.7966127,
-    "seen": 1792060078.211505,
-    "ast_hash": "7de3d55e689df2b91ac2e7207fab08ef",
+    "mtime": 1792061517.0813015,
+    "seen": 1792061526.112132,
+    "ast_hash": "0389e700fa477b138b979c3b92b711f3",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -4434,9 +4434,9 @@
     "semantic_hash": ""
   },
   "scripts/rls_attack_test_leads.sql": {
-    "mtime": 1792058984.3074448,
-    "seen": 1792060078.2103,
-    "ast_hash": "b415818bdd99ad3348c25c75dbbad1e8",
+    "mtime": 1792060275.0258815,
+    "seen": 1792061526.1108322,
+    "ast_hash": "92844dc06c07efc04e7e1226479b5c9b",
     "semantic_hash": ""
   },
   "supabase/functions/submit-lead/index.ts": {
@@ -4530,9 +4530,9 @@
     "semantic_hash": ""
   },
   "docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md": {
-    "mtime": 1792060062.148586,
-    "seen": 1792060078.211593,
-    "ast_hash": "3227187c0e98674f2a0d1275ff44b0db",
+    "mtime": 1792061517.0815542,
+    "seen": 1792061526.112215,
+    "ast_hash": "efa44acff012536bd2b3dc39811ed816",
     "semantic_hash": ""
   },
   "docs/archive/old-reports/wfact-mvp-progress-2026-10-12.html": {
@@ -4665,6 +4665,12 @@
     "mtime": 1792058164.085269,
     "seen": 1792060078.210599,
     "ast_hash": "eb9dc25d9d56b9075c7a3acf62f7fa3e",
+    "semantic_hash": ""
+  },
+  "packages/db/migrations/0026_leads_page_path_fix.sql": {
+    "mtime": 1792060222.1897254,
+    "seen": 1792061526.107038,
+    "ast_hash": "3ed3eda0f63a7f7b6217f4f489850285",
     "semantic_hash": ""
   }
 }
