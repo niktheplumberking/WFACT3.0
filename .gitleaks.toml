@@ -10,6 +10,13 @@
 [extend]
 useDefault = true
 
+#
+# Second entry, added 2026-10-15 after CI run 38724162336 flagged 6 "generic-api-key" hits, all the same
+# made-up UUID used as a lead-form site key in test fixtures (Step 25 M4). A site key is public by design
+# (it is in the page source; migration 0025) and this value matches no live lead_sites row (SQL, 0 rows).
+# Exact value only: any other key-shaped string is still scanned.
+
 [allowlist]
-description = "graphify stat-index: file path -> content hash, derived, no secrets"
+description = "graphify stat-index (derived hashes) and the synthetic test site key"
 paths = ['''^graphify-out/cache/stat-index\.json$''']
+regexes = ['''^0b7d3c1e-2a4f-4e6b-9c8d-1f2e3a4b5c6d$''']
