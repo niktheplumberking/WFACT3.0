@@ -60,6 +60,13 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 3. **Huraira**: GO for Step 28 Package 4 phase 14 (Activity); review, merge and apply migration 0024 (`562c5ae`) and run its attack test.
 
 **Gaps noticed**:
+- **Owner answers that contradict each other reach the builder as two facts** (2026-10-15, Harbor Street continue `e6a71046`, GitHub run
+  `38711602641`, $1.22, 12 calls). The brief's `ownerFacts` hold both q2 "15 December 2026" and q7 "20 December 2026" (opening date),
+  and both q3 "Main primary service at 20% off" and q8 "Our second flagship offer" (the offer); q3's label still reads "...is unclear".
+  Round 1 hedged ("still finalizing") and failed; round 2 combined them ("20% off") and failed; halted after 2 revisions. The
+  deterministic checks passed both rounds (the supplied-quote fix held), and the stuck breaker correctly stayed off (the issue changed).
+  Proposed fix: a later answer to the same question supersedes the earlier one, and preflight asks the owner which value is right
+  before any paid call when two facts on one topic disagree. Not built.
 - **Palette contradiction**: **resolved in code 2026-10-15** (`8e6e09d`, not pushed). Huraira's rule: tints and shades are on-brief, and CTAs use the true accent at 4.5:1. The engines already complied; the evaluator and the screenshot reviewer now quote one `BRAND_COLOUR_RULE` (eval E5). The general fix is still open: a contract test that every content fixture the builder's validator accepts also passes the deterministic gate (`docs/BUILD-FAILURE-DIAGNOSIS.md` §5.3).
 - **A Cockpit continue can stay `queued` for ever** (2026-10-15): job `caa201f1` never reached `dispatch-job` (no `dispatched_at`; cause: an unlisted Cockpit alias, fixed in v6). Nothing is spent, but nothing tells the owner. A queued job with no dispatch after a few minutes should say "never reached GitHub" and offer to press again.
 - **Only `render.perf` and `render.design-review` count as variable** for the stuck breaker and the same-stop refusal (2026-10-15). If another rendered check proves flaky, add it to `VARIABLE_CHECK` in `buildAndVerify.ts`.
