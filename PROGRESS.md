@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-15 (evening +05), via `/step-close 28` (brief consistency check + example clients): `fd67328`, `52f7088`, local, not pushed (no CI run). Locally: workflow 89/89 (E6 adds 3, each mutation-checked; briefConsistency 10; exampleClients 10), jobs 38/38, planning 45/45; typecheck clean in all three. Dry run, no model calls: the stored Harbor Street `e6a71046` owner facts halt at preflight with 2 conflicts (opening date q2/q7, offer q3/q8) and 5 unresolved labels (q1, q2, q3, q4, q6), 0 builder calls; both example briefs pass. Step 28 stays IN PROGRESS. Not done: push, live run.
+Last synced: 2026-10-15 (night +05), via `/step-close 25` (MVP M4 contact form that saves leads): `1da9a5a`, `60061b7`, `b1cd762`, `f8b1bf7`, `b7989d3`, local, not pushed (no CI run). Locally: verification 122/122, frontend-loop 130/130, jobs 38/38, workflow 89/89, submit-lead 19/19 (Node), typecheck clean in all; rendered-qa launch tests 11/11 (full rendered-qa run still running at sync). Mutation-checked twice. Migration 0025 NOT applied, `submit-lead` NOT deployed, `LEAD_IP_SALT` not set: all wait on Huraira's GO.
+Previous sync: 2026-10-15 (evening +05), via `/step-close 28` (brief consistency check + example clients): `fd67328`, `52f7088`, local, not pushed (no CI run). Locally: workflow 89/89 (E6 adds 3, each mutation-checked; briefConsistency 10; exampleClients 10), jobs 38/38, planning 45/45; typecheck clean in all three. Dry run, no model calls: the stored Harbor Street `e6a71046` owner facts halt at preflight with 2 conflicts (opening date q2/q7, offer q3/q8) and 5 unresolved labels (q1, q2, q3, q4, q6), 0 builder calls; both example briefs pass. Step 28 stays IN PROGRESS. Not done: push, live run.
 Previous sync: 2026-10-15 (13:30 +05), via `/progress-sync`. Re-synced after `626667a` (head of `origin/main` and `origin/huraira-work`, so `b8d240f` is now pushed) and `8e6e09d` (brand-colour rule, local, not pushed). **Decision (Huraira, 2026-10-15)**: tints and shades of the brief's colours are on-brief; buttons use the true accent wherever their text reads at 4.5:1, else a shade of it. Re-run here: verification 116/116, workflow 66/66 (E5 adds 4, mutation-checked), frontend-loop 125/125, rendered-qa 88/88, jobs 34/34; typecheck clean in all five; `check-trackers` OK. CI: `38605626110` (`47a2da4`, phase 13) green incl. Deploy Cockpit to Vercel; `38695633253` (`626667a`) every job green except Rendered QA, still running at sync. Live (Supabase `mcaxxhgjptwowwrluhra`, read-only SQL): 33 jobs; Harbor Street `d3c45995` failed, its continue `caa201f1` still `queued` with no `dispatched_at`; 165 `model_traces`; 31 `plan_inputs`; 0 `account_requests`; latest migration 20261014140027 (0023, so 0024 is not applied). No step changed status; none newly qualifies for Closed. Plan: Part B gained a Depends on / waiting for column. Not checked: the signed-in Cockpit, the live URL (Doppler), the Agent 37 gateway.
-Previous sync: 2026-10-15 (12:10 +05), via `/step-close 28` (build-failure guards): `b8d240f`. Diagnosed all 25 build jobs since 2026-09-28 (3 passed; the repeat-spend cause is rule contradictions plus continues that changed nothing; `docs/BUILD-FAILURE-DIAGNOSIS.md`). Locally: verification 116/116, workflow 62/62 (18 new failure-mode evals, each mutation-checked), jobs 34/34, Cockpit 252/252, typecheck clean in all four. Independent agent review: 5 weaknesses, all fixed with evals. Not pushed, so no CI run and not deployed; not yet proven on a live build.
 Older sync entries (2026-09-28 to 2026-10-15): `docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md`. Keep at most two "Previous sync" lines here; move older ones there.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
@@ -16,6 +16,9 @@ phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07)
 steps; this file tracks the Continuation Stages.
 
 **Status summary (2026-10-15, 13:30 +05, `/progress-sync`)**:
+- **Step 25 PARTIAL** (`/step-close 25`, 2026-10-15): MVP M4, the contact form that saves leads, is built and tested locally (migration 0025 +
+  attack test, `submit-lead` Edge Function, both starters wired by the runner, launch check `launch.form-connected`). Not applied, not deployed,
+  not pushed; the live proof waits on Huraira's GO. The real-client run still waits on Nick's brief.
 - **Step 28 IN PROGRESS** (the current step). Package 4, the Cockpit v2 rebuild, has phases 1–13 CI-green and deployed: about 13 of
   ~18 pieces. Left: Activity, Costs, Team, Settings, Notifications preferences and the cleanup; then Package 5, the paid proof.
 - **Build failures** (`docs/BUILD-FAILURE-DIAGNOSIS.md`): both known rule contradictions are fixed in code. Testimonials: `b8d240f`,
@@ -55,10 +58,9 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-15, evening, `/step-close 28`):
-1. **Huraira**: review the brief-consistency + example-clients report; GO to push `fd67328`/`52f7088`.
-2. **Huraira**: after the push, continue Harbor Street `e6a71046` (the live proof of the guards; it should first ask, at no cost, which opening date and which offer are right). A Lanternworks continue
-   after it would prove the colour rule.
+**Next up** (2026-10-15, night, `/step-close 25`):
+1. **Huraira**: review the Step 25 / M4 report; GO to apply migration 0025, set `LEAD_IP_SALT`, deploy `submit-lead`, then the synthetic live proof.
+2. **Huraira**: GO to push `fd67328`/`52f7088` and the M4 commits; then continue Harbor Street `e6a71046` (the live proof of the guards).
 3. **Huraira**: GO for Step 28 Package 4 phase 14 (Activity); review, merge and apply migration 0024 (`562c5ae`) and run its attack test.
 
 **Gaps noticed**:
@@ -815,3 +817,29 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 **Verification**: suites green locally (frontend-loop 115, planning 42, jobs 33, workflow 42, verification 113, agent-runtime 39, hermes 55, rendered-qa 79, Cockpit 123); typecheck clean. Independent agent review: 6 defects in the new checks, all fixed with tests that failed first. Not pushed, so no CI run; no live build (Package 1 forbids one).
 
 **Exit check** (Package 1): "validating the stored Lanternworks content now FAILS with 'missing: Ongoing care', 'missing step: discovery call, proposal, care', 'primary action should be 'Book a discovery call'' and the meta-copy errors". **MET** (locally). Step exit (Package 5 proof): **NOT MET**.
+
+## Step 25 — Real-client proof run (PARTIAL 2026-10-15 — MVP M4 contact form built locally; verification pending)
+
+Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 25 and `docs/MVP-CUTLINE.md` §2 M4. Only M4 (the contact form that saves leads) was
+worked on; the real-client run waits on Nick's brief.
+
+- [x] Migration `0025_leads.sql` (`lead_sites`, `leads`, `lead_drops`, `record_lead_drop`, status-only and client-match triggers, RLS) and
+  `scripts/rls_attack_test_leads.sql`: `1da9a5a`. **Not applied** (waits on GO); the attack test has not run against a database yet.
+- [x] Edge Function `supabase/functions/submit-lead` (JSON and no-JS form posts, site key + origin, per-form validation, honeypot, fill time,
+  5 per 10 min per IP hash, 100 per hour per site, 10 kB streamed cap, no PII in logs): `60061b7`; 19/19 tests under Node; CI job `submit-lead`
+  runs them under Deno (no CI run yet, not pushed). **Not deployed.**
+- [x] Starters: both forms post to submit-lead when the runner puts the client's lead site on the brief (`brief.leadForm`, never the model);
+  without it the "not connected" behaviour is unchanged: `b1cd762`. Browser check at 1440 and 375 (sent and error states, no-JS `:target`
+  messages): axe 0, no horizontal scroll, console clean. JS error path seen in the browser (function not deployed yet).
+- [x] Registry check `launch.form-connected` (launch stage) with a seeded failing fixture: `f8b1bf7`. Mutation-checked: unwiring the Track A
+  form turns the new tests and the end-to-end launch check red; neutering the check turns 5 verification tests red.
+- [ ] Live proof (synthetic Lanternworks site, `is_test`): one JS and one no-JS submit land as rows; wrong origin, honeypot, 6th post, unknown key
+  refused or dropped (curl); `get_advisors` clean.
+
+**Verification**: verification 122/122, frontend-loop 130/130, jobs 38/38, workflow 89/89, submit-lead 19/19, typecheck clean; rendered-qa
+launch tests 11/11, full rendered-qa run pending at sync. Independent review (separate instance, same vendor): 0 critical; 1 HIGH (spoofable
+rate-limit IP) and MEDIUM items fixed; open items listed in the report.
+
+**Exit check** (M4): "Form submission lands in the CRM capture in a live test". NOT MET yet: built and tested locally, the live test waits on GO;
+the CRM target is Nick's (BLOCKED-ON-NICK).
+

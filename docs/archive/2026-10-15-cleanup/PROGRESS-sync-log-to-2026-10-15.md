@@ -35,3 +35,5 @@ latest migration applied `0017_model_traces_openai` (20261007114354). Step 7 is 
 Previous sync: 2026-10-06 via `/step-close 4B M4` (`8dae180`…`4bbd4bc`); 2026-10-02 (20:05 +05) via `/progress-sync` (`a9f4dcf`…`0f00cde`, CI `37016971442`).
 Previous syncs: 2026-10-02 (18:55 +05) via `/step-close 4B M4` (`a9f4dcf`…`7267575`); 2026-10-01 (23:30 +05) via `/progress-sync` (`70cd7d1`…`e76cff2`, Step 4C, CI `36905237284`); 2026-10-01 (19:20 +05)
 after Step 4B M2 (CI `36871379578`); earlier `289ec00`…`c0f3d29`.
+
+Previous sync: 2026-10-15 (12:10 +05), via `/step-close 28` (build-failure guards): `b8d240f`. Diagnosed all 25 build jobs since 2026-09-28 (3 passed; the repeat-spend cause is rule contradictions plus continues that changed nothing; `docs/BUILD-FAILURE-DIAGNOSIS.md`). Locally: verification 116/116, workflow 62/62 (18 new failure-mode evals, each mutation-checked), jobs 34/34, Cockpit 252/252, typecheck clean in all four. Independent agent review: 5 weaknesses, all fixed with evals. Not pushed, so no CI run and not deployed; not yet proven on a live build.
