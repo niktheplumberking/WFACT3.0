@@ -1,6 +1,7 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-15 (12:10 +05), via `/step-close 28` (build-failure guards): `b8d240f`. Diagnosed all 25 build jobs since 2026-09-28 (3 passed; the repeat-spend cause is rule contradictions plus continues that changed nothing; `docs/BUILD-FAILURE-DIAGNOSIS.md`). Locally: verification 116/116, workflow 62/62 (18 new failure-mode evals, each mutation-checked), jobs 34/34, Cockpit 252/252, typecheck clean in all four. Independent agent review: 5 weaknesses, all fixed with evals. Not pushed, so no CI run and not deployed; not yet proven on a live build.
+Last synced: 2026-10-15 (13:30 +05), via `/progress-sync`. Re-synced after `626667a` (head of `origin/main` and `origin/huraira-work`, so `b8d240f` is now pushed) and `8e6e09d` (brand-colour rule, local, not pushed). **Decision (Huraira, 2026-10-15)**: tints and shades of the brief's colours are on-brief; buttons use the true accent wherever their text reads at 4.5:1, else a shade of it. Re-run here: verification 116/116, workflow 66/66 (E5 adds 4, mutation-checked), frontend-loop 125/125, rendered-qa 88/88, jobs 34/34; typecheck clean in all five; `check-trackers` OK. CI: `38605626110` (`47a2da4`, phase 13) green incl. Deploy Cockpit to Vercel; `38695633253` (`626667a`) every job green except Rendered QA, still running at sync. Live (Supabase `mcaxxhgjptwowwrluhra`, read-only SQL): 33 jobs; Harbor Street `d3c45995` failed, its continue `caa201f1` still `queued` with no `dispatched_at`; 165 `model_traces`; 31 `plan_inputs`; 0 `account_requests`; latest migration 20261014140027 (0023, so 0024 is not applied). No step changed status; none newly qualifies for Closed. Plan: Part B gained a Depends on / waiting for column. Not checked: the signed-in Cockpit, the live URL (Doppler), the Agent 37 gateway.
+Previous sync: 2026-10-15 (12:10 +05), via `/step-close 28` (build-failure guards): `b8d240f`. Diagnosed all 25 build jobs since 2026-09-28 (3 passed; the repeat-spend cause is rule contradictions plus continues that changed nothing; `docs/BUILD-FAILURE-DIAGNOSIS.md`). Locally: verification 116/116, workflow 62/62 (18 new failure-mode evals, each mutation-checked), jobs 34/34, Cockpit 252/252, typecheck clean in all four. Independent agent review: 5 weaknesses, all fixed with evals. Not pushed, so no CI run and not deployed; not yet proven on a live build.
 Previous sync: 2026-10-15 (05:30 +05), via `/progress-sync`. Re-synced after `47a2da4` (head of both branches; no commits since the 04:50 sync). Re-run here: Cockpit 248/248, typecheck clean, `check-trackers` OK. CI: `38604205509` (`56e545f`, phase 12) green on every job incl. Deploy Cockpit to Vercel (its smoke check returned HTTP 200), so phases 1–12 are live; `38605626110` (`47a2da4`, phase 13) still running at sync. Side session: migration 0024 (owner-only `launch.placeholders_ok`) written on branch `claude/objective-engelbart-d65df7` (`562c5ae`), not merged or applied. Tracker tidy: 16 superseded status-summary and 16 superseded next-up blocks merged away (history stays in these sync lines and git); Step 28 heading and P4 list corrected. Not checked: the live Cockpit URL directly (held in Doppler), the signed-in Cockpit, Supabase rows.
 Previous sync: 2026-10-15 (04:50 +05), via `/step-close 28` (Package 4 phase 13): `a01dbbf` Finished site review. Cockpit 248/248 locally; CI for the latest pushes not re-checked at this sync.
 Previous sync: 2026-10-15 (04:10 +05), via `/step-close 28` (Package 4 phase 12): `a94eb6f` Stopped build. Cockpit 243/243 locally; CI for the latest pushes not re-checked at this sync.
@@ -45,13 +46,14 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-15, 12:10 +05, `/step-close 28`)**:
-- **Step 28 IN PROGRESS**, plus build-failure guards (`b8d240f`, local, not pushed): the claims gate no longer fails owner-supplied quotes (the contradiction behind Harbor Street `d3c45995`), a run halts as `STUCK:` when a revision leaves its deterministic failures unchanged, and a continue with the same brief and code on a known result is refused with nothing spent (`repeat_refused`). 18 evals replay real failures. Package 4 status below unchanged.
-
-**Status summary (2026-10-15, 05:30 +05, `/progress-sync`)**:
-- **Step 28 IN PROGRESS**: the Cockpit v2 rebuild (Package 4) has 13 screens and shells built; phases 1–12 are CI-green and live (CI `38604205509`), phase 13 (Finished site review) is waiting on CI `38605626110`. About 13 of ~18 Package 4 pieces done: Activity, Costs, Team, Settings, Notifications preferences and the final cleanup remain; Package 5 (paid proof) after that.
-- **Biggest blocker**: decisions owed by Nick in `BLOCKED-ON-NICK.md` (caps, role rules, the site-approval record, the logo rule, stop-view actions, Ask for changes). The UI follows the database where they disagree, so none of them stops the next screen.
-- **Database follow-up**: the owner-only check for "launch with placeholders" is written (`562c5ae`, migration 0024, not merged, not applied, attack test not run).
+**Status summary (2026-10-15, 13:30 +05, `/progress-sync`)**:
+- **Step 28 IN PROGRESS** (the current step). Package 4, the Cockpit v2 rebuild, has phases 1–13 CI-green and deployed: about 13 of
+  ~18 pieces. Left: Activity, Costs, Team, Settings, Notifications preferences and the cleanup; then Package 5, the paid proof.
+- **Build failures** (`docs/BUILD-FAILURE-DIAGNOSIS.md`): both known rule contradictions are fixed in code. Testimonials: `b8d240f`,
+  pushed. Palette: `8e6e09d`, local, after Huraira's rule. Stuck runs now halt early, and a no-change continue is refused unpaid.
+  None of this is proven on a live build yet.
+- **Biggest blockers**: (1) Huraira: push `8e6e09d`, then the live continue on Harbor Street (cancel `caa201f1` first). (2) Nick:
+  the Cockpit v2 decisions in `BLOCKED-ON-NICK.md`, and the real brief Step 25 needs (no `clients/bennett*` in the repo).
 
 **Earlier (2026-10-14)**:
 - **Why no build succeeded since 2026-10-01 (diagnosed 2026-10-13)**: 0 of 17 builds passed. The main blocker was the design review: Node's fetch cut every Agent 37 review at 300 s, so builds that passed every deterministic check (`b880a7d5`, `456368c5`, `63278e56`, `83f2841f`) halted there. Fixed in `67033f7` (reviewer on Anthropic, 32 s live). Other causes: QA failing after 2 revisions (4 builds), builder schema strictness (2, fixed), checkpoint/resume (4, fixed by 4D), Agent 37 credits or a dropped connection (2).
@@ -82,28 +84,14 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
-**Next up** (2026-10-15, 12:10 +05):
-1. **Huraira**: review `b8d240f` (build-failure guards) and say whether to push; CI then proves it and the worker runs the new code.
-2. **Huraira, after the push**: cancel the stuck Harbor Street continue `caa201f1` (queued since 2026-10-14 18:12, never dispatched, nothing spent) and press continue again; on the new code its sample-label failure should not recur. That is the live proof of the guards.
-3. **Huraira**: decide the palette rule (tints and shades of brand colours allowed?) for the side session "Align Track B palette engine with brand-colour briefs"; then GO for Step 28 Package 4 phase 14.
-
-Earlier list (2026-10-15, 05:30 +05):
-1. **Huraira**: GO for Step 28 Package 4 phase 14 (Activity). Confirm CI `38605626110` (phase 13) finishes green.
-2. **Huraira**: review migration 0024 on `claude/objective-engelbart-d65df7` (`562c5ae`); merge, apply live, run `scripts/rls_attack_test_placeholders.sql`, record the result.
-3. **Nick**: the open Cockpit v2 decisions in `BLOCKED-ON-NICK.md`, and the Bennett & Co brief (Step 25).
-
-Earlier list (2026-10-12 evening, after `/step-close 21`):
-1. **Huraira**: review the M5 report; say whether to push `9968019` (CI then proves it; the Cockpit deploy job must run this time); give the cost-cap yes so M6 can start; send Nick the cut-line questions, now including the live site address (needed for canonical, sitemap and og:image).
-2. **Agent, on GO**: MVP M6 (per-build cap, Agent 37 priced) if the cap is approved, else Step 27's one-page motion-budget design.
-3. **Nick**: Bennett & Co brief, logo, colours, live address, CRM target, credits.
-Earlier list (2026-10-12 morning):
-1. **Nick / Huraira**: Nick's Bennett & Co brief (repo or brief, logo, exact colors, pages, real case studies, CRM target); Huraira's yes on the cost cap ($5 per build across retries, $20 per week, Agent 37 priced); OpenAI and Agent 37 credits (`docs/MVP-CUTLINE.md` §4, §6).
-2. **Huraira**: check that the Agent 37 gateway answers, then press "continue" on Track A `b880a7d5` (closes Track A for 4B M4 and proves 4D live); re-run Track B `4acbde1f`; rotate the Higgsfield key.
-3. **Agent** (can start now, nothing blocks it): Step 27's one-page motion-budget design for GO; the launch files for both starters (MVP M5); the per-build cap code once Huraira says yes (MVP M6, the Step 12 slice). Then Step 25 on the Bennett brief, stopping at "awaiting launch approval".
-After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bundle, Health room). Deferred: Steps 15, 16, 24; e-commerce out of scope.
+**Next up** (2026-10-15, 13:30 +05):
+1. **Huraira**: push `8e6e09d` (brand-colour rule); confirm CI `38695633253` and the new run finish green, so the worker runs the new code.
+2. **Huraira, after that**: cancel Harbor Street `caa201f1` (queued, never dispatched, nothing spent), then press continue. This is
+   the live proof of the guards. A Lanternworks continue after it would prove the colour rule.
+3. **Huraira**: GO for Step 28 Package 4 phase 14 (Activity); review, merge and apply migration 0024 (`562c5ae`) and run its attack test.
 
 **Gaps noticed**:
-- **Palette contradiction** (2026-10-15, from `e2a204fb`): the Track B palette engine derives extra colours for contrast, so a brief limited to three brand colours fails the evaluator on every revision. Needs Huraira's rule; side session "Align Track B palette engine with brand-colour briefs" started.
+- **Palette contradiction**: **resolved in code 2026-10-15** (`8e6e09d`, not pushed). Huraira's rule: tints and shades are on-brief, and CTAs use the true accent at 4.5:1. The engines already complied; the evaluator and the screenshot reviewer now quote one `BRAND_COLOUR_RULE` (eval E5). The general fix is still open: a contract test that every content fixture the builder's validator accepts also passes the deterministic gate (`docs/BUILD-FAILURE-DIAGNOSIS.md` §5.3).
 - **A Cockpit continue can stay `queued` for ever** (2026-10-15): job `caa201f1` never reached `dispatch-job` (no `dispatched_at`). Nothing is spent, but nothing tells the owner. A queued job with no dispatch after a few minutes should say "never reached GitHub" and offer to press again.
 - **Only `render.perf` and `render.design-review` count as variable** for the stuck breaker and the same-stop refusal (2026-10-15). If another rendered check proves flaky, add it to `VARIABLE_CHECK` in `buildAndVerify.ts`.
 - Cockpit v2 (Step 28 P4): the design's "Test client" badge has no data source (no test flag on clients or projects); not shown until one exists.
@@ -220,6 +208,12 @@ After the MVP: the 2026-10-07 order resumes (Step 26 in full, Steps 8/12/20 bund
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
+- **Builds paid again for failures no revision could fix (2026-10-01 to 2026-10-14).** Two factory rules contradicted the builder.
+  The claims gate demanded SAMPLE labels on real quotes the rulebook forbids labelling (Harbor Street `d3c45995`). A judge read
+  "only the three brand colours" against a palette engine that derives tints for contrast (Lanternworks `e2a204fb`). Every
+  revision and every continue re-paid for the same failure. It was found by diagnosing all 25 build jobs
+  (`docs/BUILD-FAILURE-DIAGNOSIS.md`) and fixed in `b8d240f` (quotes, stuck breaker, no-change continue refused) and `8e6e09d`
+  (colour rule). Live proof pending.
 - **CI red on the pushed head, deploy skipped (2026-10-14).** `d5129e0` (CI `38452956084`) failed Rendered QA: on Node 22 the hung-fetch mock in `test/reviewer.test.ts` left the event loop empty, so tests 35-40 were cancelled. Node 24 (local) did not show it. The test is the problem, not the reviewer. The Cockpit job runner builds from `main`, so live builds already use `67033f7`. Fixed in `a9b271f` (local 18/18, not pushed at this sync).
 - **Step 4D's first CI run failed and skipped the Cockpit deploy (2026-10-07).** `9730d99` (CI `37638990031`): the Frontend loop job failed on my new test of the Agent 37 request timeout ("Promise resolution is still pending but the event loop has already resolved"): `AbortSignal.timeout`'s timer does not keep Node alive, so on the runner the test process ended first; locally other handles hid it. Product code was fine. Fixed in `a643d2d` (test holds the loop open); CI `37644039022` green and the Cockpit deployed. Nothing live was affected: migration 0018 was already applied and the old Cockpit simply did not use it.
 - **A push made a live QA crash possible (2026-10-07).** `8cb26e9` (render.perf on applied throttling) added a second Lighthouse Chrome per
@@ -1155,7 +1149,7 @@ Governed by `docs/WFACT-3.0-Factory-Completion-Plan.md` Step 12, narrowed by D3 
 - Met live 2026-10-14: a build wrote estimated rows and reviewer rows (run `4c35703b`).
 - Not yet proven live: the Run page and a live cap refusal.
 
-## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-15 — Packages 1–3 of 5 built and verified; Package 4 phases 1–13 built, 1–12 CI-green and deployed)
+## Step 28 — Build quality and Cockpit plain-language UX (IN PROGRESS 2026-10-15 — Packages 1–3 of 5 built and verified; Package 4 phases 1–13 CI-green and deployed; build-failure guards pushed, brand-colour rule local; live proof pending)
 
 Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one at a time, GO between) and Part D Step 28 of the plan.
 
@@ -1191,8 +1185,9 @@ Governed by `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (five packages, one a
 - [x] P4 phase 11, Live build (`99ba999`): 227/227; axe 0 at 1440 and 375. Not done here: Spent so far, phone toggle.
 - [x] P4 phase 12, Stopped build, 8 cases (`a94eb6f`): 243/243; axe 0 at 1440 and 375. Not done here: see BLOCKED-ON-NICK (stop-view actions).
 - [x] P4 phases 7–12 shipped: CI green on every job incl. the deploy for each push: `38599509988` (`d65c5b9`), `38600629357` (`2d53fbe`), `38601154434` (`49e6843`), `38602080530` (`f45c83d`, phase 11), `38604205509` (`56e545f`, phase 12; deploy smoke check HTTP 200). Live URL not probed directly this sync (it is held in Doppler).
-- [x] P4 phase 13, Finished site review (`a01dbbf`): 248/248; axe 0 at 1440 and 375. Approve is off (no record); Ask for changes not offered. Re-run at the 2026-10-15 05:30 sync: 248/248, typecheck clean. CI `38605626110` (`47a2da4`) still running at sync, so phase 13 is **not yet confirmed deployed**.
-- [x] Build-failure guards (`b8d240f`, 2026-10-15; `docs/BUILD-FAILURE-DIAGNOSIS.md`): claims gate accepts word-for-word supplied quotes (invented ones still need SAMPLE); stuck breaker in `verifyLoop`; `wouldRepeat` refuses a no-change continue (`repeat_refused`, `workflow.reopen_refused`, `force` overrides); halts record fingerprint, brief digest and `GITHUB_SHA`; Cockpit leads stuck stops with the report. `packages/workflow/test/failureEvals.test.ts` 18/18; each guard switched off turns its evals red. Not pushed; live proof pending (continue on Harbor Street after deploy).
+- [x] P4 phase 13, Finished site review (`a01dbbf`): 248/248; axe 0 at 1440 and 375. Approve is off (no record); Ask for changes not offered. Re-run at the 2026-10-15 05:30 sync: 248/248, typecheck clean. CI `38605626110` (`47a2da4`) green incl. Deploy Cockpit to Vercel (re-checked 2026-10-15), so phase 13 is deployed.
+- [x] Build-failure guards (`b8d240f`, 2026-10-15; `docs/BUILD-FAILURE-DIAGNOSIS.md`): claims gate accepts word-for-word supplied quotes (invented ones still need SAMPLE); stuck breaker in `verifyLoop`; `wouldRepeat` refuses a no-change continue (`repeat_refused`, `workflow.reopen_refused`, `force` overrides); halts record fingerprint, brief digest and `GITHUB_SHA`; Cockpit leads stuck stops with the report. `packages/workflow/test/failureEvals.test.ts` 18/18; each guard switched off turns its evals red. Pushed (`origin/main` at `626667a`; CI `38695633253` running at the 13:30 sync); live proof pending (continue on Harbor Street after deploy).
+- [x] Brand-colour rule (`8e6e09d`, 2026-10-15, local, not pushed): Huraira's decision. Tints and shades of brief colours are on-brief; CTAs use the true accent at 4.5:1, else a shade of it. `packages/verification/src/brandColours.ts` `BRAND_COLOUR_RULE` is quoted by the evaluator RUBRIC and the screenshot reviewer prompt. Eval E5 (4 cases) passes; 5 mutants each turn it red (rule removed from either judge, CTAs darkened, blended hue with or without the refusal, loosened `dim` contrast). Suites: verification 116, workflow 66, frontend-loop 125, rendered-qa 88, jobs 34; typecheck clean. Live proof pending (a Lanternworks continue).
 - [ ] P4 remaining screens: Activity (phase 14), then Costs, Team, Settings (appearance, per-person settings, Home order) and Notifications preferences; final cleanup (remove the `tokens.css` alias block, the old fonts and icon); Lighthouse a11y ≥ 95 per room; banned-word DOM grep. Done so far: Home, Projects, New request, the client's page, Proposal review, Needs, Live build, Stopped build, Finished site review (phases 5–13 above).
 - [ ] DB owner check on `launch.placeholders_ok` (locked decision 3): migration `0024_placeholders_owner_only.sql` + `scripts/rls_attack_test_placeholders.sql` written on branch `claude/objective-engelbart-d65df7` (`562c5ae`, side session), **not merged, not applied, attack test not run**. Waits on Huraira to review, merge, apply live and run the attack test.
 - [ ] Package 5 (paid Lanternworks proof).
