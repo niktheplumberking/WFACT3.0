@@ -53,14 +53,15 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
 **Next up** (2026-10-15, 13:30 +05):
-1. **Huraira**: push `8e6e09d` (brand-colour rule); confirm CI `38695633253` and the new run finish green, so the worker runs the new code.
-2. **Huraira, after that**: cancel Harbor Street `caa201f1` (queued, never dispatched, nothing spent), then press continue. This is
-   the live proof of the guards. A Lanternworks continue after it would prove the colour rule.
+1. **Done 2026-10-15**: `8e6e09d` pushed, CI `38699792456` green; `caa201f1` cancelled; `dispatch-job` v6 accepts the new Cockpit alias
+   (see Incidents).
+2. **Huraira**: press Start on Harbor Street continue `e6a71046` (queued). This is the live proof of the guards. A Lanternworks continue
+   after it would prove the colour rule.
 3. **Huraira**: GO for Step 28 Package 4 phase 14 (Activity); review, merge and apply migration 0024 (`562c5ae`) and run its attack test.
 
 **Gaps noticed**:
 - **Palette contradiction**: **resolved in code 2026-10-15** (`8e6e09d`, not pushed). Huraira's rule: tints and shades are on-brief, and CTAs use the true accent at 4.5:1. The engines already complied; the evaluator and the screenshot reviewer now quote one `BRAND_COLOUR_RULE` (eval E5). The general fix is still open: a contract test that every content fixture the builder's validator accepts also passes the deterministic gate (`docs/BUILD-FAILURE-DIAGNOSIS.md` §5.3).
-- **A Cockpit continue can stay `queued` for ever** (2026-10-15): job `caa201f1` never reached `dispatch-job` (no `dispatched_at`). Nothing is spent, but nothing tells the owner. A queued job with no dispatch after a few minutes should say "never reached GitHub" and offer to press again.
+- **A Cockpit continue can stay `queued` for ever** (2026-10-15): job `caa201f1` never reached `dispatch-job` (no `dispatched_at`; cause: an unlisted Cockpit alias, fixed in v6). Nothing is spent, but nothing tells the owner. A queued job with no dispatch after a few minutes should say "never reached GitHub" and offer to press again.
 - **Only `render.perf` and `render.design-review` count as variable** for the stuck breaker and the same-stop refusal (2026-10-15). If another rendered check proves flaky, add it to `VARIABLE_CHECK` in `buildAndVerify.ts`.
 - Cockpit v2 (Step 28 P4): the design's "Test client" badge has no data source (no test flag on clients or projects); not shown until one exists.
 - Cockpit v2 (Step 28 P4): no table or column records a site approval, so "Approved, waiting for launch" cannot be reached; logged for Nick, then Huraira. Phase 13 shows "Approve the site" switched off with the reason until it exists.
@@ -176,6 +177,12 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
   - The Cockpit dark-theme restyle (`a57d977`).
 
 **Incidents & regressions**:
+- **Cockpit presses from a new address never reached GitHub (2026-10-14 18:12 to 2026-10-15 09:08 UTC, fixed).** The Cockpit gained a
+  production alias, `wfact-3-cockpit.vercel.app` (same bundle `index-Dtf_dbEO.js` as the old alias), that `dispatch-job`'s CORS allow-list
+  did not know. Its log named it ("CORS refused origin"), the browser dropped the POST, and Harbor Street continues `caa201f1` and
+  `e6a71046` stayed `queued` with no `dispatched_at`; nothing was spent. Fixed by listing the alias: `dispatch-job` v6 (2026-10-15,
+  `verify_jwt` on). Checked with curl after deploy: new and old aliases get the CORS header, `evil.example.com` does not, an unsigned
+  POST gets 401. Not yet proven by a real press (Start on `e6a71046`).
 - **Builds paid again for failures no revision could fix (2026-10-01 to 2026-10-14).** Two factory rules contradicted the builder.
   The claims gate demanded SAMPLE labels on real quotes the rulebook forbids labelling (Harbor Street `d3c45995`). A judge read
   "only the three brand colours" against a palette engine that derives tints for contrast (Lanternworks `e2a204fb`). Every

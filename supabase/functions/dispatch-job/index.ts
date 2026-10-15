@@ -21,8 +21,14 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 // and the job stayed `queued`. CORS is not the access control here — the caller's JWT is (below).
 const COCKPIT_ORIGIN = /^https:\/\/wfact-cockpit(-git-[a-z0-9-]+|-[a-z0-9]+)?-niktheplumberkings-projects\.vercel\.app$/;
 // Exact extra hosts: local dev, and `dist-rho-lime-95` — a second production alias of the
-// wfact-cockpit project (left over from the 2026-09-22 manual `dist` deploy) that doesn't fit the pattern.
-const EXTRA_ORIGINS = new Set(["http://localhost:5173", "https://dist-rho-lime-95.vercel.app"]);
+// wfact-cockpit project (left over from the 2026-09-22 manual `dist` deploy) that doesn't fit the pattern,
+// and `wfact-3-cockpit`, a production alias added 2026-10-14 (same bundle); until it was listed every
+// Cockpit press from it was refused and the job stayed `queued` (caa201f1, e6a71046).
+const EXTRA_ORIGINS = new Set([
+  "http://localhost:5173",
+  "https://dist-rho-lime-95.vercel.app",
+  "https://wfact-3-cockpit.vercel.app",
+]);
 
 function allowedOrigin(origin: string | null): string | null {
   if (!origin) return null;
