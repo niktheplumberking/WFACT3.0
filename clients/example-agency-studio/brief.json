@@ -1,0 +1,102 @@
+{
+  "clientSlug": "example-agency-studio",
+  "entitySlug": "bennett-co",
+  "projectName": "Quillmere Studio — Agency Site (synthetic example)",
+  "goal": "A multi-page site for a four-person brand and web studio (fictional) that explains its three services and its process, shows three clearly labelled illustrative sample projects, states its real trust signals, and turns visitors into project enquiries through one 'Start a project' action and a contact form. Required sections: hero, services, process, case-studies, trust, team, testimonials, contact. SYNTHETIC EXAMPLE CLIENT written 2026-10-15 (docs/EXAMPLE-CLIENTS.md): every name, number, address and quote is invented; not a real client and not Nick's brief.",
+  "requiredSections": [
+    "hero",
+    "services",
+    "process",
+    "case-studies",
+    "trust",
+    "team",
+    "testimonials",
+    "contact"
+  ],
+  "brandNotes": "Colours (fixed): ink #1B1F2A for text, paper #F4F1EA for backgrounds, rust #A8431A for buttons and links only; tints and shades of these three are on-brief. Logo: the supplied logo.svg, used as supplied. Fonts: a characterful serif for headings (Fraunces or similar) paired with a plain sans for body (IBM Plex Sans or similar). Tone: calm, direct, specific; no hype, no buzzwords, no exclamation marks. Case studies are illustrative samples and must each be labelled as a sample, never presented as real clients. No client logos, award badges, star ratings or project counts. No portraits (none supplied). Accessibility WCAG 2.2 AA; LCP under 2.5 s.",
+  "templatePreference": "clean-agency",
+  "pageScope": "multi",
+  "siteUrl": "https://quillmere.example.com",
+  "requestText": "SYNTHETIC EXAMPLE CLIENT (WFACT 3.0, written 2026-10-15). Quillmere Studio, its people, phone, email, address and every\ncustomer quote below are invented for testing. The quotes are invented stand-ins for quotes a real client would supply:\nuse them word for word, exactly as a real client's own quotes, and never add to them.\n\nFrom: Tamsin Quell (Quillmere Studio) <hello@quillmere.example.com>\nTo: Bennett & Co <projects@example.org>\nSubject: New website for Quillmere Studio, everything you need is below\n\nHi Bennett & Co,\n\nQuillmere Studio is a four-person brand and web studio in Fennick Bay. We work with independent professional firms\n(accountants, architects, physiotherapy clinics) on brand identity, websites and ongoing care. Our current site is an\nold one-pager. We want a multi-page site that explains what we do, shows how we work and makes it easy to start a\nproject with us.\n\nBrand (fixed):\n- Colours: ink #1B1F2A for text, paper #F4F1EA for backgrounds, and rust #A8431A for buttons and links only. Tints and\n  shades of those three are fine.\n- Logo: the attached logo.svg (a quill mark and the word Quillmere). Use it as supplied.\n- Fonts: a serif with character for headings (Fraunces or similar) and a plain sans for body text (IBM Plex Sans or\n  similar).\n- Tone: calm, direct and specific. No hype, no buzzwords, no exclamation marks.\n\nPages:\n- Home: who we are in one sentence, the three services in short, one sample project, and a \"Start a project\" button.\n- Services: Brand identity, Websites, Ongoing care.\n- Process: Discovery call, Proposal, Design, Build, Launch, Care.\n- Work: our client work is under NDA, so please show the three sample projects below and label each one clearly as\n  an illustrative sample, not a real client.\n    1. Sample: a rebrand and five-page site for an independent accounting firm.\n    2. Sample: a booking-led website for a physiotherapy clinic.\n    3. Sample: a portfolio site for a small architecture practice.\n- About: the four of us (Tamsin Quell, studio lead; Odile Brask, design; Henrik Saye, development; Mae Corrow, project\n  manager). No photos of us yet, so no portraits.\n- Contact: a form with name, email, company, budget range and message. Also show our phone, email, address and hours.\n\nFacts for the site:\n- Phone: (415) 555-0147\n- Email: hello@quillmere.example.com\n- Address: Unit 3, 48 Larkspur Yard, Fennick Bay, OR 97999 (we are a studio, visits by appointment)\n- Hours: Mon to Thu 9am to 5:30pm, Fri 9am to 3pm (Pacific time)\n- Who we work with: remotely across the US and Canada; in-person workshops in the Fennick Bay area\n- Prices: Brand identity from $4,800; Websites from $12,000; Ongoing care $650 a month\n- Our live address will be https://quillmere.example.com\n\nTrust: please don't invent client logos, award badges, star ratings or project counts. What is true and can go on the\nsite: every project gets a fixed-fee written proposal before any work starts, a named project manager, and a reply to\nevery enquiry within one business day.\n\nCustomer quotes (use word for word, with the name and role shown):\n- \"The proposal said exactly what we would get and what it would cost, and that is what happened.\" (Lena Marsh, practice manager)\n- \"They asked better questions about our clients than we had ever asked ourselves.\" (Arjun Pell, founding partner)\n- \"Six months on, the site still gets updated every week without us chasing anyone.\" (Corin Vale, clinic owner)\n\nThanks,\nTamsin Quell\nStudio lead, Quillmere Studio\n",
+  "requested": {
+    "services": [
+      "Brand identity",
+      "Websites",
+      "Ongoing care"
+    ],
+    "processSteps": [
+      "Discovery call",
+      "Proposal",
+      "Design",
+      "Build",
+      "Launch",
+      "Care"
+    ],
+    "formFields": [
+      "Name",
+      "Email",
+      "Company",
+      "Budget range",
+      "Message"
+    ],
+    "pages": [
+      "Home",
+      "Services",
+      "Process",
+      "Work",
+      "About",
+      "Contact"
+    ],
+    "primaryActionLabel": "Start a project",
+    "audience": "Independent professional firms: accountants, architects, physiotherapy clinics",
+    "teamSize": 4,
+    "tone": "Calm, direct and specific; no hype"
+  },
+  "briefBasis": "request",
+  "ownerFacts": [
+    {
+      "key": "phone",
+      "label": "Business phone number",
+      "value": "(415) 555-0147"
+    },
+    {
+      "key": "email",
+      "label": "Business email",
+      "value": "hello@quillmere.example.com"
+    },
+    {
+      "key": "address",
+      "label": "Street address or suburb",
+      "value": "Unit 3, 48 Larkspur Yard, Fennick Bay, OR 97999 (visits by appointment)"
+    },
+    {
+      "key": "hours",
+      "label": "Opening hours",
+      "value": "Mon to Thu 9am to 5:30pm, Fri 9am to 3pm (Pacific time)"
+    },
+    {
+      "key": "service_areas",
+      "label": "Areas you serve",
+      "value": "Remotely across the US and Canada; in-person workshops in the Fennick Bay area"
+    },
+    {
+      "key": "pricing",
+      "label": "Prices or from-prices",
+      "value": "Brand identity from $4,800; Websites from $12,000; Ongoing care $650 a month"
+    },
+    {
+      "key": "quotes",
+      "label": "Real customer quotes",
+      "value": "\"The proposal said exactly what we would get and what it would cost, and that is what happened.\" (Lena Marsh, practice manager)\n\"They asked better questions about our clients than we had ever asked ourselves.\" (Arjun Pell, founding partner)\n\"Six months on, the site still gets updated every week without us chasing anyone.\" (Corin Vale, clinic owner)"
+    },
+    {
+      "key": "site_url",
+      "label": "Live site address",
+      "value": "https://quillmere.example.com"
+    }
+  ],
+  "ownerSkipped": [
+    "Opening date"
+  ],
+  "source": "synthetic-provisional-2026-09-30"
+}

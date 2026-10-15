@@ -1,0 +1,100 @@
+{
+  "note": "SYNTHETIC. Enter these in the Cockpit on the approved plan (Add details): one row per input; a waived row is 'build without it'. Uploads go through the logo and image controls. See docs/EXAMPLE-CLIENTS.md.",
+  "track": "track-b",
+  "inputs": [
+    {
+      "kind": "fact",
+      "key": "phone",
+      "label": "Business phone number",
+      "value": "(415) 555-0147",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "email",
+      "label": "Business email",
+      "value": "hello@quillmere.example.com",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "address",
+      "label": "Street address or suburb",
+      "value": "Unit 3, 48 Larkspur Yard, Fennick Bay, OR 97999 (visits by appointment)",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "hours",
+      "label": "Opening hours",
+      "value": "Mon to Thu 9am to 5:30pm, Fri 9am to 3pm (Pacific time)",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "service_areas",
+      "label": "Areas you serve",
+      "value": "Remotely across the US and Canada; in-person workshops in the Fennick Bay area",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "pricing",
+      "label": "Prices or from-prices",
+      "value": "Brand identity from $4,800; Websites from $12,000; Ongoing care $650 a month",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "quotes",
+      "label": "Real customer quotes",
+      "value": "\"The proposal said exactly what we would get and what it would cost, and that is what happened.\" (Lena Marsh, practice manager)\n\"They asked better questions about our clients than we had ever asked ourselves.\" (Arjun Pell, founding partner)\n\"Six months on, the site still gets updated every week without us chasing anyone.\" (Corin Vale, clinic owner)",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "opening_date",
+      "label": "Opening date",
+      "value": null,
+      "waived": true
+    },
+    {
+      "kind": "fact",
+      "key": "site_url",
+      "label": "Live site address",
+      "value": "https://quillmere.example.com",
+      "waived": false
+    }
+  ],
+  "uploads": [
+    {
+      "key": "asset.logo",
+      "file": "logo.svg"
+    },
+    {
+      "key": "asset.image.index.hero",
+      "file": "images/index.hero.png",
+      "slot": "index.hero"
+    },
+    {
+      "key": "asset.image.work.case-studies.1",
+      "file": "images/work.case-studies.1.png",
+      "slot": "work.case-studies.1"
+    },
+    {
+      "key": "asset.image.work.case-studies.2",
+      "file": "images/work.case-studies.2.png",
+      "slot": "work.case-studies.2"
+    },
+    {
+      "key": "asset.image.work.case-studies.3",
+      "file": "images/work.case-studies.3.png",
+      "slot": "work.case-studies.3"
+    },
+    {
+      "key": "asset.image.about.studio",
+      "file": "images/about.studio.png",
+      "slot": "about.studio"
+    }
+  ]
+}

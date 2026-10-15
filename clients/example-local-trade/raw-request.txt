@@ -1,0 +1,51 @@
+SYNTHETIC EXAMPLE CLIENT (WFACT 3.0, written 2026-10-15). Brightwater Lane Plumbing, its people, phone, email, address
+and every customer quote below are invented for testing. The quotes are invented stand-ins for quotes a real client would
+supply: use them word for word, exactly as a real client's own quotes, and never add to them.
+
+From: Priya Okonkwo-Hale (Brightwater Lane Plumbing) <bookings@brightwaterlane.example.org>
+To: Bennett & Co <projects@example.org>
+Subject: Website for my new plumbing business, all the details are here
+
+Hi Bennett & Co,
+
+I'm opening Brightwater Lane Plumbing on Tuesday 2 March 2027. It is me and one apprentice, with one van. Before this I
+worked for another plumbing firm as a qualified plumber. I need a simple, solid multi-page site so local homeowners can
+see what I do, what it costs and how to book me.
+
+Brand (fixed):
+- Colours: deep harbour blue #12324A for text and headers, warm off-white #F7F5F0 for backgrounds, and amber #B45309
+  for buttons and links only. Tints and shades are fine.
+- Logo: the attached logo.svg (a water-drop mark and the name). Use it exactly as supplied.
+- Fonts: a sturdy sans for headings (Archivo or similar) and a very readable body font (Source Sans 3 or similar).
+- Tone: plain, friendly, practical. Like a good tradesperson explaining a job. No hype.
+
+Pages:
+- Home: what I do, where I work, the opening date, and a big "Book a visit" button.
+- Services: Leaks and repairs, Hot water systems, Bathroom and kitchen fit-outs, Blocked drains.
+- Pricing: my call-out and hourly rates (below). Bigger jobs get a written quote first.
+- Areas: the suburbs I cover (below).
+- About: me and my apprentice, how a job runs (call or book, I confirm a time, I arrive and explain the fix, I do the
+  work and clean up, you get an itemised invoice).
+- Contact: a booking form with name, phone, email, suburb, what's wrong, and preferred day.
+
+Facts for the site:
+- Phone: (503) 555-0182
+- Email: bookings@brightwaterlane.example.org
+- Address: 7 Tansy Row, Hollin Vale, OR 97998 (the workshop; no walk-in counter)
+- Hours: Mon to Fri 7am to 5pm, Sat 8am to 12pm; closed Sundays and public holidays
+- Areas: Hollin Vale, Marrow Point, Eastbrook Flats, Juniper Reach and Calder Hill
+- Prices: call-out fee $95 (includes the first 30 minutes); then $110 an hour; written quotes free for jobs over $500
+- Opening date: Tuesday 2 March 2027
+- Live address: https://brightwaterlane.example.org
+
+Please don't put up star ratings, licence numbers, years in business or "best in town" type claims. My licence is
+being transferred to the new business and I'll add the number myself later.
+
+Customer quotes from my previous work (use word for word, with first name and suburb):
+- "Priya found the leak behind the shower in ten minutes and explained exactly what she was doing." (Dana, Marrow Point)
+- "Clear price before she started, and she left the laundry cleaner than she found it." (Tom, Eastbrook Flats)
+- "Our hot water went on a Saturday morning and it was running again by lunch." (Wen, Calder Hill)
+
+Thanks,
+Priya Okonkwo-Hale
+Owner, Brightwater Lane Plumbing

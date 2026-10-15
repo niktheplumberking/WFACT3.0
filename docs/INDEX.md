@@ -31,6 +31,7 @@ Live status: `../PROGRESS.md` ("Status summary" and "Next up" at the top). Waiti
 | `AI-COST-AUDIT.md` | 12 | Model cost evidence (2026-10-13); caps $5 per build, $20 per 7 days |
 | `BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` | 28 | The five-package agent prompt Step 28 runs from |
 | `BUILD-FAILURE-DIAGNOSIS.md` | 28 | All 25 build jobs diagnosed (2026-10-15); source of the build-failure guards |
+| `EXAMPLE-CLIENTS.md` | 28 | The two synthetic, complete example clients (`clients/example-*`): what they are for and how to run one |
 | `BUILD-SPEED-UX-PROMPTS.md` | proposed | Build-time baseline and prompts P0–P6 (P0 cited by `rendered-qa/src/reviewer.ts`) |
 | `design/cockpit-v2/` | 28 Pkg 4 | **Locked** Cockpit v2 design (Claude Design export) and its build prompts; extend, do not restyle |
 | `step-4c/` | 4C | `PHASE-1-PROPOSAL.md` (historical audit, cited by Cockpit source) and before/after screenshots cited as evidence |

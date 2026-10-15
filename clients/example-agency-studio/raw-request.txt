@@ -1,0 +1,57 @@
+SYNTHETIC EXAMPLE CLIENT (WFACT 3.0, written 2026-10-15). Quillmere Studio, its people, phone, email, address and every
+customer quote below are invented for testing. The quotes are invented stand-ins for quotes a real client would supply:
+use them word for word, exactly as a real client's own quotes, and never add to them.
+
+From: Tamsin Quell (Quillmere Studio) <hello@quillmere.example.com>
+To: Bennett & Co <projects@example.org>
+Subject: New website for Quillmere Studio, everything you need is below
+
+Hi Bennett & Co,
+
+Quillmere Studio is a four-person brand and web studio in Fennick Bay. We work with independent professional firms
+(accountants, architects, physiotherapy clinics) on brand identity, websites and ongoing care. Our current site is an
+old one-pager. We want a multi-page site that explains what we do, shows how we work and makes it easy to start a
+project with us.
+
+Brand (fixed):
+- Colours: ink #1B1F2A for text, paper #F4F1EA for backgrounds, and rust #A8431A for buttons and links only. Tints and
+  shades of those three are fine.
+- Logo: the attached logo.svg (a quill mark and the word Quillmere). Use it as supplied.
+- Fonts: a serif with character for headings (Fraunces or similar) and a plain sans for body text (IBM Plex Sans or
+  similar).
+- Tone: calm, direct and specific. No hype, no buzzwords, no exclamation marks.
+
+Pages:
+- Home: who we are in one sentence, the three services in short, one sample project, and a "Start a project" button.
+- Services: Brand identity, Websites, Ongoing care.
+- Process: Discovery call, Proposal, Design, Build, Launch, Care.
+- Work: our client work is under NDA, so please show the three sample projects below and label each one clearly as
+  an illustrative sample, not a real client.
+    1. Sample: a rebrand and five-page site for an independent accounting firm.
+    2. Sample: a booking-led website for a physiotherapy clinic.
+    3. Sample: a portfolio site for a small architecture practice.
+- About: the four of us (Tamsin Quell, studio lead; Odile Brask, design; Henrik Saye, development; Mae Corrow, project
+  manager). No photos of us yet, so no portraits.
+- Contact: a form with name, email, company, budget range and message. Also show our phone, email, address and hours.
+
+Facts for the site:
+- Phone: (415) 555-0147
+- Email: hello@quillmere.example.com
+- Address: Unit 3, 48 Larkspur Yard, Fennick Bay, OR 97999 (we are a studio, visits by appointment)
+- Hours: Mon to Thu 9am to 5:30pm, Fri 9am to 3pm (Pacific time)
+- Who we work with: remotely across the US and Canada; in-person workshops in the Fennick Bay area
+- Prices: Brand identity from $4,800; Websites from $12,000; Ongoing care $650 a month
+- Our live address will be https://quillmere.example.com
+
+Trust: please don't invent client logos, award badges, star ratings or project counts. What is true and can go on the
+site: every project gets a fixed-fee written proposal before any work starts, a named project manager, and a reply to
+every enquiry within one business day.
+
+Customer quotes (use word for word, with the name and role shown):
+- "The proposal said exactly what we would get and what it would cost, and that is what happened." (Lena Marsh, practice manager)
+- "They asked better questions about our clients than we had ever asked ourselves." (Arjun Pell, founding partner)
+- "Six months on, the site still gets updated every week without us chasing anyone." (Corin Vale, clinic owner)
+
+Thanks,
+Tamsin Quell
+Studio lead, Quillmere Studio

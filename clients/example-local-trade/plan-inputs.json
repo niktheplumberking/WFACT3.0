@@ -1,0 +1,105 @@
+{
+  "note": "SYNTHETIC. Enter these in the Cockpit on the approved plan (Add details): one row per input; a waived row is 'build without it'. Uploads go through the logo and image controls. See docs/EXAMPLE-CLIENTS.md.",
+  "track": "track-a",
+  "inputs": [
+    {
+      "kind": "fact",
+      "key": "phone",
+      "label": "Business phone number",
+      "value": "(503) 555-0182",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "email",
+      "label": "Business email",
+      "value": "bookings@brightwaterlane.example.org",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "address",
+      "label": "Street address or suburb",
+      "value": "7 Tansy Row, Hollin Vale, OR 97998 (workshop; no walk-in counter)",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "hours",
+      "label": "Opening hours",
+      "value": "Mon to Fri 7am to 5pm, Sat 8am to 12pm; closed Sundays and public holidays",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "service_areas",
+      "label": "Areas you serve",
+      "value": "Hollin Vale, Marrow Point, Eastbrook Flats, Juniper Reach, Calder Hill",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "pricing",
+      "label": "Prices or from-prices",
+      "value": "Call-out fee $95 (includes the first 30 minutes); then $110 an hour; written quotes free for jobs over $500",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "quotes",
+      "label": "Real customer quotes",
+      "value": "\"Priya found the leak behind the shower in ten minutes and explained exactly what she was doing.\" (Dana, Marrow Point)\n\"Clear price before she started, and she left the laundry cleaner than she found it.\" (Tom, Eastbrook Flats)\n\"Our hot water went on a Saturday morning and it was running again by lunch.\" (Wen, Calder Hill)",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "opening_date",
+      "label": "Opening date",
+      "value": "Tuesday 2 March 2027",
+      "waived": false
+    },
+    {
+      "kind": "fact",
+      "key": "site_url",
+      "label": "Live site address",
+      "value": "https://brightwaterlane.example.org",
+      "waived": false
+    }
+  ],
+  "uploads": [
+    {
+      "key": "asset.logo",
+      "file": "logo.svg"
+    },
+    {
+      "key": "asset.image.index.hero",
+      "file": "images/index.hero.png",
+      "slot": "index.hero"
+    },
+    {
+      "key": "asset.image.services.services.1",
+      "file": "images/services.services.1.png",
+      "slot": "services.services.1"
+    },
+    {
+      "key": "asset.image.services.services.2",
+      "file": "images/services.services.2.png",
+      "slot": "services.services.2"
+    },
+    {
+      "key": "asset.image.services.services.3",
+      "file": "images/services.services.3.png",
+      "slot": "services.services.3"
+    },
+    {
+      "key": "asset.image.services.services.4",
+      "file": "images/services.services.4.png",
+      "slot": "services.services.4"
+    },
+    {
+      "key": "asset.image.about.team",
+      "file": "images/about.team.png",
+      "slot": "about.team"
+    }
+  ]
+}

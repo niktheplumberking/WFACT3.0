@@ -1,0 +1,105 @@
+{
+  "clientSlug": "example-local-trade",
+  "entitySlug": "bennett-co",
+  "projectName": "Brightwater Lane Plumbing — Trade Site (synthetic example)",
+  "goal": "A multi-page site for a new one-van plumbing business (fictional) opening on Tuesday 2 March 2027: what it fixes, its call-out and hourly prices, the suburbs it covers, how a job runs, three customer quotes, and one 'Book a visit' action with a booking form. Required sections: hero, services, pricing, process, areas, testimonials, faq, contact. SYNTHETIC EXAMPLE CLIENT written 2026-10-15 (docs/EXAMPLE-CLIENTS.md): every name, number, address and quote is invented; not a real client and not Nick's brief.",
+  "requiredSections": [
+    "hero",
+    "services",
+    "pricing",
+    "process",
+    "areas",
+    "testimonials",
+    "faq",
+    "contact"
+  ],
+  "brandNotes": "Colours (fixed): deep harbour blue #12324A for text and headers, warm off-white #F7F5F0 for backgrounds, amber #B45309 for buttons and links only; tints and shades are on-brief. Logo: the supplied logo.svg, used exactly as supplied. Fonts: a sturdy sans for headings (Archivo or similar) paired with a very readable body face (Source Sans 3 or similar). Tone: plain, friendly, practical; no hype. No star ratings, licence numbers, years in business or 'best' claims. Accessibility WCAG 2.2 AA; LCP under 2.5 s; reads well from 360 px.",
+  "templatePreference": "clean-agency",
+  "pageScope": "multi",
+  "siteUrl": "https://brightwaterlane.example.org",
+  "requestText": "SYNTHETIC EXAMPLE CLIENT (WFACT 3.0, written 2026-10-15). Brightwater Lane Plumbing, its people, phone, email, address\nand every customer quote below are invented for testing. The quotes are invented stand-ins for quotes a real client would\nsupply: use them word for word, exactly as a real client's own quotes, and never add to them.\n\nFrom: Priya Okonkwo-Hale (Brightwater Lane Plumbing) <bookings@brightwaterlane.example.org>\nTo: Bennett & Co <projects@example.org>\nSubject: Website for my new plumbing business, all the details are here\n\nHi Bennett & Co,\n\nI'm opening Brightwater Lane Plumbing on Tuesday 2 March 2027. It is me and one apprentice, with one van. Before this I\nworked for another plumbing firm as a qualified plumber. I need a simple, solid multi-page site so local homeowners can\nsee what I do, what it costs and how to book me.\n\nBrand (fixed):\n- Colours: deep harbour blue #12324A for text and headers, warm off-white #F7F5F0 for backgrounds, and amber #B45309\n  for buttons and links only. Tints and shades are fine.\n- Logo: the attached logo.svg (a water-drop mark and the name). Use it exactly as supplied.\n- Fonts: a sturdy sans for headings (Archivo or similar) and a very readable body font (Source Sans 3 or similar).\n- Tone: plain, friendly, practical. Like a good tradesperson explaining a job. No hype.\n\nPages:\n- Home: what I do, where I work, the opening date, and a big \"Book a visit\" button.\n- Services: Leaks and repairs, Hot water systems, Bathroom and kitchen fit-outs, Blocked drains.\n- Pricing: my call-out and hourly rates (below). Bigger jobs get a written quote first.\n- Areas: the suburbs I cover (below).\n- About: me and my apprentice, how a job runs (call or book, I confirm a time, I arrive and explain the fix, I do the\n  work and clean up, you get an itemised invoice).\n- Contact: a booking form with name, phone, email, suburb, what's wrong, and preferred day.\n\nFacts for the site:\n- Phone: (503) 555-0182\n- Email: bookings@brightwaterlane.example.org\n- Address: 7 Tansy Row, Hollin Vale, OR 97998 (the workshop; no walk-in counter)\n- Hours: Mon to Fri 7am to 5pm, Sat 8am to 12pm; closed Sundays and public holidays\n- Areas: Hollin Vale, Marrow Point, Eastbrook Flats, Juniper Reach and Calder Hill\n- Prices: call-out fee $95 (includes the first 30 minutes); then $110 an hour; written quotes free for jobs over $500\n- Opening date: Tuesday 2 March 2027\n- Live address: https://brightwaterlane.example.org\n\nPlease don't put up star ratings, licence numbers, years in business or \"best in town\" type claims. My licence is\nbeing transferred to the new business and I'll add the number myself later.\n\nCustomer quotes from my previous work (use word for word, with first name and suburb):\n- \"Priya found the leak behind the shower in ten minutes and explained exactly what she was doing.\" (Dana, Marrow Point)\n- \"Clear price before she started, and she left the laundry cleaner than she found it.\" (Tom, Eastbrook Flats)\n- \"Our hot water went on a Saturday morning and it was running again by lunch.\" (Wen, Calder Hill)\n\nThanks,\nPriya Okonkwo-Hale\nOwner, Brightwater Lane Plumbing\n",
+  "requested": {
+    "services": [
+      "Leaks and repairs",
+      "Hot water systems",
+      "Bathroom and kitchen fit-outs",
+      "Blocked drains"
+    ],
+    "processSteps": [
+      "Call or book online",
+      "Time confirmed",
+      "Arrive and explain the fix",
+      "Do the work and clean up",
+      "Itemised invoice"
+    ],
+    "formFields": [
+      "Name",
+      "Phone",
+      "Email",
+      "Suburb",
+      "What's wrong",
+      "Preferred day"
+    ],
+    "pages": [
+      "Home",
+      "Services",
+      "Pricing",
+      "Areas",
+      "About",
+      "Contact"
+    ],
+    "primaryActionLabel": "Book a visit",
+    "audience": "Local homeowners in five nearby suburbs",
+    "teamSize": 2,
+    "tone": "Plain, friendly and practical"
+  },
+  "briefBasis": "request",
+  "ownerFacts": [
+    {
+      "key": "phone",
+      "label": "Business phone number",
+      "value": "(503) 555-0182"
+    },
+    {
+      "key": "email",
+      "label": "Business email",
+      "value": "bookings@brightwaterlane.example.org"
+    },
+    {
+      "key": "address",
+      "label": "Street address or suburb",
+      "value": "7 Tansy Row, Hollin Vale, OR 97998 (workshop; no walk-in counter)"
+    },
+    {
+      "key": "hours",
+      "label": "Opening hours",
+      "value": "Mon to Fri 7am to 5pm, Sat 8am to 12pm; closed Sundays and public holidays"
+    },
+    {
+      "key": "service_areas",
+      "label": "Areas you serve",
+      "value": "Hollin Vale, Marrow Point, Eastbrook Flats, Juniper Reach, Calder Hill"
+    },
+    {
+      "key": "pricing",
+      "label": "Prices or from-prices",
+      "value": "Call-out fee $95 (includes the first 30 minutes); then $110 an hour; written quotes free for jobs over $500"
+    },
+    {
+      "key": "quotes",
+      "label": "Real customer quotes",
+      "value": "\"Priya found the leak behind the shower in ten minutes and explained exactly what she was doing.\" (Dana, Marrow Point)\n\"Clear price before she started, and she left the laundry cleaner than she found it.\" (Tom, Eastbrook Flats)\n\"Our hot water went on a Saturday morning and it was running again by lunch.\" (Wen, Calder Hill)"
+    },
+    {
+      "key": "opening_date",
+      "label": "Opening date",
+      "value": "Tuesday 2 March 2027"
+    },
+    {
+      "key": "site_url",
+      "label": "Live site address",
+      "value": "https://brightwaterlane.example.org"
+    }
+  ],
+  "source": "synthetic-provisional-2026-09-30"
+}
