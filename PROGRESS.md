@@ -216,8 +216,12 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
   "generic-api-key" hits, all one made-up UUID used as a lead-form site key in Step 25 M4 test fixtures (`60061b7`, `b1cd762`,
   `f8b1bf7`). False positive: site keys are public by design (migration 0025) and the value matches no live `lead_sites` row (SQL, 0).
   Fixed by an exact-value allowlist entry in `.gitleaks.toml`. Local gitleaks 8.30.1 over `2a64471..4abf890`: 6 findings before,
-  0 after; a different key-shaped value is still caught. Every other CI job was skipped, so the `submit-lead` Deno job has still
-  never run in CI. Not pushed yet.
+  0 after; a different key-shaped value is still caught. Pushed as `6d88f79`: CI `38725434775` passed the scan and the
+  `submit-lead` Deno job (its first CI run), then failed Rendered QA's "Fixtures are up to date" step, so the deploy was skipped again.
+  Cause: `f8b1bf7` edited the generated registry fixtures by hand (connected forms on every site page, the new
+  `fail/launch.form-connected` site) without changing their generator, so `npm run fixtures` in CI undid it (16 files). Fixed in
+  `packages/rendered-qa/scripts/make-fixtures.ts` (`connectForm`, the new variant). Locally: regeneration now leaves the committed
+  fixtures unchanged byte for byte (before the fix it changed 16 files); rendered-qa typecheck clean (it does not cover `scripts/`).
 - **Cockpit presses from a new address never reached GitHub (2026-10-14 18:12 to 2026-10-15 09:08 UTC, fixed).** The Cockpit gained a
   production alias, `wfact-3-cockpit.vercel.app` (same bundle `index-Dtf_dbEO.js` as the old alias), that `dispatch-job`'s CORS allow-list
   did not know. Its log named it ("CORS refused origin"), the browser dropped the POST, and Harbor Street continues `caa201f1` and

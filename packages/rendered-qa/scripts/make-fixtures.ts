@@ -233,6 +233,19 @@ type HeadTag = keyof typeof HEAD_TAGS;
 const regHead = (omit: HeadTag[] = []) => (Object.keys(HEAD_TAGS) as HeadTag[]).filter((k) => !omit.includes(k)).map((k) => HEAD_TAGS[k]).join("\n");
 const reg = (note: string, extra: Partial<Parts> = {}, omit: HeadTag[] = []): string => page({ note: `Step 7 registry: ${note}`, head: regHead(omit), ...extra });
 
+// Step 25 / MVP M4: a launched site's form posts to submit-lead (launch.form-connected), so every clean or broken site
+// page carries the connected form the runner writes when the brief has a lead form (SYNTHETIC endpoint and site key,
+// the same values as the lead-form tests). `fail/launch.form-connected` keeps the unconnected form.
+const UNCONNECTED_FORM = `<form aria-label="Inspection request" onsubmit="event.preventDefault()">`;
+const CONNECTED_FORM =
+  `<form aria-label="Inspection request" action="https://abcdefghijklmnopqrst.supabase.co/functions/v1/submit-lead" method="post" onsubmit="event.preventDefault()">` +
+  `<input type="hidden" name="site_key" value="0b7d3c1e-2a4f-4e6b-9c8d-1f2e3a4b5c6d"><input type="hidden" name="variant" value="request"><input type="hidden" name="page" value="/">` +
+  `<div hidden><label for="f-website">Leave this field empty</label><input id="f-website" name="website" tabindex="-1" autocomplete="off"></div>`;
+const connectForm = (html: string): string => {
+  if (!html.includes(UNCONNECTED_FORM)) throw new Error("make-fixtures: the registry site page has no form to connect");
+  return html.replace(UNCONNECTED_FORM, CONNECTED_FORM);
+};
+
 const PRIVACY_LINK = `<section id="details" aria-labelledby="details-h"><h2 id="details-h">Your details</h2><p>We only use what you send in the form to call you back. <a href="privacy.html#data">How we handle your details</a>.</p></section>`;
 
 const REGISTRY_PAGES: Record<string, string> = {
@@ -299,7 +312,7 @@ const NOT_FOUND = PRIVACY.replace("How we handle your details | ", "Page not fou
   .replace(`<link rel="canonical" href="${SITE_URL}/privacy.html">\n`, "")
   .replace(/<main id="main">[\s\S]*<\/main>/, `<main id="main">\n<h1>Page not found</h1>\n<p>That page is not here. The home page has everything about repairs, replacements and the yearly Care visit.</p>\n<p><a href="index.html">Go to the home page</a></p>\n</main>`);
 const CLEAN_SITE: Record<string, string> = {
-  "index.html": reg("clean site home page", { extraMain: PRIVACY_LINK }),
+  "index.html": connectForm(reg("clean site home page", { extraMain: PRIVACY_LINK })),
   "privacy.html": PRIVACY,
   "404.html": NOT_FOUND,
   "sitemap.xml": `<?xml version="1.0" encoding="UTF-8"?>\n<!-- SYNTHETIC TEST FIXTURE (Step 7 registry) -->\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>${SITE_URL}/</loc></url>\n  <url><loc>${SITE_URL}/privacy.html</loc></url>\n</urlset>\n`,
@@ -316,7 +329,7 @@ const REGISTRY_SITES: Record<string, Record<string, string>> = {
   "clean-site": CLEAN_SITE,
   "fail/sec.source-maps": siteVariant((f) => (f["site.js"] = `document.documentElement.dataset.ready = "1";\n//# sourceMappingURL=site.js.map\n`)),
   "fail/seo.duplicate-titles": siteVariant((f) => (f["privacy.html"] = PRIVACY.replace("How we handle your details | Summit Line Roofing (synthetic fixture)", "Summit Line Roofing (synthetic fixture)"))),
-  "fail/links.site-internal": siteVariant((f) => (f["index.html"] = reg("clean site home page; planted: a link to a page the build does not have", { extraMain: PRIVACY_LINK.replace("privacy.html#data", "areas.html") }))),
+  "fail/links.site-internal": siteVariant((f) => (f["index.html"] = connectForm(reg("clean site home page; planted: a link to a page the build does not have", { extraMain: PRIVACY_LINK.replace("privacy.html#data", "areas.html") })))),
   "fail/tells.404-page": siteVariant((f) => delete f["404.html"]),
   "fail/tells.sitemap": siteVariant((f) => (f["sitemap.xml"] = f["sitemap.xml"]!.replace(`  <url><loc>${SITE_URL}/privacy.html</loc></url>\n`, ""))),
   "fail/tells.robots": siteVariant((f) => (f["robots.txt"] = "# SYNTHETIC TEST FIXTURE (Step 7 registry), planted: blocks every crawler\nUser-agent: *\nDisallow: /\n")),
@@ -324,10 +337,14 @@ const REGISTRY_SITES: Record<string, Record<string, string>> = {
   // Build-quality Package 3: an "Image to come" placeholder card left on the site at launch.
   "fail/content.placeholders-launch": siteVariant(
     (f) =>
-      (f["index.html"] = reg("clean site home page; planted: a labelled placeholder picture left on the site", {
-        extraMain: `<figure class="media media-placeholder" data-placeholder="index.hero" role="img" aria-label="Image to come: a photo of a recent roof"><figcaption>Image to come: a photo of a recent roof</figcaption></figure>`,
-      })),
+      (f["index.html"] = connectForm(
+        reg("clean site home page; planted: a labelled placeholder picture left on the site", {
+          extraMain: `<figure class="media media-placeholder" data-placeholder="index.hero" role="img" aria-label="Image to come: a photo of a recent roof"><figcaption>Image to come: a photo of a recent roof</figcaption></figure>`,
+        }),
+      )),
   ),
+  // Step 25 / MVP M4: the launched site's form still posts nowhere.
+  "fail/launch.form-connected": siteVariant((f) => (f["index.html"] = reg("clean site home page", { extraMain: PRIVACY_LINK }))),
 };
 rmSync(registryDir, { recursive: true, force: true });
 for (const [name, html] of Object.entries(REGISTRY_PAGES)) {
