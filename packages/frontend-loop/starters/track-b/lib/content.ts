@@ -169,6 +169,16 @@ export interface Logo {
   width: number;
   height: number;
 }
+/**
+ * Where the contact form sends (Step 25 / MVP M4): the submit-lead endpoint and the site's public key, written to
+ * launch.json by the build from the runner's lead form (frontend-loop src/leadForm.ts), never by the builder. null = the form
+ * is not connected and says so.
+ */
+export const leadForm = ((launch as { leadForm?: LeadFormConfig | null }).leadForm ?? null) as LeadFormConfig | null;
+export interface LeadFormConfig {
+  endpoint: string;
+  siteKey: string;
+}
 /** The share card the build writes to public/ (src/launch.ts). */
 export const OG_IMAGE = "/og-image.png";
 

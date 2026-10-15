@@ -14,6 +14,7 @@ import path from "node:path";
 import { loadBrief } from "../brief.js";
 import { validateSiteContent } from "./content.js";
 import { buildTrackBSite, TrackBBuildError } from "./build.js";
+import { leadFormOf } from "../leadForm.js";
 
 async function main(): Promise<void> {
   const [briefPath, contentPath, outDir] = process.argv.slice(2);
@@ -30,7 +31,8 @@ async function main(): Promise<void> {
     return;
   }
   try {
-    const b = await buildTrackBSite(content);
+    // A brief with a lead form (Step 25) builds the contact form wired to submit-lead, as the runner would.
+    const b = await buildTrackBSite(content, { leadForm: leadFormOf(brief) });
     if (outDir) {
       const bin = new Set(b.binary);
       for (const [name, body] of Object.entries(b.files)) {

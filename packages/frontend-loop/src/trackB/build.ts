@@ -24,13 +24,15 @@ import type { SiteContent } from "./content.js";
 import { logoDisplaySize, servedLogoData, type LogoAsset } from "../brandAsset.js";
 import type { ImageAsset } from "../media.js";
 import { OG_IMAGE_FILE, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
+import { parseLeadForm, type LeadForm } from "../leadForm.js";
 
 // 1.1.0: contact form variants (enquiry | signup), "Location" label. 1.2.0: launch files (robots, llms, sitemap, share card, canonical)
 // 1.3.0: the client's logo (header, footer, favicon). 1.4.0 (Build-quality Package 2): the logo has an explicit display size
 // (it collapsed to 0x0), the accent fills buttons and never panels, a phone action bar, an entrance for every section type,
 // a swipeable work reel on phones, no empty band under the phone hero.
 // 1.5.0 (Build-quality Package 3): media slots (the owner's verified images, or labelled placeholder cards) and a team section.
-export const STARTER_VERSION = "track-b-starter/1.5.0";
+// 1.6.0 (Step 25 / MVP M4): the contact form posts to submit-lead when launch.json carries a lead form.
+export const STARTER_VERSION = "track-b-starter/1.6.0";
 
 /** Extensions read back as text; everything else in the export is binary (base64). */
 const TEXT_EXT = new Set([".html", ".txt", ".js", ".css", ".json", ".svg", ".xml", ".webmanifest", ".map"]);
@@ -107,6 +109,8 @@ export interface TrackBBuildOptions {
   accentActionsOnly?: boolean;
   /** Owner-supplied images by media slot (media.ts imageAssetsFor), verified; a slot without one shows a placeholder card. */
   images?: ReadonlyMap<string, ImageAsset>;
+  /** Where the contact form sends (leadForm.ts, set by the runner), written to content/launch.json. Absent = not connected. */
+  leadForm?: LeadForm | null;
 }
 
 export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOptions = {}): Promise<TrackBBuild> {
@@ -118,7 +122,8 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
   // Two simultaneous builds of the same content would share this folder; each runner builds one site at a time.
   const siteUrl = opts.siteUrl ?? null;
   const logo = opts.logo ?? null;
-  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").update(logo?.sha256 ?? "").update(opts.accentActionsOnly ? "actions" : "").update([...(opts.images ?? new Map()).entries()].map(([k, v]) => `${k}=${v.sha256}`).sort().join(",")).digest("hex").slice(0, 16);
+  const leadForm = opts.leadForm ? parseLeadForm(opts.leadForm) : null;
+  const key = createHash("sha256").update(STARTER_VERSION).update(JSON.stringify(content)).update(siteUrl ?? "").update(logo?.sha256 ?? "").update(opts.accentActionsOnly ? "actions" : "").update([...(opts.images ?? new Map()).entries()].map(([k, v]) => `${k}=${v.sha256}`).sort().join(",")).update(leadForm ? `${leadForm.endpoint}|${leadForm.siteKey}` : "").digest("hex").slice(0, 16);
   const work = path.join(tmpdir(), "wfact-track-b", key);
   rmSync(work, { recursive: true, force: true });
   mkdirSync(work, { recursive: true });
@@ -131,7 +136,7 @@ export async function buildTrackBSite(content: SiteContent, opts: TrackBBuildOpt
     writeFileSync(path.join(work, "content/site.json"), `${JSON.stringify(content, null, 2)}\n`);
     writeFileSync(path.join(work, "content/theme.json"), `${JSON.stringify({ ...palette, accentActionsOnly: opts.accentActionsOnly === true }, null, 2)}\n`);
     const logoInfo = logo ? { src: `/${logo.file}`, mime: logo.mime, ...logoDisplaySize(logo) } : null;
-    writeFileSync(path.join(work, "content/launch.json"), `${JSON.stringify({ siteUrl, ...(logoInfo ? { logo: logoInfo } : {}) }, null, 2)}\n`);
+    writeFileSync(path.join(work, "content/launch.json"), `${JSON.stringify({ siteUrl, ...(logoInfo ? { logo: logoInfo } : {}), ...(leadForm ? { leadForm } : {}) }, null, 2)}\n`);
     // Launch files (MVP M5): Next copies public/ into the export as is.
     mkdirSync(path.join(work, "public"));
     writeFileSync(path.join(work, "public/robots.txt"), robotsTxt(siteUrl));

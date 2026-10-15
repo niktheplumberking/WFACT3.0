@@ -202,6 +202,13 @@ a:hover { text-decoration-thickness: 0.14em; }
 .form-note { margin-bottom: 20px; color: var(--muted); }
 .form-status { margin-top: 16px; font-weight: 700; }
 .form-status:empty { display: none; }
+.form-privacy { margin: -8px 0 20px; font-size: 0.95rem; color: var(--muted); }
+/* The honeypot: hidden from people (and from assistive technology), left empty by them. */
+.hp { display: none; }
+/* After a form post without JavaScript the endpoint sends the visitor back to #lead-sent or #lead-error. */
+.form-flash { display: none; margin-bottom: 20px; padding: 14px 16px; font-weight: 700; border-left: 4px solid var(--accent-ink); background: var(--paper); }
+.form-flash-error { border-left-color: var(--error); }
+.form-flash:target { display: block; }
 
 /* Prose with an aside. */
 .prose-grid { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: clamp(32px, 5vw, 64px); align-items: start; }

@@ -868,6 +868,26 @@ html:has(.menu-panel[open]) {
 .form-status {
   font-weight: 600;
 }
+.form-privacy {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  max-width: 56ch;
+}
+/* The honeypot: hidden from people (and from assistive technology), left empty by them. */
+.hp {
+  display: none;
+}
+/* After a form post without JavaScript the endpoint sends the visitor back to #lead-sent or #lead-error. */
+.form-flash {
+  display: none;
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+  border-left: 4px solid var(--accent-ink);
+  background: var(--paper);
+}
+.form-flash:target {
+  display: block;
+}
 @media (min-width: 900px) {
   .contact-grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));

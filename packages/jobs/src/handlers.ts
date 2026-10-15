@@ -25,6 +25,8 @@ import type { Job } from "./jobStore.js";
 import { IMAGE_INPUT_PREFIX, LAUNCH_PLACEHOLDERS_KEY, LOGO_INPUT_KEY, ownerFactsFrom, type PlanInput, type PlanInputStore } from "./inputStore.js";
 import { parseImageRecord, SLOT_RE, type SuppliedImage } from "@wfact/frontend-loop/media";
 import { parseBriefLogo } from "@wfact/frontend-loop/brandAsset";
+import type { LeadForm } from "@wfact/frontend-loop/leadForm";
+import type { LeadSiteLookup } from "./leadSites.js";
 
 export interface HandlerDeps {
   planning: PlanningDeps;
@@ -62,6 +64,8 @@ export interface HandlerDeps {
    * (the intake job's text). Absent in older tests: such plans then build from the summary only, and say so.
    */
   requests?: RequestTextLookup;
+  /** Step 25 / MVP M4: the client's lead form (lead_sites). Absent in older tests: every form stays "not connected". */
+  leadSites?: LeadSiteLookup;
   /** Hermes-lite status answer — injected so tests don't need a model or Supabase. */
   ask: (question: string) => Promise<{ answer: string; sourcesUsed: string[]; needsHuman: boolean; escalationReason: string | null }>;
 }
@@ -266,8 +270,9 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       }
       const wf = linkRun(stored.buildTrack === "B" ? deps.trackBWorkflow! : deps.trackAWorkflow ?? deps.workflow, job, deps);
       const inputs = (await deps.inputs?.current(planId)) ?? [];
-      const brief = briefForBuild(stored.plan, inputs, stored.plan.brief.requestText ? null : await requestFor(planId, deps));
-      const extra = { planId, buildTrack: stored.buildTrack, inputsUsed: inputs.filter((i) => !i.waived).length, inputsWaived: inputs.filter((i) => i.waived).length, briefBasis: brief.briefBasis };
+      const lead = await leadFormFor(stored.plan.brief.clientSlug, deps);
+      const brief = briefForBuild(stored.plan, inputs, stored.plan.brief.requestText ? null : await requestFor(planId, deps), lead.leadForm);
+      const extra = { planId, buildTrack: stored.buildTrack, inputsUsed: inputs.filter((i) => !i.waived).length, inputsWaived: inputs.filter((i) => i.waived).length, briefBasis: brief.briefBasis, leadForm: lead.note };
       let runId: string | null = null;
       try {
         const first = await buildAndVerify(brief, wf);
@@ -295,9 +300,11 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
           const stored = await deps.planStore.get(planId);
           const inputs = (await deps.inputs?.current(planId)) ?? [];
           if (stored && inputs.length > 0) {
-            const b = briefForBuild(stored.plan, inputs, stored.plan.brief.requestText ? null : await requestFor(planId, deps));
+            const lead = await leadFormFor(stored.plan.brief.clientSlug, deps);
+            const b = briefForBuild(stored.plan, inputs, stored.plan.brief.requestText ? null : await requestFor(planId, deps), lead.leadForm);
             brief = b;
             extra.briefBasis = b.briefBasis;
+            extra.leadForm = lead.note;
           }
           extra.inputsUsed = inputs.filter((i) => !i.waived).length;
           extra.inputsWaived = inputs.filter((i) => i.waived).length;
@@ -407,11 +414,26 @@ async function requestFor(planId: string, deps: HandlerDeps): Promise<string | n
 }
 
 /**
+ * The client's lead form for a build (Step 25 / MVP M4), with a note for the run record. A failed lookup is not a failed
+ * build: the form is then built "not connected" (it says so on the site), the note names the failure, and the launch check
+ * fails the site at launch, so nothing goes live with a dead form.
+ */
+async function leadFormFor(clientSlug: string, deps: HandlerDeps): Promise<{ leadForm: LeadForm | null; note: string }> {
+  if (!deps.leadSites) return { leadForm: null, note: "not connected (no lead site lookup)" };
+  try {
+    const leadForm = await deps.leadSites.leadFormFor(clientSlug);
+    return leadForm ? { leadForm, note: "connected" } : { leadForm: null, note: "not connected (no active lead site for this client)" };
+  } catch (e) {
+    return { leadForm: null, note: `not connected (lead site lookup failed: ${e instanceof Error ? e.message.slice(0, 120) : "unknown"})` };
+  }
+}
+
+/**
  * The brief a plan is built from. Plans approved before 2026-10-06 carry no page scope; their lead type says it.
  * Two owner details are not facts for the copy but settings the starters use: `asset.logo` (the uploaded logo record,
  * checked by the database when it was added and by the build when it runs) and `site_url` (the live address).
  */
-export function briefForBuild(plan: Pick<Plan, "brief" | "intake">, inputs: PlanInput[] = [], requestText: string | null = null): PilotBrief {
+export function briefForBuild(plan: Pick<Plan, "brief" | "intake">, inputs: PlanInput[] = [], requestText: string | null = null, leadForm: LeadForm | null = null): PilotBrief {
   const scoped: PilotBrief = plan.brief.pageScope ? plan.brief : { ...plan.brief, pageScope: plan.intake.leadType === "landing_page" ? "single" : "multi" };
   // Build-quality Package 1: plans stored before 2026-10-14 carry no request. Use the intake job's text when it is on file
   // (the requested list stays empty: it was never checked), otherwise build from the summary and say so. Synonym sections
@@ -448,8 +470,11 @@ export function briefForBuild(plan: Pick<Plan, "brief" | "intake">, inputs: Plan
     }
   }
   const launchWithPlaceholders = inputs.some((i) => i.key === LAUNCH_PLACEHOLDERS_KEY && !i.waived && i.value === "yes");
+  // The lead form comes from the runner's lookup only: whatever a stored brief carries is dropped.
+  const { leadForm: _stored, ...unwired } = base;
   return {
-    ...base,
+    ...unwired,
+    ...(leadForm ? { leadForm } : {}),
     ...(ownerFacts.length > 0 ? { ownerFacts } : {}),
     ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}),
     ...(logo ? { logo } : {}),

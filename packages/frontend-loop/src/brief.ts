@@ -10,6 +10,7 @@ import { readFileSync } from "node:fs";
 import { LogoError, parseBriefLogo, type BriefLogo } from "./brandAsset.js";
 import { parseRequested, REQUEST_TEXT_MAX, type RequestedItems } from "./request.js";
 import { ImageError, parseSuppliedImages, type SuppliedImage } from "./media.js";
+import { LeadFormError, parseLeadForm, type LeadForm } from "./leadForm.js";
 
 export type { RequestedItems } from "./request.js";
 
@@ -72,6 +73,11 @@ export interface PilotBrief {
   images?: SuppliedImage[];
   /** The owner ticked "launch with placeholders" (plan input `launch.placeholders_ok`): the launch check then lets them pass. */
   launchWithPlaceholders?: boolean;
+  /**
+   * Where the contact form sends (Step 25 / MVP M4): set by the build runner from the client's lead_sites row, never by a
+   * model (leadForm.ts). Absent: the form says plainly it is not connected, and the launch check fails the site.
+   */
+  leadForm?: LeadForm;
   /** Provenance — never silently treat a placeholder brief as Nick's real one. */
   source: "nick" | "placeholder-2.0-case" | "intake-planner" | "synthetic-provisional-2026-09-30";
 }
@@ -197,6 +203,14 @@ export function parseBrief(raw: unknown): PilotBrief {
   if (record.launchWithPlaceholders !== undefined && typeof record.launchWithPlaceholders !== "boolean") {
     throw new InvalidBriefError('Brief "launchWithPlaceholders", if present, must be true or false.');
   }
+  let leadForm: LeadForm | undefined;
+  if (record.leadForm !== undefined) {
+    try {
+      leadForm = parseLeadForm(record.leadForm);
+    } catch (e) {
+      throw new InvalidBriefError(e instanceof LeadFormError ? e.message : String(e));
+    }
+  }
 
   const ownerFacts = parseOwnerFacts(record.ownerFacts);
   const ownerSkipped = Array.isArray(record.ownerSkipped) ? (record.ownerSkipped as unknown[]).filter((x): x is string => typeof x === "string" && x.length <= OWNER_FACT_LIMITS.label).slice(0, OWNER_FACT_LIMITS.count) : [];
@@ -216,6 +230,7 @@ export function parseBrief(raw: unknown): PilotBrief {
     ...(requested ? { requested } : {}),
     ...(images.length > 0 ? { images } : {}),
     ...(record.launchWithPlaceholders === true ? { launchWithPlaceholders: true } : {}),
+    ...(leadForm ? { leadForm } : {}),
     ...(record.briefBasis !== undefined ? { briefBasis: record.briefBasis as "request" | "summary-only" } : {}),
     ...(ownerFacts.length > 0 ? { ownerFacts } : {}),
     ...(ownerSkipped.length > 0 ? { ownerSkipped } : {}),

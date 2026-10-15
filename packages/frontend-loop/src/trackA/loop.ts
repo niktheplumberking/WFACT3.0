@@ -18,6 +18,7 @@ import { DESIGN_RULEBOOK } from "../rulebook.js";
 import { CONTENT_SCHEMA_VERSION, SITE_CONTENT_JSON_SCHEMA, extractJson, validateSiteContent, type SiteContent } from "./content.js";
 import { renderSite, STARTER_VERSION } from "./render.js";
 import { siteUrlOf } from "../launch.js";
+import { leadFormOf } from "../leadForm.js";
 import { CONTENT_FLOORS, requestLines } from "../request.js";
 import { imageAssetsFor } from "../media.js";
 import { logoAssetFor } from "../brandAsset.js";
@@ -246,7 +247,7 @@ export class TrackALoop {
       if ("invalid" in content) {
         return this.escalate(brief, rounds, null, `The builder's content was still invalid after ${this.maxValidation} attempts: ${content.invalid.slice(0, 5).join(" | ")}`);
       }
-      const site = renderSite(content, { siteUrl: siteUrlOf(brief), logo: logoAssetFor(brief), images: imageAssetsFor(brief) });
+      const site = renderSite(content, { siteUrl: siteUrlOf(brief), logo: logoAssetFor(brief), images: imageAssetsFor(brief), leadForm: leadFormOf(brief) });
       const contentJson = JSON.stringify(content, null, 2);
       const built = { files: site.files, pages: site.pages, binary: site.binary, contentJson, starterVersion: STARTER_VERSION };
       const review = await this.review(brief, contentJson);

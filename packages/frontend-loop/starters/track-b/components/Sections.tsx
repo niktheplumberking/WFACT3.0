@@ -27,7 +27,7 @@
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { Fragment } from "react";
-import { actionHref, content, type Fact, type Section } from "@/lib/content";
+import { actionHref, content, href, leadForm, type Fact, type Section } from "@/lib/content";
 import { ContactForm } from "./ContactForm";
 import { MediaFrame } from "./MediaFrame";
 import { MagneticAction } from "./motion/MagneticAction";
@@ -295,7 +295,15 @@ export function SectionView({ section, first, page }: { section: Section; first:
                 </dl>
               )}
             </div>
-            <ContactForm variant={s.form ?? "enquiry"} actionLabel={content.primaryAction.label} note={s.formNote} fallback={fallback} />
+            <ContactForm
+              variant={s.form ?? "enquiry"}
+              actionLabel={content.primaryAction.label}
+              note={s.formNote}
+              fallback={fallback}
+              lead={leadForm}
+              businessName={b.name}
+              page={href(page)}
+            />
           </div>
         </section>
       );

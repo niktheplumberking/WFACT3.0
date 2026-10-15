@@ -23,6 +23,7 @@ import { BANNED_CLAIMS, briefBlock, REVIEW_REQUEST_DUTIES, WORDS_FROM_REQUEST } 
 import { CONTENT_SCHEMA_VERSION, SITE_CONTENT_JSON_SCHEMA, extractJson, validateSiteContent, type SiteContent } from "./content.js";
 import { buildTrackBSite, STARTER_VERSION, TrackBBuildError, type TrackBBuild } from "./build.js";
 import { siteUrlOf } from "../launch.js";
+import { leadFormOf } from "../leadForm.js";
 import { CONTENT_FLOORS } from "../request.js";
 import { logoAssetFor } from "../brandAsset.js";
 import { accentForActionsOnly } from "./brand.js";
@@ -48,7 +49,11 @@ export interface TrackBLoopOptions {
   build?: (content: SiteContent, brief: PilotBrief) => Promise<TrackBBuild>;
 }
 
-export function trackBSystemPrompt(scope: PageScope = "multi"): string {
+/**
+ * `connected`: the brief carries a lead form (Step 25), so the contact form really sends; the form note then says what happens
+ * next instead of saying the form is not connected.
+ */
+export function trackBSystemPrompt(scope: PageScope = "multi", connected = false): string {
   const rules = DESIGN_RULEBOOK.rules.map((r) => `- ${r.id}: ${r.rule}`);
   return [
     `You write the CONTENT for WFACT's Track B starter: a ${scope === "single" ? "single-page" : "multi-page"}, motion-rich brand website (Next.js, exported as static files).`,
@@ -94,8 +99,10 @@ export function trackBSystemPrompt(scope: PageScope = "multi"): string {
     "- faq: questions as disclosure rows.",
     "- contact: a form beside the contact facts. form \"enquiry\" = a project enquiry (name, email, organisation, what are you planning,",
     "  when); form \"signup\" = email updates only (email, optional first name). Use signup when the visitor's action is to get updates,",
-    "  join a list or a waitlist, or hear about an opening; enquiry when they are starting a project or a conversation. formNote must say",
-    "  honestly that the form is not connected yet and what to do instead.",
+    "  join a list or a waitlist, or hear about an opening; enquiry when they are starting a project or a conversation.",
+    ...(connected
+      ? ["  The form is connected: it sends. formNote says in one short sentence what happens next, using only facts in the brief", "  (never a promised reply time the brief does not give); never say the form is not connected."]
+      : ["  formNote must say honestly that the form is not connected yet and what to do instead."]),
     "- prose: reading column with an optional aside.",
     "- team: the people behind the business: heading, intro, members (name and role ONLY when the client's request or the owner's",
     "  facts name them; otherwise leave members empty and describe the team in the intro). No invented people, no invented photos.",
@@ -140,12 +147,12 @@ export class TrackBLoop {
     this.maxRounds = opts.maxRounds ?? 3;
     this.maxValidation = opts.maxValidationAttempts ?? 3;
     this.nowIso = opts.nowIso ?? (() => new Date().toISOString());
-    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b), logo: logoAssetFor(b), accentActionsOnly: accentForActionsOnly(b), images: imageAssetsFor(b) }));
+    this.build = opts.build ?? ((c, b) => buildTrackBSite(c, { siteUrl: siteUrlOf(b), logo: logoAssetFor(b), accentActionsOnly: accentForActionsOnly(b), images: imageAssetsFor(b), leadForm: leadFormOf(b) }));
   }
 
   async run(brief: PilotBrief): Promise<FrontendLoopResult> {
     const first = await this.builder.complete({
-      system: trackBSystemPrompt(pageScopeOf(brief)),
+      system: trackBSystemPrompt(pageScopeOf(brief), leadFormOf(brief) !== null),
       user: `${briefBlock(brief)}\n\nWrite the site content now. Output only the JSON object.`,
     });
     return this.reviewThenBuild(brief, await this.settle(brief, first));
@@ -159,7 +166,7 @@ export class TrackBLoop {
 
   private async fix(brief: PilotBrief, contentJson: string, issues: string[]): Promise<string> {
     return this.builder.complete({
-      system: trackBSystemPrompt(pageScopeOf(brief)),
+      system: trackBSystemPrompt(pageScopeOf(brief), leadFormOf(brief) !== null),
       user: [
         briefBlock(brief),
         "",

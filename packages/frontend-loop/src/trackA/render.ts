@@ -14,11 +14,13 @@ import { buildPalette, type Palette } from "./palette.js";
 import { OG_IMAGE_FILE, absoluteUrl, llmsTxt, ogImagePng, robotsTxt, sitemapXml } from "../launch.js";
 import { logoDisplaySize, servedLogoData, type LogoAsset } from "../brandAsset.js";
 import type { ImageAsset, Media } from "../media.js";
+import type { LeadForm } from "../leadForm.js";
 
 // 1.1.0: launch files (404, robots, llms, sitemap, share card, canonical); 1.2.0: client logo + favicon; 1.3.0 (Build-quality
 // Package 2): the logo has an explicit display size and an SVG without one gets it from its viewBox (it collapsed to 0x0).
 // 1.4.0 (Build-quality Package 3): media slots on hero, services and prose: the owner's verified image, or a labelled card.
-export const STARTER_VERSION = "track-a-starter/1.4.0";
+// 1.5.0 (Step 25 / MVP M4): the request form posts to submit-lead when the brief carries a lead form (leadForm.ts).
+export const STARTER_VERSION = "track-a-starter/1.5.0";
 const STARTER_DIR = path.join(import.meta.dirname, "..", "..", "starters", "track-a");
 const STARTER_CSS = readFileSync(path.join(STARTER_DIR, "styles.css"), "utf-8");
 const STARTER_JS = readFileSync(path.join(STARTER_DIR, "site.js"), "utf-8");
@@ -39,6 +41,8 @@ export interface RenderOptions {
   logo?: LogoAsset | null;
   /** Owner-supplied images by media slot (media.ts imageAssetsFor); a slot without one shows a placeholder card. */
   images?: ReadonlyMap<string, ImageAsset>;
+  /** Where the request form sends (leadForm.ts, set by the runner). Absent = the form says it is not connected. */
+  leadForm?: LeadForm | null;
 }
 
 export class RenderError extends Error {
@@ -142,6 +146,7 @@ interface Ctx {
   page: Page;
   logo?: LogoAsset | null;
   images?: ReadonlyMap<string, ImageAsset>;
+  leadForm?: LeadForm | null;
 }
 
 /**
@@ -277,13 +282,32 @@ function renderSection(s: Section, ctx: Ctx, lvl: Level, tint: boolean): string 
   }
 }
 
+/**
+ * The request form. Connected (the brief carries a lead form): it posts to submit-lead with the site key, the page and a
+ * hidden honeypot; site.js sends it with fetch, with how long the form was open, and without JavaScript it is a plain form post that
+ * comes back with #lead-sent or #lead-error, which CSS shows (:target). Not connected: it says so and sends nothing.
+ */
 function requestForm(ctx: Ctx, note: string): string {
   const field = (id: string, label: string, control: string, required: boolean, message?: string) =>
     `<div class="field"><label for="${id}">${esc(label)}${required ? ' <span aria-hidden="true">*</span>' : ""}</label>${control}${
       required ? `<p class="error" id="${id}-error" data-message="${esc(message!)}" aria-live="polite"></p>` : ""
     }</div>`;
   const req = (id: string) => ` required aria-required="true" aria-describedby="${id}-error"`;
-  return `<form id="request" data-request novalidate aria-label="${esc(ctx.content.primaryAction.label)}" data-unconnected="Thank you. This form is not connected yet, so nothing was sent. Please call or email instead.">${[
+  const lead = ctx.leadForm;
+  const b = ctx.content.business;
+  const fallback = [b.phone ? `call ${b.phone.value}` : "", b.email ? `email ${b.email.value}` : ""].filter(Boolean).join(" or ");
+  const failed = `Your request was not sent. Please try again${fallback ? `, or ${fallback} instead` : ""}.`;
+  const sent = "Thank you, we have your request. We will be in touch soon.";
+  const attrs = lead
+    ? ` action="${esc(lead.endpoint)}" method="post" data-endpoint data-sent="${esc(sent)}" data-failed="${esc(failed)}"`
+    : ' data-unconnected="Thank you. This form is not connected yet, so nothing was sent. Please call or email instead."';
+  const hidden = lead
+    ? `<input type="hidden" name="site_key" value="${esc(lead.siteKey)}"><input type="hidden" name="variant" value="request"><input type="hidden" name="page" value="/${esc(pagePath(ctx.page.slug))}"><input type="hidden" name="fill_ms" value=""><div class="hp"><label for="rq-website">Leave this field empty</label><input id="rq-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>`
+    : "";
+  const flash = lead
+    ? `<p class="form-flash" id="lead-sent" tabindex="-1">${esc(sent)}</p><p class="form-flash form-flash-error" id="lead-error" tabindex="-1">${esc(failed)}</p>`
+    : "";
+  return `${flash}<form id="request" data-request novalidate aria-label="${esc(ctx.content.primaryAction.label)}"${attrs}>${hidden}${[
     field("rq-name", "Your name", `<input id="rq-name" name="name" type="text" autocomplete="name"${req("rq-name")}>`, true, "Please enter your name."),
     field("rq-phone", "Phone", `<input id="rq-phone" name="phone" type="tel" autocomplete="tel"${req("rq-phone")}>`, true, "Please enter a phone number we can call."),
     field("rq-address", "Address or suburb", `<input id="rq-address" name="address" type="text" autocomplete="street-address">`, false),
@@ -294,7 +318,9 @@ function requestForm(ctx: Ctx, note: string): string {
       `<select id="rq-time" name="time"><option>No preference</option><option>Morning</option><option>Afternoon</option></select>`,
       false,
     ),
-  ].join("")}<p class="form-note">${esc(note)}</p><button class="btn" type="submit">${esc(ctx.content.primaryAction.label)}${icon("arrow")}</button><p class="form-status" role="status" aria-live="polite"></p></form>`;
+  ].join("")}<p class="form-note">${esc(note)}</p>${
+    lead ? `<p class="form-privacy">Your details go only to ${esc(b.name)}, and are used only to reply to you.</p>` : ""
+  }<button class="btn" type="submit">${esc(ctx.content.primaryAction.label)}${icon("arrow")}</button><p class="form-status" role="status" aria-live="polite"></p></form>`;
 }
 
 function header(ctx: Ctx): string {
@@ -368,8 +394,8 @@ function shareTags(content: SiteContent, page: Page, siteUrl: string | null): st
   ];
 }
 
-function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl: string | null, logo: LogoAsset | null, images?: ReadonlyMap<string, ImageAsset>): string {
-  const ctx: Ctx = { content, page, logo, ...(images ? { images } : {}) };
+function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl: string | null, logo: LogoAsset | null, images?: ReadonlyMap<string, ImageAsset>, leadForm?: LeadForm | null): string {
+  const ctx: Ctx = { content, page, logo, ...(images ? { images } : {}), ...(leadForm ? { leadForm } : {}) };
   // One h1 per page: the first section's heading. Plain sections alternate a tint for rhythm; the hero
   // and the call-to-action band are deep brand fields and reset the alternation.
   let tinted = true;
@@ -460,7 +486,7 @@ export function renderSite(content: SiteContent, opts: RenderOptions = {}): Rend
   const pages: string[] = [];
   for (const page of content.pages) {
     const file = pageFile(page.slug);
-    files[file] = renderPage(content, page, palette, siteUrl, logo, opts.images);
+    files[file] = renderPage(content, page, palette, siteUrl, logo, opts.images, opts.leadForm);
     pages.push(file);
   }
   files["404.html"] = renderNotFound(content, palette, logo);

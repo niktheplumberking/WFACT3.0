@@ -2,13 +2,18 @@
 /**
  * The contact form, in one of two shapes the content chooses: "enquiry" (a project enquiry: name, email,
  * organisation, what they are planning, timing) or "signup" (email updates only: email, and a first name
- * that is optional, Cockpit job 6f68adbd: an email signup must not ask for a project brief). It is not
- * connected to a handler yet (a later step wires it), so on submit it checks the required fields, then
- * says plainly that nothing was sent and how to get in touch instead. Labels above fields, errors below
- * and announced, no placeholder-as-label.
+ * that is optional, Cockpit job 6f68adbd: an email signup must not ask for a project brief). Labels above fields,
+ * errors below and announced, no placeholder-as-label.
+ *
+ * Connected (Step 25 / MVP M4; `lead` comes from launch.json, written by the build, never the builder): the form posts to
+ * the submit-lead endpoint with the site key, the page, how long the form was open and a hidden honeypot. With JavaScript it
+ * is sent with fetch and the result is announced; without it, it is a plain form post that comes back to #lead-sent or
+ * #lead-error, which CSS shows (:target). Not connected: on submit it checks the required fields, then says plainly that
+ * nothing was sent and how to get in touch instead.
  */
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import type { LeadFormConfig } from "@/lib/content";
 
 type Field = "name" | "email" | "message";
 const MESSAGES: Record<Field, string> = {
@@ -17,32 +22,75 @@ const MESSAGES: Record<Field, string> = {
   message: "Please tell us a little about the project.",
 };
 const REQUIRED: Record<"enquiry" | "signup", Field[]> = { enquiry: ["name", "email", "message"], signup: ["email"] };
+const SENT: Record<"enquiry" | "signup", string> = {
+  enquiry: "Thank you, we have your message. We will reply soon.",
+  signup: "Thank you, you are signed up for updates.",
+};
 
 export function ContactForm({
   variant,
   actionLabel,
   note,
   fallback,
+  lead,
+  businessName,
+  page,
 }: {
   variant: "enquiry" | "signup";
   actionLabel: string;
   note: string;
   fallback: string;
+  lead: LeadFormConfig | null;
+  businessName: string;
+  /** This page's site path ("/", "/contact/"): where a form post without JavaScript comes back to. */
+  page: string;
 }) {
   const id = useId();
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [status, setStatus] = useState("");
+  const [sending, setSending] = useState(false);
+  const loadedAt = useRef(0);
+  const failed = `Your message was not sent. Please try again. ${fallback}`;
+
+  // The endpoint drops a form sent faster than a person can type, so it is told how long the form was open, measured on the
+  // visitor's own clock (load to submit).
+  useEffect(() => {
+    loadedAt.current = Date.now();
+  }, []);
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const data = new FormData(form);
     const next: Partial<Record<Field, string>> = {};
     for (const f of REQUIRED[variant]) {
       const v = String(data.get(f) ?? "").trim();
       if (!v || (f === "email" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v))) next[f] = MESSAGES[f];
     }
     setErrors(next);
-    setStatus(Object.keys(next).length ? "" : `Thank you. This form is not connected yet, so nothing was sent. ${fallback}`);
+    if (Object.keys(next).length) {
+      setStatus("");
+      return;
+    }
+    if (!lead) {
+      setStatus(`Thank you. This form is not connected yet, so nothing was sent. ${fallback}`);
+      return;
+    }
+    const body: Record<string, string> = {};
+    data.forEach((value, key) => {
+      body[key] = String(value);
+    });
+    body.fill_ms = String(Date.now() - loadedAt.current);
+    setSending(true);
+    setStatus("Sending...");
+    fetch(lead.endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
+      .then((r) => r.json().then((j: { ok?: boolean }) => r.ok && j?.ok === true))
+      .then((ok) => {
+        if (ok) form.reset();
+        setStatus(ok ? SENT[variant] : failed);
+      })
+      .catch(() => setStatus(failed))
+      .finally(() => setSending(false));
   };
 
   const field = (name: Field, label: string, control: (props: Record<string, unknown>) => React.ReactNode, required = true) => {
@@ -66,7 +114,32 @@ export function ContactForm({
   };
 
   return (
-    <form className="enquiry" data-form={variant} noValidate onSubmit={submit} aria-label={actionLabel}>
+    <form
+      className="enquiry"
+      data-form={variant}
+      noValidate
+      onSubmit={submit}
+      aria-label={actionLabel}
+      {...(lead ? { action: lead.endpoint, method: "post", "data-endpoint": "" } : {})}
+    >
+      {lead && (
+        <>
+          <p className="form-flash" id="lead-sent" tabIndex={-1}>
+            {SENT[variant]}
+          </p>
+          <p className="form-flash form-flash-error" id="lead-error" tabIndex={-1}>
+            {failed}
+          </p>
+          <input type="hidden" name="site_key" defaultValue={lead.siteKey} />
+          <input type="hidden" name="variant" defaultValue={variant} />
+          <input type="hidden" name="page" defaultValue={page} />
+          <input type="hidden" name="fill_ms" defaultValue="" />
+          <div className="hp">
+            <label htmlFor={`${id}-website`}>Leave this field empty</label>
+            <input id={`${id}-website`} name="website" type="text" tabIndex={-1} autoComplete="off" />
+          </div>
+        </>
+      )}
       {variant === "signup" ? (
         <>
           {field("email", "Email", (p) => <input type="email" autoComplete="email" {...p} />)}
@@ -93,7 +166,14 @@ export function ContactForm({
         </>
       )}
       <p className="form-note">{note}</p>
-      <button type="submit" className="btn btn-accent">
+      {lead && (
+        <p className="form-privacy">
+          {variant === "signup"
+            ? `Your email goes only to ${businessName}, and is used only to send you updates.`
+            : `Your details go only to ${businessName}, and are used only to reply to you.`}
+        </p>
+      )}
+      <button type="submit" className="btn btn-accent" disabled={sending}>
         <span>{actionLabel}</span>
         <span className="btn-icon" aria-hidden="true">
           <ArrowUpRight size={18} strokeWidth={1.75} />
