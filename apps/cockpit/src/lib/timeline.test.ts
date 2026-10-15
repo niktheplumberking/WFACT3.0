@@ -231,6 +231,12 @@ describe("continueOptions", () => {
     // With details to add, the form comes first and its button continues.
     expect(continueOptions({ ...base, haltStatus: "failed_verification", hasNeeds: true })[0]).toMatchObject({ needsDetails: true, label: "Save the details and continue" });
   });
+  it("stuck (the same checks failed unchanged): no free 'check again', and continuing is offered but never pushed", () => {
+    const o = continueOptions({ ...base, haltStatus: "failed_verification", cause: "factory" });
+    expect(o.map((x) => `${x.id}:${x.fromStep}:${x.primary}:${x.label}`)).toEqual(["revise:revise:false:Continue after a fix"]);
+    // With details to add, the details form leads (new details change the brief, so the engine lets it continue).
+    expect(continueOptions({ ...base, haltStatus: "failed_verification", cause: "factory", hasNeeds: true })[0]).toMatchObject({ primary: true, needsDetails: true });
+  });
   it("review didn't run, QA couldn't finish, or a crash mid-QA: run the checks again (no builder cost)", () => {
     for (const c of [{ haltStatus: "not_verified_no_evaluator" }, { haltStatus: "qa_failed" }, { haltStatus: null, stoppedIn: "qa" as const }]) {
       expect(ids(c)).toEqual(["qa:qa:Run the quality checks again"]);

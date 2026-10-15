@@ -363,6 +363,12 @@ export interface WorkflowDeps {
    * step. A failed probe stops the run with nothing spent (`provider_unavailable`) instead of failing 5-28 minutes in.
    */
   providerProbes?: () => Promise<PreflightCheck[]>;
+  /**
+   * The factory code this run executes (the runner's commit, GITHUB_SHA). Recorded on every halt, so a continue can tell
+   * whether anything changed since the stop: same code, same brief and a stop that cannot change by itself means the
+   * continue would fail the same way, and it is refused before anything is paid. Absent: never refused on that ground.
+   */
+  codeVersion?: string | null;
 }
 
 /** One readiness check (workflow.preflight row). */
@@ -391,7 +397,8 @@ export type WorkflowStatus =
   | "checkpoint_corrupt" // artifact changed since its checkpoint — refused
   | "needs_input" // the readiness check found something only the owner can supply (e.g. the logo the brief names); nothing was spent
   | "provider_unavailable" // a model provider failed its readiness probe (credits, unreachable); nothing was spent
-  | "already_finished"; // resume of a run that already reached a terminal row
+  | "already_finished" // resume of a run that already reached a terminal row
+  | "repeat_refused"; // a continue that would fail exactly as the last stop did (same code, same brief); refused, nothing was spent
 
 export interface QaFailure {
   failedChecks: { checkId: string; details: string[] }[];
@@ -461,8 +468,69 @@ export function qaFailureToIssues(failure: QaFailure): string[] {
   ];
 }
 
+/**
+ * Checks whose result is a measurement or a model's judgement: they can change between two runs of the same site, so they
+ * never prove that a run is stuck. Everything else in `failedChecks` is a deterministic function of the saved site.
+ */
+const VARIABLE_CHECK = /^render\.(perf|design-review)/;
+
+/**
+ * The deterministic part of a QA failure, as comparable lines. Numbers are kept on purpose: "5 images" becoming "2 images" is
+ * a revision making progress, not a stuck run. Empty when only measured or model-judged checks failed.
+ */
+export function stuckFingerprint(failure: QaFailure | null | undefined): string[] {
+  if (!failure) return [];
+  const lines = failure.failedChecks
+    .filter((c) => !VARIABLE_CHECK.test(c.checkId))
+    .flatMap((c) => (c.details.length > 0 ? c.details : ["failed"]).map((d) => `${c.checkId}|${d.replace(/\s+/g, " ").trim()}`));
+  return [...new Set(lines)].sort();
+}
+
+const sameLines = (a: string[], b: string[]) => a.length === b.length && a.every((x, i) => x === b[i]);
+
+/** Key-order-independent JSON, so the same brief always hashes the same. */
+function stableJson(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(stableJson).join(",")}]`;
+  if (v && typeof v === "object") {
+    return `{${Object.keys(v as Record<string, unknown>)
+      .filter((k) => (v as Record<string, unknown>)[k] !== undefined)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${stableJson((v as Record<string, unknown>)[k])}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(v);
+}
+
+export function briefDigest(brief: PilotBrief): string {
+  return createHash("sha256").update(stableJson(brief)).digest("hex").slice(0, 16);
+}
+
+/**
+ * Would continuing this halted run fail exactly as it stopped? True only when all of these hold, so a real chance of a
+ * different outcome is never refused: the stop was a QA failure with a deterministic part; the brief and the factory code
+ * are both unchanged since (both recorded on the halt); and either the run asked for a plain re-check (the same site under
+ * the same checks), or that deterministic part already survived a revision unchanged (`stuck`), so another revision with
+ * the same findings is money spent on a known result. Halts recorded before 2026-10-15 carry no digest and are never refused.
+ */
+export function wouldRepeat(
+  halt: AuditRecord | undefined,
+  now: { briefDigest: string; codeVersion: string | null | undefined; fromStep: ContinueFrom },
+): { repeat: false } | { repeat: true; why: string; fingerprint: string[] } {
+  const p = halt?.payload;
+  if (!p || p.status !== "failed_verification" || now.fromStep === "rebuild") return { repeat: false };
+  const fingerprint = Array.isArray(p.fingerprint) ? (p.fingerprint as string[]) : [];
+  if (fingerprint.length === 0) return { repeat: false };
+  if (typeof p.briefDigest !== "string" || p.briefDigest !== now.briefDigest) return { repeat: false };
+  if (!now.codeVersion || typeof p.codeVersion !== "string" || p.codeVersion !== now.codeVersion) return { repeat: false };
+  if (now.fromStep === "qa") return { repeat: true, why: "a re-check of the same saved site, with the same brief and the same factory code, gives the same failed checks", fingerprint };
+  if (p.stuck === true) return { repeat: true, why: "these checks already failed unchanged after a revision, and neither the brief nor the factory code has changed since", fingerprint };
+  return { repeat: false };
+}
+
 class Workflow {
   private readonly ctx: AuditContext;
+  /** The deterministic failures of the previous QA cycle in this session, to notice a revision that changed nothing. */
+  lastFingerprint: string[] | null = null;
   private readonly maxRevisions: number;
   private builderRounds: FrontendLoopResult["rounds"] = [];
   private readonly documentationEscalations: NonNullable<WorkflowResult["documentationEscalations"]> = [];
@@ -563,11 +631,25 @@ class Workflow {
     cp: CheckpointState | null,
     reason: string,
     qaFailure: QaFailure | null = null,
+    stuck = false,
   ): Promise<WorkflowResult> {
     await recordAudit(this.ctx, {
       action: "workflow.halt",
       outcome: "failure",
-      payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, status, stage, reason, qaFailure, cycles },
+      payload: {
+        workflow: WORKFLOW_ID,
+        version: WORKFLOW_VERSION,
+        status,
+        stage,
+        reason,
+        qaFailure,
+        cycles,
+        // What a later continue compares against, to refuse one that would end exactly like this (wouldRepeat).
+        fingerprint: stuckFingerprint(qaFailure),
+        briefDigest: briefDigest(this.brief),
+        codeVersion: this.deps.codeVersion ?? null,
+        stuck,
+      },
     });
     return this.result(status, cycles, cp, reason, qaFailure);
   }
@@ -850,6 +932,25 @@ class Workflow {
         failedChecks: verdict.checkResults.filter((c) => !c.passed && !c.advisory).map(({ checkId, details }) => ({ checkId, details })),
         evaluatorIssues: verdict.evaluator?.issues ?? [],
       };
+      // A revision that left every deterministic failure exactly as it was will not fix it on the next try either: the
+      // builder cannot satisfy that check (a rule conflict or a missing input, e.g. jobs d3c45995, e2a204fb). Stop now
+      // instead of paying for the rest of the revision budget, and say it is stuck so a continue is not offered blindly.
+      const fingerprint = stuckFingerprint(failure);
+      if (fingerprint.length > 0 && this.lastFingerprint !== null && sameLines(fingerprint, this.lastFingerprint)) {
+        const checks = [...new Set(failure.failedChecks.filter((c) => !VARIABLE_CHECK.test(c.checkId)).map((c) => c.checkId))].join(", ");
+        const halted = await this.halt(
+          "failed_verification",
+          "qa",
+          cp.cycle + 1,
+          cp,
+          `STUCK: the same check(s) failed unchanged after a revision (${checks}). Another revision would cost money and fail the same way; this needs a change to the brief, the details or the factory, not another try`,
+          failure,
+          true,
+        );
+        await this.stageEnded("qa", cp.cycle, qaTaskId, "failed_verification");
+        return halted;
+      }
+      this.lastFingerprint = fingerprint;
       if (cp.cycle - this.cycleBase >= this.maxRevisions) {
         const halted = await this.halt(
           "failed_verification",
@@ -925,6 +1026,8 @@ export interface ReopenRequest {
   by: string;
   /** The brief to continue with, e.g. the approved brief plus the facts the owner added. Absent: the run keeps the brief it has. */
   brief?: unknown;
+  /** Continue even when nothing changed since the stop (wouldRepeat). Only for an explicit technical override. */
+  force?: boolean;
 }
 
 /** Where a run stands, from its audit rows: what is saved, how many times it was reopened, whether it ended. */
@@ -1040,10 +1143,24 @@ export async function resumeBuildAndVerify(
   // The revision budget restarts from here. A fresh build is its own first cycle, so it gets the full budget after it;
   // recorded on the reopen row so a crash and a later resume keep the same budget.
   const baseCycle = !lastCp ? 0 : fromStep === "rebuild" ? lastCp.cycle + 1 : lastCp.cycle;
+  const lastHalt = [...workflowRows].reverse().find((r) => r.action === "workflow.halt");
   if (progress.state === "halted") {
     if (!opts.reopen) return finished("run already ended with workflow.halt — not re-opened");
     if (progress.haltStatus === "checkpoint_corrupt") {
       return finished("the saved site no longer matches its hash, so this run cannot continue: a fresh build is needed", "checkpoint_corrupt");
+    }
+    // Refuse a continue that would end exactly like the last stop, before any paid step. The automatic retry never gets
+    // here with a QA failure (it only follows a reviewer outage); `force` is Huraira's explicit override.
+    const verdict = opts.reopen.force ? { repeat: false as const } : wouldRepeat(lastHalt, { briefDigest: briefDigest(brief), codeVersion: deps.codeVersion, fromStep });
+    if (verdict.repeat) {
+      await recordAudit(
+        { sink: deps.audit, actor: `workflow:${WORKFLOW_ID}`, runId, taskId: start.taskId, entitySlug: brief.entitySlug },
+        { action: "workflow.reopen_refused", outcome: "info", payload: { workflow: WORKFLOW_ID, version: WORKFLOW_VERSION, by: opts.reopen.by, reason: opts.reopen.reason, fromStep, why: verdict.why, fingerprint: verdict.fingerprint } },
+      );
+      return {
+        ...finished(`Not continued, nothing was spent: ${verdict.why}. Add or change the details, or have the factory fixed, then continue.`, "repeat_refused"),
+        qaFailure: (lastHalt?.payload?.qaFailure as QaFailure | null | undefined) ?? null,
+      };
     }
     // Written before anything runs, so the run's history shows who continued it and why, and the revision budget restarts here.
     await recordAudit(
@@ -1088,6 +1205,10 @@ export async function resumeBuildAndVerify(
       return await wf.buildFrom(cycle, lastCp);
     }
     if (fromStep === "revise") {
+      // Compare the first check after this revision with the stop it continues from, so a revision that changes nothing is
+      // caught at once instead of after one more paid revision.
+      const fp = lastHalt?.payload?.fingerprint;
+      if (Array.isArray(fp) && fp.length > 0) wf.lastFingerprint = fp as string[];
       const extra = opts.reopen?.brief !== undefined ? ["[owner] The owner added or changed details since the last check: use every owner-confirmed fact in the brief."] : [];
       return await wf.reviseFrom({ ...lastCp, stage: "build" }, [...findings!, ...extra]);
     }

@@ -151,6 +151,7 @@ export const HALT_WORDS: Record<string, string> = {
   qa_failed: "The quality checks couldn't finish.",
   checkpoint_corrupt: "The saved copy of the site no longer matched, so it can't be checked. It has to be written again.",
   already_finished: "This run had already finished.",
+  repeat_refused: "It was not continued, because nothing had changed since it stopped, so it would have failed the same way. Nothing was spent.",
 };
 export const CRASH_WORDS = "The worker stopped before reporting. Anything it saved is kept.";
 
@@ -162,6 +163,7 @@ const STAGE_OF_STATUS: Record<string, Stage> = {
   qa_failed: "qa",
   checkpoint_corrupt: "qa",
   build_failed: "build",
+  repeat_refused: "qa",
 };
 
 const ms = (iso: string | null | undefined) => (iso ? new Date(iso).getTime() : NaN);

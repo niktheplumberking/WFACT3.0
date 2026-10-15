@@ -122,6 +122,35 @@ export const contentAfterHtmlCheck: Check = {
   },
 };
 
+/** Quote text for matching: case, typographic quotes and dashes, quote marks and whitespace do not count. */
+const quoteNorm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[‘’]/g, "'")
+    .replace(/[–—]/g, "-")
+    .replace(/["“”«»„]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[\s.,!?;:'-]+$/, "")
+    .replace(/^['\s]+/, "");
+
+/**
+ * True when the card quotes, word for word, feedback the brief supplies (the owner's confirmed facts). R-10 asks for a SAMPLE
+ * label only on invented feedback; the builder's own rule (DR-FAKE-SOCIAL-PROOF, rulebook 1.1.0) forbids SAMPLE quotes and
+ * allows only supplied ones, so without this the two rules contradict and every build with real quotes fails, then fails the
+ * same way again on every continue (Cockpit job d3c45995, Harbor Street, 2026-10-14). The quote must be the bulk of the card
+ * (attribution aside) and at least 6 words, so a stray brief sentence cannot excuse an invented testimonial around it.
+ */
+function quotesSuppliedFeedback(card: HTMLElement, normSources: string): boolean {
+  if (!normSources.trim()) return false;
+  const cardWords = quoteNorm(card.text).split(" ").filter(Boolean).length;
+  return [card, ...card.querySelectorAll("*")].some((el) => {
+    const t = quoteNorm(el.text).replace(/[.,!?;:()]/g, " ").replace(/\s+/g, " ").trim();
+    const words = t.split(" ").filter(Boolean).length;
+    return words >= 6 && words * 2 >= cardWords && normSources.includes(` ${t} `);
+  });
+}
+
 const QUOTE_UNITS =
   'blockquote, q, [class*="quote"], [class*="testimonial"], [class*="review"], [id*="testimonial"], [id*="review"]';
 const PROOF_HEADING = /testimonial|review|what (our )?(customers|clients|homeowners) say|kind words/i;
@@ -156,9 +185,11 @@ export const sampleLabelCheck: Check = {
         cards.add(card);
       }
     }
+    // Padded and punctuation-spaced so a match only counts on whole words ("…us" never matches "…use").
+    const normSources = ` ${quoteNorm((ctx.factSources ?? []).join("\n")).replace(/[.,!?;:()]/g, " ").replace(/\s+/g, " ")} `;
     for (const card of cards) {
       if (card.text.trim().length < 20) continue; // a "Reviews" nav link or empty wrapper is not a testimonial
-      if (!SAMPLE.test(card.text)) {
+      if (!SAMPLE.test(card.text) && !quotesSuppliedFeedback(card, normSources)) {
         details.push(
           `Testimonial without a visible SAMPLE label: "${snippet(card.text, 90)}". Label it "SAMPLE - replace with real customer feedback" or use supplied, real feedback.`,
         );
@@ -168,7 +199,10 @@ export const sampleLabelCheck: Check = {
     for (const section of root.querySelectorAll("section")) {
       const heading = section.querySelector("h1, h2, h3")?.text ?? "";
       const hasCards = [...cards].some((c) => c === section || contains(section, c));
-      if (PROOF_HEADING.test(heading) && !hasCards && !SAMPLE.test(section.text)) {
+      // Every quote-like paragraph must be supplied: one copied brief sentence cannot excuse invented quotes beside it.
+      const quoteLike = section.querySelectorAll("blockquote, q, p").filter((el) => !el.querySelector("blockquote, q, p") && el.text.trim().split(/\s+/).length >= 6);
+      const supplied = quoteLike.length > 0 && quoteLike.every((el) => quotesSuppliedFeedback(el, normSources));
+      if (PROOF_HEADING.test(heading) && !hasCards && !SAMPLE.test(section.text) && !supplied) {
         details.push(`Section "${snippet(heading, 60)}" presents customer feedback with no SAMPLE label.`);
       }
     }

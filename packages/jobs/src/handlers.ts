@@ -303,7 +303,7 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
           extra.inputsWaived = inputs.filter((i) => i.waived).length;
         }
         const reason = typeof p.reason === "string" && p.reason.trim() ? p.reason.trim().slice(0, 200) : "continued from the Cockpit";
-        reopen = { reason, by: job.createdBy, ...(brief !== undefined ? { brief } : {}) };
+        reopen = { reason, by: job.createdBy, ...(brief !== undefined ? { brief } : {}), ...(p.force === true ? { force: true } : {}) };
       }
       // Where to continue (the Cockpit's step-targeted buttons): re-check the saved site, revise it with the last findings, or build again.
       const fromStep: ContinueFrom | undefined = p.fromStep === "qa" || p.fromStep === "revise" || p.fromStep === "rebuild" ? p.fromStep : undefined;

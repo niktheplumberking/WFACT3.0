@@ -43,6 +43,9 @@ describe("why a build stopped, in the owner's terms", () => {
     ["factory: a scope contradiction", halted("build_failed", 'builder rejected: permission denied for role "front-end-builder": client:x (client x belongs to entity "a")'), "factory"],
     ["factory: the isolated build", halted("build_failed", "builder escalated: The isolated Track B build failed: next build failed (exit 1)"), "factory"],
     ["factory: an invalid brief", job({ error: 'InvalidBriefError: Brief is missing required string field "goal".' }), "factory"],
+    ["factory: stuck, the same checks failed unchanged after a revision", halted("failed_verification", "STUCK: the same check(s) failed unchanged after a revision (claims.after-html). Another revision would cost money and fail the same way", { qaIssues: ["[claims.after-html] Text after </html> renders on the page"] }), "factory"],
+    ["factory: a continue refused because nothing changed", halted("repeat_refused", "Not continued, nothing was spent: these checks already failed unchanged after a revision"), "factory"],
+    ["info beats stuck when the owner can supply what is missing", halted("failed_verification", "STUCK: the same check(s) failed unchanged after a revision (claims.unsourced-fact)", { qaIssues: ["[claims.unsourced-fact] phone number 0400 111 222 on contact.html is not in the brief"] }), "info"],
     ["unknown: something never seen", job({ error: "Error: something nobody planned for" }), "unknown"],
   ])("%s", (_name, j, cause) => {
     expect(diagnoseJob(j, [j], { planId: PLAN }).cause).toBe(cause);

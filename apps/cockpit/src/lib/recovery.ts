@@ -63,6 +63,9 @@ const TEMPORARY =
   /no response|fetch failed|HTTP 5\d\d|HTTP 429|upstream_unreachable|after 4 attempts|runner crashed|artifact upload failed|AuditWriteError|timed? ?out|ECONNRESET|a required review could not run|GitHub dispatch failed \(HTTP 5|VERDICT protocol/i;
 const FACTORY =
   /permission denied for role|CheckpointIntegrityError|isolated Track B build failed|InvalidBriefError|Brief (is missing|"|ownerFacts)|clientSlug must be|sandbox-exec|unshare|refusing to build|input failed the agent's schema|Lighthouse could not measure|is outside clients\//i;
+// A run the engine found stuck (the same checks failed unchanged after a revision) or a continue it refused because nothing
+// changed since that stop: another press of the same button cannot help, so the report for Huraira leads (2026-10-15).
+const STUCK = /^STUCK:|\nSTUCK:|Not continued, nothing was spent/;
 const FIXABLE = /content was still invalid|round cap|without reviewer approval|QA still failing|verification (rejected|failed)/i;
 
 /** A run the worker never reported on (killed at GitHub's time limit, crashed) is treated as stopped, with the reason said plainly. */
@@ -174,6 +177,8 @@ function classify(j: JobRow, needs: Need[]): Cause {
   if (SETUP.test(text) && !/a required review could not run/i.test(text)) return "setup";
   if (status === "checkpoint_corrupt") return "temporary";
   if (needs.length > 0 || status === "needs_input") return "info";
+  // After "info": a stuck stop the owner can unblock with details leads with the form (new details lift the refusal).
+  if (status === "repeat_refused" || STUCK.test(text)) return "factory";
   if (status === "crashed" || TEMPORARY.test(text)) return "temporary";
   if (FACTORY.test(text)) return "factory";
   if (status === "failed_verification" || FIXABLE.test(text)) return "fixable";
@@ -474,6 +479,12 @@ export function continueOptions(c: ContinueInput): ContinueOption[] {
     return [{ id: "details", label: "Save the details and continue", hint: "Nothing was spent yet. It starts once the details are in.", primary: true, needsDetails: !!c.hasNeeds, toast: "Starting with your details." }];
   }
   if (status === "checkpoint_corrupt") return [rebuild("Build it again")];
+  if (status === "failed_verification" && c.cause === "factory") {
+    // Stuck: the same press would fail the same way (and the engine refuses it unpaid). Continue only after the details or
+    // the factory changed, so the button is offered but never as the main action.
+    if (!built) return [{ ...rebuild(), primary: false }];
+    return [{ ...revise(c.hasNeeds ? "Save the details and continue" : "Continue after a fix"), primary: !!c.hasNeeds }];
+  }
   if (status === "failed_verification") {
     if (!built) return [rebuild()];
     return [revise(c.hasNeeds ? "Save the details and continue" : "Fix and continue"), recheck("Check again without changes", false)];

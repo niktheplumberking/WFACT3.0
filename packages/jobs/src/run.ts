@@ -116,6 +116,8 @@ function buildDeps(): HandlerDeps {
     stageObserver,
     // 2026-10-14: the owner's uploaded logo (client-assets bucket) and the readiness probes run before any paid step.
     brandAssets: new SupabaseBrandAssetStore(url, serviceKey),
+    // 2026-10-15: the commit this runner executes; a continue with the same code and brief as a stuck stop is refused unpaid.
+    codeVersion: process.env.GITHUB_SHA ?? null,
     providerProbes: providerProbes({
       anthropicKey: apiKey,
       anthropicModel: (JSON.parse(readFileSync(path.join(REPO_ROOT, "packages", "rendered-qa", "config", "reviewer.json"), "utf-8")) as { model: string }).model,
