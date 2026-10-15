@@ -56,10 +56,16 @@ only `render.perf` and `render.design-review` are treated as variable; if anothe
 
 ## 5. Still open (not changed here)
 
-1. **Palette contradiction (e2a204fb b).** The Track B palette engine (`frontend-loop/src/trackB/palette.ts`) derives surface, muted
-   and darkened-accent colours for contrast; a brief that says "only the three brand colours" fails on them. Needs a decision: are
-   tints and shades of the brand colours allowed (the client's own words were "nothing else except tints of those")? Then align the
-   engine and the evaluator to that one rule.
+1. **Palette contradiction (e2a204fb b): CLOSED 2026-10-15.** Decision (Huraira, 2026-10-15): tints and shades of the brief's
+   colours (same hue mixed with white or black) are on-brief, as the client's own words said; "only the N colours" means no other
+   hue. Buttons fill with the true brand accent whenever their text reads at 4.5:1, otherwise a shade of that same accent. The
+   engine already did this (8857819 on-brief tokens with refusal, d112f62 `action` = true accent; both landed after e2a204fb ran).
+   What was missing was the judges: the screenshot reviewer had no colour rule and read the brief literally. Now one text,
+   `verification/src/brandColours.ts` `BRAND_COLOUR_RULE`, is quoted by the evaluator RUBRIC (item 4) and the reviewer's system
+   prompt. Eval E5 in `failureEvals.test.ts` (4 cases) proves the Lanternworks brief yields only tints/shades, CTAs in `#F26B38`,
+   every text pair at 4.5:1, a shade-of-accent fallback when no text can read on the accent, and both judges carrying the rule.
+   Mutation-checked: removing the rule from either judge, darkening every CTA, a blended hue (with or without the engine's
+   refusal) and a loosened `dim` contrast each turn E5 red. No contrast or motion budget changed.
 2. **A continue that never reached GitHub.** Job `caa201f1` (Harbor Street continue, 2026-10-14 18:12) is still `queued` with no
    `dispatched_at`: the browser's call to `dispatch-job` never landed. Nothing was spent. It should be cancelled and pressed again
    *after* this change is deployed. The old code would fail it the same way.

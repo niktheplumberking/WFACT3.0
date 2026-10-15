@@ -8,6 +8,10 @@
  *   E2  d3c45995, e2a204fb  the same deterministic failure survived a revision unchanged, then the run paid for another.
  *   E3  e2a204fb → 55ddba7c  a continue with nothing changed (same code, same brief) re-ran a known failure.
  *   E4  what must still go through: changed code, changed brief, an explicit override, old runs, measured-only failures.
+ *   E5  e2a204fb  "only the three brand colours" failed every revision: the palette engine derives tints and shades for WCAG
+ *                 contrast (and filled CTAs with a darkened accent), which a judge reading the brief literally never accepts.
+ *                 Rule (Huraira, 2026-10-15): tints and shades of brief colours are on-brief; buttons use the true accent
+ *                 wherever its text reads at 4.5:1, else a shade of it. Engine, evaluator and reviewer must hold that one rule.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -20,6 +24,12 @@ import { MockModelClient as BuilderMock } from "@wfact/frontend-loop/modelClient
 import { createQaEvaluatorAgent } from "@wfact/verification/agent";
 import { MockModelClient as EvaluatorMock } from "@wfact/verification/modelClient";
 import { sampleLabelCheck } from "@wfact/verification/checks/claims";
+import { RUBRIC } from "@wfact/verification/evaluator";
+import { BRAND_COLOUR_RULE } from "@wfact/verification/brandColours";
+import { buildTrackBPalette } from "@wfact/frontend-loop/trackB/palette";
+import { contrast, hueChroma, offBriefTokens } from "@wfact/frontend-loop/trackA/palette";
+import { createScreenshotReviewSuite } from "@wfact/rendered-qa/reviewer";
+import { loadRulebook } from "@wfact/rendered-qa/rulebook";
 import {
   buildAndVerify,
   resumeBuildAndVerify,
@@ -236,4 +246,69 @@ test("E4: halts recorded before this change (no digest) are never refused, and r
   assert.equal(wouldRepeat(modern, { briefDigest: "d", codeVersion: "c", fromStep: "rebuild" }).repeat, false);
   const outage = { action: "workflow.halt", payload: { status: "not_verified_no_evaluator", fingerprint: ["x|y"], briefDigest: "d", codeVersion: "c" } } as never;
   assert.equal(wouldRepeat(outage, { briefDigest: "d", codeVersion: "c", fromStep: "qa" }).repeat, false, "a reviewer outage can clear by itself");
+});
+
+// ---- E5: one brand-colour rule for the palette engine, the evaluator and the screenshot reviewer -------------------------
+
+const AA = 4.5;
+const LANTERNWORKS_NOTES = "Use only the three fixed brand colors, navy #14213D, paper white #FAF7F2, and signal orange #F26B38 reserved for interactive elements.";
+const threeColours = { ink: "#14213D", paper: "#FAF7F2", accent: "#F26B38", deep: "#14213D" };
+const briefHexes = (c: typeof threeColours) => [c.ink, c.paper, c.accent, c.deep];
+const hueGap = (a: number, b: number) => Math.min(Math.abs(a - b), 360 - Math.abs(a - b));
+
+/** Every text/background pair the Track B starter paints, each must reach WCAG AA (4.5:1). */
+function textPairs(p: NonNullable<ReturnType<typeof buildTrackBPalette>["palette"]>): [string, string, string][] {
+  return [
+    ["ink on paper", p.ink, p.paper], ["muted on paper", p.muted, p.paper], ["accentInk on paper", p.accentInk, p.paper],
+    ["dim on paper", p.dim, p.paper], ["ink on surface", p.ink, p.surface], ["muted on surface", p.muted, p.surface],
+    ["accentInk on surface", p.accentInk, p.surface], ["onDeep on deep", p.onDeep, p.deep], ["onDeep on deepPanel", p.onDeep, p.deepPanel],
+    ["onAccent on accentInk", p.onAccent, p.accentInk], ["onAction on action", p.onAction, p.action],
+  ];
+}
+
+test("E5 e2a204fb: a three-colour brief yields only tints and shades of its colours, and every text pair still reaches 4.5:1", () => {
+  const { palette, problems } = buildTrackBPalette(threeColours);
+  assert.deepEqual(problems, []);
+  assert.ok(palette, "the engine accepts the Lanternworks brief");
+  assert.deepEqual(offBriefTokens(palette, briefHexes(threeColours)), [], "no derived token introduces a new hue");
+  for (const [label, fg, bg] of textPairs(palette)) assert.ok(contrast(fg, bg) >= AA, `${label}: ${contrast(fg, bg).toFixed(2)}:1`);
+});
+
+test("E5 e2a204fb: CTAs are filled with the client's true accent #F26B38 when its text reads at 4.5:1, not the darkened #9D4624", () => {
+  const p = buildTrackBPalette(threeColours).palette!;
+  assert.equal(p.action, "#F26B38");
+  assert.notEqual(p.action, p.accentInk);
+  assert.ok(contrast(p.onAction, p.action) >= AA);
+});
+
+test("E5: an accent no text can read on falls back to a shade of the SAME accent (not a new hue), still at 4.5:1", () => {
+  const colours = { ink: "#333333", paper: "#FFFFFF", accent: "#D9701F", deep: "#333333" };
+  assert.ok(contrast(colours.ink, colours.accent) < AA && contrast(colours.paper, colours.accent) < AA, "precondition: the true accent cannot carry text");
+  const p = buildTrackBPalette(colours).palette!;
+  assert.notEqual(p.action, colours.accent);
+  assert.deepEqual(offBriefTokens({ action: p.action }, [colours.accent]), [], "the button is a tint/shade of the accent itself");
+  assert.ok(hueGap(hueChroma(p.action).hue, hueChroma(colours.accent).hue) <= 2, "same hue as the brief accent");
+  assert.ok(contrast(p.onAction, p.action) >= AA);
+});
+
+test("E5: the evaluator and the screenshot reviewer are told the same rule the engine follows, next to the literal brief", async () => {
+  assert.ok(RUBRIC.includes(BRAND_COLOUR_RULE), "evaluator rubric carries the brand-colour rule");
+  assert.match(BRAND_COLOUR_RULE, /tints and shades of the brief's colours/);
+  assert.match(BRAND_COLOUR_RULE, /only its\s+colours: that means no other HUE/, "a 'use only these colours' brief is read as hues, not exact hex values");
+  assert.match(BRAND_COLOUR_RULE, /accent itself\s+whenever their text reads on it at 4\.5:1/);
+  const ids = loadRulebook().rules.filter((r) => r.detect.review).map((r) => r.id);
+  const sent: Record<string, unknown>[] = [];
+  const fetchImpl = (async (_url: string, init: RequestInit) => {
+    sent.push(JSON.parse(String(init.body)));
+    const answer = JSON.stringify({ findings: ids.map((ruleId) => ({ ruleId, verdict: "pass", evidence: "ok" })) });
+    return new Response(JSON.stringify({ choices: [{ message: { content: answer } }], usage: { prompt_tokens: 1, completion_tokens: 1 } }), { status: 200 });
+  }) as unknown as typeof fetch;
+  const shots = [{ page: "index.html", viewport: "desktop" as const, width: 1440, file: "/dev/null", slices: [Buffer.from("fake-jpeg")] }];
+  const suite = createScreenshotReviewSuite({ apiKey: "k", builderVendor: "agent37", shots: () => shots, fetchImpl, retryDelaysMs: [0] });
+  await suite.run({ html: "<html></html>", clientSlug: "lanternworks-studio", requiredSections: [], otherClientSlugs: [], factSources: [LANTERNWORKS_NOTES] });
+  assert.equal(sent.length, 1);
+  const messages = sent[0]!.messages as { role: string; content: unknown }[];
+  const system = String(messages.find((m) => m.role === "system")!.content);
+  assert.ok(system.includes(BRAND_COLOUR_RULE), "screenshot reviewer carries the same brand-colour rule");
+  assert.ok(JSON.stringify(messages).includes(LANTERNWORKS_NOTES), "and still sees the client's own words");
 });
