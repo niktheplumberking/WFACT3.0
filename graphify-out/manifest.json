@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1791998329.0873444,
-    "seen": 1791998333.054452,
-    "ast_hash": "ca7a9d6f1d098b766a0eb4e7d9234be8",
+    "mtime": 1792047277.0154493,
+    "seen": 1792047294.5610838,
+    "ast_hash": "1859fd851b02e97d27635d7647ed0083",
     "semantic_hash": ""
   },
   "README.md": {
@@ -840,9 +840,9 @@
     "semantic_hash": ""
   },
   "packages/workflow/src/buildAndVerify.ts": {
-    "mtime": 1791990041.5140069,
-    "seen": 1791991135.655555,
-    "ast_hash": "e8c8989bc2fa14a358cf73514107da42",
+    "mtime": 1792047058.7241366,
+    "seen": 1792047294.5601642,
+    "ast_hash": "8c9ffa35d309dd3f0fe3faa950f54537",
     "semantic_hash": ""
   },
   "packages/workflow/src/cli.ts": {
@@ -996,9 +996,9 @@
     "semantic_hash": ""
   },
   "packages/jobs/src/handlers.ts": {
-    "mtime": 1791986310.4144711,
-    "seen": 1791989613.808338,
-    "ast_hash": "e96a6649eccba79aae14bbb9a0cd82fe",
+    "mtime": 1792046667.7042305,
+    "seen": 1792047294.558793,
+    "ast_hash": "6a25eca8cb60eaf4adaaae86baa35ec6",
     "semantic_hash": ""
   },
   "packages/jobs/src/jobStore.ts": {
@@ -1008,9 +1008,9 @@
     "semantic_hash": ""
   },
   "packages/jobs/src/run.ts": {
-    "mtime": 1791981635.4778993,
-    "seen": 1791982653.7118342,
-    "ast_hash": "a4e5b52ca8398952e2bf3ae9a32c6c2e",
+    "mtime": 1792046666.0627913,
+    "seen": 1792047294.558882,
+    "ast_hash": "955f5b1e87f2bcdc25b193c7222bfa5e",
     "semantic_hash": ""
   },
   "packages/jobs/test/handlers.test.ts": {
@@ -1182,9 +1182,9 @@
     "semantic_hash": ""
   },
   "packages/verification/src/checks/claims.ts": {
-    "mtime": 1791973619.4606917,
-    "seen": 1791982653.712279,
-    "ast_hash": "1cf082f91d29e1bd831784221b936684",
+    "mtime": 1792047058.2953818,
+    "seen": 1792047294.559726,
+    "ast_hash": "5ad8ab7610eddcd52e78ce931e9ff334",
     "semantic_hash": ""
   },
   "packages/verification/test/claims.test.ts": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1791998329.0868185,
-    "seen": 1791998333.054847,
-    "ast_hash": "3dff6510362bb2cd55383afda54476f3",
+    "mtime": 1792047277.0160286,
+    "seen": 1792047294.561513,
+    "ast_hash": "836b651111fc8e5d40f8189580fab280",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -2898,15 +2898,15 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/recovery.test.ts": {
-    "mtime": 1791993742.0770574,
-    "seen": 1791994041.763916,
-    "ast_hash": "28a43f919167229dd6e3d3267cc742cd",
+    "mtime": 1792046875.3924203,
+    "seen": 1792047294.555968,
+    "ast_hash": "94f8dd7ae67d27b36062f16f623404cd",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/recovery.ts": {
-    "mtime": 1791972368.7527733,
-    "seen": 1791982653.70996,
-    "ast_hash": "8d6b311567582b4b2661c9c42873c610",
+    "mtime": 1792046852.1504104,
+    "seen": 1792047294.555969,
+    "ast_hash": "77daf85fee92fed3f3d4d380f800762e",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/runInfo.ts": {
@@ -3684,15 +3684,15 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/timeline.test.ts": {
-    "mtime": 1791972315.8538742,
-    "seen": 1791982653.7099771,
-    "ast_hash": "ac6fed36264a9ebc01b754f87b89f7aa",
+    "mtime": 1792046857.8173256,
+    "seen": 1792047294.556054,
+    "ast_hash": "33fdeef5bbfe30aee3915ccf195ab456",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/timeline.ts": {
-    "mtime": 1791997253.572258,
-    "seen": 1791997742.0857248,
-    "ast_hash": "ff2acb1dd0b6df818c3d72bbf92a759f",
+    "mtime": 1792047035.5968874,
+    "seen": 1792047294.556055,
+    "ast_hash": "758ed903f3203eb9783b517c75d35efb",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/useNow.ts": {
@@ -4371,6 +4371,30 @@
     "mtime": 1791998329.0888572,
     "seen": 1791998333.054142,
     "ast_hash": "b1d801337630aec4ba4ac64f0a862af7",
+    "semantic_hash": ""
+  },
+  "packages/workflow/test/failureEvals.test.ts": {
+    "mtime": 1792047050.1708462,
+    "seen": 1792047294.560243,
+    "ast_hash": "09ff240c9272e0f2b1274e42f4d5e26c",
+    "semantic_hash": ""
+  },
+  ".claude/completions/2026-10-15-step-28-build-failure-guards.md": {
+    "mtime": 1792047290.1675012,
+    "seen": 1792047294.560673,
+    "ast_hash": "c919c29edae7b22177c45cb22baa62bf",
+    "semantic_hash": ""
+  },
+  "docs/BUILD-FAILURE-DIAGNOSIS.md": {
+    "mtime": 1792047083.32802,
+    "seen": 1792047294.561344,
+    "ast_hash": "2fe188180bec67e8097259c7ca1ed4b7",
+    "semantic_hash": ""
+  },
+  "docs/design/cockpit-v2/docs/COCKPIT-V2-PHASES-14-ON-PROMPT.md": {
+    "mtime": 1791999442.8274713,
+    "seen": 1792047294.561784,
+    "ast_hash": "1c336df029770408006b9bea5fb6e33a",
     "semantic_hash": ""
   }
 }
