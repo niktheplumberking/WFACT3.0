@@ -420,9 +420,9 @@
     "semantic_hash": ""
   },
   "BLOCKED-ON-NICK.md": {
-    "mtime": 1792057897.6542113,
-    "seen": 1792058103.073326,
-    "ast_hash": "043d21ade48ca111fbe3c3e85d5ebed7",
+    "mtime": 1792166799.4900897,
+    "seen": 1792166923.487134,
+    "ast_hash": "4ffd2c51f99f6acc681d9f734effb418",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1792061517.0817487,
-    "seen": 1792061526.111615,
-    "ast_hash": "4de289447e91984002e212453e006b38",
+    "mtime": 1792166901.71009,
+    "seen": 1792166923.487154,
+    "ast_hash": "7b8295c8af5a291a804158293832936b",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1032,9 +1032,9 @@
     "semantic_hash": ""
   },
   "packages/rendered-qa/scripts/make-fixtures.ts": {
-    "mtime": 1791989845.29979,
-    "seen": 1791991135.6546738,
-    "ast_hash": "5975d0b23e0cad23d81e8e9a6d411083",
+    "mtime": 1792062825.3546917,
+    "seen": 1792166923.485224,
+    "ast_hash": "7b544014d143b1685acf02e5c78d12ed",
     "semantic_hash": ""
   },
   "packages/rendered-qa/src/browserScripts.ts": {
@@ -1158,9 +1158,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1792061517.0813015,
-    "seen": 1792061526.112132,
-    "ast_hash": "0389e700fa477b138b979c3b92b711f3",
+    "mtime": 1792166881.0744429,
+    "seen": 1792166923.4876192,
+    "ast_hash": "1135c8911d49da3e1b2e9ce87c3c30e9",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1224,104 +1224,104 @@
     "semantic_hash": "954cd7408d30fabe0f0a640b8d534cf0"
   },
   "packages/frontend-loop/design/fixtures/DQ-ART-DIRECTION.html": {
-    "mtime": 1791989853.1840978,
-    "seen": 1791991135.656976,
+    "mtime": 1792063182.4569242,
+    "seen": 1792166923.488099,
     "ast_hash": "1be8c17f6172db0c60d16c8ce4b3d3a7",
     "semantic_hash": "1be8c17f6172db0c60d16c8ce4b3d3a7"
   },
   "packages/frontend-loop/design/fixtures/DQ-CONTENT-HIERARCHY.html": {
-    "mtime": 1791989853.1842268,
-    "seen": 1791991135.656977,
+    "mtime": 1792063182.4571216,
+    "seen": 1792166923.488099,
     "ast_hash": "e3ad94ce9f1988b416b338ae09756fa6",
     "semantic_hash": "e3ad94ce9f1988b416b338ae09756fa6"
   },
   "packages/frontend-loop/design/fixtures/DQ-MOBILE-READABLE.html": {
-    "mtime": 1791989853.184293,
-    "seen": 1791991135.656978,
+    "mtime": 1792063182.457223,
+    "seen": 1792166923.4881,
     "ast_hash": "523062eb538c96bd14b98bcc7b1b9303",
     "semantic_hash": "523062eb538c96bd14b98bcc7b1b9303"
   },
   "packages/frontend-loop/design/fixtures/DQ-TYPE-HIERARCHY.html": {
-    "mtime": 1791989853.1841617,
-    "seen": 1791991135.656978,
+    "mtime": 1792063182.4570272,
+    "seen": 1792166923.4881,
     "ast_hash": "b11cfeda95d26fdd8a8987600af497ae",
     "semantic_hash": "b11cfeda95d26fdd8a8987600af497ae"
   },
   "packages/frontend-loop/design/fixtures/DR-CENTRED-EVERYTHING.html": {
-    "mtime": 1791989853.1830955,
-    "seen": 1791991135.656978,
+    "mtime": 1792063182.4560487,
+    "seen": 1792166923.488101,
     "ast_hash": "959f30972992ed3d6debc00ec974357a",
     "semantic_hash": "959f30972992ed3d6debc00ec974357a"
   },
   "packages/frontend-loop/design/fixtures/DR-EMOJI-ICONS.html": {
-    "mtime": 1791989853.1830344,
-    "seen": 1791991135.6569788,
+    "mtime": 1792063182.4559493,
+    "seen": 1792166923.488101,
     "ast_hash": "28a36c097c34dc474f3faa347b0ad6a9",
     "semantic_hash": "28a36c097c34dc474f3faa347b0ad6a9"
   },
   "packages/frontend-loop/design/fixtures/DR-EYEBROW-OVERUSE.html": {
-    "mtime": 1791989853.1840227,
-    "seen": 1791991135.65698,
+    "mtime": 1792063182.4568307,
+    "seen": 1792166923.488102,
     "ast_hash": "5f52414d0329ddc9247813806b5a195c",
     "semantic_hash": "5f52414d0329ddc9247813806b5a195c"
   },
   "packages/frontend-loop/design/fixtures/DR-FAKE-SOCIAL-PROOF.html": {
-    "mtime": 1791989853.1832268,
-    "seen": 1791991135.65698,
+    "mtime": 1792063182.4562554,
+    "seen": 1792166923.488102,
     "ast_hash": "caf9b598ed42360d634a822427841196",
     "semantic_hash": "caf9b598ed42360d634a822427841196"
   },
   "packages/frontend-loop/design/fixtures/DR-FILLER-COPY.html": {
-    "mtime": 1791989853.183284,
-    "seen": 1791991135.656981,
+    "mtime": 1792063182.4563453,
+    "seen": 1792166923.488102,
     "ast_hash": "2cec31d8db83e64b9ce65248a15685cd",
     "semantic_hash": "2cec31d8db83e64b9ce65248a15685cd"
   },
   "packages/frontend-loop/design/fixtures/DR-GLASS-EVERYWHERE.html": {
-    "mtime": 1791989853.1834579,
-    "seen": 1791991135.656981,
+    "mtime": 1792063182.4564476,
+    "seen": 1792166923.488103,
     "ast_hash": "ebc4d258b600ecda6d4b548b2b2652d9",
     "semantic_hash": "ebc4d258b600ecda6d4b548b2b2652d9"
   },
   "packages/frontend-loop/design/fixtures/DR-GRADIENT-HERO.html": {
-    "mtime": 1791989853.1827672,
-    "seen": 1791991135.656981,
+    "mtime": 1792063182.4554665,
+    "seen": 1792166923.488103,
     "ast_hash": "64fe9e07967144bfea9f50837f72b6e6",
     "semantic_hash": "64fe9e07967144bfea9f50837f72b6e6"
   },
   "packages/frontend-loop/design/fixtures/DR-GRATUITOUS-MOTION.html": {
-    "mtime": 1791989853.1837654,
-    "seen": 1791991135.656982,
+    "mtime": 1792063182.456647,
+    "seen": 1792166923.4881039,
     "ast_hash": "062527f9a66c1bca6b507dfce9799294",
     "semantic_hash": "062527f9a66c1bca6b507dfce9799294"
   },
   "packages/frontend-loop/design/fixtures/DR-REPEATED-RHYTHM.html": {
-    "mtime": 1791989853.1836858,
-    "seen": 1791991135.656982,
+    "mtime": 1792063182.456547,
+    "seen": 1792166923.4881039,
     "ast_hash": "2fc49fb885fdd62a1702a40723067d0e",
     "semantic_hash": "2fc49fb885fdd62a1702a40723067d0e"
   },
   "packages/frontend-loop/design/fixtures/DR-SINGLE-DEFAULT-FONT.html": {
-    "mtime": 1791989853.1831603,
-    "seen": 1791991135.6569831,
+    "mtime": 1792063182.4561625,
+    "seen": 1792166923.4881039,
     "ast_hash": "8096b79b9992f6cf4b7676936d13b46a",
     "semantic_hash": "8096b79b9992f6cf4b7676936d13b46a"
   },
   "packages/frontend-loop/design/fixtures/DR-THIN-LOW-CONTRAST.html": {
-    "mtime": 1791989853.1839573,
-    "seen": 1791991135.6569831,
+    "mtime": 1792063182.4567392,
+    "seen": 1792166923.488105,
     "ast_hash": "dcd470ab7a95ea053b78f22b0a61daa7",
     "semantic_hash": "dcd470ab7a95ea053b78f22b0a61daa7"
   },
   "packages/frontend-loop/design/fixtures/DR-THREE-CARD-ROW.html": {
-    "mtime": 1791989853.1828318,
-    "seen": 1791991135.656984,
+    "mtime": 1792063182.4556525,
+    "seen": 1792166923.488105,
     "ast_hash": "61da30a02e143117d3abd2935b883edd",
     "semantic_hash": "61da30a02e143117d3abd2935b883edd"
   },
   "packages/frontend-loop/design/fixtures/clean.html": {
-    "mtime": 1791989853.1826792,
-    "seen": 1791991135.656984,
+    "mtime": 1792063182.4552245,
+    "seen": 1792166923.488105,
     "ast_hash": "895ebc794e30912f8c72e8ed534ee84f",
     "semantic_hash": "895ebc794e30912f8c72e8ed534ee84f"
   },
@@ -1332,50 +1332,50 @@
     "semantic_hash": ""
   },
   "packages/rendered-qa/test/fixtures/broken-link.html": {
-    "mtime": 1791989853.184914,
-    "seen": 1791991135.657094,
+    "mtime": 1792063182.4580681,
+    "seen": 1792166923.488201,
     "ast_hash": "7c283134debf33c59f643a6630b41774",
     "semantic_hash": "7c283134debf33c59f643a6630b41774"
   },
   "packages/rendered-qa/test/fixtures/console-error.html": {
-    "mtime": 1791989853.1850395,
-    "seen": 1791991135.657095,
+    "mtime": 1792063182.4582362,
+    "seen": 1792166923.488201,
     "ast_hash": "2d1710798f4dc2d06df2face0306c8bd",
     "semantic_hash": "2d1710798f4dc2d06df2face0306c8bd"
   },
   "packages/rendered-qa/test/fixtures/over-budget-js.html": {
-    "mtime": 1791989853.1854794,
-    "seen": 1791991135.657095,
+    "mtime": 1792063182.4588177,
+    "seen": 1792166923.488202,
     "ast_hash": "2e1f96745813724496c249ef0fa968c1",
     "semantic_hash": "2e1f96745813724496c249ef0fa968c1"
   },
   "packages/rendered-qa/test/fixtures/reduced-motion-ignored.html": {
-    "mtime": 1791989853.1855488,
-    "seen": 1791991135.657096,
+    "mtime": 1792063182.4589407,
+    "seen": 1792166923.488202,
     "ast_hash": "14f08312436a5b7714c0b39c54d1c6c9",
     "semantic_hash": "14f08312436a5b7714c0b39c54d1c6c9"
   },
   "packages/verification/test/fixtures/claims/banned-claim.html": {
-    "mtime": 1791989853.1848295,
-    "seen": 1791991135.6571252,
+    "mtime": 1792063182.4577575,
+    "seen": 1792166923.488229,
     "ast_hash": "36fc126056f088ea455dd14ed766537f",
     "semantic_hash": "36fc126056f088ea455dd14ed766537f"
   },
   "packages/verification/test/fixtures/claims/invented-fact.html": {
-    "mtime": 1791989853.184756,
-    "seen": 1791991135.657126,
+    "mtime": 1792063182.4576237,
+    "seen": 1792166923.48823,
     "ast_hash": "31872ac787ae8c4b83303615cc7f9e47",
     "semantic_hash": "31872ac787ae8c4b83303615cc7f9e47"
   },
   "packages/verification/test/fixtures/claims/leaked-text.html": {
-    "mtime": 1791989853.1845133,
-    "seen": 1791991135.657126,
+    "mtime": 1792063182.4573483,
+    "seen": 1792166923.48823,
     "ast_hash": "ee795f2594d82d66440f1c0865169749",
     "semantic_hash": "ee795f2594d82d66440f1c0865169749"
   },
   "packages/verification/test/fixtures/claims/missing-sample.html": {
-    "mtime": 1791989853.1846879,
-    "seen": 1791991135.657127,
+    "mtime": 1792063182.4574523,
+    "seen": 1792166923.48823,
     "ast_hash": "1e7b969e3033a4c1c45c6d07c94a671b",
     "semantic_hash": "1e7b969e3033a4c1c45c6d07c94a671b"
   },
@@ -1584,9 +1584,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/flows.test.tsx": {
-    "mtime": 1791998216.7604907,
-    "seen": 1791998333.0493639,
-    "ast_hash": "c31208319034c357141106719c86609a",
+    "mtime": 1792166421.0411038,
+    "seen": 1792166923.4813461,
+    "ast_hash": "ba10187842a6df7922e6ba9a132fd164",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/attention.ts": {
@@ -1614,9 +1614,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Activity.tsx": {
-    "mtime": 1791998194.4082727,
-    "seen": 1791998333.04986,
-    "ast_hash": "c270fcb71c6e007d9605594282c76fdd",
+    "mtime": 1792166712.086794,
+    "seen": 1792166923.481729,
+    "ast_hash": "f3e561e2a80ee914bae14dcd7036a1ba",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Decisions.tsx": {
@@ -3036,8 +3036,8 @@
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.source-maps/site.js": {
-    "mtime": 1791989853.192495,
-    "seen": 1791991135.655456,
+    "mtime": 1792063182.4681795,
+    "seen": 1792166923.486061,
     "ast_hash": "80bff4946f8ff48565682c617fc5ad2e",
     "semantic_hash": ""
   },
@@ -3102,386 +3102,386 @@
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/clean-site/404.html": {
-    "mtime": 1791989853.1918824,
-    "seen": 1791991135.657143,
+    "mtime": 1792063182.4676337,
+    "seen": 1792166923.488245,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/clean-site/index.html": {
-    "mtime": 1792057019.27222,
-    "seen": 1792058103.0748532,
+    "mtime": 1792063182.4675448,
+    "seen": 1792166923.488245,
     "ast_hash": "f61542491d8c2764bfa99125eeb10d51",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/clean-site/llms.txt": {
-    "mtime": 1791989853.1919897,
-    "seen": 1791991135.657144,
+    "mtime": 1792063182.4677446,
+    "seen": 1792166923.488246,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/clean-site/privacy.html": {
-    "mtime": 1791989853.191846,
-    "seen": 1791991135.657145,
+    "mtime": 1792063182.4675941,
+    "seen": 1792166923.488246,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/clean-site/robots.txt": {
-    "mtime": 1791989853.191953,
-    "seen": 1791991135.657145,
+    "mtime": 1792063182.4677072,
+    "seen": 1792166923.4882472,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/clean.html": {
-    "mtime": 1791989853.1903348,
-    "seen": 1791991135.6571462,
+    "mtime": 1792063182.4654844,
+    "seen": 1792166923.4882472,
     "ast_hash": "0cb85acdcbbea85cdeac71367525e42a",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/a11y.form-labels.html": {
-    "mtime": 1791989853.1909845,
-    "seen": 1791991135.6571462,
+    "mtime": 1792063182.4662604,
+    "seen": 1792166923.488248,
     "ast_hash": "6b0209f86bb5d0a5e03e393bbea16990",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/a11y.heading-order.html": {
-    "mtime": 1791989853.191048,
-    "seen": 1791991135.657147,
+    "mtime": 1792063182.4663548,
+    "seen": 1792166923.488248,
     "ast_hash": "e864c3698d302c9278236ce963d5dfc6",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/a11y.html-lang.html": {
-    "mtime": 1791989853.1909144,
-    "seen": 1791991135.657148,
+    "mtime": 1792063182.4661648,
+    "seen": 1792166923.488249,
     "ast_hash": "240949e330c724480ef6cbe21aaacb77",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/content.placeholder-media.html": {
-    "mtime": 1791989853.1908426,
-    "seen": 1791991135.657148,
+    "mtime": 1792063182.4660568,
+    "seen": 1792166923.488249,
     "ast_hash": "d584f5cbb34706c4d0ffd4166f1a979b",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/integrity.duplicate-ids.html": {
-    "mtime": 1791989853.1907618,
-    "seen": 1791991135.657152,
+    "mtime": 1792063182.4659495,
+    "seen": 1792166923.488252,
     "ast_hash": "23c5989d48b1b811c3b3334391d1c84b",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/integrity.prerendered-content.html": {
-    "mtime": 1791989853.1917303,
-    "seen": 1791991135.657152,
+    "mtime": 1792063182.4674265,
+    "seen": 1792166923.488252,
     "ast_hash": "5c8c23b00db4740a29a162c72cb9f8ad",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/links.site-internal/404.html": {
-    "mtime": 1791989853.1929839,
-    "seen": 1791991135.6571531,
+    "mtime": 1792063182.4687333,
+    "seen": 1792166923.488256,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/links.site-internal/index.html": {
-    "mtime": 1792057019.272694,
-    "seen": 1792058103.0751429,
+    "mtime": 1792063182.4686294,
+    "seen": 1792166923.488256,
     "ast_hash": "ff69b593843626aa62ee6d801ed08279",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/links.site-internal/llms.txt": {
-    "mtime": 1791989853.193104,
-    "seen": 1791991135.657154,
+    "mtime": 1792063182.468944,
+    "seen": 1792166923.488257,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/links.site-internal/privacy.html": {
-    "mtime": 1791989853.1929426,
-    "seen": 1791991135.657155,
+    "mtime": 1792063182.468679,
+    "seen": 1792166923.488257,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/links.site-internal/robots.txt": {
-    "mtime": 1791989853.193064,
-    "seen": 1791991135.657155,
+    "mtime": 1792063182.4688966,
+    "seen": 1792166923.4882581,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.dev-urls.html": {
-    "mtime": 1791989853.1904578,
-    "seen": 1791991135.657156,
+    "mtime": 1792063182.4656234,
+    "seen": 1792166923.4882581,
     "ast_hash": "e0fb97774a8274a534e1f2806ba951ea",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.mixed-content.html": {
-    "mtime": 1791989853.190576,
-    "seen": 1791991135.657156,
+    "mtime": 1792063182.4657197,
+    "seen": 1792166923.4882581,
     "ast_hash": "c45bf8ba59e475ab2f3a014e0c067cdd",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.source-maps/404.html": {
-    "mtime": 1791989853.192305,
-    "seen": 1791991135.6571572,
+    "mtime": 1792063182.46797,
+    "seen": 1792166923.488259,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.source-maps/index.html": {
-    "mtime": 1792057019.2733364,
-    "seen": 1792058103.075257,
+    "mtime": 1792063182.4678907,
+    "seen": 1792166923.488259,
     "ast_hash": "f61542491d8c2764bfa99125eeb10d51",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.source-maps/llms.txt": {
-    "mtime": 1791989853.1924167,
-    "seen": 1791991135.6571572,
+    "mtime": 1792063182.468093,
+    "seen": 1792166923.48826,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.source-maps/privacy.html": {
-    "mtime": 1791989853.192266,
-    "seen": 1791991135.657158,
+    "mtime": 1792063182.4679306,
+    "seen": 1792166923.48826,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.source-maps/robots.txt": {
-    "mtime": 1791989853.1923814,
-    "seen": 1791991135.657158,
+    "mtime": 1792063182.4680536,
+    "seen": 1792166923.48826,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.target-blank.html": {
-    "mtime": 1791989853.1906803,
-    "seen": 1791991135.6571589,
+    "mtime": 1792063182.4658399,
+    "seen": 1792166923.4882612,
     "ast_hash": "9b6c767250391da9c1e617f1b6b1a677",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.duplicate-titles/404.html": {
-    "mtime": 1791989853.192644,
-    "seen": 1791991135.6571589,
+    "mtime": 1792063182.468368,
+    "seen": 1792166923.4882612,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.duplicate-titles/index.html": {
-    "mtime": 1792057019.2725255,
-    "seen": 1792058103.075352,
+    "mtime": 1792063182.4682965,
+    "seen": 1792166923.4882612,
     "ast_hash": "f61542491d8c2764bfa99125eeb10d51",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.duplicate-titles/llms.txt": {
-    "mtime": 1791989853.1927586,
-    "seen": 1791991135.65716,
+    "mtime": 1792063182.468479,
+    "seen": 1792166923.488262,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.duplicate-titles/privacy.html": {
-    "mtime": 1791989853.1926079,
-    "seen": 1791991135.657162,
+    "mtime": 1792063182.468335,
+    "seen": 1792166923.488263,
     "ast_hash": "4c254c6e527e9654862044ba4956de10",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.duplicate-titles/robots.txt": {
-    "mtime": 1791989853.1927211,
-    "seen": 1791991135.657163,
+    "mtime": 1792063182.4684412,
+    "seen": 1792166923.488263,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.meta-description.html": {
-    "mtime": 1791989853.191163,
-    "seen": 1791991135.657163,
+    "mtime": 1792063182.466658,
+    "seen": 1792166923.488263,
     "ast_hash": "de4d4b307f9a38e27db83e4d0109231b",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.open-graph.html": {
-    "mtime": 1791989853.1913092,
-    "seen": 1791991135.657164,
+    "mtime": 1792063182.4668517,
+    "seen": 1792166923.4882638,
     "ast_hash": "d5d6d8c3e55694e6c4e8e7db46f08e41",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.single-h1.html": {
-    "mtime": 1791989853.1912427,
-    "seen": 1791991135.657164,
+    "mtime": 1792063182.4667559,
+    "seen": 1792166923.4882638,
     "ast_hash": "865acada1abdc9abb7a4d1f79de7a33c",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.title.html": {
-    "mtime": 1791989853.1911032,
-    "seen": 1791991135.657165,
+    "mtime": 1792063182.466452,
+    "seen": 1792166923.4882638,
     "ast_hash": "54f0ef83982a560dee15cbb5a907bd9a",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.404-page/index.html": {
-    "mtime": 1792057019.2739472,
-    "seen": 1792058103.0754838,
+    "mtime": 1792063182.4692454,
+    "seen": 1792166923.488265,
     "ast_hash": "f61542491d8c2764bfa99125eeb10d51",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.404-page/llms.txt": {
-    "mtime": 1791989853.1934116,
-    "seen": 1791991135.657166,
+    "mtime": 1792063182.4694252,
+    "seen": 1792166923.488265,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.404-page/privacy.html": {
-    "mtime": 1791989853.1932847,
-    "seen": 1791991135.657166,
+    "mtime": 1792063182.4692938,
+    "seen": 1792166923.488266,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.404-page/robots.txt": {
-    "mtime": 1791989853.1933706,
-    "seen": 1791991135.6571672,
+    "mtime": 1792063182.4693768,
+    "seen": 1792166923.488266,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.canonical.html": {
-    "mtime": 1791989853.1914287,
-    "seen": 1791991135.6571672,
+    "mtime": 1792063182.4670517,
+    "seen": 1792166923.488266,
     "ast_hash": "e4226d5764947cb423d76d404899bc5a",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.favicon.html": {
-    "mtime": 1791989853.1913717,
-    "seen": 1791991135.657168,
+    "mtime": 1792063182.4669437,
+    "seen": 1792166923.488267,
     "ast_hash": "7064e0cfff3f8329f46840d172c07d85",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.llms-txt/404.html": {
-    "mtime": 1791989853.1943974,
-    "seen": 1791991135.657168,
+    "mtime": 1792063182.470626,
+    "seen": 1792166923.488267,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.llms-txt/index.html": {
-    "mtime": 1792057019.2729144,
-    "seen": 1792058103.075597,
+    "mtime": 1792063182.4705462,
+    "seen": 1792166923.488267,
     "ast_hash": "f61542491d8c2764bfa99125eeb10d51",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.llms-txt/privacy.html": {
-    "mtime": 1791989853.194354,
-    "seen": 1791991135.6571689,
+    "mtime": 1792063182.4705887,
+    "seen": 1792166923.4882681,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.llms-txt/robots.txt": {
-    "mtime": 1791989853.1944838,
-    "seen": 1791991135.6571698,
+    "mtime": 1792063182.4707096,
+    "seen": 1792166923.4882681,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.og-image.html": {
-    "mtime": 1791989853.1915934,
-    "seen": 1791991135.6571698,
+    "mtime": 1792063182.4671538,
+    "seen": 1792166923.4882681,
     "ast_hash": "b80fe279c03770e7e95e7b1b02b7c11e",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.robots/404.html": {
-    "mtime": 1791989853.1940382,
-    "seen": 1791991135.657171,
+    "mtime": 1792063182.4701536,
+    "seen": 1792166923.488269,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.robots/index.html": {
-    "mtime": 1792057019.2731338,
-    "seen": 1792058103.075674,
+    "mtime": 1792063182.470047,
+    "seen": 1792166923.488269,
     "ast_hash": "f61542491d8c2764bfa99125eeb10d51",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.robots/llms.txt": {
-    "mtime": 1791989853.1941597,
-    "seen": 1791991135.657172,
+    "mtime": 1792063182.4703019,
+    "seen": 1792166923.488269,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.robots/privacy.html": {
-    "mtime": 1791989853.1939907,
-    "seen": 1791991135.657172,
+    "mtime": 1792063182.4701025,
+    "seen": 1792166923.48827,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.robots/robots.txt": {
-    "mtime": 1791989853.1941197,
-    "seen": 1791991135.657173,
+    "mtime": 1792063182.470255,
+    "seen": 1792166923.48827,
     "ast_hash": "f201b138ddff3639b489b88f56d9ad32",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.sitemap/404.html": {
-    "mtime": 1791989853.193648,
-    "seen": 1791991135.657173,
+    "mtime": 1792063182.469674,
+    "seen": 1792166923.488271,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.sitemap/index.html": {
-    "mtime": 1792057019.2740934,
-    "seen": 1792058103.0757508,
+    "mtime": 1792063182.4695764,
+    "seen": 1792166923.488271,
     "ast_hash": "f61542491d8c2764bfa99125eeb10d51",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.sitemap/llms.txt": {
-    "mtime": 1791989853.1938002,
-    "seen": 1791991135.657174,
+    "mtime": 1792063182.4698143,
+    "seen": 1792166923.488272,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.sitemap/privacy.html": {
-    "mtime": 1791989853.1936057,
-    "seen": 1791991135.657175,
+    "mtime": 1792063182.4696238,
+    "seen": 1792166923.488272,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.sitemap/robots.txt": {
-    "mtime": 1791989853.193745,
-    "seen": 1791991135.657175,
+    "mtime": 1792063182.4697683,
+    "seen": 1792166923.488272,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/render/render.a11y.html": {
-    "mtime": 1791989853.1916804,
-    "seen": 1791991135.657176,
+    "mtime": 1792063182.4672976,
+    "seen": 1792166923.488273,
     "ast_hash": "ad2cbc48e414ed65e2f1f9afd14991f8",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/clean-site/favicon.svg": {
-    "mtime": 1791989853.1920323,
-    "seen": 1791991135.6589491,
+    "mtime": 1792063182.4677844,
+    "seen": 1792166923.49006,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/links.site-internal/favicon.svg": {
-    "mtime": 1791989853.193147,
-    "seen": 1791991135.6589508,
+    "mtime": 1792063182.4689846,
+    "seen": 1792166923.490061,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/sec.source-maps/favicon.svg": {
-    "mtime": 1791989853.1924548,
-    "seen": 1791991135.6589508,
+    "mtime": 1792063182.4681413,
+    "seen": 1792166923.490062,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/seo.duplicate-titles/favicon.svg": {
-    "mtime": 1791989853.192801,
-    "seen": 1791991135.658952,
+    "mtime": 1792063182.4685175,
+    "seen": 1792166923.490062,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.404-page/favicon.svg": {
-    "mtime": 1791989853.1934528,
-    "seen": 1791991135.658952,
+    "mtime": 1792063182.4694836,
+    "seen": 1792166923.4900632,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.llms-txt/favicon.svg": {
-    "mtime": 1791989853.1945267,
-    "seen": 1791991135.658953,
+    "mtime": 1792063182.4707558,
+    "seen": 1792166923.4900632,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.robots/favicon.svg": {
-    "mtime": 1791989853.194202,
-    "seen": 1791991135.658953,
+    "mtime": 1792063182.470347,
+    "seen": 1792166923.4900632,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/tells.sitemap/favicon.svg": {
-    "mtime": 1791989853.1938453,
-    "seen": 1791991135.658954,
+    "mtime": 1792063182.469856,
+    "seen": 1792166923.490064,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
@@ -3624,9 +3624,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/progress.test.tsx": {
-    "mtime": 1791997587.91668,
-    "seen": 1791997742.0858848,
-    "ast_hash": "92e6e9d552fcd3c0dfef7b4ba9537473",
+    "mtime": 1792166421.0407033,
+    "seen": 1792166923.481884,
+    "ast_hash": "6099f846763395c832a0441d870231b2",
     "semantic_hash": ""
   },
   "packages/db/migrations/0021_brand_assets.sql": {
@@ -3906,32 +3906,32 @@
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/content.placeholders-launch/404.html": {
-    "mtime": 1791989853.194702,
-    "seen": 1791991135.6571488,
+    "mtime": 1792063182.4709659,
+    "seen": 1792166923.48825,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/content.placeholders-launch/index.html": {
-    "mtime": 1792057019.2737517,
-    "seen": 1792058103.0750232,
+    "mtime": 1792063182.4708605,
+    "seen": 1792166923.48825,
     "ast_hash": "4f58736d80805cccb2f59b88e11ad85c",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/content.placeholders-launch/llms.txt": {
-    "mtime": 1791989853.1948428,
-    "seen": 1791991135.65715,
+    "mtime": 1792063182.4711103,
+    "seen": 1792166923.488251,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/content.placeholders-launch/privacy.html": {
-    "mtime": 1791989853.1946585,
-    "seen": 1791991135.657151,
+    "mtime": 1792063182.470905,
+    "seen": 1792166923.488251,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/content.placeholders-launch/robots.txt": {
-    "mtime": 1791989853.1947916,
-    "seen": 1791991135.657151,
+    "mtime": 1792063182.471063,
+    "seen": 1792166923.488251,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
@@ -3942,8 +3942,8 @@
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/content.placeholders-launch/favicon.svg": {
-    "mtime": 1791989853.1949043,
-    "seen": 1791991135.6589499,
+    "mtime": 1792063182.4711585,
+    "seen": 1792166923.49006,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
@@ -4074,9 +4074,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/dev/fakeSupabase.ts": {
-    "mtime": 1791998250.680643,
-    "seen": 1791998333.049363,
-    "ast_hash": "70bf19a8b394b561a814e3aae0e47c88",
+    "mtime": 1792166630.365334,
+    "seen": 1792166923.481345,
+    "ast_hash": "65ea4f81da4bba0efe9944666e230ab4",
     "semantic_hash": ""
   },
   "apps/cockpit/src/shell/shell.test.tsx": {
@@ -4152,9 +4152,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/phrases.ts": {
-    "mtime": 1791995593.9164488,
-    "seen": 1791995777.8078961,
-    "ast_hash": "d7ce13606f4202838deaf08ae703484f",
+    "mtime": 1792166245.6967137,
+    "seen": 1792166923.48156,
+    "ast_hash": "5b3fd161b578e0a95268487f6c9322c3",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/client.test.tsx": {
@@ -4530,9 +4530,9 @@
     "semantic_hash": ""
   },
   "docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md": {
-    "mtime": 1792061517.0815542,
-    "seen": 1792061526.112215,
-    "ast_hash": "efa44acff012536bd2b3dc39811ed816",
+    "mtime": 1792166901.7097545,
+    "seen": 1792166923.4877021,
+    "ast_hash": "ded0840bcd8efc2dc4976eaf5e9fab7a",
     "semantic_hash": ""
   },
   "docs/archive/old-reports/wfact-mvp-progress-2026-10-12.html": {
@@ -4542,32 +4542,32 @@
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/launch.form-connected/404.html": {
-    "mtime": 1792057019.254926,
-    "seen": 1792058103.0751202,
+    "mtime": 1792063182.4715466,
+    "seen": 1792166923.4882529,
     "ast_hash": "d77d2ea49eb3ff5378f311cc6702992f",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/launch.form-connected/index.html": {
-    "mtime": 1792057019.2546709,
-    "seen": 1792058103.075121,
+    "mtime": 1792063182.4713726,
+    "seen": 1792166923.488254,
     "ast_hash": "239e75bd6c2e1cacd1032b3dbea5a7c0",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/launch.form-connected/llms.txt": {
-    "mtime": 1792057019.2543216,
-    "seen": 1792058103.075121,
+    "mtime": 1792063182.471717,
+    "seen": 1792166923.488254,
     "ast_hash": "81297231b06a99b8210b7b70fb332464",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/launch.form-connected/privacy.html": {
-    "mtime": 1792057019.25628,
-    "seen": 1792058103.0751219,
+    "mtime": 1792063182.4714625,
+    "seen": 1792166923.488255,
     "ast_hash": "d57be9982fdf518836b7857f3081eb66",
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/launch.form-connected/robots.txt": {
-    "mtime": 1792057019.2558076,
-    "seen": 1792058103.0751219,
+    "mtime": 1792063182.4716673,
+    "seen": 1792166923.488255,
     "ast_hash": "404c4ec603c473e8f29152de2c16cc30",
     "semantic_hash": ""
   },
@@ -4650,8 +4650,8 @@
     "semantic_hash": ""
   },
   "packages/verification/test/fixtures/registry/fail/launch.form-connected/favicon.svg": {
-    "mtime": 1792057019.2560384,
-    "seen": 1792058103.077632,
+    "mtime": 1792063182.47177,
+    "seen": 1792166923.490061,
     "ast_hash": "23367ff5d31f49bd2b3c29ca9baf35f2",
     "semantic_hash": ""
   },
@@ -4671,6 +4671,24 @@
     "mtime": 1792060222.1897254,
     "seen": 1792061526.107038,
     "ast_hash": "3ed3eda0f63a7f7b6217f4f489850285",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/lib/activity.ts": {
+    "mtime": 1792166592.6570525,
+    "seen": 1792166923.481361,
+    "ast_hash": "9ad40148345d84fe126304a73b5c1bd7",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/pages/activity.test.tsx": {
+    "mtime": 1792166572.192547,
+    "seen": 1792166923.481799,
+    "ast_hash": "9a8d8e38a43a8589b0a23a3d10ce562c",
+    "semantic_hash": ""
+  },
+  ".claude/completions/2026-10-15-step-3A.md": {
+    "mtime": 1792063096.0499022,
+    "seen": 1792166923.486928,
+    "ast_hash": "11107a34ea54927041dba5479746433f",
     "semantic_hash": ""
   }
 }
