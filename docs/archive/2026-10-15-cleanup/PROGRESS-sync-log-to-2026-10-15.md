@@ -1,3 +1,3 @@
 
 
-Previous sync: 2026-10-15 (night, +05), via `/step-close 3A` — verification only, no code change (HEAD `aa78cae`, another session's commit; nothing pushed, no CI run). Step 3A verified live on project `mcaxxhgjptwowwrluhra`: a test account signed up, an owner approved it as `pm` (audit `4ffd872c`), the profile appeared only at approval, a password sign-in after approval is in the Auth logs (11:16:33 UTC), the RLS view is role-limited, `rls_attack_test_accounts.sql` 32/32 rolled back. 3A moved to Closed steps.
+Previous sync: 2026-10-16 (+05), via `/step-close 28` (Package 4 phase 14) — Cockpit v2 Activity room built in `35a869d` (vitest 265/265 incl. 14 new, mutation-checked; typecheck and build clean; axe 0 at 1440x900 and 375x812, light and dark, on the synthetic fake). Two Activity gaps logged in BLOCKED-ON-NICK (saved views on this device only; what the design leaves out). Pushed with these trackers; CI pending (id in the phase report).
