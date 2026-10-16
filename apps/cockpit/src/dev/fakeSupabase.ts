@@ -31,6 +31,25 @@ if (new URLSearchParams(location.search).get("fake-ph") === "1") {
       : j,
   );
 }
+// ?fake-activity=1 adds SYNTHETIC audit rows (a decision, a detail, a build request, a round of fixes, an account
+// approval, and one yesterday) so the Activity room has person and factory events to show.
+if (new URLSearchParams(location.search).get("fake-activity") === "1") {
+  const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
+  const owner = "00000000-0000-4000-8000-0000000000aa";
+  const pm = "00000000-0000-4000-8000-0000000000bb";
+  const planA = "22222222-2222-4222-8222-222222222222";
+  const run = "77777777-7777-4777-8777-777777777777";
+  rows.profiles = [...rows.profiles, { id: pm, role: "pm", full_name: "Sample Applicant" }];
+  rows.audit_log = [
+    { id: "a1", occurred_at: ago(120), actor: owner, action: "plan.decision", task_id: planA, run_id: null, payload: { status: "approved", buildTrack: "A" } },
+    { id: "a2", occurred_at: ago(110), actor: owner, action: "plan.input", task_id: planA, run_id: null, payload: { key: "phone", waived: false } },
+    { id: "a3", occurred_at: ago(100), actor: owner, action: "job.requested", task_id: "44444444-4444-4444-8444-444444444444", run_id: null, payload: { kind: "build_plan", params: { planId: planA } } },
+    { id: "a4", occurred_at: ago(99), actor: "worker", action: "job.run", task_id: "44444444-4444-4444-8444-444444444444", run_id: run, payload: {} },
+    { id: "a5", occurred_at: ago(97), actor: "worker", action: "workflow.return_to_builder", task_id: null, run_id: run, payload: { cycle: 0 } },
+    { id: "a6", occurred_at: ago(60), actor: owner, action: "account.approved", task_id: null, run_id: null, payload: { user_id: pm, role: "pm" } },
+    { id: "a7", occurred_at: ago(60 * 26), actor: owner, action: "job.requested", task_id: null, run_id: null, payload: { kind: "intake" } },
+  ];
+}
 const fake = createFake(rows);
 
 const signedIn = {

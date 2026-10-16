@@ -1,22 +1,29 @@
 /**
- * Activity: everything the factory did, and for any run, why it failed and what to do next.
- * Results come from the jobs table (written by the worker), never from this page's own claims.
+ * Activity: everything the factory and the team did (lib/activity.ts), and for any build, why it stopped and what to do
+ * next. Results come from the jobs table and the audit trail (written by the worker and the database), never from this
+ * page's own claims.
  */
-import { useCallback, useRef, useState } from "react";
-import { Link, NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { Archive, ArrowCounterClockwise, ArrowSquareOut, Play, XCircle } from "@phosphor-icons/react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
+import {
+  Archive, ArrowCounterClockwise, ArrowSquareOut, ArrowsClockwise, BookmarkSimple, ChatCircleText, CheckCircle, FileText, Hammer, PencilSimple, Play, Question,
+  SealCheck, StopCircle, UserMinus, UserPlus, XCircle, type Icon,
+} from "@phosphor-icons/react";
 import { supabase } from "../supabaseClient";
 import { archiveJob, cancelJob, dispatchJob, isActive, isFinished, isStaleQueued, isStaleRunning, type JobRow } from "../jobsClient";
 import { latestBuildByPlan, planIdOfJob } from "../lib/attention";
 import { asStopped, diagnoseJob } from "../lib/recovery";
 import { enrichWithRows, loadRun } from "../lib/runInfo";
-import { deriveTimeline, progressHint, stoppedAtFromJob, type Timeline } from "../lib/timeline";
+import { deriveTimeline, type Timeline } from "../lib/timeline";
 import { loadBuildStats } from "../lib/buildStats";
 import {
   KIND_LABEL, clock, dateTime, duration, explainJobError, jobState, planName, shortId,
   type PlanRow, type RoundRow,
 } from "../lib/model";
-import { fetchJob, useFactory, useLoad, useMe, useToast } from "../lib/state";
+import { canDecide, fetchJob, useFactory, useLoad, useMe, useToast } from "../lib/state";
+import { ALL_ACTIVITY, FACTORY, actorName, byDay, factoryLines, fetchRoundEvents, matches, teamLines, type ActivityFilter, type ActivityLine } from "../lib/activity";
+import { fetchPeople, fetchPersonEvents } from "../lib/phrases";
+import { Button, EmptyState } from "../components/kit";
 import { fetchRunSpend, money, total } from "../lib/costs";
 import { stageLabel } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
@@ -27,95 +34,207 @@ import { clientNameOf } from "../lib/clients";
 import { buildsOf } from "../lib/path";
 import { PlaceholdersPanel } from "../components/Placeholders";
 import { LiveBuild } from "../components/LiveBuild";
-import { subjectOf } from "./Home";
 
-/* ---------------- list ---------------- */
+/* ---------------- the Activity room (Cockpit v2 phase 14) ---------------- */
 
-// Archived runs (migration 0015) are hidden everywhere except their own filter.
-const FILTERS: { id: string; label: string; test: (j: JobRow) => boolean }[] = [
-  { id: "all", label: "All", test: (j) => !j.archived_at },
-  { id: "failed", label: "Failed", test: (j) => !j.archived_at && j.status === "failed" },
-  { id: "stuck", label: "Never started", test: (j) => !j.archived_at && isStaleQueued(j) },
-  { id: "running", label: "Running", test: (j) => isActive(j) },
-  { id: "archived", label: "Archived", test: (j) => !!j.archived_at },
+const TYPES: [ActivityFilter["type"], string][] = [
+  ["all", "Everything"],
+  ["decision", "Decisions"],
+  ["build", "Builds"],
+  ["stop", "Stops"],
+  ["detail", "Details"],
+  ["team", "Team"],
 ];
+
+const GLYPH: Record<ActivityLine["glyph"], Icon> = {
+  approved: SealCheck,
+  changes: ChatCircleText,
+  detail: PencilSimple,
+  build: Hammer,
+  continue: Play,
+  question: Question,
+  proposal: FileText,
+  archive: Archive,
+  cancel: XCircle,
+  team: UserPlus,
+  declined: UserMinus,
+  finished: CheckCircle,
+  stopped: StopCircle,
+  round: ArrowsClockwise,
+};
+const glyphTone = (l: ActivityLine) => (l.type === "stop" ? "var(--stop)" : l.type === "decision" ? "var(--need)" : "var(--ink-2)");
+const hhmm = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" });
+
+/** The saved view lives in this browser only: profiles hold no settings column (checked 2026-10-16; BLOCKED-ON-NICK.md). */
+const viewKey = (userId: string | null) => `cockpit-activity-view:${userId ?? "anon"}`;
+function readView(userId: string | null): ActivityFilter {
+  try {
+    const v = localStorage.getItem(viewKey(userId));
+    return v ? { ...ALL_ACTIVITY, ...(JSON.parse(v) as Partial<ActivityFilter>) } : ALL_ACTIVITY;
+  } catch {
+    return ALL_ACTIVITY;
+  }
+}
+function writeView(userId: string | null, v: ActivityFilter | null) {
+  try {
+    if (v) localStorage.setItem(viewKey(userId), JSON.stringify(v));
+    else localStorage.removeItem(viewKey(userId));
+  } catch {
+    /* private mode: the filters still work for this visit */
+  }
+}
+
+async function loadActivity() {
+  const [events, rounds, people] = await Promise.all([fetchPersonEvents(), fetchRoundEvents(), fetchPeople()]);
+  return { events, rounds, people };
+}
+
+export default function Activity() {
+  const me = useMe();
+  const f = useFactory();
+  const toast = useToast();
+  const decider = canDecide(me.role);
+  const [v, setV] = useState<ActivityFilter>(() => readView(me.userId));
+  const set = (patch: Partial<ActivityFilter>) => setV((x) => ({ ...x, ...patch }));
+  const load = useLoad(() => (decider ? loadActivity() : Promise.resolve(null)), [decider]);
+
+  const lines = useMemo(() => {
+    if (!load.data || !f.jobs || !f.plans) return null;
+    return [...teamLines(load.data.events, load.data.people, f.jobs, f.plans), ...factoryLines(f.jobs, f.plans, load.data.rounds)];
+  }, [load.data, f.jobs, f.plans]);
+  const people = load.data?.people ?? {};
+  const who = (actor: string) => actorName(actor, people, me.userId);
+
+  const clients = useMemo(() => [...new Set((lines ?? []).map((l) => l.client).filter((c): c is string => !!c))].sort((a, b) => a.localeCompare(b)), [lines]);
+  const persons = useMemo(() => {
+    const ids = [...new Set((lines ?? []).map((l) => l.actor).filter((a) => a !== FACTORY))];
+    return ids.map((id) => ({ id, name: actorName(id, people, me.userId) })).sort((a, b) => (a.id === me.userId ? -1 : b.id === me.userId ? 1 : a.name.localeCompare(b.name)));
+  }, [lines, people, me.userId]);
+  const days = useMemo(() => byDay((lines ?? []).filter((l) => matches(l, v))), [lines, v]);
+
+  if (!decider) {
+    return (
+      <div className="activity">
+        <header className="activity-head">
+          <h1 className="t-title">Activity</h1>
+        </header>
+        <EmptyState title="Activity is for owners and admins.">Your clients’ progress is on each client’s page in Projects.</EmptyState>
+      </div>
+    );
+  }
+
+  const error = load.error ?? f.error;
+  return (
+    <div className="activity">
+      <header className="activity-head">
+        <h1 className="t-title">Activity</h1>
+        <p className="muted">Everything the factory and the team did, newest first.</p>
+      </header>
+      <div className="projects-tools">
+        <label className="select-field">
+          <span>Client</span>
+          <select value={v.client} onChange={(e) => set({ client: e.target.value })}>
+            <option value="all">All clients</option>
+            {clients.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+            {v.client !== "all" && !clients.includes(v.client) && <option value={v.client}>{v.client}</option>}
+          </select>
+        </label>
+        <label className="select-field">
+          <span>Person</span>
+          <select value={v.person} onChange={(e) => set({ person: e.target.value })}>
+            <option value="all">Anyone</option>
+            <option value={FACTORY}>The factory</option>
+            {persons.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+            {v.person !== "all" && v.person !== FACTORY && !persons.some((p) => p.id === v.person) && <option value={v.person}>{who(v.person)}</option>}
+          </select>
+        </label>
+        <button
+          type="button"
+          className="btn quiet"
+          onClick={() => {
+            const before = readView(me.userId);
+            writeView(me.userId, v);
+            toast("Saved on this device. Activity opens like this next time you use this browser.", { label: "Undo", run: () => writeView(me.userId, before) });
+          }}
+        >
+          <BookmarkSimple aria-hidden="true" />
+          Save this view
+        </button>
+      </div>
+      <div role="group" aria-label="Type" className="filters">
+        {TYPES.map(([k, label]) => (
+          <button key={k} type="button" className="pill" aria-pressed={v.type === k} onClick={() => set({ type: k })}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {error && <LoadError what="the activity" error={error} onRetry={() => void Promise.all([load.reload(), f.reload()])} />}
+      {!error && !lines && <Loading rows={4} label="Loading the activity" />}
+      {lines && lines.length === 0 && <EmptyState title="Nothing has happened yet.">Requests, decisions and builds appear here as they happen.</EmptyState>}
+      {lines && lines.length > 0 && days.length === 0 && (
+        <div role="status" className="no-match">
+          <p className="muted">Nothing matches these filters yet.</p>
+          <Button onClick={() => setV(ALL_ACTIVITY)}>Show everything</Button>
+        </div>
+      )}
+      {days.map((day) => (
+        <section key={day.label} className="activity-day" aria-labelledby={`day-${day.label}`}>
+          <h2 id={`day-${day.label}`} className="activity-day-h">
+            {day.label}
+          </h2>
+          <ol className="activity-list">
+            {day.items.map((l) => {
+              const G = GLYPH[l.glyph];
+              return (
+                <li key={l.key} className="activity-row">
+                  <time className="activity-time fig" dateTime={l.at}>
+                    {hhmm.format(new Date(l.at))}
+                  </time>
+                  <G aria-hidden="true" className="activity-glyph" style={{ color: glyphTone(l) }} />
+                  <div className="activity-what">
+                    <p>
+                      <b>{who(l.actor)}</b> · {l.jobId ? <Link to={`/activity/${l.jobId}`}>{l.text}</Link> : <span>{l.text}</span>}
+                    </p>
+                    {l.client ? (
+                      <span className="activity-client">{l.client}</span>
+                    ) : (
+                      <span className="activity-client">
+                        <span aria-hidden="true">—</span>
+                        <span className="sr-only">No client</span>
+                      </span>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- fix rounds ---------------- */
 
 function ActivityTabs() {
   return (
     <nav className="tabs" aria-label="Activity views">
       <NavLink to="/activity" end>
-        Runs
+        Activity
       </NavLink>
       <NavLink to="/activity/fixes">Fix rounds</NavLink>
     </nav>
   );
 }
-
-export default function Activity() {
-  const f = useFactory();
-  const [params, setParams] = useSearchParams();
-  const show = FILTERS.find((x) => x.id === params.get("show")) ?? FILTERS[0]!;
-  const jobs = f.jobs?.filter(show.test) ?? null;
-  return (
-    <>
-      <PageHead title="Activity" lead="Every request the factory ran, newest first. Open one to see what happened and why." />
-      <ActivityTabs />
-      <div className="row-wrap" role="group" aria-label="Filter runs" style={{ marginBottom: 16 }}>
-        {FILTERS.map((x) => (
-          <button key={x.id} type="button" className={`btn small${x.id === show.id ? " primary" : ""}`} aria-pressed={x.id === show.id} onClick={() => setParams(x.id === "all" ? {} : { show: x.id })}>
-            {x.label}
-          </button>
-        ))}
-      </div>
-      <Plate title={show.id === "all" ? "Runs" : `${show.label} runs`} note={f.jobs ? `${jobs!.length} of ${f.jobs.filter((j) => (show.id === "archived") === !!j.archived_at).length}` : undefined}>
-        {f.error && <div className="plate-body"><LoadError what="runs" error={f.error} onRetry={f.reload} /></div>}
-        {!f.jobs && !f.error && <Loading rows={4} label="Loading runs" />}
-        {jobs && jobs.length === 0 && <Empty title={show.id === "all" ? "Nothing has run yet." : show.id === "archived" ? "Nothing is archived." : "No runs match this filter."}>{show.id === "archived" ? "Archive a finished run from its page to hide it here." : "Requests you start appear here."}</Empty>}
-        {jobs && jobs.length > 0 && (
-          <ul className="rows">
-            {jobs.map((j) => {
-              const s = jobState(j);
-              const subject = subjectOf(j, f.plans ?? []);
-              return (
-                <li key={j.id}>
-                  <Aspect tone={s.tone}>{s.label}</Aspect>
-                  <div>
-                    <Link className="row-link what" to={`/activity/${j.id}`}>
-                      {KIND_LABEL[j.kind]}
-                      {subject ? `: ${subject}` : ""}
-                    </Link>
-                    {isActive(j) && (j.kind === "build_plan" || j.kind === "resume") && <RunningHint j={j} />}
-                    {j.status === "failed" && (
-                      <p className="why">
-                        {stoppedAtFromJob(j) ? `${stoppedAtFromJob(j)}: ` : ""}
-                        {diagnoseJob(j).headline}
-                      </p>
-                    )}
-                  </div>
-                  <span className="when fig">
-                    {dateTime(j.created_at)}
-                    {duration(j.started_at, j.finished_at) ? `, ${duration(j.started_at, j.finished_at)}` : ""}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </Plate>
-    </>
-  );
-}
-
-/** A running build's list row says which step it is on ("Quality checks, round 2 of 3"), refreshed while it runs. */
-function RunningHint({ j }: { j: JobRow }) {
-  const always = useCallback(() => true, []);
-  const run = useLoad(() => loadRun(j), [j.id, j.status], { pollMs: 5000, pollWhile: always });
-  if (!run.data) return null;
-  const hint = progressHint(deriveTimeline({ rows: run.data.rows, job: j, active: isActive(j) }));
-  return hint ? <p className="why">Now: {hint}</p> : null;
-}
-
-/* ---------------- fix rounds ---------------- */
 
 async function fetchRounds(): Promise<RoundRow[]> {
   const res = await supabase

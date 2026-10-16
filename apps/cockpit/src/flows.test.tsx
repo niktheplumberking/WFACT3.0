@@ -201,14 +201,12 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     expect(t.calls().some((c) => c.op === "update" && c.table === "jobs")).toBe(false);
   });
 
-  it("archived runs leave Activity and Home, and come back under the Archived filter", async () => {
+  it("an archived build leaves Home but stays in Activity, which opens its page (the way back to un-archive it)", async () => {
     const fx = fixtures();
     fx.jobs = fx.jobs.map((j) => (j.id === JOB_FAILED ? { ...j, archived_at: new Date().toISOString() } : j));
     start("/activity", "owner", fx);
-    expect(await screen.findByText("2 of 2", {}, T)).toBeInTheDocument();
-    expect(screen.queryByText(/out of credits/i)).not.toBeInTheDocument();
-    await userEvent.setup().click(screen.getByRole("button", { name: "Archived" }));
-    expect(await screen.findByText("1 of 1", {}, T)).toBeInTheDocument();
+    const stopped = await screen.findByRole("link", { name: /^Stopped: the site builder is out of credits/ }, T);
+    expect(stopped).toHaveAttribute("href", `/activity/${JOB_FAILED}`);
   });
 
   it("a running or never-started run cannot be archived", async () => {

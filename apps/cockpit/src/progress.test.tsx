@@ -69,17 +69,6 @@ describe("a running build shows where it is", () => {
     // No way to "continue" a build that is still running.
     expect(screen.queryByRole("button", { name: /continue|again/i })).toBeNull();
   });
-
-  it("the Activity list says which step a running build is on", async () => {
-    const fx = fixtures();
-    fx.jobs = [
-      ...fx.jobs,
-      { id: JOB_RUNNING, created_at: ago(9), kind: "build_plan", params: { planId: PLAN_APPROVED }, status: "running", started_at: ago(8), finished_at: null, result: { workflowRunId: RUN_LIVE }, error: null, gh_run_url: null, archived_at: null },
-    ];
-    fx.audit_log = [audit(RUN_LIVE, 8, "workflow.start", { maxQaRevisions: 2 }), audit(RUN_LIVE, 7.8, "agent.spawn", { role: "front-end-builder" })];
-    start("/activity", fx);
-    expect(await screen.findByText("Now: Writing the site", {}, T)).toBeInTheDocument();
-  });
 });
 
 describe("a stopped build offers the right ways on (Cockpit v2 stop view)", () => {
