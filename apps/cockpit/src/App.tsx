@@ -17,7 +17,7 @@ import { DetailProvider } from "./lib/detail";
 const Home = lazy(() => import("./pages/Home"));
 const PlansTab = lazy(() => import("./pages/Decisions"));
 const PlanPage = lazy(() => import("./pages/Decisions").then((m) => ({ default: m.PlanPage })));
-const AccountsTab = lazy(() => import("./pages/Decisions").then((m) => ({ default: m.AccountsTab })));
+const Team = lazy(() => import("./pages/Team"));
 const StagesTab = lazy(() => import("./pages/Decisions").then((m) => ({ default: m.StagesTab })));
 const Projects = lazy(() => import("./pages/Work"));
 const ProjectPage = lazy(() => import("./pages/Work").then((m) => ({ default: m.ProjectPage })));
@@ -73,7 +73,7 @@ export function CockpitRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/decisions" element={<PlansTab />} />
         <Route path="/decisions/plans/:id" element={<PlanPage />} />
-        <Route path="/decisions/accounts" element={<AccountsTab />} />
+        <Route path="/decisions/accounts" element={<Navigate to="/team" replace />} />
         <Route path="/decisions/stages" element={<StagesTab />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/new" element={<NewRequest />} />
@@ -85,8 +85,7 @@ export function CockpitRoutes() {
         <Route path="/costs" element={<Costs />} />
         <Route path="/soon/:slug" element={<ComingSoon />} />
         <Route path="/more" element={<More />} />
-        {/* Team and access: account requests until the Team room (Cockpit v2 phase 12) adds invites and assignments. */}
-        <Route path="/team" element={<AccountsTab />} />
+        <Route path="/team" element={<Team />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/settings" element={<Settings />} />
         {/* Old room names (before Step 4C) still land somewhere sensible. */}

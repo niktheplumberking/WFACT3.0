@@ -71,6 +71,21 @@ if (new URLSearchParams(location.search).get("fake-costs") === "1") {
     t("c7", runF, "agent:qa-evaluator", "claude-sonnet-5", 0.52, 179),
   ];
 }
+// ?fake-team=1 adds SYNTHETIC teammates (an admin, a PM with two clients, a PM with none) for Team and access.
+if (new URLSearchParams(location.search).get("fake-team") === "1") {
+  const pmA = "00000000-0000-4000-8000-0000000000dd";
+  rows.profiles = [
+    ...rows.profiles,
+    { id: "00000000-0000-4000-8000-0000000000cc", role: "admin", full_name: "Alex Admin" },
+    { id: pmA, role: "pm", full_name: "Sam Manager" },
+    { id: "00000000-0000-4000-8000-0000000000ee", role: "pm", full_name: "Robin New" },
+  ];
+  rows.profile_clients = [
+    { profile_id: pmA, client_id: "c1", clients: { name: "Harbor Street Bakery" } },
+    { profile_id: pmA, client_id: "c2", clients: { name: "Summit Line Roofing" } },
+  ];
+  rows.account_requests = [...rows.account_requests, { user_id: pmA, email: "sam@example.test", full_name: "Sam Manager", status: "approved", requested_at: new Date(Date.now() - 9e6).toISOString(), decided_role: "pm", decision_note: null }];
+}
 const fake = createFake(rows);
 
 const signedIn = {

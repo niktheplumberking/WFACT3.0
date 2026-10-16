@@ -313,7 +313,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
     const t = start();
     await t.click(await screen.findByRole("link", { name: "Review the request" }, T));
     await t.user.selectOptions(await screen.findByLabelText("Role", {}, T), "admin");
-    await t.click(screen.getByRole("button", { name: "Approve" }));
+    await t.click(screen.getByRole("button", { name: "Approve as admin" }));
     expect(t.calls()).toContainEqual({ op: "rpc", name: "decide_account_request", args: { p_user_id: "00000000-0000-4000-8000-0000000000bb", p_decision: "approve", p_role: "admin", p_note: null } });
     expect(t.clicks()).toBe(2);
   });

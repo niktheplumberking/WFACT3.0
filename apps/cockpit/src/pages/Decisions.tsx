@@ -21,7 +21,7 @@ import { isActive, requestJob } from "../jobsClient";
 import { planIdOfJob } from "../lib/attention";
 import {
   GOAL_LABEL, KIND_LABEL, LEAD_LABEL, dateTime, jobState, planName, shortDate,
-  type AccountRequestRow, type Direction, type PlanRow, type ProjectRow, type Role, type Track,
+  type Direction, type PlanRow, type ProjectRow, type Track,
 } from "../lib/model";
 import { canDecide, fetchPlan, useFactory, useLoad, useMe, useToast } from "../lib/state";
 import { nextStage, stageLabel, stageMoveBlock } from "../stages";
@@ -42,7 +42,7 @@ function Tabs() {
       <NavLink to="/decisions" end>
         Plans {pendingPlans + launches > 0 && <span className="count">{pendingPlans + launches}</span>}
       </NavLink>
-      <NavLink to="/decisions/accounts">Accounts {pendingAccounts > 0 && <span className="count">{pendingAccounts}</span>}</NavLink>
+      <NavLink to="/team">Accounts {pendingAccounts > 0 && <span className="count">{pendingAccounts}</span>}</NavLink>
       <NavLink to="/decisions/stages">Stage moves</NavLink>
     </nav>
   );
@@ -900,114 +900,6 @@ export function PlanPage() {
       <div className="split">
         <PlanDetails row={row} />
         <AfterDecision row={row} />
-      </div>
-    </>
-  );
-}
-
-/* ---------------- accounts ---------------- */
-
-export function AccountsTab() {
-  const me = useMe();
-  const f = useFactory();
-  const toast = useToast();
-  const [roles, setRoles] = useState<Record<string, Role>>({});
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const rows = f.accounts;
-  const others = rows?.filter((r) => r.user_id !== me.userId) ?? [];
-  const pending = others.filter((r) => r.status === "pending");
-  const decided = others.filter((r) => r.status !== "pending").slice(0, 8);
-  const grantable: Role[] = me.role === "owner" ? ["pm", "admin", "owner"] : ["pm"];
-
-  async function decide(row: AccountRequestRow, decision: "approve" | "reject") {
-    const role = roles[row.user_id] ?? "pm";
-    const note = (notes[row.user_id] ?? "").trim();
-    if (decision === "reject" && !note) return setError("Write a note before rejecting, so there's a record of why.");
-    setBusyId(row.user_id);
-    setError(null);
-    const { error: e } = await supabase.rpc("decide_account_request", {
-      p_user_id: row.user_id,
-      p_decision: decision,
-      p_role: decision === "approve" ? role : null,
-      p_note: note || null,
-    });
-    setBusyId(null);
-    if (e) return setError(`Your decision wasn't recorded: ${e.message}. Nothing changed.`);
-    toast(decision === "approve" ? `${row.email} can now sign in as ${role}.` : `${row.email}'s request was rejected.`);
-    await f.reload();
-  }
-
-  return (
-    <>
-      <Header />
-      <Tabs />
-      <div className="stack">
-        <Plate title="Account requests" note={me.role === "admin" ? "As an admin you can approve PM accounts only." : "New accounts see nothing until you approve them."}>
-          {!rows && !f.error && <Loading rows={2} label="Loading account requests" />}
-          {f.error && <div className="plate-body"><LoadError what="account requests" error={f.error} onRetry={f.reload} /></div>}
-          {rows && pending.length === 0 && <Empty title="No accounts are waiting for approval." />}
-          {pending.length > 0 && (
-            <ul className="rows">
-              {pending.map((row) => (
-                <li key={row.user_id} style={{ gridTemplateColumns: "minmax(0,1fr)" }}>
-                  <div>
-                    <p className="what">{row.full_name ?? "No name given"}</p>
-                    <p className="why">
-                      {row.email}. Asked {dateTime(row.requested_at)}.
-                    </p>
-                  </div>
-                  <div className="form-grid account-form">
-                    <div className="field">
-                      <label htmlFor={`role-${row.user_id}`}>Role</label>
-                      <select id={`role-${row.user_id}`} className="select" value={roles[row.user_id] ?? "pm"} onChange={(e) => setRoles({ ...roles, [row.user_id]: e.target.value as Role })}>
-                        {grantable.map((r) => (
-                          <option key={r} value={r}>
-                            {r === "pm" ? "PM" : r[0]!.toUpperCase() + r.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="field">
-                      <label htmlFor={`note-${row.user_id}`}>Note</label>
-                      <input id={`note-${row.user_id}`} className="input" placeholder="Needed to reject" value={notes[row.user_id] ?? ""} onChange={(e) => setNotes({ ...notes, [row.user_id]: e.target.value })} />
-                    </div>
-                    <div className="actions">
-                      <button className="btn go" type="button" disabled={busyId === row.user_id} onClick={() => decide(row, "approve")}>
-                        Approve
-                      </button>
-                      <button className="btn danger" type="button" disabled={busyId === row.user_id} onClick={() => decide(row, "reject")}>
-                        Reject
-                      </button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Plate>
-        {error && <Notice tone="stop">{error}</Notice>}
-        {decided.length > 0 && (
-          <Plate title="Recently decided">
-            <ul className="rows">
-              {decided.map((r) => (
-                <li key={r.user_id}>
-                  <Aspect tone={r.status === "approved" ? "clear" : "stop"}>{r.status === "approved" ? "Approved" : "Rejected"}</Aspect>
-                  <div>
-                    <p className="what">{r.full_name ?? r.email}</p>
-                    <p className="why">
-                      {r.email}
-                      {r.decided_role ? `, as ${r.decided_role}` : ""}
-                      {r.decision_note ? `. Note: “${r.decision_note}”` : ""}
-                    </p>
-                  </div>
-                  <span className="when fig">{shortDate(r.requested_at)}</span>
-                </li>
-              ))}
-            </ul>
-          </Plate>
-        )}
       </div>
     </>
   );
