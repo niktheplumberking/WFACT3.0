@@ -14,6 +14,7 @@ parallel with Steps 5-8 because it only touches `apps/cockpit`.
 **Last synced 2026-10-15 (night +05)** via `/progress-sync`: every step re-checked against git (HEAD `3b5a94c`; `origin/main` = `origin/huraira-work` = `2a64471`, 16 local commits unpushed), CI (`38706155999` and `38711602641` green on `2a64471`, incl. the Cockpit deploy) and the live database (read-only SQL: 34 jobs, `caa201f1` cancelled, `e6a71046` failed, 177 `model_traces`, 5 `leads`, 0 `account_requests`, latest migration 20261015103026). No step changed status and none newly qualifies for Closed (3A: still 0 sign-ups; 4C, 21, 25, 28: live checks pending). Fixed stale notes: `8e6e09d` and `b8d240f` are pushed (were "local"); Harbor Street's live continue result recorded under Step 28. Added work found in git but cited nowhere: `a6f64cd` and `dde68a5` (Step 28), `3c79212` and `892c468` (Step 12), `e11c1ea` (Step 21). **Synced 2026-10-15 (13:30 +05)** via `/progress-sync`: re-synced after `626667a` (pushed; CI `38695633253` running at sync) and `8e6e09d` (brand-colour rule, local). Huraira decided the palette rule (tints and shades on-brief, CTAs in the true accent at 4.5:1). Step 28 updated; no step changed status and none newly qualifies for Closed (3A still 0 `account_requests`; 4C and 21 still need their live checks). The Part B table gained a **Depends on / waiting for** column, rows 3A, 4B, 12 and 26 were realigned, and the missing 4D row was added; Part E rows 3A, 4B, 12, 26 and 28 were refreshed. Live (read-only SQL): 33 jobs, `d3c45995` failed, `caa201f1` queued and never dispatched; 165 `model_traces`; 31 `plan_inputs`; latest migration 20261014140027. **Updated 2026-10-15 (12:10 +05)** via `/step-close 28`: Step 28 stays IN PROGRESS; build-failure guards added (`b8d240f`, local, `docs/BUILD-FAILURE-DIAGNOSIS.md`). **Last synced 2026-10-14 (17:00 +05)** via `/progress-sync`: Step 4D closed (exit check met live, `55ddba7c`); Steps 4B, 25, 26 updated from the first passing build since 2026-10-01; CI `38554457540` green on `8271858`, `38557714567` on `caf42bc` running at sync (all jobs green except Rendered QA, still running). Previous sync 2026-10-14 (00:45 +05) via `/progress-sync`: every step re-checked against git (`92fd4ac`; `a9b271f` and `92fd4ac` local only, remotes at `d5129e0`), CI (`38452956084` on `d5129e0` FAILED in Rendered QA only, fixed by `a9b271f`, unpushed) and the live database (Cockpit continue `e2a204fb` reached a real QA verdict with the Anthropic reviewer). No status changed. No step newly qualifies for Closed: 3A still lacks its live sign-up (0 `account_requests` rows). The step table row for 4B is fixed (its columns were misaligned) and the Part E rows for 3A, 4B, 4D, 12 and 26 are refreshed. Previous sync 2026-10-13 via `/progress-sync`: every step re-checked against git (`76e9d6c`, no code since `c97e329`), CI (`38437214851`, `38438423293` green incl. deploy) and the live database (no build since 2026-10-12); no status changed. Previous full re-audit 2026-10-12 (no commits since `072b391`,
 2026-10-07), CI and the live database. Closed steps (DONE with citable evidence: 1, 2, 3, 5, 6, 7; 3A added 2026-10-15) moved to **"Closed steps"** at the end of
 Part D; open steps carry a **Next action** line and a continuation or verification prompt.
+**Status as of 2026-10-16 (`/step-close 28`, Package 4 phase 14)**: no status changed. Step 28 stays **IN PROGRESS**: phase 14 (Activity) is built (`35a869d`, 265 tests, axe 0) and pushed; CI pending. Two Activity gaps logged in BLOCKED-ON-NICK (saved views on this device only; what the design leaves out).
 **Status as of 2026-10-15 (`/step-close 3A`)**: Step 3A is **DONE and closed**: the live sign-up was proven end to end (sign-up → owner approval as `pm` with audit row → password sign-in after approval in the Auth logs → role-limited view; attack test 32/32). Moved to Closed steps. No other step changed status. Open verification prompts remain for 4C and 21.
 **Status as of 2026-10-15 (night, `/progress-sync`)**: no status changed. Open steps that need only a live check or a sign-off keep their verification prompts (3A, 4C, 21). The next move is Huraira's push of the 16 local commits, then the Harbor Street continue (Step 28) and Nick's CRM and brief answers (Step 25).
 **Status as of 2026-10-15 (`/step-close 25`, live)**: Step 25 is **PARTIAL**: MVP M4 (contact form that saves leads) is met live on synthetic data (migrations 0025/0026 applied, attack test 43/43, `submit-lead` deployed, JS and no-JS submits on both tracks stored as rows); not pushed. The real-client run waits on Nick's brief. Step 28 stays IN PROGRESS. No other step changed status.
@@ -1345,7 +1346,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-15, Packages 1–3 of 5 built and verified; Package 4 phases 1–13 CI-green and deployed; build-failure guards, brand-colour rule, brief consistency check and example clients built, live proof pending
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-16, Packages 1–3 of 5 built and verified; Package 4 phases 1–13 CI-green and deployed, phase 14 (Activity) built and pushed, CI pending; build-failure guards, brand-colour rule, brief consistency check and example clients built, live proof pending
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1474,6 +1475,13 @@ phase 5 and `2cd7f6b` phase 6, CI `38595375699` and `38596185659` green and depl
   site, placeholder pictures, owner-only launch tick, readiness line, Technical details, sticky bar. Not done
   (BLOCKED-ON-NICK): "Approve the site" is off (no approval record); "Ask for changes" not offered (no runner input);
   the tick is owner-only in the UI but not in the database. 248 tests; axe 0.
+- Phase 14 Activity (`35a869d`, 2026-10-16): `lib/activity.ts` + `Activity()` in `pages/Activity.tsx`. Client, person and
+  type filters (Everything, Decisions, Builds, Stops, Details, Team), "Save this view" (this device only: `profiles` has no
+  settings column, logged), grouped by day, time · glyph · who · sentence · client. Person events through `lib/phrases.ts`
+  (`personLines()`; account decisions added); factory events only from rows (proposal written, finished, stopped, round of
+  fixes via `workflow.return_to_builder` + `job.run`). Build sentences link to the build page (the old list's Archived
+  filter has no place in the design; logged). PMs see "Activity is for owners and admins". 265 tests (14 new in
+  `pages/activity.test.tsx`; mutation-checked); axe 0 at 1440/375 light and dark.
 - Phases 1–13 shipped: every push CI-green incl. Deploy Cockpit to Vercel; phase 13 `38605626110` (`47a2da4`) green incl. the deploy
   (re-checked 2026-10-15). Live URL not probed directly (held in Doppler).
 - Not done: Activity, Costs, Team, Settings, Notifications preferences and the final cleanup; no Lighthouse run yet.
@@ -1504,14 +1512,14 @@ phase 5 and `2cd7f6b` phase 6, CI `38595375699` and `38596185659` green and depl
   curl-checked) `dispatch-job` v6 allows the `wfact-3-cockpit.vercel.app` alias, whose presses were CORS-refused (why `caa201f1`
   and the first `e6a71046` press stayed queued).
 
-**Next action** (2026-10-15 night sync): Huraira GOes the push of the 16 local commits (`dde68a5`…`3b5a94c`, incl. `fd67328`,
-`52f7088` and the Step 25 M4 work); after CI is green, the owner answers Harbor Street's two conflicts in the Cockpit and presses
-continue (the live proof of the brief consistency check and the brand-colour rule). Then GO for Package 4 phase 14 (Activity). Separately (Huraira): review, merge and apply migration 0024 (`562c5ae`, still only on the unmerged worktree branch
+**Next action** (2026-10-16, after phase 14): confirm the CI run on the phase 14 push is green incl. Deploy Cockpit to Vercel,
+then Huraira GOes Package 4 phase 15 (Costs). Still open: the owner answers Harbor Street's two conflicts in the Cockpit and
+presses continue (the live proof of the brief consistency check and the brand-colour rule). Separately (Huraira): review, merge and apply migration 0024 (`562c5ae`, still only on the unmerged worktree branch
 `claude/objective-engelbart-d65df7`, checked 2026-10-15 night), and run
 `scripts/rls_attack_test_placeholders.sql`. Nick answers the caps, roles and site-approval questions. Package 5: see the source
 doc.
 
-Continuation prompt — updated 2026-10-15 (sync), after phase 13 and the build-failure work (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
+Continuation prompt — updated 2026-10-16, after phase 14 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
 ```
 You are a senior front-end engineer in the WFACT 3.0 monorepo, branch huraira-work. Read CLAUDE.md, then
 docs/design/cockpit-v2/docs/COCKPIT-V2-BUILD-PROMPT.md (the full brief: hard rules, locked decisions, tokens,
@@ -1550,6 +1558,10 @@ ALREADY DONE (do not redo):
 - Phase 13 Finished site review, a01dbbf: components/SiteReview.tsx on the newest passing build waiting for approval;
   Approve the site shown off (no approval record), Ask for changes not offered (no runner input), pages/review.test.tsx.
   Dev: ?fake-ph=1.
+- Phase 14 Activity, 35a869d: lib/activity.ts (factoryLines, teamLines, byDay, matches) and Activity() in pages/Activity.tsx;
+  lib/phrases.ts personLines() is the one phrase table (phrase() wraps it; account.approved/rejected added).
+  Saved view: localStorage per person, said on screen ("Saved on this device"), logged. pages/activity.test.tsx.
+  Dev: ?fake-activity=1.
 - Not UI (side session, branch claude/objective-engelbart-d65df7, 562c5ae): migration 0024 makes launch.placeholders_ok
   owner-only in the database; not merged, not applied. Leave it to Huraira.
 - Not UI, already done (do not touch): dispatch-job v6 dde68a5 (Cockpit alias allowed); a6f64cd "What was built" site
@@ -1558,10 +1570,11 @@ ALREADY DONE (do not redo):
   Phases 1-13 are CI-green and deployed (phase 13: CI 38605626110).
 
 LEFT, in order (each a separate commit, then /step-close 28 and STOP for GO):
-14. Activity (brief §7.10): filters by client, person and type pills; save view; grouped by day; time, glyph, who, plain
-   sentence, client; audit actions only through lib/phrases.ts (never a raw slug). PMs do not see Activity (RLS).
-15. Costs, Team, Settings (appearance draft, per-person settings, Home order), Notifications preferences.
-16. Final cleanup: delete the tokens.css alias block, the old Overpass fonts and the old icon; Lighthouse a11y >= 95 per room.
+15. Costs (owner only; live cap period words from spend-caps.json; trend with dashed cap line and text alternative).
+16. Team and access (decide_account_request rpc; check whether any invite path exists, else log it).
+17. Settings (appearance draft with live preview; per-person settings cannot be stored yet: say "this device").
+18. Notifications (Inbox on the Home attention source; Preferences only for channels that really deliver).
+19. Final cleanup: delete the tokens.css alias block, the old Overpass fonts and the old icon; Lighthouse a11y >= 95 per room.
 Each screen with empty, loading, running, waiting, stopped and success states; owner-only gates; PM view.
 Every phase: npm test green; screenshots at 1440x900 and 375x812, light and dark, beside the matching frame in
 Cockpit Screens*.dc.html; axe 0 per room; at 375 px scrollWidth === 375; banned-word grep of the DOM outside <details>;
@@ -1763,7 +1776,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | **PARTIAL** (MVP M4 contact form MET live on synthetic data: migrations 0025/0026 applied (20261015102916, 20261015103026), attack test 43/43, `submit-lead` v1 deployed, 4 browser submits (JS and no-JS, both tracks) = 4 `leads` rows, curl refusals as designed; code `1da9a5a`..`2154fda`, not pushed; the real-client run still waits on Nick's brief) | 2026-10-15 | |
 | 26 | Quality calibration | **PARTIAL**: item 1 met live 2026-10-14 (`67033f7`; Anthropic reviewer and evaluator rows on run `4c35703b`; build `55ddba7c` reached the launch gate; CI `38554457540` green); items 2–4 (blind calibration, reference set, cost report) open, after the MVP | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
-| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (2026-10-15: Packages 1–3 built, verified and deployed (`3e493f6` CI `38569635936`, `d112f62` CI `38574380444`, `7e30b09` CI `38585878100`; migrations 0022 and 0023 live). Package 4 Cockpit v2 phases 1–13 CI-green and deployed (last `38605626110` on `47a2da4`); Activity, Costs, Team, Settings, Notifications preferences and cleanup left. Build-failure guards `b8d240f` and brand-colour rule `8e6e09d` pushed (CI `38695633253`, `38706155999` green; decision by Huraira 2026-10-15; eval E5 mutation-checked); live continue `e6a71046` proved the quote fix and failed on contradictory owner answers; a passing live build is still pending. Also `a6f64cd` ("What was built" site preview, pushed) and `dde68a5` (`dispatch-job` v6, deployed, commit local). Migration 0024 written on the unmerged branch `claude/objective-engelbart-d65df7`, not applied. Brief consistency check `fd67328` (contradictory owner answers halt at preflight unpaid, owner's pick clears it, planner asks each topic once; eval E6 mutation-checked) and example clients `52f7088` (`docs/EXAMPLE-CLIENTS.md`), local, not pushed, live proof pending. Package 5 open) | 2026-10-15 | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (2026-10-15: Packages 1–3 built, verified and deployed (`3e493f6` CI `38569635936`, `d112f62` CI `38574380444`, `7e30b09` CI `38585878100`; migrations 0022 and 0023 live). Package 4 Cockpit v2 phases 1–13 CI-green and deployed (last `38605626110` on `47a2da4`); phase 14 Activity `35a869d` built (265 tests, axe 0 at 1440/375 light and dark), pushed 2026-10-16, CI pending; Costs, Team, Settings, Notifications and cleanup left. Build-failure guards `b8d240f` and brand-colour rule `8e6e09d` pushed (CI `38695633253`, `38706155999` green; decision by Huraira 2026-10-15; eval E5 mutation-checked); live continue `e6a71046` proved the quote fix and failed on contradictory owner answers; a passing live build is still pending. Also `a6f64cd` ("What was built" site preview, pushed) and `dde68a5` (`dispatch-job` v6, deployed, commit local). Migration 0024 written on the unmerged branch `claude/objective-engelbart-d65df7`, not applied. Brief consistency check `fd67328` (contradictory owner answers halt at preflight unpaid, owner's pick clears it, planner asks each topic once; eval E6 mutation-checked) and example clients `52f7088` (`docs/EXAMPLE-CLIENTS.md`), local, not pushed, live proof pending. Package 5 open) | 2026-10-16 | |
 
 **Goal tracker (Blueprint §16K)**
 
