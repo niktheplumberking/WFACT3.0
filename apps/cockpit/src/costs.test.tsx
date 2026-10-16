@@ -1,24 +1,13 @@
 /**
- * MVP M6 cost transparency: the Costs page shows the true total (list price + labelled estimates), the cap
- * gauges, per-build and per-call spend, and keeps raw cost from non-owners. SYNTHETIC rows (src/test/fake.ts).
+ * MVP M6 cost arithmetic: list price and estimates kept apart, history priced from real tokens, unpriced calls counted.
+ * The Costs room itself is tested in src/pages/costs.test.tsx. SYNTHETIC rows.
  */
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import { createFake, fixtures, OWNER_ID } from "./test/fake";
-import type { Role } from "./lib/model";
+
+// lib/costs imports the Supabase client; these tests never call it.
+vi.mock("./supabaseClient", () => ({ supabase: {} }));
 import { callCost, priceTokens, runSpend, sumDays, total, type DayRow, type RunRow } from "./lib/costs";
 
-const h = vi.hoisted(() => ({ fake: null as unknown as ReturnType<typeof import("./test/fake").createFake> }));
-vi.mock("./supabaseClient", () => ({
-  get supabase() {
-    return h.fake.client;
-  },
-}));
-
-import { SignedIn } from "./App";
-
-const T = { timeout: 3000 };
 const today = new Date().toISOString().slice(0, 10);
 const RUN = "9bb96676-1630-4b15-81aa-3e0b1c58656e";
 
@@ -61,46 +50,5 @@ describe("cost arithmetic", () => {
     const base = { id: "1", occurred_at: today, run_id: null, actor: "a", provider: "agent37", entity_slug: null, latency_ms: 1, outcome: "success" };
     expect(callCost({ ...base, model: "hermes-agent", input_tokens: 1e6, output_tokens: 0, cost_usd: null, price_basis: "unpriced" })).toEqual({ usd: 3, basis: "history" });
     expect(callCost({ ...base, model: "claude-sonnet-5", input_tokens: 1, output_tokens: 1, cost_usd: "0.25", price_basis: "metered" })).toEqual({ usd: 0.25, basis: "metered" });
-  });
-});
-
-function start(role: Role = "owner") {
-  const fx = fixtures();
-  fx.model_cost_by_day = days as unknown as Record<string, unknown>[];
-  fx.model_cost_by_run = [run as unknown as Record<string, unknown>];
-  fx.model_traces = [{ id: "t1", occurred_at: "2026-09-28T17:09:31Z", run_id: RUN, actor: "agent:front-end-builder", provider: "agent37", model: "hermes-agent", entity_slug: "dreamsign", input_tokens: 629_322, output_tokens: 19_708, cost_usd: null, price_basis: "unpriced", latency_ms: 152_659, outcome: "success" }];
-  h.fake = createFake(fx);
-  render(
-    <MemoryRouter initialEntries={["/costs"]}>
-      <SignedIn me={{ userId: OWNER_ID, email: "owner@example.test", role, fullName: "Test Owner" }} />
-    </MemoryRouter>,
-  );
-}
-
-describe("Costs page", () => {
-  it("leads with the true total and labels the estimate", async () => {
-    start();
-    expect(await screen.findByRole("heading", { level: 1, name: "$6.00 spent on AI" }, T)).toBeInTheDocument();
-    expect(screen.getByText(/\$1\.00 at list prices; \$5\.00 is an estimate for Agent 37/)).toBeInTheDocument();
-    expect(screen.getByText("Estimates are not a bill.")).toBeInTheDocument();
-  });
-  it("shows the approved caps, counting only priced spend (not pre-pricing history)", async () => {
-    start();
-    const week = await screen.findByRole("meter", { name: "Last 7 days" }, T);
-    // $1.00 list price + $0.50 estimated; the $4.50 history is in the total, not in the cap.
-    expect(week).toHaveAttribute("aria-valuenow", "1.5");
-    expect(week).toHaveAttribute("aria-valuemax", "20");
-    expect(screen.getByText("$1.50 of $20.00")).toBeInTheDocument();
-    expect(screen.getByText(/is refused before the next model call/)).toBeInTheDocument();
-  });
-  it("lists builds and the biggest calls, with history marked as an estimate", async () => {
-    start();
-    expect(await screen.findByRole("cell", { name: "9bb96676" }, T)).toBeInTheDocument();
-    expect(screen.getAllByText("est. (history)").length).toBeGreaterThan(0);
-    expect(screen.getByRole("heading", { name: "Biggest calls" })).toBeInTheDocument();
-  });
-  it("keeps raw cost from admins (Blueprint §9)", async () => {
-    start("admin");
-    expect(await screen.findByText("Costs are visible to owners only.", {}, T)).toBeInTheDocument();
   });
 });

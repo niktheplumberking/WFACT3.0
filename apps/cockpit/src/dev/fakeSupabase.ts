@@ -50,6 +50,27 @@ if (new URLSearchParams(location.search).get("fake-activity") === "1") {
     { id: "a7", occurred_at: ago(60 * 26), actor: owner, action: "job.requested", task_id: null, run_id: null, payload: { kind: "intake" } },
   ];
 }
+// ?fake-costs=1 adds SYNTHETIC cost rows (six weeks of spend, two builds and their calls) for the Costs room.
+if (new URLSearchParams(location.search).get("fake-costs") === "1") {
+  const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
+  const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
+  const runV = "77777777-7777-4777-8777-777777777777";
+  const runF = "66666666-6666-4666-8666-666666666666";
+  const d = (n: number, model: string, priced: number, estimated = 0) => ({ day: day(n), entity_slug: "bennett-co", provider: model === "hermes-agent" ? "agent37" : "anthropic", model, calls: 6, input_tokens: 90_000, output_tokens: 9_000, priced_usd: priced, estimated_usd: estimated, unpriced_calls: 0, unpriced_input_tokens: 0, unpriced_output_tokens: 0 });
+  rows.model_cost_by_day = [d(0, "claude-sonnet-5", 0.42), d(0, "hermes-agent", 0.9, 0.9), d(3, "claude-sonnet-5", 0.31), d(9, "claude-sonnet-5", 1.2), d(16, "hermes-agent", 2.1, 2.1), d(24, "claude-sonnet-5", 0.6), d(33, "claude-sonnet-5", 0.25)];
+  const r = (run_id: string, priced: number, est: number, min: number) => ({ run_id, entity_slug: "bennett-co", calls: 4, errors: 0, input_tokens: 120_000, output_tokens: 12_000, priced_usd: priced, estimated_usd: est, unpriced_calls: 0, unpriced_input_tokens: 0, unpriced_output_tokens: 0, first_call_at: ago(min + 4), last_call_at: ago(min) });
+  rows.model_cost_by_run = [r(runV, 0.71, 0.3, 96), r(runF, 1.12, 0.6, 178)];
+  const t = (id: string, run_id: string | null, actor: string, model: string, cost: number, min: number) => ({ id, occurred_at: ago(min), run_id, actor, provider: model === "hermes-agent" ? "agent37" : "anthropic", model, entity_slug: "bennett-co", input_tokens: 30_000, output_tokens: 3_000, cost_usd: cost, price_basis: model === "hermes-agent" ? "estimated" : "metered", latency_ms: 20_000, outcome: "success" });
+  rows.model_traces = [
+    t("c1", runV, "agent:qa-evaluator", "claude-sonnet-5", 0.18, 96),
+    t("c2", runV, "agent:front-end-builder", "hermes-agent", 0.3, 97),
+    t("c3", runV, "agent:qa-evaluator", "claude-sonnet-5", 0.08, 98),
+    t("c4", runV, "agent:front-end-builder", "claude-sonnet-5", 0.15, 99),
+    t("c5", null, "hermes-lite", "claude-sonnet-5", 0.004, 120),
+    t("c6", runF, "agent:front-end-builder", "hermes-agent", 0.6, 178),
+    t("c7", runF, "agent:qa-evaluator", "claude-sonnet-5", 0.52, 179),
+  ];
+}
 const fake = createFake(rows);
 
 const signedIn = {

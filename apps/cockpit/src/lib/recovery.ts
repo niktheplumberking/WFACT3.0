@@ -56,7 +56,8 @@ export interface Diagnosis {
 const BUILD_KINDS = new Set(["build_plan", "resume"]);
 
 const MONEY = /credits exhausted|HTTP 402|insufficient_quota|credit balance|out of credits/i;
-const SPEND = /spend:\$|ceiling of \$/i;
+/** A stop caused by a spending cap (the job runner writes "spend:$X ceiling of $Y reached …"). */
+export const SPEND = /spend:\$|ceiling of \$/i;
 const SETUP =
   /GITHUB_DISPATCH_TOKEN|Dispatcher not configured|is not set \(Doppler|builder models unavailable|no Track B builder|CrossModelViolation|same vendor as the builder|no evaluator model was configured|needs AGENT37|API key|HTTP 40[13]\b/i;
 const TEMPORARY =

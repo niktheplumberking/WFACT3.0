@@ -1,250 +1,336 @@
 /**
- * Costs (MVP M6): what the factory has spent on AI, per day, per client, per build and per call, against the
- * spend caps. Owner-only: the views and model_traces are owner-only by RLS (0008, 0020), and Blueprint §9 keeps
- * raw cost away from admins. Every figure says how sure it is: metered (list price), estimated (Agent 37, no
- * published rate) or history (calls recorded before Agent 37 had a price, estimated now from their real tokens).
+ * Costs (Cockpit v2 phase 15, brief §6.11): what the factory spent on AI against the live caps. Owner-only: the cost
+ * views and model_traces are owner-only by RLS (0008, 0020), so admins and PMs see a plain notice (role conflict logged
+ * in BLOCKED-ON-NICK.md). Every figure comes from the cost views or the recorded calls; the caps and their period come
+ * from spend-caps.json (today "per 7 days", not the design's "this month": caps conflict logged). Estimates (the site
+ * builder publishes no price) are labelled wherever they appear; the per-model table sits in Technical details.
  */
+import { useMemo } from "react";
+import { clientNameOf } from "../lib/clients";
+import { planIdOfJob } from "../lib/attention";
+import { SPEND } from "../lib/recovery";
 import { dateTime } from "../lib/model";
-import { useLoad, useMe } from "../lib/state";
-import { CAPS, PRICING_VERSION, byKey, callCost, capped, dayKey, fetchCostData, money, runSpend, sumDays, tokens, total, type Spend, type TraceRow } from "../lib/costs";
-import { Empty, LoadError, Loading, Notice, PageHead, Plate } from "../components/ui";
+import { useFactory, useLoad, useMe } from "../lib/state";
+import {
+  CAPS, PRICING_VERSION, TRACE_LIMIT, buildStopLine, byKey, capWeek, capWindowStart, capped, fetchCostRoom, runSpend, runsOfJobs, stepOf, sumCalls, total, usd,
+  usualRange, weekBlocks, type TraceRow,
+} from "../lib/costs";
+import { EmptyState, TechDetails } from "../components/kit";
+import { LoadError, Loading } from "../components/ui";
 
-const role = (actor: string) => actor.replace(/^agent:/, "").replace(/-/g, " ");
-const client = (slug: string | null) => (slug ? slug : "no client");
-
-/** "$1.20 (est.)" when any part of the figure is an estimate. */
-function Amount({ s }: { s: Spend }) {
-  const est = s.estimated + s.history > 0;
-  return (
-    <>
-      {money(total(s))}
-      {est && <span className="quiet"> est.</span>}
-    </>
-  );
-}
-
-function CallCost({ t }: { t: TraceRow }) {
-  const c = callCost(t);
-  if (c.usd === null) return <>no price</>;
-  return (
-    <>
-      {money(c.usd)}
-      {c.basis !== "metered" && <span className="quiet"> {c.basis === "history" ? "est. (history)" : "est."}</span>}
-    </>
-  );
-}
-
-function CapLine({ label, spent, cap }: { label: string; spent: number; cap: number | null }) {
-  if (cap === null) {
-    return (
-      <div className="cap">
-        <div className="cap-head">
-          <b>{label}</b>
-          <span className="fig">{money(spent)} <span className="quiet">(no cap set)</span></span>
-        </div>
-      </div>
-    );
-  }
-  const pct = Math.min(100, Math.round((spent / cap) * 100));
-  return (
-    <div className="cap">
-      <div className="cap-head">
-        <b>{label}</b>
-        <span className="fig">{money(spent)} of {money(cap)}</span>
-      </div>
-      <div className="cap-bar" role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={cap} aria-valuenow={Number(spent.toFixed(2))}>
-        <span style={{ width: `${pct}%` }} className={spent >= cap ? "over" : pct >= 80 ? "near" : undefined} />
-      </div>
-    </div>
-  );
-}
+const dayFmt = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+const short = (day: string) => dayFmt.format(new Date(`${day}T00:00:00Z`));
+const NO_CLIENT = "Not tied to a client";
 
 export function Costs() {
   const me = useMe();
-  const costs = useLoad(fetchCostData, []);
-  if (me.role !== "owner") {
+  const f = useFactory();
+  const owner = me.role === "owner";
+  const load = useLoad(() => (owner ? fetchCostRoom() : Promise.resolve(null)), [owner]);
+  const now = useMemo(() => new Date(), []);
+
+  const room = useMemo(() => {
+    const d = load.data;
+    if (!d || !f.jobs || !f.plans) return null;
+    const jobs = f.jobs;
+    const planById = new Map(f.plans.map((p) => [p.id, p]));
+    const runs = runsOfJobs(jobs, d.links, (j) => planIdOfJob(j, jobs));
+    const clientOfRun = (runId: string | null) => {
+      const planId = runId ? runs.get(runId)?.planId : null;
+      const plan = planId ? planById.get(planId) : undefined;
+      return plan ? clientNameOf(plan) : null;
+    };
+
+    const week = capWeek(d.days, now);
+    const builds = d.runs.filter((r) => runs.get(r.run_id)?.build);
+    const last = builds[0] ?? null;
+    const range = usualRange(builds.map((r) => total(runSpend(r))).filter((v) => v > 0));
+    const blocks = weekBlocks(d.days, now);
+
+    const since = capWindowStart(now);
+    const inWindow = d.traces.filter((t) => t.occurred_at.slice(0, 10) >= since);
+    const perClientMap = new Map<string, TraceRow[]>();
+    for (const t of inWindow) {
+      const name = clientOfRun(t.run_id) ?? NO_CLIENT;
+      perClientMap.set(name, [...(perClientMap.get(name) ?? []), t]);
+    }
+    const perClient = [...perClientMap.entries()].map(([name, rows]) => ({ name, ...sumCalls(rows) })).sort((a, b) => b.usd - a.usd);
+
+    // The caps example: the newest build a cap stopped, else the newest build.
+    const capStopped = jobs
+      .filter((j) => (j.kind === "build_plan" || j.kind === "resume") && SPEND.test(j.error ?? ""))
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+    const stoppedRun = capStopped ? [...runs.entries()].find(([, r]) => r.jobId === capStopped.id)?.[0] ?? null : null;
+    const exampleRun = stoppedRun ?? last?.run_id ?? null;
+    const exampleCalls = exampleRun ? d.traces.filter((t) => t.run_id === exampleRun).reverse() : [];
+    const steps: { name: string; usd: number; estimated: boolean }[] = [];
+    for (const t of exampleCalls) {
+      const name = stepOf(t.actor);
+      const c = sumCalls([t]);
+      const prev = steps[steps.length - 1];
+      if (prev && prev.name === name) {
+        prev.usd += c.usd;
+        prev.estimated ||= c.estimated;
+      } else steps.push({ name, usd: c.usd, estimated: c.estimated });
+    }
+
+    const usedFor = new Map<string, Set<string>>();
+    for (const t of d.traces) usedFor.set(t.model, (usedFor.get(t.model) ?? new Set()).add(stepOf(t.actor)));
+    const models = byKey(d.days, (r) => r.model).sort((a, b) => total(b.spend) - total(a.spend));
+
+    return { d, week, last, range, blocks, perClient, steps, exampleClient: clientOfRun(exampleRun), stopped: !!stoppedRun, usedFor, models, clientOfRun, builds };
+  }, [load.data, f.jobs, f.plans, now]);
+
+  if (!owner) {
     return (
-      <>
-        <PageHead title="Costs" />
-        <Empty title="Costs are visible to owners only.">Admins see operational rooms, not raw cost (Blueprint §9).</Empty>
-      </>
+      <div className="costs">
+        <header className="costs-head">
+          <h1 className="t-title">Costs</h1>
+        </header>
+        <EmptyState title="Costs are for owners only.">The cost records can be read by owners only, so this room shows nothing for other roles.</EmptyState>
+      </div>
     );
   }
-  const d = costs.data;
-  const now = new Date();
-  const all = d ? sumDays(d.days) : null;
-  const week = d ? sumDays(d.days.filter((r) => r.day >= dayKey(now, 6))) : null;
-  const last14 = d ? byKey(d.days.filter((r) => r.day >= dayKey(now, 13)), (r) => r.day).sort((a, b) => b.key.localeCompare(a.key)) : [];
-  const clients = d ? byKey(d.days, (r) => r.entity_slug).sort((a, b) => total(b.spend) - total(a.spend)) : [];
-  const models = d ? byKey(d.days, (r) => r.model).sort((a, b) => total(b.spend) - total(a.spend)) : [];
-  const latestBuild = d?.runs[0] ? runSpend(d.runs[0]) : null;
-  const capsOff = CAPS.perBuildUsd === null && CAPS.weeklyUsd === null;
+
+  const error = load.error ?? f.error;
+  if (error) {
+    return (
+      <div className="costs">
+        <header className="costs-head">
+          <h1 className="t-title">Costs</h1>
+        </header>
+        <LoadError what="the costs" error={error} onRetry={() => void Promise.all([load.reload(), f.reload()])} />
+      </div>
+    );
+  }
+  if (!room) {
+    return (
+      <div className="costs">
+        <header className="costs-head">
+          <h1 className="t-title">Costs</h1>
+        </header>
+        <Loading rows={4} label="Loading the costs" />
+      </div>
+    );
+  }
+  if (room.d.days.length === 0) {
+    return (
+      <div className="costs">
+        <header className="costs-head">
+          <h1 className="t-title">Costs</h1>
+        </header>
+        <EmptyState title="Nothing has been spent yet.">Costs appear here once the factory has read its first request.</EmptyState>
+      </div>
+    );
+  }
+
+  const weekCap = CAPS.weeklyUsd;
+  const buildCap = CAPS.perBuildUsd;
+  const spent = capped(room.week);
+  const headline = weekCap === null ? `Last 7 days: ${usd(spent)}.` : `Last 7 days: ${usd(spent)} of your ${usd(weekCap)} cap.`;
+  const lastCost = room.last ? total(runSpend(room.last)) : null;
+  const lead = [
+    lastCost === null ? "No build has run yet." : `The last build cost ${usd(lastCost)}.`,
+    room.range ? `Most builds cost between ${usd(room.range[0])} and ${usd(room.range[1])}.` : null,
+    room.week.estimated > 0 ? "Part of this is an estimate: the site builder publishes no price." : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  // Trend: 7-day blocks against the 7-day cap.
+  const values = room.blocks.map((b) => total(b.spend));
+  const scale = Math.max(weekCap ?? 0, ...values, 0.01) * 1.08;
+  const label = (i: number) => (i === room.blocks.length - 1 ? "Last 7 days" : short(room.blocks[i]!.from));
+  const anyEstimate = room.blocks.some((b) => b.spend.estimated + b.spend.history > 0);
+  const trendText =
+    `Spend per 7 days: ${room.blocks.map((b, i) => `${i === room.blocks.length - 1 ? "the last 7 days" : `${short(b.from)} to ${short(b.to)}`} ${usd(values[i]!)}`).join(", ")}.` +
+    (weekCap !== null ? ` The cap is ${usd(weekCap)} per 7 days.` : " No 7-day cap is switched on.") +
+    (anyEstimate ? " Includes estimates." : "");
+
+  const maxClient = Math.max(...room.perClient.map((c) => c.usd), 0.0001);
+
+  // The caps example bar.
+  const exampleTotal = room.steps.reduce((a, s) => a + s.usd, 0);
+  const barScale = Math.max((buildCap ?? 0) * 1.2, exampleTotal, 0.01);
+  let before = 0;
+  const segs = room.steps.map((s, i) => {
+    const seg = { ...s, left: (before / barScale) * 100, width: (s.usd / barScale) * 100, over: buildCap !== null && before + s.usd > buildCap, alt: i % 2 === 1 };
+    before += s.usd;
+    return seg;
+  });
+  const who = room.exampleClient ? `${room.exampleClient}'s` : "The";
+  const exampleText =
+    room.steps.length === 0
+      ? null
+      : `${room.stopped ? "The last build a cap stopped" : `${who} last build`}: ${room.steps.map((s) => `${s.name.toLowerCase()} ${usd(s.usd)}`).join(", ")}. ` +
+        (buildCap !== null ? `${usd(exampleTotal)} of the ${usd(buildCap)} per-build cap.` : `${usd(exampleTotal)} in all.`);
 
   return (
-    <>
-      <PageHead
-        title={all ? `${money(total(all))} spent on AI` : "Costs"}
-        lead={
-          all
-            ? `${all.calls.toLocaleString("en-GB")} model calls, ${tokens(all.inputTokens)} tokens in and ${tokens(all.outputTokens)} out. ` +
-              `${money(all.metered)} at list prices; ${money(all.estimated + all.history)} is an estimate for Agent 37, which publishes no rate.`
-            : undefined
-        }
-      />
-      <div className="stack">
-        {costs.error && <LoadError what="costs" error={costs.error} onRetry={costs.reload} />}
-        {!d && !costs.error && <Loading rows={4} label="Loading costs" />}
-        {d && d.days.length === 0 && <Empty title="No model calls traced yet." />}
-        {all && all.estimated + all.history > 0 && (
-          <Notice tone="info" title="Estimates are not a bill.">
-            Agent 37 calls are priced at $3 in / $15 out per million tokens (price table v{PRICING_VERSION}). Check its dashboard for the real figure; once its rate is on file, these become exact.
-          </Notice>
-        )}
-        {all && all.unknownCalls > 0 && <Notice tone="caution">{all.unknownCalls} calls went to a model with no price on file. They are counted, not priced, so the total is a lower bound.</Notice>}
+    <div className="costs">
+      <header className="costs-head">
+        <p className="costs-eyebrow">{short(capWindowStart(now))} to today</p>
+        <h1 className="costs-title">{headline}</h1>
+        <p className="costs-lead">{lead}</p>
+      </header>
 
-        {d && d.days.length > 0 && week && (
-          <Plate title="Spend caps" note={capsOff ? "Off" : "On"}>
-            <div className="caps">
-              <CapLine label="Last 7 days" spent={capped(week)} cap={CAPS.weeklyUsd} />
-              {latestBuild && d.runs[0] && (
-                <CapLine label={`Latest build (${client(d.runs[0].entity_slug)}, ${dateTime(d.runs[0].first_call_at)})`} spent={capped(latestBuild)} cap={CAPS.perBuildUsd} />
+      <div className="costs-grid">
+        <section aria-labelledby="tr-h" className="costs-card">
+          <h2 id="tr-h" className="costs-h2">The last six weeks</h2>
+          <div role="img" aria-label={trendText} className="trend">
+            <div className="trend-plot">
+              {weekCap !== null && (
+                <>
+                  <span aria-hidden="true" className="trend-cap" style={{ bottom: `${(weekCap / scale) * 100}%` }} />
+                  <span aria-hidden="true" className="trend-cap-label" style={{ bottom: `calc(${(weekCap / scale) * 100}% + 4px)` }}>
+                    {usd(weekCap)} cap
+                  </span>
+                </>
               )}
-              <p className="fine quiet">
-                {capsOff
-                  ? "Caps are switched off."
-                  : "A build or a week at its cap is refused before the next model call. Caps count spend priced since 13 October; earlier calls show in the totals above as history."}
+              {values.map((v, i) => (
+                <div key={room.blocks[i]!.from} className="trend-col">
+                  <span className="trend-v" style={{ bottom: `calc(${(v / scale) * 100}% + 4px)` }}>
+                    {usd(v)}
+                  </span>
+                  <span className={`trend-bar${i === values.length - 1 ? " now" : ""}`} style={{ height: `${(v / scale) * 100}%` }} />
+                </div>
+              ))}
+            </div>
+            <div className="trend-axis" aria-hidden="true">
+              {room.blocks.map((b, i) => (
+                <span key={b.from}>{label(i)}</span>
+              ))}
+            </div>
+          </div>
+          <p className="costs-note">Each bar is 7 days, from the date under it; the same period the cap counts.{anyEstimate ? " Includes estimates." : ""}</p>
+        </section>
+
+        <section aria-labelledby="pc-h" className="costs-card">
+          <h2 id="pc-h" className="costs-h2">Cost per client, last 7 days</h2>
+          {room.perClient.length === 0 ? (
+            <p className="muted">Nothing was spent in the last 7 days.</p>
+          ) : (
+            <ul className="per-client">
+              {room.perClient.map((c) => (
+                <li key={c.name}>
+                  <span className="per-client-row">
+                    <span>{c.name}</span>
+                    <span className="fig">
+                      {usd(c.usd)}
+                      {c.estimated && <span className="quiet"> estimate</span>}
+                    </span>
+                  </span>
+                  <span className="per-client-bar" aria-hidden="true">
+                    <span style={{ width: `${(c.usd / maxClient) * 100}%` }} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+
+      <section aria-labelledby="cap-h" className="caps-protect">
+        <h2 id="cap-h" className="costs-h2 big">How the caps protect you</h2>
+        <div className="caps-protect-grid">
+          <div className="caps-protect-text">
+            <p className="costs-p">
+              {buildStopLine()}{" "}
+              {weekCap !== null ? `Over the last 7 days the factory stops at ${usd(weekCap)}, even in the middle of a build.` : "No 7-day cap is switched on."}{" "}
+              Before every AI call it checks what has been spent, and refuses the call once a cap is reached, so the last call can take spending slightly past it.
+            </p>
+            <p className="muted">{room.stopped ? "The picture shows the last build a cap stopped." : "No build has reached a cap yet. The picture shows the last build against its cap."}</p>
+            <p className="muted">The caps are set in the factory’s own settings and change only on Nick’s say-so.</p>
+          </div>
+          {exampleText ? (
+            <div role="img" aria-label={exampleText} className="caps-bar-box">
+              <div className="caps-bar">
+                {segs.map((s, i) => (
+                  <span key={`${s.name}-${i}`} className={`caps-seg${s.alt ? " alt" : ""}${s.over ? " over" : ""}`} style={{ left: `${s.left}%`, width: `${s.width}%` }} />
+                ))}
+                {buildCap !== null && <span aria-hidden="true" className="caps-line" style={{ left: `${(buildCap / barScale) * 100}%` }} />}
+              </div>
+              <div className="caps-legend" aria-hidden="true">
+                {room.steps.map((s, i) => (
+                  <span key={`${s.name}-${i}`}>
+                    {s.name} {usd(s.usd)}
+                    {s.estimated ? " (estimate)" : ""}
+                  </span>
+                ))}
+              </div>
+              <p className={room.stopped ? "caps-caption stop" : "caps-caption"} aria-hidden="true">
+                {room.stopped ? `Stopped at ${usd(exampleTotal)}, before its next AI call.` : buildCap !== null ? `${usd(exampleTotal)} of ${usd(buildCap)}.` : `${usd(exampleTotal)}.`}
               </p>
             </div>
-          </Plate>
-        )}
+          ) : (
+            <p className="muted">No build has recorded any calls yet, so there is nothing to show here.</p>
+          )}
+        </div>
+      </section>
 
-        {d && d.days.length > 0 && (
-          <div className="cost-grid">
-            <Plate title="Last 14 days">
-              <div className="table-scroll" tabIndex={0} role="region" aria-label="Spend per day, scrollable">
-                <table className="table">
-                  <thead>
-                    <tr><th scope="col">Day</th><th scope="col">Calls</th><th scope="col">Tokens in / out</th><th scope="col">Spend</th></tr>
-                  </thead>
-                  <tbody>
-                    {last14.length === 0 && <tr><td colSpan={4} className="quiet">No calls in the last 14 days.</td></tr>}
-                    {last14.map(({ key, spend }) => (
-                      <tr key={key}>
-                        <td className="fig">{key}</td>
-                        <td className="fig">{spend.calls}</td>
-                        <td className="fig">{tokens(spend.inputTokens)} / {tokens(spend.outputTokens)}</td>
-                        <td className="fig"><Amount s={spend} /></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Plate>
-            <Plate title="By client">
-              <div className="table-scroll" tabIndex={0} role="region" aria-label="Spend per client, scrollable">
-                <table className="table">
-                  <thead>
-                    <tr><th scope="col">Client</th><th scope="col">Calls</th><th scope="col">Spend</th></tr>
-                  </thead>
-                  <tbody>
-                    {clients.map(({ key, spend }) => (
-                      <tr key={key || "none"}>
-                        <td>{client(key || null)}</td>
-                        <td className="fig">{spend.calls}</td>
-                        <td className="fig"><Amount s={spend} /></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <h3 className="sub">By model</h3>
-              <div className="table-scroll" tabIndex={0} role="region" aria-label="Spend per model, scrollable">
-                <table className="table">
-                  <thead>
-                    <tr><th scope="col">Model</th><th scope="col">Tokens in / out</th><th scope="col">Spend</th></tr>
-                  </thead>
-                  <tbody>
-                    {models.map(({ key, spend }) => (
-                      <tr key={key}>
-                        <td className="fig">{key}</td>
-                        <td className="fig">{tokens(spend.inputTokens)} / {tokens(spend.outputTokens)}</td>
-                        <td className="fig"><Amount s={spend} /></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Plate>
+      <TechDetails summary="Technical details: cost by AI model">
+        <div className="table-scroll" tabIndex={0} role="region" aria-label="Cost by AI model, scrollable">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Model</th>
+                <th scope="col">Used for</th>
+                <th scope="col" className="num">Calls</th>
+                <th scope="col" className="num">Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {room.models.map(({ key, spend }) => (
+                <tr key={key}>
+                  <td className="fig">{key}</td>
+                  <td>{[...(room.usedFor.get(key) ?? [])].join(", ") || "Not recorded"}</td>
+                  <td className="fig num">{spend.calls}</td>
+                  <td className="fig num">
+                    {usd(total(spend))}
+                    {spend.estimated + spend.history > 0 && " (estimated)"}
+                    {spend.unknownCalls > 0 && ` + ${spend.unknownCalls} unpriced`}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="costs-note">
+          Prices from the factory’s own price table (version {PRICING_VERSION}). The site builder publishes no price, so its cost is an estimate and labelled as one. Calls recorded before it had a price are estimated from their real token counts.
+        </p>
+        {room.builds.length > 0 && (
+          <div className="table-scroll" tabIndex={0} role="region" aria-label="Cost per build, scrollable">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">Started</th>
+                  <th scope="col">Client</th>
+                  <th scope="col" className="num">Calls</th>
+                  <th scope="col" className="num">Cost</th>
+                  <th scope="col">Run</th>
+                </tr>
+              </thead>
+              <tbody>
+                {room.builds.slice(0, 25).map((r) => {
+                  const s = runSpend(r);
+                  return (
+                    <tr key={r.run_id}>
+                      <td className="fig">{dateTime(r.first_call_at)}</td>
+                      <td>{room.clientOfRun(r.run_id) ?? NO_CLIENT}</td>
+                      <td className="fig num">{r.calls}</td>
+                      <td className="fig num">
+                        {usd(total(s))}
+                        {s.estimated + s.history > 0 && " (estimated)"}
+                      </td>
+                      <td className="fig">{r.run_id.slice(0, 8)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
-
-        {d && d.runs.length > 0 && (
-          <Plate title="Builds" note="Latest 25. One build counts every retry and reopen.">
-            <div className="table-scroll" tabIndex={0} role="region" aria-label="Spend per build, scrollable">
-              <table className="table">
-                <thead>
-                  <tr><th scope="col">Started</th><th scope="col">Client</th><th scope="col">Calls</th><th scope="col">Tokens in / out</th><th scope="col">Spend</th><th scope="col">Run</th></tr>
-                </thead>
-                <tbody>
-                  {d.runs.map((r) => {
-                    const s = runSpend(r);
-                    const limit = CAPS.perBuildUsd;
-                    return (
-                      <tr key={r.run_id}>
-                        <td className="fig">{dateTime(r.first_call_at)}</td>
-                        <td>{client(r.entity_slug)}</td>
-                        <td className="fig">{r.calls}{Number(r.errors) > 0 ? <span className="quiet"> ({r.errors} failed)</span> : null}</td>
-                        <td className="fig">{tokens(Number(r.input_tokens))} / {tokens(Number(r.output_tokens))}</td>
-                        <td className="fig">
-                          <Amount s={s} />
-                          {limit !== null && capped(s) >= limit && <span className="tag-over"> at the {money(limit)} cap</span>}
-                        </td>
-                        <td className="fig">{r.run_id.slice(0, 8)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </Plate>
-        )}
-
-        {d && d.costliest.length > 0 && <CallTable title="Biggest calls" note="Most input tokens. Outliers here are where tokens leak." rows={d.costliest} />}
-        {d && d.latest.length > 0 && <CallTable title="Latest calls" rows={d.latest} />}
-        {d && d.days.length > 0 && (
-          <p className="fine quiet">
-            Where the tokens go and how to cut them: docs/AI-COST-AUDIT.md in the repo.
-          </p>
-        )}
-      </div>
-    </>
-  );
-}
-
-function CallTable({ title, note, rows }: { title: string; note?: string; rows: TraceRow[] }) {
-  return (
-    <Plate title={title} note={note}>
-      <div className="table-scroll" tabIndex={0} role="region" aria-label={`${title}, scrollable`}>
-        <table className="table">
-          <thead>
-            <tr><th scope="col">When</th><th scope="col">Role</th><th scope="col">Client</th><th scope="col">Model</th><th scope="col">Tokens in / out</th><th scope="col">Cost</th><th scope="col">Time</th><th scope="col">Outcome</th></tr>
-          </thead>
-          <tbody>
-            {rows.map((t) => (
-              <tr key={t.id}>
-                <td className="fig">{dateTime(t.occurred_at)}</td>
-                <td>{role(t.actor)}</td>
-                <td>{client(t.entity_slug)}</td>
-                <td className="fig">{t.model}</td>
-                <td className="fig">{tokens(t.input_tokens)} / {tokens(t.output_tokens)}</td>
-                <td className="fig"><CallCost t={t} /></td>
-                <td className="fig">{(t.latency_ms / 1000).toFixed(1)} s</td>
-                <td>{t.outcome}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Plate>
+        {room.d.traces.length >= TRACE_LIMIT && <p className="costs-note">Only the newest {TRACE_LIMIT} calls are read for the per-client and per-step figures; the totals above count every call.</p>}
+      </TechDetails>
+    </div>
   );
 }

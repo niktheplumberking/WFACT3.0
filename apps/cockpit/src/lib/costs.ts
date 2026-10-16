@@ -205,3 +205,104 @@ export async function fetchRequestCost(): Promise<number | null> {
     return null;
   }
 }
+
+/* ---------------- the Costs room (Cockpit v2 phase 15) ---------------- */
+
+/** Dollars as the Costs room says them: two decimals, or "under $0.01" for a real but tiny figure. */
+export const usd = (n: number) => (n > 0 && n < 0.005 ? "under $0.01" : `$${n.toFixed(2)}`);
+
+/** What each part of the factory is for, in plain words (the model table's "Used for" and the caps example). */
+export const STEP_OF_ACTOR: Record<string, string> = {
+  "agent:front-end-builder": "Writing and fixing the site",
+  "agent:qa-evaluator": "Checks and reviews",
+  "agent:planner": "Writing the proposal",
+  "agent:intake": "Reading the request",
+  "agent:direction": "Choosing the direction",
+  "hermes-lite": "Answering questions",
+};
+export const stepOf = (actor: string) => STEP_OF_ACTOR[actor] ?? "Other work";
+
+export interface CostRoomData {
+  days: DayRow[];
+  runs: RunRow[];
+  /** Every recorded call, newest first, up to TRACE_LIMIT (the totals come from the views, which are exact). */
+  traces: TraceRow[];
+  /** job.run links (task_id = job id), so a run can be tied to its job, its proposal and its client. */
+  links: { task_id: string | null; run_id: string | null }[];
+}
+export const TRACE_LIMIT = 5000;
+
+export async function fetchCostRoom(): Promise<CostRoomData> {
+  const [d, r, t, l] = await Promise.all([
+    supabase.from("model_cost_by_day").select("*").order("day", { ascending: false }),
+    supabase.from("model_cost_by_run").select("*").order("last_call_at", { ascending: false }).limit(500),
+    supabase.from("model_traces").select(TRACE_COLS).order("occurred_at", { ascending: false }).limit(TRACE_LIMIT),
+    supabase.from("audit_log").select("task_id,run_id").eq("action", "job.run").limit(2000),
+  ]);
+  for (const res of [d, r, t, l]) if (res.error) throw new Error(res.error.message);
+  return { days: (d.data ?? []) as DayRow[], runs: (r.data ?? []) as RunRow[], traces: (t.data ?? []) as TraceRow[], links: (l.data ?? []) as CostRoomData["links"] };
+}
+
+/** The spend the weekly cap counts, exactly as packages/hermes/src/spendCaps.ts does: priced spend on UTC days from 6 days ago. */
+export const capWindowStart = (now: Date) => dayKey(now, 6);
+export function capWeek(days: DayRow[], now: Date): Spend {
+  return sumDays(days.filter((r) => r.day >= capWindowStart(now)));
+}
+
+/** Spend in consecutive 7-day blocks ending today, oldest first (the trend). */
+export function weekBlocks(days: DayRow[], now: Date, n = 6): { from: string; to: string; spend: Spend }[] {
+  return Array.from({ length: n }, (_, i) => {
+    const k = n - 1 - i;
+    const from = dayKey(now, 7 * k + 6);
+    const to = dayKey(now, 7 * k);
+    return { from, to, spend: sumDays(days.filter((r) => r.day >= from && r.day <= to)) };
+  });
+}
+
+/** The middle half of past build costs (25th to 75th percentile), or null with fewer than 3 builds to go on. */
+export function usualRange(values: number[]): [number, number] | null {
+  if (values.length < 3) return null;
+  const v = [...values].sort((a, b) => a - b);
+  const at = (p: number) => v[Math.min(v.length - 1, Math.max(0, Math.round(p * (v.length - 1))))]!;
+  return [at(0.25), at(0.75)];
+}
+
+/** A traced run, tied to the job that ran it: whether it was a build, which job, which client. */
+export interface RunInfo {
+  jobId: string;
+  build: boolean;
+  planId: string | null;
+}
+type JobLike = { id: string; kind: string; params: Record<string, unknown> | null; result: Record<string, unknown> | null };
+
+/** Run id -> its job. Builds name the run in result.workflowRunId (a continued build in params.workflowRunId),
+ *  a request or a new proposal in result.runId, and every job that reached the worker has a job.run link row. */
+export function runsOfJobs<J extends JobLike>(jobs: J[], links: CostRoomData["links"], planOf: (j: J) => string | null): Map<string, RunInfo> {
+  const out = new Map<string, RunInfo>();
+  const byId = new Map(jobs.map((j) => [j.id, j]));
+  const put = (runId: unknown, j: J) => {
+    if (typeof runId !== "string" || out.has(runId)) return;
+    out.set(runId, { jobId: j.id, build: j.kind === "build_plan" || j.kind === "resume", planId: planOf(j) });
+  };
+  for (const j of jobs) {
+    put(j.result?.workflowRunId, j);
+    put(j.params?.workflowRunId, j);
+    put(j.result?.runId, j);
+  }
+  for (const l of links) if (l.task_id && byId.has(l.task_id)) put(l.run_id, byId.get(l.task_id)!);
+  return out;
+}
+
+/** Sum of calls as dollars, with how sure: any estimate makes the whole figure an estimate. */
+export function sumCalls(rows: TraceRow[]): { usd: number; estimated: boolean; unknown: number; calls: number } {
+  let usdSum = 0;
+  let estimated = false;
+  let unknown = 0;
+  for (const t of rows) {
+    const c = callCost(t);
+    if (c.usd === null) unknown += 1;
+    else usdSum += c.usd;
+    if (c.basis !== "metered") estimated = true;
+  }
+  return { usd: usdSum, estimated, unknown, calls: rows.length };
+}
