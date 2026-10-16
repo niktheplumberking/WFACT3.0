@@ -17,7 +17,7 @@ steps; this file tracks the Continuation Stages.
 
 **Status summary (2026-10-15, 13:30 +05, `/progress-sync`)**:
 - **Step 3A DONE, closed** (`/step-close 3A`, 2026-10-15): the live sign-up is proven end to end (sign-up, owner approval as `pm` with audit row, password
-  sign-in after approval in the Auth logs, role-limited view, attack test 32/32). Supabase email confirmation is off in the live project; Huraira's setting.
+  sign-in after approval in the Auth logs, role-limited view, attack test 32/32). Supabase email confirmation stays off (Huraira, 2026-10-15: the approval gate is enough).
 - **Step 25 PARTIAL** (`/step-close 25`, 2026-10-15): MVP M4, the contact form that saves leads, is **met live on synthetic data** (migrations 0025/0026
   applied, attack test 43/43, `submit-lead` deployed, JS and no-JS submits on both tracks stored as rows, refusals proven with curl). Not pushed.
   The CRM target and lead notification wait on Nick; the real-client run waits on Nick's brief.
@@ -61,7 +61,7 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 **MVP override (Decision D3, recorded 2026-10-10, docs only, no code changed)**: Nick wants the Website Build Module proven on Bennett & Co (colors and logo fixed, fonts free, agency-style site, websites only) by Wed 2026-10-14. Until then only items 1 to 4 below run, trimmed to that proof; scope fence, schedule and cost evidence are in `docs/MVP-CUTLINE.md`. Cost evidence from live `model_traces` (113 rows): Claude spend is about $1.32 in total; the 53 Agent 37 builder calls (2.41M input / 0.39M output tokens) are unpriced and, at an assumed Sonnet-class rate, would be about $13, matching the credits spent. Proposed cap (awaiting Huraira's yes): price Agent 37, $5 per build across retries, $20 per week. Nick's brief had not arrived at the time of writing.
 
 **Next up** (2026-10-15, night, `/progress-sync`; 3A closed by `/step-close 3A`, nothing further needed for it):
-1. **Huraira**: GO to push the 16 local commits (`dde68a5`…`3b5a94c`: v6 dispatch fix, `fd67328`/`52f7088`, the M4 work `1da9a5a`..`2154fda`); CI then runs the new `submit-lead` Deno job for the first time.
+1. **Done**: the 16 commits are on `main` (`6d88f79` contains `3b5a94c`). `main` CI then failed: gitleaks on `4abf890` (`38724162336`, fixed by `6d88f79`), then stale fixtures on `6d88f79` (`38725434775`). Fix `aa78cae` verified locally (fixtures check, typecheck, rendered-qa tests); pushed with the 3A trackers on Huraira's GO (2026-10-16); the CI run on that push is the independent check.
 2. **Nick**: the CRM target and whether a lead notifies him (BLOCKED-ON-NICK); for Bennett & Co, a real `clients` + `lead_sites` row with the live origin.
 3. **Huraira**: continue Harbor Street `e6a71046`; GO for Step 28 Package 4 phase 14 (Activity).
 

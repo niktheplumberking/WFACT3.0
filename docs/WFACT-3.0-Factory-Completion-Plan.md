@@ -1669,7 +1669,7 @@ under RLS as that user: profiles 1 of 2, account_requests 1 of 1, jobs 0 of 34, 
 plan_approvals 0 of 8 (a `pm` sees only assigned clients and no jobs: `clients_select`, `jobs_select`). `scripts/rls_attack_test_accounts.sql`
 re-run in a rolled-back transaction: 32/32, 0 leftover test users.
 **Noted, not a step gap**: Supabase email confirmation is off in the live project (email confirmed 35 ms after sign-up, `immediate_login_after_signup`);
-the approval gate still holds (no profile, so no data, until approved). Whether to turn confirmation on is Huraira's Auth setting.
+the approval gate still holds (no profile, so no data, until approved). Huraira decided 2026-10-15: leave confirmation off; the approval gate is enough.
 
 *The original agent prompt for this step is retired from the live plan (step closed). It is preserved in `docs/archive/2026-10-07-alignment/WFACT-3.0-Factory-Completion-Plan.pre-realignment.md`.*
 
