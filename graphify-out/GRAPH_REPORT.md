@@ -1,16 +1,16 @@
 # Graph Report - wfact-3.0-build  (2026-10-16)
 
 ## Corpus Check
-- 508 files · ~1,143,072 words
+- 511 files · ~1,143,060 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 4914 nodes · 9454 edges · 388 communities (300 shown, 69 thin omitted)
+- 4933 nodes · 9512 edges · 389 communities (300 shown, 69 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 173 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4e6c0722`
+- Built from commit: `3768941a`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -65,7 +65,7 @@
 - compilerOptions
 - pipeline.ts
 - compilerOptions
-- Work.tsx
+- stopped.test.tsx
 - compilerOptions
 - compilerOptions
 - compilerOptions
@@ -79,7 +79,7 @@
 - Lessons Ledger
 - WFACT Business Context (memory/context.md)
 - planStore.ts
-- Decisions.tsx
+- Work.tsx
 - production.ts
 - trackB/loop.ts
 - run.ts
@@ -278,7 +278,7 @@
 - pre-tool-bash-guard.sh
 - cockpit-v2/support.js
 - M2 direction agent + track choice
-- ui.tsx
+- sitePreview.ts
 - egress.ts
 - PermissionGate
 - trackBSite.test.ts
@@ -347,21 +347,20 @@
 - user-prompt-inject-snapshot.sh
 - Activity.tsx
 - Why builds keep failing, and failing again on continue (2026-10-15)
-- vitest
+- shell.test.tsx
 - 2026-10-14-step-28-package-4-phase-5.md
 - 2026-10-14-step-28-package-3.md
 - 2026-10-14-step-28-package-4-phases-1-2.md
 - user-prompt-validate-claude-md.sh
 - cockpit-v2/CLAUDE.md
 - 2026-10-15-step-28-package-4-phase-10.md
-- PROGRESS-sync-log-to-2026-10-15.md
 - fake.ts
 - 2026-10-14-step-28-package-4-phase-3.md
 - 2026-10-15-step-28-package-4-phase-12.md
 - 2026-10-15-step-28-package-4-phase-9.md
 - StoppedBuild.tsx
 - 2026-10-15-step-28-package-4-phase-11.md
-- App.tsx
+- ui.tsx
 - 2026-10-14-step-28-package-4-phase-6.md
 - 2026-10-15-step-28-build-failure-guards.md
 - pg_temp.attack_leads
@@ -374,9 +373,9 @@
 - 2026-10-15-step-28-brief-consistency-examples.md
 - public.leads
 - verification/test/permissions.test.ts
-- LiveBuild.tsx
+- projects.test.tsx
 - fakeSupabase.ts
-- progress.test.tsx
+- vitest
 - scripts
 - dependencies
 - vite.config.ts
@@ -384,18 +383,19 @@
 - requiredSections.ts
 - runCheck.ts
 - 2026-10-16-step-28-package-4-phase-14.md
+- 2026-10-16-step-28-package-4-phase-15.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `PilotBrief` - 43 edges
 2. `JobRow` - 33 edges
-3. `useToast()` - 32 edges
-4. `useMe()` - 31 edges
+3. `useToast()` - 33 edges
+4. `useMe()` - 32 edges
 5. `RunPage()` - 30 edges
-6. `Part D — The prompts` - 29 edges
-7. `fixtures()` - 28 edges
-8. `buildTrackBSite()` - 28 edges
-9. `useLoad()` - 27 edges
-10. `ProjectPage()` - 26 edges
+6. `fixtures()` - 30 edges
+7. `useLoad()` - 29 edges
+8. `Part D — The prompts` - 29 edges
+9. `buildTrackBSite()` - 28 edges
+10. `createFake()` - 27 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `WFACT SOP 1 — Sales & Onboarding (md)` --semantically_similar_to--> `WFact SOP 1 — Sales & Onboarding (PDF)`  [INFERRED] [semantically similar]
@@ -427,7 +427,7 @@
 - **Claims gate planted-failure fixtures** — packages_verification_test_fixtures_claims_banned_claim_banned_claim, packages_verification_test_fixtures_claims_invented_fact_invented_fact, packages_verification_test_fixtures_claims_leaked_text_leaked_text, packages_verification_test_fixtures_claims_missing_sample_missing_sample, packages_rendered_qa_readme_claims_gate [INFERRED 0.95]
 - **Rendered suite planted-failure fixtures** — packages_rendered_qa_test_fixtures_broken_link_broken_link, packages_rendered_qa_test_fixtures_console_error_console_error, packages_rendered_qa_test_fixtures_over_budget_js_over_budget_js, packages_rendered_qa_test_fixtures_reduced_motion_ignored_reduced_motion_ignored, packages_rendered_qa_readme_rendered_suite [INFERRED 0.95]
 
-## Communities (388 total, 69 thin omitted)
+## Communities (389 total, 69 thin omitted)
 
 ### Community 0 - "lead.ts"
 Cohesion: 0.08
@@ -555,15 +555,15 @@ Nodes (64): createDocumentationAgent(), createDocumentationObserver(), DOCUMENTA
 
 ### Community 31 - "brandUpload.ts"
 Cohesion: 0.12
-Nodes (22): checkSiteUrl(), EXT, IMAGE_EXT, IMAGE_MAX_BYTES, IMAGE_TYPES, ImageRecord, ImageType, imageTypeOf() (+14 more)
+Nodes (20): EXT, IMAGE_EXT, IMAGE_MAX_BYTES, IMAGE_TYPES, ImageRecord, ImageType, imageTypeOf(), inspectImageFile() (+12 more)
 
 ### Community 32 - "spendCaps.ts"
 Cohesion: 0.15
 Nodes (11): capCheckForCurrentRun(), capModelClient(), capValue(), checkSpendCaps(), loadSpendCaps(), SPEND_CAPS_PATH, SpendCapExceededError, SpendCaps (+3 more)
 
 ### Community 33 - "state.tsx"
-Cohesion: 0.05
-Nodes (59): ComingSoon, More, NotFound, Notifications, Settings, PageHead(), Plate(), JOB_COLUMNS (+51 more)
+Cohesion: 0.04
+Nodes (72): Activity, App(), ComingSoon, Costs, FixRounds, Home, More, NewRequest (+64 more)
 
 ### Community 34 - "timeline.ts"
 Cohesion: 0.10
@@ -629,9 +629,9 @@ Nodes (17): createDirectionAgent(), main(), createIntakeAgent(), directionFor(),
 Cohesion: 0.17
 Nodes (11): compilerOptions, esModuleInterop, module, moduleResolution, noUncheckedIndexedAccess, outDir, resolveJsonModule, skipLibCheck (+3 more)
 
-### Community 50 - "Work.tsx"
-Cohesion: 0.08
-Nodes (30): NewRequest, ProjectPage, Projects, LogoUpload(), choose(), FieldState, LogoRecord, uploadLogo() (+22 more)
+### Community 50 - "stopped.test.tsx"
+Cohesion: 0.19
+Nodes (11): CASES, CP, failedJob(), h, start(), T, ago(), asClient() (+3 more)
 
 ### Community 51 - "compilerOptions"
 Cohesion: 0.17
@@ -685,9 +685,9 @@ Nodes (10): Step 4B milestones M0-M6, Definition of Done goals (Blueprint 16K), 
 Cohesion: 0.22
 Nodes (11): DirectionResult, IntakeResult, PlanningResult, Plan, BuildTrack, InsertPendingArgs, PlanStatus, Row (+3 more)
 
-### Community 64 - "Decisions.tsx"
-Cohesion: 0.08
-Nodes (53): AccountsTab, Home, PlanPage, PlansTab, StagesTab, ButtonLink(), buildStopLine(), capped() (+45 more)
+### Community 64 - "Work.tsx"
+Cohesion: 0.05
+Nodes (86): LogoUpload(), choose(), rebuild(), FieldState, Aspect(), Empty(), LoadError(), requestJob() (+78 more)
 
 ### Community 65 - "production.ts"
 Cohesion: 0.22
@@ -830,8 +830,8 @@ Cohesion: 0.40
 Nodes (5): .claude/hooks/notification-token-display.sh, ast_hash, mtime, seen, semantic_hash
 
 ### Community 101 - "createFake"
-Cohesion: 0.11
-Nodes (18): h, start(), T, h, start(), T, cards(), h (+10 more)
+Cohesion: 0.10
+Nodes (20): SignedIn(), start(), Role, h, start(), T, h, start() (+12 more)
 
 ### Community 102 - ".claude/hooks/pre-tool-bash-guard.sh"
 Cohesion: 0.40
@@ -1163,7 +1163,7 @@ Nodes (5): scripts/rls_attack_test.sql, ast_hash, mtime, seen, semantic_hash
 
 ### Community 185 - "model.ts"
 Cohesion: 0.07
-Nodes (50): JobKind, JobRow, AttentionInput, ClientRow, ClientsInput, LIVE_FROM, PlanInputRow, AccountRequestRow (+42 more)
+Nodes (46): JobKind, JobRow, AttentionInput, ClientRow, ClientsInput, LIVE_FROM, PlanInputRow, AccountRequestRow (+38 more)
 
 ### Community 186 - "Sample Lead: Harbor Street Bakery (synthetic, Bennett & Co)"
 Cohesion: 0.50
@@ -1222,12 +1222,12 @@ Cohesion: 0.33
 Nodes (5): PROGRESS.md: closed steps 6, 5, 7, 4D (all DONE), Step 4D — Build recovery (DONE 2026-10-14 — exit check met live: `63278e56`, `e2a204fb`, `55ddba7c`), Step 5 — Stage 6: Documentation agent and episodic memory (DONE 2026-10-07), Step 6 — Enforce agent permissions (DONE 2026-10-06 — CI green 2026-10-07), Step 7 — Expand the evaluation registry (DONE 2026-10-07 — CI green)
 
 ### Community 201 - "TimelineHarness.tsx"
-Cohesion: 0.16
-Nodes (14): ago(), failed, failedJob, failedRows, Harness(), needs, needsJob, plan (+6 more)
+Cohesion: 0.18
+Nodes (13): ago(), failed, failedJob, failedRows, Harness(), needs, needsJob, plan (+5 more)
 
 ### Community 204 - "timeline.test.ts"
-Cohesion: 0.25
-Nodes (13): ContinueInput, progressHint(), at(), back(), checkpoint(), complete(), decision(), job() (+5 more)
+Cohesion: 0.21
+Nodes (15): ContinueInput, progressHint(), RunRow, at(), back(), checkpoint(), complete(), decision() (+7 more)
 
 ### Community 217 - "render.ts"
 Cohesion: 0.08
@@ -1373,9 +1373,9 @@ Nodes (75): boot(), bundledBlob(), cdnScriptFor(), collectProps(), compileAttr()
 Cohesion: 0.20
 Nodes (10): CI workflow (ci.yml), Deploy Cockpit to Vercel (trunk only) job, Rendered QA CI job (real Chromium, fixtures diff), Repo law & structure guardrails job (gitleaks, required files, plaintext secret block), Cockpit (control room PWA, apps/cockpit), Planted ambiguities and forbidden-claim traps, Summit Line Roofing raw request email (synthetic), Doppler secrets manager (+2 more)
 
-### Community 275 - "ui.tsx"
-Cohesion: 0.10
-Nodes (33): Aspect(), Empty(), LoadError(), Loading(), PagePreview(), RouteLine(), SinglePagePreview(), load() (+25 more)
+### Community 275 - "sitePreview.ts"
+Cohesion: 0.22
+Nodes (16): SinglePageSitePreview(), open(), show(), SitePreview(), show(), framePage(), loadSitePreview(), pageForHref() (+8 more)
 
 ### Community 276 - "egress.ts"
 Cohesion: 0.14
@@ -1470,12 +1470,12 @@ Cohesion: 0.40
 Nodes (4): pg_temp.attack_recovery(), public.audit_log, public.jobs, public.plan_inputs
 
 ### Community 310 - "ComponentGallery.tsx"
-Cohesion: 0.09
-Nodes (42): CommandPalette(), onKey(), run(), matchItems(), ORDER, PaletteGroup, PaletteItem, CheckResult (+34 more)
+Cohesion: 0.06
+Nodes (57): CommandPalette(), onKey(), run(), matchItems(), ORDER, PaletteGroup, PaletteItem, CheckResult (+49 more)
 
 ### Community 311 - "BuildTimeline.tsx"
-Cohesion: 0.33
-Nodes (11): announcement(), BuildTimeline(), found(), Mark(), STATE_WORD, when(), clock(), currentWait() (+3 more)
+Cohesion: 0.32
+Nodes (12): announcement(), BuildTimeline(), found(), Mark(), STATE_WORD, when(), clock(), currentWait() (+4 more)
 
 ### Community 312 - "layout.tsx"
 Cohesion: 0.15
@@ -1487,7 +1487,7 @@ Nodes (5): Job, JobKind, JobStatus, JobStore, MemoryJobStore
 
 ### Community 314 - "costs.ts"
 Cohesion: 0.09
-Nodes (40): Costs, days, run, today, addDay(), byKey(), callCost(), CAPS (+32 more)
+Nodes (39): days, run, today, addDay(), byKey(), callCost(), CAPS, capWeek() (+31 more)
 
 ### Community 315 - "Order and file ownership (two writers never share files)"
 Cohesion: 0.18
@@ -1554,32 +1554,32 @@ Cohesion: 0.07
 Nodes (29): buildAndVerify(), MemoryArtifactStore, notVerifiedReason(), SITE_MANIFEST, tagRunId(), WorkflowDeps, brief, CLEAN (+21 more)
 
 ### Community 344 - "SiteReview.tsx"
-Cohesion: 0.13
-Nodes (25): PlaceholderSlot, placeholdersOf(), PlaceholdersPanel(), add(), rebuild(), toggleLaunch(), where(), SiteReview() (+17 more)
+Cohesion: 0.17
+Nodes (20): Button(), PlaceholderSlot, placeholdersOf(), PlaceholdersPanel(), add(), toggleLaunch(), where(), SiteReview() (+12 more)
 
 ### Community 348 - "Activity.tsx"
 Cohesion: 0.04
-Nodes (95): archiveJob(), cancelJob(), dispatchJob(), isActive(), isFinished(), isStaleQueued(), isStaleRunning(), JobStatus (+87 more)
+Nodes (93): archiveJob(), cancelJob(), dispatchJob(), isActive(), isFinished(), isStaleQueued(), isStaleRunning(), JobStatus (+85 more)
 
 ### Community 349 - "Why builds keep failing, and failing again on continue (2026-10-15)"
 Cohesion: 0.29
 Nodes (6): 1. The record, 2. Why "continue" failed the same way, 3. What changed (2026-10-15), 4. Evals, 5. Still open (not changed here), Why builds keep failing, and failing again on continue (2026-10-15)
 
-### Community 350 - "vitest"
-Cohesion: 0.12
-Nodes (11): h, mainNav(), navNames(), start(), T, contrast(), dark, light (+3 more)
+### Community 350 - "shell.test.tsx"
+Cohesion: 0.33
+Nodes (5): h, mainNav(), navNames(), start(), T
 
 ### Community 358 - "fake.ts"
-Cohesion: 0.10
-Nodes (27): h, start(), T, accounts, clientsFor(), f, jobs, plans (+19 more)
+Cohesion: 0.11
+Nodes (23): h, T, accounts, clientsFor(), f, jobs, plans, projects (+15 more)
 
 ### Community 362 - "StoppedBuild.tsx"
 Cohesion: 0.07
-Nodes (64): FixChoice, FixInput, BeforeBuild(), ClientNeedsPanel(), copy(), DetailsForm(), submit(), LOGO_NEED (+56 more)
+Nodes (62): BeforeBuild(), ClientNeedsPanel(), copy(), DetailsForm(), submit(), LOGO_NEED, questionKey(), RecoveryPanel() (+54 more)
 
-### Community 364 - "App.tsx"
-Cohesion: 0.09
-Nodes (20): Activity, App(), FixRounds, Profile, RunPage, useProfile(), AccessPending(), Login() (+12 more)
+### Community 364 - "ui.tsx"
+Cohesion: 0.06
+Nodes (37): Team, AccessPending(), Login(), MIN_PASSWORD_LENGTH, Mode, SetPassword(), Status, Wordmark() (+29 more)
 
 ### Community 367 - "pg_temp.attack_leads"
 Cohesion: 0.40
@@ -1590,28 +1590,28 @@ Cohesion: 0.24
 Nodes (10): at(), day(), dayAgo(), fx(), h, now, run(), start() (+2 more)
 
 ### Community 370 - "activity.test.tsx"
-Cohesion: 0.22
-Nodes (7): AuditEvent, at(), fx(), h, row(), start(), T
+Cohesion: 0.24
+Nodes (6): at(), fx(), h, row(), start(), T
 
 ### Community 371 - "client.test.tsx"
 Cohesion: 0.32
-Nodes (6): SignedIn(), at(), audit(), h, start(), T
+Nodes (6): AuditEvent, at(), audit(), h, start(), T
 
 ### Community 377 - "verification/test/permissions.test.ts"
 Cohesion: 0.17
 Nodes (6): QA_EVALUATOR_ROLE, MockModelClient, FIXTURES_DIR, html, input, task
 
-### Community 378 - "LiveBuild.tsx"
-Cohesion: 0.31
-Nodes (9): LIVE_ROWS, LiveBuild(), LiveBuildProps, toneOf(), took(), useNow(), BuildStats, stallNote() (+1 more)
+### Community 378 - "projects.test.tsx"
+Cohesion: 0.17
+Nodes (6): cards(), h, names(), start(), T, @testing-library/react
 
 ### Community 379 - "fakeSupabase.ts"
 Cohesion: 0.25
 Nodes (7): CP, fake, role, rows, signedIn, STOPS, supabase
 
-### Community 380 - "progress.test.tsx"
-Cohesion: 0.28
-Nodes (7): ago(), audit(), failedVerification(), h, start(), T, RUN_FAILED
+### Community 380 - "vitest"
+Cohesion: 0.33
+Nodes (5): contrast(), dark, light, lum(), vitest
 
 ### Community 381 - "scripts"
 Cohesion: 0.33
@@ -1636,8 +1636,8 @@ Nodes (3): isSiteLevel(), runOneCheck(), SiteLevelCheck
   packages/db/RLS_ATTACK_TEST_RESULTS.md · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1923 isolated node(s):** `stop-tracker-guard.sh script`, `name`, `version`, `private`, `description` (+1918 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2442 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **1928 isolated node(s):** `stop-tracker-guard.sh script`, `name`, `version`, `private`, `description` (+1923 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2450 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **69 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
@@ -1648,12 +1648,12 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `Step 4C: Cockpit UI/UX redesign` and `Migration 0010 (account requests, approval function)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **Why does `lanternworksFixed()` connect `trackBBrand.test.ts` to `render.ts`, `media.ts`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `react-router-dom` connect `createFake` to `Decisions.tsx`, `state.tsx`, `fake.ts`, `TimelineHarness.tsx`, `App.tsx`, `cockpit/package.json`, `pages/costs.test.tsx`, `activity.test.tsx`, `client.test.tsx`, `Work.tsx`, `ComponentGallery.tsx`, `progress.test.tsx`, `Activity.tsx`, `vitest`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `VerificationContext` connect `verificationLoop.ts` to `evaluator.ts`, `requiredSections.ts`, `runCheck.ts`, `evalRegistry.ts`, `claims.ts`, `registryChecks.ts`, `verification/src/registry.ts`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
-- **Why does `LANTERNWORKS_REQUEST` connect `trackBBrand.test.ts` to `media.ts`?**
+- **Why does `react-router-dom` connect `createFake` to `Work.tsx`, `state.tsx`, `fake.ts`, `TimelineHarness.tsx`, `cockpit/package.json`, `pages/costs.test.tsx`, `activity.test.tsx`, `client.test.tsx`, `stopped.test.tsx`, `ComponentGallery.tsx`, `projects.test.tsx`, `Activity.tsx`, `shell.test.tsx`?**
   _High betweenness centrality (0.003) - this node is a cross-community bridge._
 - **What connects `stop-tracker-guard.sh script`, `name`, `version` to the rest of the system?**
-  _1923 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1928 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `lead.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.08130081300813008 - nodes in this community are weakly interconnected._

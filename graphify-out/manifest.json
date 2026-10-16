@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/App.tsx": {
-    "mtime": 1791995603.6242242,
-    "seen": 1791995777.8074849,
-    "ast_hash": "0beeb3b6a6e2379bd0168c4f8b66000e",
+    "mtime": 1792172592.8809142,
+    "seen": 1792172889.174882,
+    "ast_hash": "25f7748b363c85215755b590cc85ded0",
     "semantic_hash": ""
   },
   "apps/cockpit/src/main.tsx": {
@@ -420,9 +420,9 @@
     "semantic_hash": ""
   },
   "BLOCKED-ON-NICK.md": {
-    "mtime": 1792169212.8214884,
-    "seen": 1792169266.5783522,
-    "ast_hash": "4b085c09cdd753a957033119dc62e613",
+    "mtime": 1792172838.0055602,
+    "seen": 1792172889.182095,
+    "ast_hash": "35cbafb443ff33159eec98f620ad8aed",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1792169249.2792768,
-    "seen": 1792169266.578372,
-    "ast_hash": "66b6902cf44ce7a8fbef54ea807cba0a",
+    "mtime": 1792172872.5129223,
+    "seen": 1792172889.182118,
+    "ast_hash": "b7fc4e510ddd14d16060ae59605c34a0",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1158,9 +1158,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1792169249.2775955,
-    "seen": 1792169266.578864,
-    "ast_hash": "1894c7f2dfbdba91ec8007220b102b7f",
+    "mtime": 1792172872.5114534,
+    "seen": 1792172889.182656,
+    "ast_hash": "05bf5472a0f19d8f91ed20633d1bd272",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1584,9 +1584,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/flows.test.tsx": {
-    "mtime": 1792166421.0411038,
-    "seen": 1792166923.4813461,
-    "ast_hash": "ba10187842a6df7922e6ba9a132fd164",
+    "mtime": 1792172612.9555652,
+    "seen": 1792172889.175154,
+    "ast_hash": "70208fbb1effc29e817b6327c5befb8a",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/attention.ts": {
@@ -1620,9 +1620,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Decisions.tsx": {
-    "mtime": 1791996377.0314956,
-    "seen": 1791996478.627435,
-    "ast_hash": "334442f07a8950feb578e41a7bacae90",
+    "mtime": 1792172604.7234306,
+    "seen": 1792172889.175655,
+    "ast_hash": "1327a0dd8122a7c98130963195570fd6",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Home.tsx": {
@@ -4074,9 +4074,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/dev/fakeSupabase.ts": {
-    "mtime": 1792169058.217974,
-    "seen": 1792169266.572541,
-    "ast_hash": "321033dba959c12b548990e3a950c336",
+    "mtime": 1792172743.206876,
+    "seen": 1792172889.1751528,
+    "ast_hash": "b117fb70b163be58c7ffa77c207dcf5f",
     "semantic_hash": ""
   },
   "apps/cockpit/src/shell/shell.test.tsx": {
@@ -4530,9 +4530,9 @@
     "semantic_hash": ""
   },
   "docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md": {
-    "mtime": 1792169249.2786906,
-    "seen": 1792169266.5789492,
-    "ast_hash": "ff28de2999ab6a17be4e596aed75870a",
+    "mtime": 1792172872.5124447,
+    "seen": 1792172889.1827462,
+    "ast_hash": "b15391397837abb5e31822126b6d03b5",
     "semantic_hash": ""
   },
   "docs/archive/old-reports/wfact-mvp-progress-2026-10-12.html": {
@@ -4701,6 +4701,24 @@
     "mtime": 1792166930.871034,
     "seen": 1792169266.578132,
     "ast_hash": "9ebe7eddd8d451b4fa17c9b836cbfca3",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/pages/Team.tsx": {
+    "mtime": 1792172704.704255,
+    "seen": 1792172889.175689,
+    "ast_hash": "b523f2173a30193050018978fb3a9983",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/pages/team.test.tsx": {
+    "mtime": 1792172688.041107,
+    "seen": 1792172889.1758652,
+    "ast_hash": "23ec123eeaa0b486a5e9de3e5c63043d",
+    "semantic_hash": ""
+  },
+  ".claude/completions/2026-10-16-step-28-package-4-phase-15.md": {
+    "mtime": 1792169294.2636683,
+    "seen": 1792172889.181851,
+    "ast_hash": "0e159639020f1eb0f73d2f715241d354",
     "semantic_hash": ""
   }
 }
