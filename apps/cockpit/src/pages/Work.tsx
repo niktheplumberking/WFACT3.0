@@ -25,6 +25,7 @@ import type { ClientRow } from "../lib/clients";
 import { StageMove } from "./Decisions";
 import { LogoUpload } from "../components/LogoUpload";
 import { checkSiteUrl, isTestAddress, type LogoRecord } from "../lib/brandUpload";
+import { PROJECTS_VIEW_KEY } from "../lib/prefs";
 
 /* ---------------- add client / project ---------------- */
 
@@ -159,7 +160,6 @@ interface ProjectsView {
   group: Group;
   view: "grid" | "list";
 }
-const VIEW_KEY = "cockpit-projects-view";
 const PIN_KEY = "cockpit-pins";
 const DEFAULT_VIEW: ProjectsView = { query: "", filter: "all", sort: "need", group: "none", view: "grid" };
 
@@ -205,7 +205,7 @@ export default function Projects() {
   const f = useFactory();
   const toast = useToast();
   const decider = canDecide(me.role);
-  const [v, setV] = useState<ProjectsView>(() => readJson(VIEW_KEY, DEFAULT_VIEW));
+  const [v, setV] = useState<ProjectsView>(() => readJson(PROJECTS_VIEW_KEY, DEFAULT_VIEW));
   const [pins, setPins] = useState<Record<string, boolean>>(() => readJson<Record<string, boolean>>(PIN_KEY, {}));
   const set = (patch: Partial<ProjectsView>) => setV((x) => ({ ...x, ...patch }));
   const myName = me.fullName ?? "you";
@@ -289,8 +289,8 @@ export default function Projects() {
           type="button"
           className="btn quiet"
           onClick={() => {
-            writeJson(VIEW_KEY, v);
-            toast("Saved. Projects opens like this next time.", { label: "Undo", run: () => writeJson(VIEW_KEY, DEFAULT_VIEW) });
+            writeJson(PROJECTS_VIEW_KEY, v);
+            toast("Saved. Projects opens like this next time.", { label: "Undo", run: () => writeJson(PROJECTS_VIEW_KEY, DEFAULT_VIEW) });
           }}
         >
           <BookmarkSimple aria-hidden="true" />

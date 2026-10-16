@@ -19,22 +19,10 @@ import type { JobRow } from "../jobsClient";
 import type { ClientRow } from "../lib/clients";
 
 export { fetchProjects };
+import { readHomeLayout, type HomeSection } from "../lib/prefs";
 
-/* ---------------- section order (per person; edited in Settings, Home) ---------------- */
-
-export type HomeSection = "needs" | "overview" | "clients";
-const HOME_KEY = "cockpit-home";
-export function readHomeLayout(): { order: HomeSection[]; hidden: HomeSection[] } {
-  const all: HomeSection[] = ["needs", "overview", "clients"];
-  try {
-    const v = JSON.parse(localStorage.getItem(HOME_KEY) ?? "null") as { order?: unknown; hidden?: unknown } | null;
-    const order = Array.isArray(v?.order) ? (v!.order as string[]).filter((x): x is HomeSection => all.includes(x as HomeSection)) : [];
-    const hidden = Array.isArray(v?.hidden) ? (v!.hidden as string[]).filter((x): x is HomeSection => all.includes(x as HomeSection)) : [];
-    return { order: [...order, ...all.filter((x) => !order.includes(x))], hidden };
-  } catch {
-    return { order: all, hidden: [] };
-  }
-}
+/* Section order and visibility: lib/prefs.ts (kept on this device; edited in Settings, Home). */
+export type { HomeSection } from "../lib/prefs";
 
 /* ---------------- words ---------------- */
 
@@ -115,7 +103,7 @@ export default function Home() {
       {layout.order.filter((k) => !layout.hidden.includes(k)).map((k) => sections[k])}
       {decider && (
         <p className="t-small quiet home-foot">
-          Choose, reorder or hide these sections in <Link to="/settings">Settings, Home</Link>.
+          Choose, reorder or hide these sections in <Link to="/settings?group=home">Settings, Home</Link>.
         </p>
       )}
     </div>

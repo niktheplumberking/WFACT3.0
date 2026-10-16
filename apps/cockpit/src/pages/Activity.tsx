@@ -34,6 +34,7 @@ import { clientNameOf } from "../lib/clients";
 import { buildsOf } from "../lib/path";
 import { PlaceholdersPanel } from "../components/Placeholders";
 import { LiveBuild } from "../components/LiveBuild";
+import { activityViewKey } from "../lib/prefs";
 
 /* ---------------- the Activity room (Cockpit v2 phase 14) ---------------- */
 
@@ -66,7 +67,7 @@ const glyphTone = (l: ActivityLine) => (l.type === "stop" ? "var(--stop)" : l.ty
 const hhmm = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" });
 
 /** The saved view lives in this browser only: profiles hold no settings column (checked 2026-10-16; BLOCKED-ON-NICK.md). */
-const viewKey = (userId: string | null) => `cockpit-activity-view:${userId ?? "anon"}`;
+const viewKey = activityViewKey;
 function readView(userId: string | null): ActivityFilter {
   try {
     const v = localStorage.getItem(viewKey(userId));

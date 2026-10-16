@@ -75,7 +75,7 @@ function isTyping(t: EventTarget | null): boolean {
   return !!el && (["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName) || el.isContentEditable);
 }
 
-const SHORTCUTS: [string, string][] = [
+export const SHORTCUTS: [string, string][] = [
   ["⌘ K", "Search or run a command"],
   ["/", "Search"],
   ["G then H", "Go home"],

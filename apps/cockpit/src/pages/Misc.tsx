@@ -1,16 +1,16 @@
 /**
  * Cockpit v2: the honest "Coming later" rooms, the phone "More" screen, the Notifications inbox (same source as Home
- * attention), Settings and Not found. Costs is pages/Costs.tsx.
+ * attention) and Not found. Costs is pages/Costs.tsx; Settings is pages/Settings.tsx.
  */
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { SignOut, CaretRight, Coins, UsersThree, Bell, GearSix } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 import { supabase } from "../supabaseClient";
-import { applyTheme, canDecide, readThemePref, useMe, useNotifications, type ThemePref } from "../lib/state";
+import { canDecide, useMe, useNotifications } from "../lib/state";
 import { useDetail } from "../lib/detail";
 import { COMING } from "../shell/Shell";
-import { PageHead, Plate } from "../components/ui";
+import { PageHead } from "../components/ui";
 import { ComingLater, EmptyState, Segmented, StatusChip } from "../components/kit";
 import { dateTime } from "../lib/model";
 
@@ -132,72 +132,6 @@ export function Notifications() {
 }
 
 /* ---------------- settings ---------------- */
-
-export function Settings() {
-  const me = useMe();
-  const [theme, setTheme] = useState<ThemePref>(readThemePref());
-  function choose(t: ThemePref) {
-    setTheme(t);
-    applyTheme(t);
-  }
-  return (
-    <>
-      <PageHead title="Settings" />
-      <div className="stack">
-        <Plate title="Your account">
-          <div className="plate-body stack-tight">
-            <dl className="kv" style={{ maxWidth: 520 }}>
-              <div>
-                <dt>Name</dt>
-                <dd>{me.fullName ?? "Not given"}</dd>
-              </div>
-              <div>
-                <dt>Email</dt>
-                <dd>{me.email}</dd>
-              </div>
-              <div>
-                <dt>Role</dt>
-                <dd>{me.role ?? "None"}</dd>
-              </div>
-            </dl>
-            <div>
-              <button className="btn" type="button" onClick={() => supabase.auth.signOut()}>
-                <SignOut aria-hidden="true" />
-                Sign out
-              </button>
-            </div>
-          </div>
-        </Plate>
-        <Plate title="Appearance">
-          <fieldset className="plate-body tracks" style={{ maxWidth: 520 }}>
-            <legend>Theme</legend>
-            {(["light", "dark", "system"] as ThemePref[]).map((t) => (
-              <label key={t} className={`track${theme === t ? " is-chosen" : ""}`}>
-                <input type="radio" name="theme" checked={theme === t} onChange={() => choose(t)} />
-                <span>
-                  <b>{t === "system" ? "Match my device" : t === "dark" ? "Dark" : "Light"}</b>
-                  <span className="muted">{t === "system" ? "Light or dark, following the device setting." : t === "dark" ? "For dim rooms." : "The default."}</span>
-                </span>
-              </label>
-            ))}
-          </fieldset>
-        </Plate>
-        <Plate title="Team">
-          <div className="plate-body stack-tight">
-            <p className="muted">
-              Approve new accounts in <Link to="/decisions/accounts">Decisions, Accounts</Link>. Changing someone's role, removing access and assigning PMs to clients arrive with role-based views in Step 17; until then Huraira changes them directly in the database.
-            </p>
-          </div>
-        </Plate>
-        <Plate title="Alerts">
-          <div className="plate-body">
-            <p className="muted">Push and Telegram alerts by severity arrive in Step 17.</p>
-          </div>
-        </Plate>
-      </div>
-    </>
-  );
-}
 
 export function NotFound() {
   return (

@@ -4,7 +4,7 @@
  * from profiles here just hides controls the database would refuse anyway.
  */
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "./supabaseClient";
 import { AccessPending, Login, SetPassword } from "./auth/Auth";
@@ -13,6 +13,7 @@ import type { Role } from "./lib/model";
 import { Shell } from "./shell/Shell";
 import { Loading } from "./components/ui";
 import { DetailProvider } from "./lib/detail";
+import { readLanding } from "./lib/prefs";
 
 const Home = lazy(() => import("./pages/Home"));
 const PlansTab = lazy(() => import("./pages/Decisions"));
@@ -28,7 +29,7 @@ const RunPage = lazy(() => import("./pages/Activity").then((m) => ({ default: m.
 const Costs = lazy(() => import("./pages/Costs").then((m) => ({ default: m.Costs })));
 const ComingSoon = lazy(() => import("./pages/Misc").then((m) => ({ default: m.ComingSoon })));
 const More = lazy(() => import("./pages/Misc").then((m) => ({ default: m.More })));
-const Settings = lazy(() => import("./pages/Misc").then((m) => ({ default: m.Settings })));
+const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/Misc").then((m) => ({ default: m.NotFound })));
 const Notifications = lazy(() => import("./pages/Misc").then((m) => ({ default: m.Notifications })));
 
@@ -100,6 +101,26 @@ export function CockpitRoutes() {
   );
 }
 
+/** "Open the Cockpit on" (Settings, Home; kept on this device): once per browser tab, opening the Cockpit at Home goes to
+ *  the chosen room instead. Only a choice the person made moves them; with none saved the Cockpit opens on Home. */
+function OpenOn({ role }: { role: Role | null }) {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  useEffect(() => {
+    let opened = false;
+    try {
+      opened = sessionStorage.getItem("cockpit-opened") === "1";
+      sessionStorage.setItem("cockpit-opened", "1");
+    } catch {
+      /* private mode: behave as a fresh open */
+    }
+    const to = readLanding(role);
+    if (!opened && pathname === "/" && to !== "/") navigate(to, { replace: true });
+    // Once, when the Cockpit opens: later visits to Home stay on Home.
+  }, []);
+  return null;
+}
+
 export function SignedIn({ me }: { me: Me }) {
   return (
     <MeProvider value={me}>
@@ -107,6 +128,7 @@ export function SignedIn({ me }: { me: Me }) {
         <ToastProvider>
           <FactoryProvider>
             <Shell>
+              <OpenOn role={me.role} />
               <CockpitRoutes />
             </Shell>
           </FactoryProvider>
