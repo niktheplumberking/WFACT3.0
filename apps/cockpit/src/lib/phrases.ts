@@ -47,7 +47,7 @@ const JOB_PHRASE: Record<string, string> = {
 const ROLE_WORDS: Record<string, string> = { owner: "an owner", admin: "an admin", pm: "a project manager" };
 
 /** The Activity room's type pills. "other" shows under Everything only. */
-export type ActivityType = "decision" | "build" | "stop" | "detail" | "team" | "other";
+export type ActivityType = "decision" | "build" | "stop" | "round" | "detail" | "team" | "other";
 /** Which glyph a line carries (the Activity room picks the icon). */
 export type Glyph = "approved" | "changes" | "detail" | "build" | "continue" | "question" | "proposal" | "archive" | "cancel" | "team" | "declined";
 
@@ -137,4 +137,18 @@ export function eventsFor(events: AuditEvent[], planIds: Set<string>, jobIds: Se
     const planId = (e.payload?.params as { planId?: string } | undefined)?.planId;
     return !!planId && planIds.has(planId);
   });
+}
+
+/**
+ * Who found or fixed a round of fixes (correction_rounds.flagged_by / fixed_by), in plain words. The rows name a role and,
+ * in brackets, the model or vendor behind it (live 2026-10-20: "evaluator (claude)", "frontend-loop (builder: agent37)");
+ * only the role reaches the screen. Anything this table does not know is left unnamed (null), never shown raw.
+ */
+export function roundActor(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const r = raw.toLowerCase();
+  if (/evaluat|review/.test(r)) return "the independent reviewer";
+  if (/frontend-loop|builder/.test(r)) return "the builder";
+  if (/\bqa\b|check|verif/.test(r)) return "the automatic checks";
+  return null;
 }

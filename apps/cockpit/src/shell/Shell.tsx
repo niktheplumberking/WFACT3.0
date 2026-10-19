@@ -42,7 +42,7 @@ const ROUTES: { re: RegExp; title: string; parent?: { label: string; to: string 
   { re: /^\/decisions\/plans\//, title: "Proposal", parent: { label: "Projects", to: "/projects" } },
   { re: /^\/decisions\/accounts/, title: "Team and access" },
   { re: /^\/decisions/, title: "Decisions", parent: { label: "Home", to: "/" } },
-  { re: /^\/activity\/fixes/, title: "Rounds of fixes", parent: { label: "Activity", to: "/activity" } },
+  { re: /^\/activity\/fixes/, title: "Activity" },
   { re: /^\/activity\/.+/, title: "Build", parent: { label: "Activity", to: "/activity" } },
   { re: /^\/activity/, title: "Activity" },
   { re: /^\/costs/, title: "Costs" },

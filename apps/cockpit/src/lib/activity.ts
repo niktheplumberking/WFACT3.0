@@ -11,8 +11,10 @@ import { planIdOfJob } from "./attention";
 import { clientNameOf } from "./clients";
 import type { PlanRow } from "./model";
 import { KIND_OF_SITE } from "./path";
-import { personLines, whoOf, type ActivityType, type AuditEvent, type Glyph } from "./phrases";
+import { personLines, roundActor, whoOf, type ActivityType, type AuditEvent, type Glyph } from "./phrases";
 import { diagnoseJob } from "./recovery";
+import { issueLabel } from "./timeline";
+import { stageLabel } from "../stages";
 
 export type FactoryGlyph = "finished" | "stopped" | "round" | "proposal";
 
@@ -91,6 +93,49 @@ export function factoryLines(jobs: JobRow[], plans: PlanRow[], rounds: RoundEven
     out.push({ key: `round:${r.run_id}:${r.occurred_at}`, at: r.occurred_at, actor: FACTORY, text: "Started a round of fixes on the problems the checks found.", type: "build", glyph: "round", client: owner ? clientOfJob(owner) : null, jobId: owner?.id ?? null });
   }
   return out;
+}
+
+/** One row of correction_rounds: each time a check or a person sent work back to be fixed (owner/admin, or a PM's own
+ *  clients, under RLS; the Activity room is owners and admins only). */
+export interface CorrectionRound {
+  id: string;
+  round_number: number;
+  stage: string;
+  flagged_by: string;
+  issue: string;
+  fixed_by: string | null;
+  created_at: string;
+  projects: { name: string; clients: { name: string } | null } | null;
+}
+
+export async function fetchCorrectionRounds(limit = 100): Promise<CorrectionRound[]> {
+  const res = await supabase
+    .from("correction_rounds")
+    .select("id,round_number,stage,flagged_by,issue,fixed_by,created_at,projects(name,clients(name))")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (res.error) throw new Error(res.error.message);
+  return (res.data ?? []) as unknown as CorrectionRound[];
+}
+
+/** Each logged round of fixes as an Activity line (filter "Fix rounds"): the round, what was wrong in plain words, who
+ *  found it and whether it was fixed. */
+export function roundLines(rows: CorrectionRound[]): ActivityLine[] {
+  return rows.map((r) => {
+    const found = roundActor(r.flagged_by);
+    const fixed = roundActor(r.fixed_by);
+    const who = `${found ? `${found.charAt(0).toUpperCase()}${found.slice(1)} found it` : "Found by a check"}; ${r.fixed_by ? (fixed ? `${fixed} fixed it` : "it was fixed") : "not marked fixed yet"}.`;
+    return {
+      key: `fix:${r.id}`,
+      at: r.created_at,
+      actor: FACTORY,
+      text: `Round ${r.round_number} of fixes, ${stageLabel(r.stage).toLowerCase()}: ${sentence(issueLabel(r.issue))} ${who}`,
+      type: "round",
+      glyph: "round",
+      client: r.projects?.clients?.name ?? r.projects?.name ?? null,
+      jobId: null,
+    };
+  });
 }
 
 /** Person events as Activity lines, with the client named from the proposal or the job they are about. */

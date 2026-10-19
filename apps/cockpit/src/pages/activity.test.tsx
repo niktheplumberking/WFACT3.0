@@ -99,7 +99,7 @@ describe("the Activity room", () => {
     start();
     await screen.findByText("Approved the proposal: Fast local site.", {}, T);
     const pills = within(screen.getByRole("group", { name: "Type" })).getAllByRole("button");
-    expect(pills.map((b) => b.textContent)).toEqual(["Everything", "Decisions", "Builds", "Stops", "Details", "Team"]);
+    expect(pills.map((b) => b.textContent)).toEqual(["Everything", "Decisions", "Builds", "Stops", "Fix rounds", "Details", "Team"]);
     expect(pills.filter((b) => b.getAttribute("aria-pressed") === "true").map((b) => b.textContent)).toEqual(["Everything"]);
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Stops" }));

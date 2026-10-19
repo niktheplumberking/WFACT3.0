@@ -4,12 +4,11 @@
  * page's own claims.
  */
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Archive, ArrowCounterClockwise, ArrowsClockwise, BookmarkSimple, ChatCircleText, CheckCircle, FileText, Hammer, PencilSimple, Play, Question,
   SealCheck, StopCircle, UserMinus, UserPlus, XCircle, type Icon,
 } from "@phosphor-icons/react";
-import { supabase } from "../supabaseClient";
 import { archiveJob, cancelJob, dispatchJob, isActive, isFinished, isStaleQueued, isStaleRunning, type JobRow } from "../jobsClient";
 import { latestBuildByPlan, planIdOfJob } from "../lib/attention";
 import { asStopped, diagnoseJob } from "../lib/recovery";
@@ -18,16 +17,15 @@ import { checkLabel, deriveTimeline, issueLabel, type Timeline } from "../lib/ti
 import { loadBuildStats } from "../lib/buildStats";
 import {
   KIND_LABEL, clock, dateTime, duration, explainJobError, planName,
-  type PlanRow, type RoundRow,
+  type PlanRow,
 } from "../lib/model";
 import { canDecide, fetchJob, useFactory, useLoad, useMe, useToast } from "../lib/state";
-import { ALL_ACTIVITY, FACTORY, actorName, byDay, factoryLines, fetchRoundEvents, matches, teamLines, type ActivityFilter, type ActivityLine } from "../lib/activity";
+import { ALL_ACTIVITY, FACTORY, actorName, byDay, factoryLines, fetchCorrectionRounds, fetchRoundEvents, matches, roundLines, teamLines, type ActivityFilter, type ActivityLine } from "../lib/activity";
 import { fetchPeople, fetchPersonEvents } from "../lib/phrases";
 import { Button, ButtonLink, EmptyState, StatusChip, TechDetails, type StatusTone } from "../components/kit";
 import { StepRow } from "../components/flow";
 import { fetchRunSpend, money, total } from "../lib/costs";
-import { stageLabel } from "../stages";
-import { ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
+import { ConfirmDialog, Empty, LoadError, Loading, Notice, PagePreview } from "../components/ui";
 import { ClientNeedsPanel } from "../components/Recovery";
 import { StoppedBuild } from "../components/StoppedBuild";
 import { PlaceholderPicturesSection, RebuildWithPicturesDialog, SiteReview, usePlaceholderPictures } from "../components/SiteReview";
@@ -44,6 +42,7 @@ const TYPES: [ActivityFilter["type"], string][] = [
   ["decision", "Decisions"],
   ["build", "Builds"],
   ["stop", "Stops"],
+  ["round", "Fix rounds"],
   ["detail", "Details"],
   ["team", "Team"],
 ];
@@ -87,22 +86,23 @@ function writeView(userId: string | null, v: ActivityFilter | null) {
 }
 
 async function loadActivity() {
-  const [events, rounds, people] = await Promise.all([fetchPersonEvents(), fetchRoundEvents(), fetchPeople()]);
-  return { events, rounds, people };
+  const [events, rounds, people, fixes] = await Promise.all([fetchPersonEvents(), fetchRoundEvents(), fetchPeople(), fetchCorrectionRounds()]);
+  return { events, rounds, people, fixes };
 }
 
-export default function Activity() {
+/** `type` opens the room on one filter (`/activity/fixes` opens it on Fix rounds; Package 4 R4, Huraira's option b). */
+export default function Activity({ type }: { type?: ActivityFilter["type"] } = {}) {
   const me = useMe();
   const f = useFactory();
   const toast = useToast();
   const decider = canDecide(me.role);
-  const [v, setV] = useState<ActivityFilter>(() => readView(me.userId));
+  const [v, setV] = useState<ActivityFilter>(() => (type ? { ...readView(me.userId), type } : readView(me.userId)));
   const set = (patch: Partial<ActivityFilter>) => setV((x) => ({ ...x, ...patch }));
   const load = useLoad(() => (decider ? loadActivity() : Promise.resolve(null)), [decider]);
 
   const lines = useMemo(() => {
     if (!load.data || !f.jobs || !f.plans) return null;
-    return [...teamLines(load.data.events, load.data.people, f.jobs, f.plans), ...factoryLines(f.jobs, f.plans, load.data.rounds)];
+    return [...teamLines(load.data.events, load.data.people, f.jobs, f.plans), ...factoryLines(f.jobs, f.plans, load.data.rounds), ...roundLines(load.data.fixes)];
   }, [load.data, f.jobs, f.plans]);
   const people = load.data?.people ?? {};
   const who = (actor: string) => actorName(actor, people, me.userId);
@@ -227,58 +227,9 @@ export default function Activity() {
 
 /* ---------------- fix rounds ---------------- */
 
-function ActivityTabs() {
-  return (
-    <nav className="tabs" aria-label="Activity views">
-      <NavLink to="/activity" end>
-        Activity
-      </NavLink>
-      <NavLink to="/activity/fixes">Fix rounds</NavLink>
-    </nav>
-  );
-}
-
-async function fetchRounds(): Promise<RoundRow[]> {
-  const res = await supabase
-    .from("correction_rounds")
-    .select("id,round_number,stage,flagged_by,issue,fixed_by,created_at,projects(name)")
-    .order("created_at", { ascending: false })
-    .limit(100);
-  if (res.error) throw new Error(res.error.message);
-  return (res.data ?? []) as unknown as RoundRow[];
-}
-
+/** `/activity/fixes` (and `/runs`): the Activity room on its Fix rounds filter. */
 export function FixRounds() {
-  const rounds = useLoad(fetchRounds, []);
-  return (
-    <>
-      <PageHead title="Activity" lead="Correction rounds: each time a check or a person sent work back to be fixed. This is the honest quality number the factory is measured on." />
-      <ActivityTabs />
-      <Plate title="Fix rounds" note={rounds.data ? `${rounds.data.length} logged` : undefined}>
-        {rounds.error && <div className="plate-body"><LoadError what="fix rounds" error={rounds.error} onRetry={rounds.reload} /></div>}
-        {!rounds.data && !rounds.error && <Loading rows={3} label="Loading fix rounds" />}
-        {rounds.data && rounds.data.length === 0 && <Empty title="No fix rounds logged yet." />}
-        {rounds.data && rounds.data.length > 0 && (
-          <ul className="rows">
-            {rounds.data.map((r) => (
-              <li key={r.id}>
-                <span className="aspect idle">Round {r.round_number}</span>
-                <div>
-                  <p className="what">{r.projects?.name ?? "Unknown project"}</p>
-                  <p className="why" style={{ color: "var(--ink)" }}>{r.issue}</p>
-                  <p className="why">
-                    {stageLabel(r.stage)}. Flagged by {r.flagged_by}
-                    {r.fixed_by ? `, fixed by ${r.fixed_by}` : ""}.
-                  </p>
-                </div>
-                <span className="when fig">{dateTime(r.created_at)}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Plate>
-    </>
-  );
+  return <Activity type="round" />;
 }
 
 /* ---------------- run page ---------------- */

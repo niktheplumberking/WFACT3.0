@@ -125,6 +125,16 @@ if (fakePlan === "rejected" || fakePlan === "rejected2")
   );
 if (fakePlan === "nokind") rows.plan_approvals = rows.plan_approvals.map((p) => (p.id === "22222222-2222-4222-8222-222222222222" ? { ...p, build_track: null } : p));
 
+// ?fake-rounds=1 adds two SYNTHETIC rounds of fixes, shaped like the live correction_rounds rows (Package 4 R4).
+if (new URLSearchParams(location.search).get("fake-rounds") === "1") {
+  const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
+  const project = { name: "Harbor bakery site", clients: { name: "Harbor Street Bakery" } };
+  rows.correction_rounds = [
+    { id: "cr-1", round_number: 1, stage: "4_homepage_build", flagged_by: "evaluator (claude)", issue: "[render.perf] LCP 4.1s on the Home page.", fixed_by: "frontend-loop (builder: agent37)", created_at: ago(90), projects: project },
+    { id: "cr-2", round_number: 2, stage: "4_homepage_build", flagged_by: "evaluator (claude)", issue: "Body text too light on the menu.", fixed_by: null, created_at: ago(60), projects: project },
+  ];
+}
+
 const signedIn = {
   user: { id: "00000000-0000-4000-8000-0000000000aa", email: "owner@example.test" },
   access_token: "synthetic",
