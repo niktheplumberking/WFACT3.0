@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-19 (late night, +05), via `/step-close 28` (Package 4 pre-v2 rebuild R3) — `1756b4a`: the Decisions room and stage moves kept on Huraira's option (b), restyled in the Projects grammar; PMs no longer offered a stage move or the Accounts link (RLS refuses both). vitest 348/348 (6 new in `pages/decisions.test.tsx`), tsc and build clean (precache 42 entries, 1576.54 KiB, no dev code in `dist/`); axe 0 and Lighthouse a11y 100 on both pages; fingerprints of Projects, the client's page, Activity and Home identical. CI recorded at the next update.
+Last synced: 2026-10-20 (+05), via `/step-close 21` — Step 21 DONE: CI `39304787144` on `37f99c7` green in all 18 jobs (new `rls-attack`: 26 migrations, 10 scripts PASS, 2 live-only checks NOT COVERED there), Cockpit deployed; both branches at `37f99c7`.
+Previous sync: 2026-10-19 (late night, +05), via `/step-close 28` (Package 4 pre-v2 rebuild R3) — `1756b4a`: the Decisions room and stage moves kept on Huraira's option (b), restyled in the Projects grammar; PMs no longer offered a stage move or the Accounts link (RLS refuses both). vitest 348/348 (6 new in `pages/decisions.test.tsx`), tsc and build clean (precache 42 entries, 1576.54 KiB, no dev code in `dist/`); axe 0 and Lighthouse a11y 100 on both pages; fingerprints of Projects, the client's page, Activity and Home identical. CI recorded at the next update.
 Previous sync: 2026-10-19 (late night, +05), via `/step-close 21` (round 2) — `32cfa80`..`fb6f922`: D migration 0027 (live, 12/12), H RLS runs in CI on a throwaway local database, J shared mock, K entity table (migration 0028 live, 10/10; KNOWN_ENTITIES removed), F left by decision, M5 launch files proven on live run `4c35703b`. Round 1 CI `39299701250` green. Step 21 PARTIAL until CI is green on round 2.
-Previous sync: 2026-10-19 (late night, +05), via `/step-close 28` (Package 4 pre-v2 rebuild R2) — `80f1391`: decided proposals (changes asked for; approved before the kind of site existed) in the v2 proposal grammar; BeforeBuild, AfterDecision, PlanDetails, WhatTheClientWants deleted (python count 3/2/2/2 → 0). vitest 342/342 (7 new in `pages/decided.test.tsx`, 4 mutations caught), tsc and build clean (precache 42 entries, 1575.43 KiB, no dev code in `dist/`); axe 0 and Lighthouse a11y 100 in 3 rooms; fingerprints of the proposal review, needs and Home identical. CI recorded at the next update.
 Older sync entries (2026-09-28 to 2026-10-15): `docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md`. Keep at most two "Previous sync" lines here; move older ones there.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
@@ -16,7 +16,7 @@ phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07)
 steps; this file tracks the Continuation Stages.
 
 **Status summary (2026-10-15, 13:30 +05, `/progress-sync`)**:
-- **Step 21 PARTIAL, CI only** (`/step-close 21`, 2026-10-19): every sub-item A–L done or decided; migrations 0027 and 0028 applied live and attack-tested (12/12, 10/10); M5 launch files proven on live run `4c35703b`. Round 1 CI `39299701250` green; DONE once CI is green on round 2 (`32cfa80`..`fb6f922`).
+- **Step 21 DONE, closed** (`/step-close 21`, 2026-10-20): every sub-item A–L done or decided; migrations 0027 and 0028 live and attack-tested (12/12, 10/10); RLS attack scripts now run in CI; M5 launch files proven on live run `4c35703b`; CI `39304787144` green in all 18 jobs.
 - **Step 3A DONE, closed** (`/step-close 3A`, 2026-10-15): the live sign-up is proven end to end (sign-up, owner approval as `pm` with audit row, password
   sign-in after approval in the Auth logs, role-limited view, attack test 32/32). Supabase email confirmation stays off (Huraira, 2026-10-15: the approval gate is enough).
 - **Step 25 PARTIAL** (`/step-close 25`, 2026-10-15): MVP M4, the contact form that saves leads, is **met live on synthetic data** (migrations 0025/0026
@@ -729,7 +729,7 @@ reason; the walkthrough passes; accessibility and responsiveness proven with evi
 the Cockpit and is blocked as a stage move), except that every room has only been checked with copied data, not with a live signed-in
 session. The phone layout shift on Projects (0.118, measured on the copied-data build) is also still open.
 
-## Step 21 — Housekeeping (PARTIAL 2026-10-19 — every sub-item done or decided; round 2 `32cfa80`..`fb6f922` waits only on CI)
+## Step 21 — Housekeeping (DONE 2026-10-20 — every sub-item A–L done or decided; CI `39304787144` green)
 
 - [ ] **Intake logo and live address (D4 Tier 2 slice, 2026-10-14)**: built in `8b3caed` and `a444a3d` (local, not pushed). Evidence: brandAsset tests 10, workflow readiness/continue tests 8, jobs 4, planning 1, Cockpit logo checks 9; a real isolated Track B build with the logo passes; migration 0021 dry run 28/28 on the live database, rolled back, nothing persisted (SQL-checked). Independent review: 1 HIGH (SVG `<x:script>` bypass) and 5 MEDIUM, fixed in `9597103`. Migration 0021 applied live 2026-10-14 (20261014110708, Huraira's GO); attack script on the applied migration 28/28. QA reliability fixes merged (`8857819`, `380bfd2`, `e921c6d`). Full suite green (rendered-qa 79, verification 113, frontend-loop 98, workflow 42, jobs 28, planning 34, documentation 18, hermes 55, agent-runtime 39, audit 14, media 8, Cockpit 116). CI `38554457540` green incl. deploy. **Live 2026-10-14**: Lanternworks "Fix and continue" with the uploaded logo (job `55ddba7c`) passed the readiness check, revised first, and reached the launch gate in 14 min for ~$0.68, the first passing build since 2026-10-01 (SYNTHETIC; Step 25 still needs a real client). Open: a human screenshot review; the Track B starter's 23 px contact links (cost one round). Found by Huraira on the live run: the Cockpit previewed the site's file list (site.manifest.json) instead of the site, and showed an advisory finding as a warning; both fixed (site preview with page switcher; notes marked not blocking). The preview shows pages as built; motion plays only on a real preview link (Step 4B M6).
 
@@ -773,10 +773,11 @@ Not yet: a live build with a real address at stage `launch`.
 passes on a live build's checkpoint-verified output (run `4c35703b`). The separate contact-form check (Step 25 M4) fails there, because that
 synthetic client has no lead site.
 
-**Step exit check** ("Each sub-item done or explicitly deferred with a reason; CI green; no regressions"): **PARTIALLY MET** (2026-10-19):
-every sub-item A–L is done or decided (F: leave, by Huraira). Round 1 is CI-green (`39299701250`). Round 2 is green locally: hermes 59,
-planning 46, jobs 38, verification 123, frontend-loop 130, workflow 89, documentation 18; typechecks clean; the RLS runner passes on a
-fresh database. CI on round 2 is the only check left; DONE when it is green.
+**Step exit check** ("Each sub-item done or explicitly deferred with a reason; CI green; no regressions"): **MET** (2026-10-20).
+Every sub-item A–L is done or decided (F: leave, by Huraira). CI `39299701250` (round 1) and `39304787144` on `37f99c7` (round 2) are
+green in every job, including `rls-attack` (26 migrations on a throwaway database; 10 scripts PASS; 2 live-only checks NOT COVERED
+there, both pass live), `media`, `dispatch-job`, the tracker check and the Cockpit deploy. NOT COVERED: no Cockpit job has run yet on the
+new runner code (the first one will read the entity table); old audit rows keep a null entity (append-only).
 
 ## Step 12 — Cost governance per client (PARTIAL 2026-10-14 — MVP M6 slice live; live trace rows proven on run `4c35703b`; Run page and live cap refusal pending)
 
