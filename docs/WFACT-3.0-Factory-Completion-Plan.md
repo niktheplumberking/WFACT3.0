@@ -1544,6 +1544,8 @@ presses continue (the live proof of the brief consistency check and the brand-co
 `scripts/rls_attack_test_placeholders.sql`. Nick answers the caps, roles and site-approval questions. Package 5: see the source
 doc.
 
+Full agent prompt for phases 18–19 and Package 5 — written 2026-10-19: `docs/design/cockpit-v2/docs/COCKPIT-V2-PHASES-18-ON-PROMPT.md` (state after phase 17 with SHAs and CI ids, the measured facts phases 18–19 depend on, verification and push routine, and the Package 5 stop questions). Paste that file's block into a new session; the short block below stays as the summary.
+
 Continuation prompt — updated 2026-10-16, after phase 17 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
 ```
 You are a senior front-end engineer in the WFACT 3.0 monorepo, branch huraira-work. Read CLAUDE.md, then
