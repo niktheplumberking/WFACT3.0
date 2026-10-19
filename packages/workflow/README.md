@@ -23,7 +23,8 @@ doppler run -- npm run build-and-verify -- --resume <workflow-run-id>
    deploys.** Launch is a human decision (CLAUDE.md §3).
 
 **Crash recovery**: `--resume <run-id>` reads the run's rows back from `audit_log` and continues from
-the last checkpoint. It doesn't re-run a checkpointed build, and it doesn't re-open a finished run.
+the last checkpoint. It doesn't re-run a checkpointed build. Since Step 4D a halted run can be reopened by a signed-in owner/admin (a
+`resume` job with `reopen`), recorded as a `workflow.reopen` row.
 
 ## Stand-in disclosure (Continuation Plan rule 2)
 
@@ -38,7 +39,7 @@ multiple concurrent workflows need it. Also logged in `PROGRESS.md`.
 
 ## Evidence
 
-- Unit tests (7, run in CI):
+- Unit tests (89 as of 2026-10-19, run in CI); the original seven:
   - Clean path ends at the launch gate.
   - `packages/verification/test/fixtures/broken.html` is caught before any verified checkpoint or
     gate, and the builder's revision prompt contains every failed check ID.

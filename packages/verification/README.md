@@ -108,7 +108,7 @@ side.
 | `VerificationLoop` status transitions (all 4 states) | `test/verificationLoop.test.ts`, mocked evaluator, no network | **PASS** |
 | Evaluator response parsing (strict VERDICT protocol, malformed input never silently approved) | `test/evaluator.test.ts` | **PASS** |
 | Typecheck (`tsc --noEmit`, same strict config as `hermes`/`frontend-loop`) | `npm run typecheck` | **PASS** |
-| A live evaluator run against a real page (`npm run verify -- ...` with `ANTHROPIC_API_KEY` set) | Not run | **BLOCKED** — same open `ANTHROPIC_API_KEY` item in `BLOCKED-ON-NICK.md` that blocks Phase 3's and Phase 4's live runs. The 6 deterministic checks do not need it and are fully proven above; only the evaluator step is blocked. |
+| A live evaluator run against a real page | Live builds through the Cockpit job runner | **Done live**: the evaluator approved real builds (e.g. passing build `55ddba7c`, 2026-10-14, Anthropic evaluator rows in `model_traces`; Step 26 item 1). The registry has grown from 6 checks to 54 (v1.4.0, `config/eval-registry.json`). |
 
 **Exit check status: met for the deterministic half.** The Manual's own wording — "a deliberately
 broken test build gets caught and returned before being marked done" — asks for exactly the check

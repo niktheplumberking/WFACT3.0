@@ -12,9 +12,9 @@ Checks the page a visitor actually gets, which every Step 4 check skipped (they 
    `render.perf` (Lighthouse mobile, LCP and CLS against the Track A budget: LCP < 2.0 s, CLS < 0.1, JS < 50 KB).
 3. **Screenshot review** (`src/reviewer.ts`, `render.design-review`): a vision model answers every rulebook rule on the screenshots,
    with one JSON finding per rule, validated strictly. Only runs when steps 1 and 2 passed. **Which model is a versioned decision in
-   `config/reviewer.json`**: since 2026-10-01 it is Agent 37 `hermes-agent` (Huraira; OpenAI has no credits). That is the **same vendor
-   and model as today's builder**, which the Step 4B prompt and CLAUDE.md §6 advise against: the reviewer refuses a same-vendor review
-   unless that file names who approved it, and every report flags it `sameVendorAsBuilder`. OpenAI `gpt-5.4` is wired as the alternative.
+   `config/reviewer.json`**: since 2026-10-13 (v1.1.0, Huraira) it is Anthropic `claude-sonnet-5`, a different vendor from the builder
+   (Agent 37). From 2026-10-01 to 2026-10-13 it was Agent 37 `hermes-agent`, the same vendor as the builder. The reviewer still refuses a
+   same-vendor review unless that file names who approved it, and every report flags `sameVendorAsBuilder`. OpenAI `gpt-5.4` is wired as an alternative.
 4. The existing Claude evaluator, last.
 
 Any failure is returned with its check id and a specific line (`[claims.unsourced-fact] FACT-PHONE: phone number "(555) 014-7732" is not in
@@ -44,5 +44,6 @@ Run it under `doppler run --` for the reviewer key (`AGENT37_API_KEY` + `AGENT37
   **Missed**: DQ-MOBILE-READABLE (10-11px text at 375px), even with phone shots at full detail; that fixture is caught by `render.layout`
   instead. The reviewer also adds some noise (e.g. it called the SAMPLE labels "eyebrows" once). About 34k input tokens and 130 s per
   review; Agent 37 calls are UNPRICED (no price on file).
-- Reviewer model calls are cost-logged in the CLI output and `report.json`, but not yet written to `model_traces`.
-- Single-page today (today's builder emits one file); `runRenderedQa` already takes a list of pages for M3.
+- Reviewer model calls are cost-logged in the CLI output and `report.json`; in a Cockpit job every call is also written to `model_traces`
+  and checked against the spend caps first (`src/production.ts`, MVP M6).
+- Multi-page: the suite takes the site's list of pages (`pages`), as Track A and Track B multi-page sites need.

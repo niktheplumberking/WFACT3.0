@@ -17,7 +17,8 @@ This package is that fallback, taken deliberately, not silently — flagged in `
 `BLOCKED-ON-NICK.md`, and Nick needs to see it (see those two files). It is scoped to exactly what
 Blueprint §Phase 3 says to build at this stage and nothing past it:
 
-- ✅ One model path (Claude only). Model *routing* across Claude/GPT-5.6/Kimi K3 is Phase 4.
+- ✅ One model path (Claude). Since Stage 5 the model for each job comes from `config/model-routing.json` (`src/routing.ts`),
+  which also holds the one price table every cost figure uses.
 - ✅ Task decomposition (which memory/state to pull), context assembly, tool permission gating,
   escalation.
 - ❌ No write tools of any kind — not gated off, simply never registered. Hermes decides, it
@@ -34,7 +35,12 @@ src/
     stateTools.ts     state.projectStatus — read-only Supabase wrapper
     registry.ts       the allowlist assembly: the only place tools get registered
   state.ts            StateReader interface + the real Supabase-backed implementation
-  modelClient.ts       ModelClient interface + ClaudeModelClient + a MockModelClient for tests
+  entities.ts         the entity list from public.entities (loadEntities) + detectEntitySlug (Step 21 K)
+  routing.ts          model routing and the price table (config/model-routing.json)
+  spendCaps.ts        per-build and per-7-days spend caps (config/spend-caps.json, MVP M6)
+  tracing.ts          model_traces wrapper for any model client
+  testing/            shared test doubles: mockModel.ts (every package's mock model), entities.ts (test entity list)
+  modelClient.ts       ModelClient interface + ClaudeModelClient + MockModelClient (extends testing/mockModel)
   toneFilter.ts        the plain-language fix, built in Phase 3 per the team's own call
   escalation.ts        bounded retry + exponential backoff + hard-cap escalation (CLAUDE.md §6)
   controller.ts         HermesLite — decomposition, context assembly, one model call, tone filter
@@ -55,29 +61,25 @@ test/                              unit tests, no network, no API key required
 | Full controller loop (memory + live state → model → tone filter), model mocked | `test/controller.test.ts` | **PASS**, 6/6 |
 | Live Supabase query shape (join across `entities`/`clients`/`projects`) | Run directly against `wfact-3-sandbox` via the Supabase admin path (`execute_sql`), 2026-09-10 | **PASS** — returned the two RLS-attack-test fixture rows (`dreamsign`, `bennett-co`), confirming the join `state.ts` uses is correct |
 | This app's *own* credential path reaching Supabase (not the admin path above) | Ran `scripts/verify-supabase-connection.ts` with `SUPABASE_URL` + the project's **anon** key, 2026-09-10 | **Connects and queries successfully — but returns 0 rows for both entities.** This is RLS correctly blocking an unauthenticated anon request, the same isolation Phase 2's attack test already proved. It also means: **Hermes cannot answer real status questions using only `SUPABASE_ANON_KEY`.** It needs `SUPABASE_SERVICE_ROLE_KEY` (trusted internal reader) — which is not yet in any `.env.local`, per `BLOCKED-ON-NICK.md`. Logged as a lessons-ledger proposal. |
-| Live Claude smoke test (`npm run ask -- "what stage is DreamSign in?"`) — the actual Phase 3 exit check | Not run | **BLOCKED** — `ANTHROPIC_API_KEY` is unset. `BLOCKED-ON-NICK.md` already tracks "Claude / Anthropic API billing confirmation" as **OPEN, Day 1 — blocking**. `cli.ts` refuses to fabricate an answer without it (see `modelClientFromEnv`) rather than mocking around the gap. |
+| Live Claude answer — the actual Phase 3 exit check | Cockpit `ask` jobs and `npm run ask` with Doppler keys | **Answered live**: 4 `hermes.answer` success rows in `audit_log` (latest 2026-10-07, SQL 2026-10-20), each with its `tool.invoke` rows. `cli.ts` still refuses to answer without a key rather than mock around it. |
 
-**Exit check status: not met.** Per the Operator's Manual: *"Hermes (or its stand-in) answers
-'what's the status of X' correctly and in plain language, sourced from real memory and state, not
-a canned response."* Everything up to the model call is built, wired against the real sandbox
-database, and independently tested (26/26 automated checks pass, run via `npm test`). The one
-step that needs a live Claude call is blocked on `ANTHROPIC_API_KEY`. This is the honest state —
-see `PROGRESS.md` Phase 3.
+**Exit check status (updated 2026-10-20)**: answered live through the Cockpit (`ask` jobs, rows above), sourced from memory and
+state; 60 automated tests pass (`npm test`). Per the Operator's Manual the check is *"answers 'what's the status of X' correctly and
+in plain language"*; this update checked only that the answers were produced and logged, not their correctness.
 
 ## Running it
 
 ```bash
 cd packages/hermes
 npm install
-npm test              # 26 tests, no credentials needed
+npm test              # 60 tests, no credentials needed
 npm run typecheck
 ```
 
-To actually ask it something, once credentials exist (`.env.local`, never committed — see
-`.env.example`):
+To actually ask it something, run it under Doppler (secrets never live in a file; see `docs/SECRETS.md`):
 
 ```bash
-npm run ask -- "what stage is DreamSign in?"
+doppler run -p wfact-3-0-codebase -c dev -- npm run ask -- "what stage is DreamSign in?"
 ```
 
 `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` unlock live state (falls back to memory-only, with a
