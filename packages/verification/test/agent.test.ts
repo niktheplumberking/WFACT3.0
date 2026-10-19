@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { InMemoryAuditSink } from "@wfact/audit";
-import { createSeedRegistry, runAgent } from "@wfact/agent-runtime";
-import { createQaEvaluatorAgent, QA_EVALUATOR_ROLE } from "../src/agent.js";
+import { createSeedRegistry, fileClientEntityResolver, runAgent } from "@wfact/agent-runtime";
+import { createQaEvaluatorAgent, qaCliTask, QA_EVALUATOR_ROLE } from "../src/agent.js";
 import { MockModelClient } from "../src/modelClient.js";
 
 const TASK_ID = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
@@ -55,4 +55,19 @@ test("malformed QA input (path-y slug, missing html) is rejected, never checked"
     input: { html: "", clientSlug: "../etc", goal: "x" },
   }, { registry: createSeedRegistry() });
   assert.equal(run.status, "rejected");
+});
+
+test("Step 21 D: a hand-run QA writes every row with the entity that owns the client folder, never null", async () => {
+  const sink = new InMemoryAuditSink();
+  const task = qaCliTask(TASK_ID, "dreamsign-pilot", input("broken.html"));
+  assert.equal(task.entitySlug, "dreamsign", "clients/dreamsign-pilot/brief.json names the owner entity");
+  const run = await runAgent(createQaEvaluatorAgent({ evaluatorModel: null }), task, {
+    registry: createSeedRegistry(),
+    audit: { sink },
+    clientEntityOf: fileClientEntityResolver(),
+  });
+  assert.equal(run.status, "completed");
+  assert.ok(sink.events.length >= 3);
+  for (const e of sink.events) assert.equal(e.entitySlug, "dreamsign", `${e.action} carries the entity`);
+  assert.equal(qaCliTask(TASK_ID, "no-such-client", {}).entitySlug, null, "a client with no brief has no knowable entity");
 });

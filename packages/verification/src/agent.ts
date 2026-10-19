@@ -8,12 +8,30 @@
  * A failed verification is a *completed* QA run with a failing verdict, not an escalation: the
  * agent did its job. The workflow (Stage 3) routes on `output.status`.
  */
-import { AgentInputError, currentPermissionGate, guardModelClient, requirePermission, type Agent } from "@wfact/agent-runtime";
+import {
+  AgentInputError,
+  currentPermissionGate,
+  fileClientEntityResolver,
+  guardModelClient,
+  requirePermission,
+  type Agent,
+  type AgentTask,
+  type ClientEntityResolver,
+} from "@wfact/agent-runtime";
 import { SITE_FILE_RE, type AsyncCheckSuite, type BrandPromise, type Check, type VerificationContext } from "./checks/types.js";
 import type { ModelClient } from "./modelClient.js";
 import { VerificationLoop, type VerificationResult } from "./verificationLoop.js";
 
 export const QA_EVALUATOR_ROLE = "qa-evaluator";
+
+/**
+ * Step 21 D: the task a hand-run QA (`npm run verify`) gives the runtime. The entity that owns the client folder
+ * (clients/<slug>/brief.json) is knowable, so it goes on the task, as the jobs `verify` handler already does; every
+ * lifecycle and decision row then carries it instead of a null entity_slug. Null only for a client with no brief.
+ */
+export function qaCliTask<I>(taskId: string, clientSlug: string, input: I, entityOf: ClientEntityResolver = fileClientEntityResolver()): AgentTask<I> {
+  return { taskId, role: QA_EVALUATOR_ROLE, entitySlug: entityOf(clientSlug), clientSlug, input };
+}
 
 export interface QaInput {
   ctx: VerificationContext;

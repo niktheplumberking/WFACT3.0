@@ -19,8 +19,8 @@
  */
 import { readFileSync } from "node:fs";
 import { formatVerificationSummary } from "./verificationLoop.js";
-import { createSeedRegistry, runAgent } from "@wfact/agent-runtime";
-import { createQaEvaluatorAgent, QA_EVALUATOR_ROLE } from "./agent.js";
+import { createSeedRegistry, fileClientEntityResolver, runAgent } from "@wfact/agent-runtime";
+import { createQaEvaluatorAgent, qaCliTask } from "./agent.js";
 import { evaluatorModelClientFromEnv } from "./modelClient.js";
 import { knownClientSlugs } from "./paths.js";
 import { registryGateChecks } from "./registry.js";
@@ -80,12 +80,8 @@ async function main() {
 
   const run = await runAgent(
     createQaEvaluatorAgent({ evaluatorModel, checks: registryGateChecks(), reviewSuites: [NO_BROWSER_SUITE] }),
-    {
-      taskId: process.env.WFACT_TASK_ID || randomUUID(),
-      role: QA_EVALUATOR_ROLE,
-      input: { html, clientSlug, requiredSections, otherClientSlugs, goal, factSources: [goal], stage },
-    },
-    { registry: createSeedRegistry(), audit: auditSink ? { sink: auditSink } : null },
+    qaCliTask(process.env.WFACT_TASK_ID || randomUUID(), clientSlug, { html, clientSlug, requiredSections, otherClientSlugs, goal, factSources: [goal], stage }),
+    { registry: createSeedRegistry(), audit: auditSink ? { sink: auditSink } : null, clientEntityOf: fileClientEntityResolver() },
   );
   const runId = run.runId;
   const audit = auditSink;
