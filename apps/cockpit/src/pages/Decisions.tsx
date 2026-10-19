@@ -7,8 +7,8 @@
  */
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
-import { ArrowRight, ArrowClockwise, Circle, Diamond, Play, RadioButton, SealCheck } from "@phosphor-icons/react";
-import { Button, ButtonLink, TechDetails } from "../components/kit";
+import { ArrowClockwise, Circle, Diamond, Play, RadioButton, SealCheck } from "@phosphor-icons/react";
+import { Button, ButtonLink, StatusGlyph, TechDetails } from "../components/kit";
 import { NeedRow } from "../components/flow";
 import { buildsOf, KIND_OF_SITE } from "../lib/path";
 import { currentInputs, savePlanInputs, SLOTS } from "../lib/inputs";
@@ -18,15 +18,13 @@ import { median } from "../lib/timeline";
 import { buildStopLine, capped, costLine, fetchCostData, money, runSpend } from "../lib/costs";
 import { supabase } from "../supabaseClient";
 import { isActive, requestJob } from "../jobsClient";
-import { planIdOfJob } from "../lib/attention";
 import {
-  GOAL_LABEL, KIND_LABEL, LEAD_LABEL, dateTime, jobState, planName, shortDate,
-  type Direction, type PlanRow, type ProjectRow, type Track,
+  LEAD_LABEL, dateTime, planName, shortDate,
+  type PlanRow, type ProjectRow, type Track,
 } from "../lib/model";
 import { canDecide, fetchPlan, useFactory, useLoad, useMe, useToast } from "../lib/state";
 import { nextStage, stageLabel, stageMoveBlock } from "../stages";
 import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, Plate } from "../components/ui";
-import { BeforeBuild } from "../components/Recovery";
 import { fetchProjects } from "./Home";
 
 /* ---------------- tabs ---------------- */
@@ -149,10 +147,88 @@ export default function PlansTab() {
   );
 }
 
-/* ---------------- plan page ---------------- */
+/* ---------------- proposal ---------------- */
 
-function Said({ quote }: { quote: string | null | undefined }) {
-  return quote ? <span className="said">“{quote}”</span> : null;
+const KINDS: { t: Track; name: string; what: string }[] = [
+  { t: "A", name: "Fast local site", what: "Quick to load, simple to use. Hours, directions and the call button come first." },
+  { t: "B", name: "Showcase site with motion", what: "Large pictures and gentle motion between sections. Best when the work itself is the reason to visit." },
+];
+
+/** What every proposal page reads from the row: the client's name and words, the pages asked for, the open questions. */
+function proposalFacts(row: PlanRow) {
+  const p = row.plan.plan;
+  const brief = p.brief as typeof p.brief & { requestText?: string; requested?: { pages?: string[] } };
+  const words = brief.requestText?.trim();
+  return {
+    client: p.intake?.clientName ?? row.client_slug,
+    goal: brief.goal,
+    questions: [...p.openQuestions, ...(row.plan.direction?.openQuestions ?? [])],
+    pages: brief.requested?.pages ?? [],
+    quote: words ? (words.length > 600 ? `${words.slice(0, 597)}…` : words) : null,
+  };
+}
+
+/** Proposal number, title, the goal, and the client's own words (design is.proposal). */
+function ProposalHead({ row }: { row: PlanRow }) {
+  const { client, goal, quote } = proposalFacts(row);
+  return (
+    <>
+      <header className="proposal-head">
+        <p className="t-eyebrow">
+          Proposal {row.revision} · written {dateTime(row.created_at)}
+        </p>
+        <h1 className="t-title">A site for {client}</h1>
+        <p className="t-lead muted">{goal}</p>
+      </header>
+      {quote && (
+        <figure className="client-words">
+          <figcaption className="t-small quiet">What the client wrote, in their own words</figcaption>
+          <blockquote className="t-quote">“{quote}”</blockquote>
+          <p className="t-small muted">{client}</p>
+        </figure>
+      )}
+    </>
+  );
+}
+
+/** The pages asked for and the questions still open. */
+function ProposalColumns({ row, decided = false }: { row: PlanRow; decided?: boolean }) {
+  const { pages, questions } = proposalFacts(row);
+  return (
+    <div className="proposal-cols">
+      {pages.length > 0 && (
+        <section aria-labelledby="pages-h" className="client-section">
+          <h2 id="pages-h" className="t-section">
+            Pages
+          </h2>
+          <ol className="proposal-pages">
+            {pages.map((pg, i) => (
+              <li key={pg}>
+                <span className="fig quiet">{String(i + 1).padStart(2, "0")}</span>
+                <b>{pg}</b>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+      {questions.length > 0 && (
+        <section aria-labelledby="oq-h" className="client-section">
+          <h2 id="oq-h" className="t-section">
+            Questions still open
+          </h2>
+          <p className="muted">{decided ? "The factory could not answer these from the request." : "The factory could not answer these from the request. After you approve, they go on the details list, where you or the client can answer or skip them."}</p>
+          <ul className="open-qs">
+            {questions.map((q) => (
+              <li key={q}>
+                <Diamond weight="fill" aria-hidden="true" />
+                <span>{q}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
 }
 
 /**
@@ -196,242 +272,6 @@ function RerunDirection({ row }: { row: PlanRow }) {
   );
 }
 
-function WhatTheClientWants({ p, d, note, row }: { p: PlanRow["plan"]["plan"]; d: Direction | null | undefined; note: string | null | undefined; row?: PlanRow }) {
-  return (
-    <Plate title="What the client wants">
-      <div className="plate-body stack-tight">
-        <p className="lede">{p.brief.goal}</p>
-        {!d && <Notice tone="info">No direction summary for this plan{note ? `: ${note}` : " (it was written before the direction step existed)"}.</Notice>}
-        {!d && row && <RerunDirection row={row} />}
-        {d && (
-          <dl className="facts">
-            <div>
-              <dt>Kind of business</dt>
-              <dd>
-                {d.nicheLabel}
-                <Said quote={d.nicheQuote} />
-              </dd>
-            </div>
-            <div>
-              <dt>Main goal</dt>
-              <dd>
-                More {GOAL_LABEL[d.primaryGoal] ?? d.primaryGoal}
-                <Said quote={d.goalQuote} />
-              </dd>
-            </div>
-            {d.audience && (
-              <div>
-                <dt>Who visits</dt>
-                <dd>
-                  {d.audience.point}
-                  <Said quote={d.audience.quote} />
-                </dd>
-              </div>
-            )}
-            {d.brandDirection.map((b, i) => (
-              <div key={i}>
-                <dt>{i === 0 ? "Look and feel" : <span className="sr-only">Look and feel</span>}</dt>
-                <dd>
-                  {b.point}
-                  <Said quote={b.quote} />
-                </dd>
-              </div>
-            ))}
-          </dl>
-        )}
-        {d && (d.requirements.length > 0 || d.constraints.length > 0) && (
-          <details className="raw">
-            <summary>
-              {d.requirements.length} requirements and {d.constraints.length} constraints from the client's words
-            </summary>
-            <ul className="plain" style={{ marginTop: 12 }}>
-              {[...d.requirements, ...d.constraints].map((x, i) => (
-                <li key={i}>
-                  {x.point}
-                  <Said quote={x.quote} />
-                </li>
-              ))}
-            </ul>
-          </details>
-        )}
-        {d && d.unsupported.length > 0 && (
-          <details className="raw">
-            <summary>{d.unsupported.length} points dropped because the client never said them</summary>
-            <ul className="plain" style={{ marginTop: 12 }}>
-              {d.unsupported.map((u, i) => (
-                <li key={i}>{u}</li>
-              ))}
-            </ul>
-          </details>
-        )}
-      </div>
-    </Plate>
-  );
-}
-
-function PlanDetails({ row }: { row: PlanRow }) {
-  const p = row.plan.plan;
-  const d = row.plan.direction;
-  const questions = [...p.openQuestions, ...(d?.openQuestions ?? [])];
-  const [allQ, setAllQ] = useState(false);
-  return (
-    <div className="stack">
-      <WhatTheClientWants p={p} d={d} note={row.plan.directionNote} row={row} />
-      {questions.length > 0 && (
-        <Plate title="Settle these before building" note={`${allQ ? questions.length : Math.min(questions.length, 5)} of ${questions.length}`}>
-          <div className="plate-body stack-tight">
-            <ul className="plain">
-              {(allQ ? questions : questions.slice(0, 5)).map((q, i) => (
-                <li key={i}>{q}</li>
-              ))}
-            </ul>
-            {questions.length > 5 && (
-              <div>
-                <button className="btn ghost small" type="button" aria-expanded={allQ} onClick={() => setAllQ(!allQ)}>
-                  {allQ ? "Show fewer" : `Show ${questions.length - 5} more`}
-                </button>
-              </div>
-            )}
-          </div>
-        </Plate>
-      )}
-      <Plate title="The proposal">
-        <div className="plate-body stack-tight">
-          <dl className="facts">
-            <div>
-              <dt>Starting template</dt>
-              <dd>
-                {p.templateId}
-                <span className="said" style={{ display: "block" }}>{p.templateRationale}</span>
-              </dd>
-            </div>
-            <div>
-              <dt>Sections</dt>
-              <dd>{p.brief.requiredSections.join(", ")}</dd>
-            </div>
-            <div>
-              <dt>Steps</dt>
-              <dd>
-                <ol className="plain" style={{ paddingLeft: 20 }}>
-                  {p.tasks.map((t) => (
-                    <li key={t.order}>{t.title}</li>
-                  ))}
-                </ol>
-              </dd>
-            </div>
-          </dl>
-          {p.risks.length > 0 && (
-            <details className="raw">
-              <summary>{p.risks.length} risks the planner flagged</summary>
-              <ul className="plain" style={{ marginTop: 12 }}>
-                {p.risks.map((r, i) => (
-                  <li key={i}>{r}</li>
-                ))}
-              </ul>
-            </details>
-          )}
-        </div>
-      </Plate>
-    </div>
-  );
-}
-
-function AfterDecision({ row }: { row: PlanRow }) {
-  const f = useFactory();
-  const me = useMe();
-  const nav = useNavigate();
-  const toast = useToast();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const decider = canDecide(me.role);
-  const builds = (f.jobs ?? []).filter((j) => (j.kind === "build_plan" || j.kind === "resume") && planIdOfJob(j, f.jobs ?? []) === row.id);
-  const active = builds.find((j) => isActive(j));
-
-  async function go(kind: "build_plan" | "replan") {
-    setBusy(true);
-    setError(null);
-    const { jobId, error: e } = await requestJob(kind, { planId: row.id });
-    setBusy(false);
-    if (!jobId) return setError(`It didn't start: ${e}. Nothing changed; try again.`);
-    if (e) toast(e);
-    else toast(kind === "build_plan" ? "Build started. It runs on the factory worker; this page updates as it goes." : "Revision started. The new proposal appears in Decisions.");
-    await f.reload();
-    nav(`/activity/${jobId}`);
-  }
-
-  return (
-    <section className="plate sticky" aria-labelledby="after-h">
-      <div className="plate-head">
-        <h2 id="after-h">{row.status === "approved" ? "Approved" : row.status === "rejected" ? "Rejected" : "Waiting for an owner or admin"}</h2>
-        <span className="quiet">{row.decided_at ? dateTime(row.decided_at) : null}</span>
-      </div>
-      <div className="plate-body stack-tight">
-        {row.status === "approved" && row.build_track && (
-          <>
-            <Notice tone="clear">Approved as Track {row.build_track}{row.track_overridden ? ", against the recommendation" : ""}.</Notice>
-            {active ? (
-              <Link className="btn primary" to={`/activity/${active.id}`}>
-                See the build that's running
-              </Link>
-            ) : (
-              decider && (
-                <div>
-                  <button className="btn primary" type="button" disabled={busy} onClick={() => go("build_plan")}>
-                    <ArrowRight aria-hidden="true" />
-                    {busy ? "Starting…" : builds.length ? "Build it again" : "Start build"}
-                  </button>
-                </div>
-              )
-            )}
-            {decider && !active && <BeforeBuild planId={row.id} questions={[...row.plan.plan.openQuestions, ...(row.plan.direction?.openQuestions ?? [])]} />}
-            <p className="quiet fine">Building and checking takes a few minutes. The result waits for your launch decision; nothing is published.</p>
-          </>
-        )}
-        {row.status === "approved" && !row.build_track && (
-          <Notice tone="caution">This proposal was approved before the kind of site was chosen, so it can't be built. Start a new request for this client and approve the new proposal with a kind of site.</Notice>
-        )}
-        {row.status === "rejected" && (
-          <>
-            <p>
-              Your note: <q>{row.decision_note}</q>
-            </p>
-            {row.revision < 2 ? (
-              decider && (
-                <div>
-                  <button className="btn primary" type="button" disabled={busy} onClick={() => go("replan")}>
-                    <ArrowClockwise aria-hidden="true" />
-                    {busy ? "Starting…" : "Revise from my note"}
-                  </button>
-                </div>
-              )
-            ) : (
-              <Notice tone="caution">This client's proposal has been revised twice already, the limit for automatic revisions. Start a fresh request with a clearer brief.</Notice>
-            )}
-          </>
-        )}
-        {error && <Notice tone="stop">{error}</Notice>}
-        {builds.length > 0 && (
-          <div>
-            <h3 style={{ fontSize: "var(--fs-small)", marginBottom: 8 }}>Builds of this proposal</h3>
-            <ul className="mini" style={{ padding: 0 }}>
-              {builds.map((j) => {
-                const s = jobState(j);
-                return (
-                  <li key={j.id} style={{ padding: "6px 0" }}>
-                    <Aspect tone={s.tone}>{s.label}</Aspect>
-                    <Link to={`/activity/${j.id}`}>{KIND_LABEL[j.kind]}</Link>
-                    <span className="fig quiet">{shortDate(j.created_at)}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
-
 /**
  * Proposal review (Cockpit v2): what the factory proposes, in the client's own words; the kind of site as a radiogroup
  * with the recommendation and its real reasons; pages; open questions; and a sticky bar. Approving is the owner's
@@ -445,8 +285,6 @@ function ProposalReview({ row, onDone }: { row: PlanRow; onDone: () => void }) {
   const nav = useNavigate();
   const owner = me.role === "owner";
   const decider = canDecide(me.role);
-  const p = row.plan.plan;
-  const brief = p.brief as typeof p.brief & { requestText?: string; requested?: { pages?: string[] } };
   const rec = row.plan.direction?.recommendation;
   const [kind, setKind] = useState<Track | undefined>(rec?.track ?? undefined);
   const [asking, setAsking] = useState(false);
@@ -455,15 +293,7 @@ function ProposalReview({ row, onDone }: { row: PlanRow; onDone: () => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const client = p.intake?.clientName ?? row.client_slug;
-  const questions = [...p.openQuestions, ...(row.plan.direction?.openQuestions ?? [])];
-  const pages = brief.requested?.pages ?? [];
-  const words = brief.requestText?.trim();
-  const quote = words ? (words.length > 600 ? `${words.slice(0, 597)}…` : words) : null;
-  const KINDS: { t: Track; name: string; what: string }[] = [
-    { t: "A", name: "Fast local site", what: "Quick to load, simple to use. Hours, directions and the call button come first." },
-    { t: "B", name: "Showcase site with motion", what: "Large pictures and gentle motion between sections. Best when the work itself is the reason to visit." },
-  ];
+  const { client } = proposalFacts(row);
   const chosen = KINDS.find((k) => k.t === kind);
   const overriding = !!rec?.track && !!kind && kind !== rec.track;
 
@@ -514,20 +344,7 @@ function ProposalReview({ row, onDone }: { row: PlanRow; onDone: () => void }) {
 
   return (
     <div className="proposal">
-      <header className="proposal-head">
-        <p className="t-eyebrow">
-          Proposal {row.revision} · written {dateTime(row.created_at)}
-        </p>
-        <h1 className="t-title">A site for {client}</h1>
-        <p className="t-lead muted">{brief.goal}</p>
-      </header>
-      {quote && (
-        <figure className="client-words">
-          <figcaption className="t-small quiet">What the client wrote, in their own words</figcaption>
-          <blockquote className="t-quote">“{quote}”</blockquote>
-          <p className="t-small muted">{client}</p>
-        </figure>
-      )}
+      <ProposalHead row={row} />
       <section aria-labelledby="kind-h" className="kind-section">
         <div>
           <h2 id="kind-h" className="t-section">
@@ -592,39 +409,7 @@ function ProposalReview({ row, onDone }: { row: PlanRow; onDone: () => void }) {
           </div>
         )}
       </section>
-      <div className="proposal-cols">
-        {pages.length > 0 && (
-          <section aria-labelledby="pages-h" className="client-section">
-            <h2 id="pages-h" className="t-section">
-              Pages
-            </h2>
-            <ol className="proposal-pages">
-              {pages.map((pg, i) => (
-                <li key={pg}>
-                  <span className="fig quiet">{String(i + 1).padStart(2, "0")}</span>
-                  <b>{pg}</b>
-                </li>
-              ))}
-            </ol>
-          </section>
-        )}
-        {questions.length > 0 && (
-          <section aria-labelledby="oq-h" className="client-section">
-            <h2 id="oq-h" className="t-section">
-              Questions still open
-            </h2>
-            <p className="muted">The factory could not answer these from the request. After you approve, they go on the details list, where you or the client can answer or skip them.</p>
-            <ul className="open-qs">
-              {questions.map((q) => (
-                <li key={q}>
-                  <Diamond weight="fill" aria-hidden="true" />
-                  <span>{q}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-      </div>
+      <ProposalColumns row={row} />
       {error && <Notice tone="stop">{error}</Notice>}
       {decider && (
         <div className="sticky-bar">
@@ -878,6 +663,128 @@ function NeedsScreen({ row }: { row: PlanRow }) {
   );
 }
 
+/**
+ * A proposal already decided without a build (Cockpit v2, Package 4 R2): the proposal review's own page, read-only, with the
+ * design's decided line in place of the decision bar. Changes asked for: the note, then "Revise from my note" (owner or admin,
+ * the same re-plan request, confirmed with its cost; refused after two revisions). Approved before the kind of site was
+ * chosen: it cannot be built, and the one way forward is a new request.
+ */
+function DecidedProposal({ row }: { row: PlanRow }) {
+  const me = useMe();
+  const f = useFactory();
+  const nav = useNavigate();
+  const toast = useToast();
+  const decider = canDecide(me.role);
+  const [confirm, setConfirm] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const rejected = row.status === "rejected";
+  const rec = row.plan.direction?.recommendation;
+  const recName = rec?.track ? KINDS.find((k) => k.t === rec.track)?.name : null;
+  // A revision already asked for from this note (not failed or closed): open it instead of asking twice.
+  const revision = (f.jobs ?? [])
+    .filter((j) => j.kind === "replan" && j.params?.planId === row.id && j.status !== "failed" && j.status !== "cancelled")
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+  const when = row.decided_at ? shortDate(row.decided_at) : null;
+
+  async function revise() {
+    setConfirm(false);
+    setBusy(true);
+    setError(null);
+    const { jobId, error: e } = await requestJob("replan", { planId: row.id });
+    setBusy(false);
+    if (!jobId) return setError(`It didn't start: ${e}. Nothing changed; try again.`);
+    toast(e ?? `The factory is writing proposal ${row.revision + 1} from your note.`);
+    await f.reload();
+    nav(`/activity/${jobId}`);
+  }
+
+  return (
+    <div className="proposal">
+      <ProposalHead row={row} />
+      <section aria-labelledby="kind-h" className="kind-section">
+        <h2 id="kind-h" className="t-section">
+          The kind of site
+        </h2>
+        <p className="muted">
+          {rejected
+            ? `None was chosen, because changes were asked for${recName ? `. The factory had recommended a ${recName}` : ""}.`
+            : "None was chosen: this proposal was approved before the Cockpit asked for the kind of site."}
+        </p>
+      </section>
+      <ProposalColumns row={row} decided />
+      <section aria-labelledby="decision-h" className="proposal-decision">
+        <h2 id="decision-h" className="sr-only">
+          The decision
+        </h2>
+        {rejected ? (
+          <>
+            <p role="status" className="proposal-done proposal-done-need">
+              <StatusGlyph tone="need" />
+              Changes asked for{when ? ` on ${when}` : ""}.
+            </p>
+            {row.decision_note && (
+              <figure className="client-words">
+                <figcaption className="t-small quiet">The note</figcaption>
+                <blockquote className="t-quote">“{row.decision_note}”</blockquote>
+              </figure>
+            )}
+            {revision ? (
+              <div className="row-actions">
+                <ButtonLink to={`/activity/${revision.id}`} variant="primary" size="page">
+                  See proposal {row.revision + 1} being written
+                </ButtonLink>
+              </div>
+            ) : row.revision >= 2 ? (
+              <>
+                <p className="muted">This client has had two new proposals already, the limit for automatic revisions. Start a fresh request with a clearer brief.</p>
+                <div className="row-actions">
+                  <ButtonLink to="/projects/new" variant="primary" size="page">
+                    Start a new request
+                  </ButtonLink>
+                </div>
+              </>
+            ) : decider ? (
+              <div className="row-actions">
+                <Button variant="primary" size="page" icon={ArrowClockwise} disabled={busy} onClick={() => setConfirm(true)}>
+                  {busy ? "Starting…" : "Revise from my note"}
+                </Button>
+                <span className="t-small muted">The factory writes proposal {row.revision + 1} from the note.</span>
+              </div>
+            ) : (
+              <p className="t-small muted">{f.decider} can ask the factory for a new proposal from this note.</p>
+            )}
+          </>
+        ) : (
+          <>
+            <p role="status" className="proposal-done">
+              <StatusGlyph tone="done" />
+              Approved{when ? ` on ${when}` : ""}, without a kind of site.
+            </p>
+            <p className="muted">It can't be built: a build needs the kind of site. Start a new request for {proposalFacts(row).client} and approve its proposal with a kind of site.</p>
+            <div className="row-actions">
+              <ButtonLink to="/projects/new" variant="primary" size="page">
+                Start a new request
+              </ButtonLink>
+            </div>
+          </>
+        )}
+        {error && <Notice tone="stop">{error}</Notice>}
+      </section>
+      <ConfirmDialog
+        open={confirm}
+        title="Revise from your note?"
+        body={`The factory reads your note and writes proposal ${row.revision + 1}. This proposal stays as it is.`}
+        cost={`Costs a few cents to read the note and write the proposal. ${buildStopLine()}`}
+        confirmLabel="Revise from my note"
+        busy={busy}
+        onConfirm={() => void revise()}
+        onCancel={() => setConfirm(false)}
+      />
+    </div>
+  );
+}
+
 export function PlanPage() {
   const { id = "" } = useParams();
   const plan = useLoad(() => fetchPlan(id), [id]);
@@ -885,24 +792,11 @@ export function PlanPage() {
   if (plan.error) return <LoadError what="this proposal" error={plan.error} onRetry={plan.reload} />;
   if (plan.loading && !row) return <Loading rows={4} label="Loading the proposal" />;
   if (!row) return <Empty title="This proposal doesn't exist, or your role can't see it.">Proposals are visible to owners and admins. <Link to="/decisions">Back to Decisions</Link></Empty>;
-  // Cockpit v2: a proposal waiting for a decision is reviewed here; decided ones keep the pre-v2 page until the
-  // details-list screen replaces it.
+  // Cockpit v2: waiting → the proposal review; approved with a kind of site → what the site still needs; anything else
+  // (changes asked for, or approved before the kind of site existed) → the same page, read-only, with the decision.
   if (row.status === "pending") return <ProposalReview row={row} onDone={plan.reload} />;
   if (row.status === "approved" && row.build_track) return <NeedsScreen row={row} />;
-  const p = row.plan.plan;
-  return (
-    <>
-      <PageHead
-        kicker={`Proposal, ${row.status}`}
-        title={planName(row)}
-        lead={`${LEAD_LABEL[p.intake?.leadType] ?? "Request"} for ${p.intake?.clientName ?? row.client_slug}. The factory wrote it from the client's request on ${dateTime(row.created_at)}${row.revision > 1 ? ", as a revision from your note" : ""}.`}
-      />
-      <div className="split">
-        <PlanDetails row={row} />
-        <AfterDecision row={row} />
-      </div>
-    </>
-  );
+  return <DecidedProposal row={row} />;
 }
 
 /* ---------------- stage moves ---------------- */

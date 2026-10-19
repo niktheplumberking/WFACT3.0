@@ -116,6 +116,15 @@ if (fakeJob) {
   }
 }
 
+// ?fake-plan=rejected|rejected2|nokind: decided proposals (Package 4 R2). rejected and rejected2 turn the waiting proposal
+// into one where changes were asked for (revision 1 or 2); nokind makes the approved one predate the kind of site.
+const fakePlan = new URLSearchParams(location.search).get("fake-plan");
+if (fakePlan === "rejected" || fakePlan === "rejected2")
+  rows.plan_approvals = rows.plan_approvals.map((p) =>
+    p.id === "11111111-1111-4111-8111-111111111111" ? { ...p, status: "rejected", decision_note: "Warmer tone, and show the prices for a gutter clean.", decided_at: new Date(Date.now() - 30 * 60_000).toISOString(), revision: fakePlan === "rejected2" ? 2 : 1 } : p,
+  );
+if (fakePlan === "nokind") rows.plan_approvals = rows.plan_approvals.map((p) => (p.id === "22222222-2222-4222-8222-222222222222" ? { ...p, build_track: null } : p));
+
 const signedIn = {
   user: { id: "00000000-0000-4000-8000-0000000000aa", email: "owner@example.test" },
   access_token: "synthetic",

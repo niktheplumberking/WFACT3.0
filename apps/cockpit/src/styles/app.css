@@ -778,6 +778,11 @@ body:has(.set-savebar) .toasts { bottom: calc(var(--s-6) + 80px); }
 .proposal-pages li { display: grid; grid-template-columns: 32px 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); }
 .open-qs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .open-qs li { display: flex; gap: 10px; padding: 12px 14px; border-radius: var(--r-ctl); background: var(--need-w); }
+/* A decided proposal (Package 4 R2): the design's decided line in place of the decision bar. */
+.proposal-decision { display: grid; gap: 14px; max-width: 860px; }
+.proposal-done { margin: 0; display: flex; gap: 10px; align-items: center; padding: 14px 16px; border-radius: 12px; background: var(--done-w); }
+.proposal-done .glyph { width: 20px; height: 20px; flex-shrink: 0; }
+.proposal-done-need { background: var(--need-w); }
 .open-qs svg { color: var(--need); margin-top: 4px; flex-shrink: 0; width: 14px; height: 14px; }
 .sticky-bar { position: sticky; bottom: 0; z-index: 4; display: grid; gap: 14px; padding: 16px 0 8px; background: var(--paper); border-top: 1px solid var(--line); }
 .changes { display: grid; gap: 8px; max-width: 720px; }
