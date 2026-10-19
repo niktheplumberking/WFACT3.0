@@ -15,12 +15,12 @@ revised `a913b0d`/`1ccae2b`) sits **on top of** the Continuation plan, not in pl
 phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07) and is the source for "Next up" below. Its Part E checklist tracks those
 steps; this file tracks the Continuation Stages.
 
-**Status summary (2026-10-15, 13:30 +05, `/progress-sync`)**:
+**Status summary (2026-10-15, `/progress-sync`; stale lines refreshed 2026-10-20)**:
 - **Step 21 DONE, closed** (`/step-close 21`, 2026-10-20): every sub-item A–L done or decided; migrations 0027 and 0028 live and attack-tested (12/12, 10/10); RLS attack scripts now run in CI; M5 launch files proven on live run `4c35703b`; CI `39304787144` green in all 18 jobs.
 - **Step 3A DONE, closed** (`/step-close 3A`, 2026-10-15): the live sign-up is proven end to end (sign-up, owner approval as `pm` with audit row, password
   sign-in after approval in the Auth logs, role-limited view, attack test 32/32). Supabase email confirmation stays off (Huraira, 2026-10-15: the approval gate is enough).
 - **Step 25 PARTIAL** (`/step-close 25`, 2026-10-15): MVP M4, the contact form that saves leads, is **met live on synthetic data** (migrations 0025/0026
-  applied, attack test 43/43, `submit-lead` deployed, JS and no-JS submits on both tracks stored as rows, refusals proven with curl). Not pushed.
+  applied, attack test 43/43, `submit-lead` deployed, JS and no-JS submits on both tracks stored as rows, refusals proven with curl). Pushed and CI-green since.
   The CRM target and lead notification wait on Nick; the real-client run waits on Nick's brief.
 - **Step 28 IN PROGRESS** (the current step). Package 4, the Cockpit v2 rebuild, has phases 1–17 CI-green and deployed (phase 14 Activity:
   CI `38929657403`; phase 15 Costs: CI `38934744558`; phase 16 Team: CI `38942505031`; phase 17 Settings: CI `38947151902`); phase 18 Notifications: CI `39268206990`); phase 19 cleanup `55e0a8a`..`5589192` (2026-10-19; CI `39286692404` green, deployed); pre-v2 rebuild R1, the other work pages, `f9d4842` (2026-10-19; CI `39296573842` green, deployed); R2, decided proposals, `80f1391` (2026-10-19; CI `39301911101` green, deployed); R3, the Decisions room kept (option b), `1756b4a` (2026-10-19; CI `39306953117` green, deployed). Package 4 exit check PARTIALLY MET: R4–R5 of the pre-v2 rebuild left;
@@ -28,9 +28,9 @@ steps; this file tracks the Continuation Stages.
 - **Build failures** (`docs/BUILD-FAILURE-DIAGNOSIS.md`): both known rule contradictions are fixed in code. Testimonials: `b8d240f`,
   pushed. Palette: `8e6e09d`, pushed (CI `38706155999` green), after Huraira's rule. Stuck runs now halt early, and a no-change continue is refused unpaid.
   None of this is proven on a live build yet.
-- **Brief consistency check and example clients** (`/step-close 28`, 2026-10-15): built, local, not pushed (`fd67328`, `52f7088`).
+- **Brief consistency check and example clients** (`/step-close 28`, 2026-10-15): built and pushed (`fd67328`, `52f7088`); not yet proven on a live build.
   Owner answers that disagree now halt at preflight unpaid and the owner's pick clears them; `docs/EXAMPLE-CLIENTS.md`.
-- **Biggest blockers**: (1) Huraira: push the 16 local commits, then the live continue on Harbor Street (`caa201f1` is cancelled; `e6a71046` failed on contradictory owner answers). (2) Nick:
+- **Biggest blockers**: (1) Huraira: the live continue on Harbor Street (`caa201f1` is cancelled; `e6a71046` failed on contradictory owner answers; build `ffcce674` on 2026-10-19 stopped asking for details). (2) Nick:
   the Cockpit v2 decisions in `BLOCKED-ON-NICK.md`, and the real brief Step 25 needs (no `clients/bennett*` in the repo).
 
 **Earlier (2026-10-14)**:
