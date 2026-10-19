@@ -135,6 +135,45 @@ export function Segmented<T extends string>({ label, value, options, onChange }:
   );
 }
 
+/** Inbox/Preferences on Notifications: a tablist with the segmented look. Arrow keys, Home and End move and choose;
+ *  each tab controls its own tabpanel (render both panels and hide the inactive one, so aria-controls always resolves). */
+export function Tabs<T extends string>({ label, value, options, onChange, idBase }: { label: string; value: T; options: { value: T; label: string }[]; onChange: (v: T) => void; idBase: string }) {
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  function onKey(e: KeyboardEvent, i: number) {
+    const last = options.length - 1;
+    const n = e.key === "ArrowRight" ? (i === last ? 0 : i + 1) : e.key === "ArrowLeft" ? (i === 0 ? last : i - 1) : e.key === "Home" ? 0 : e.key === "End" ? last : -1;
+    if (n < 0) return;
+    e.preventDefault();
+    onChange(options[n].value);
+    refs.current[n]?.focus();
+  }
+  return (
+    <div role="tablist" aria-label={label} className="segmented">
+      {options.map((o, i) => {
+        const on = o.value === value;
+        return (
+          <button
+            key={o.value}
+            ref={(el) => {
+              refs.current[i] = el;
+            }}
+            type="button"
+            role="tab"
+            id={`${idBase}-tab-${o.value}`}
+            aria-controls={`${idBase}-panel-${o.value}`}
+            aria-selected={on}
+            tabIndex={on ? 0 : -1}
+            onClick={() => onChange(o.value)}
+            onKeyDown={(e) => onKey(e, i)}
+          >
+            {o.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ---------------- empty and coming later ---------------- */
 
 /** Says what will appear here and offers the one way to start. */

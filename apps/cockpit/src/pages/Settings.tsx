@@ -16,7 +16,7 @@ import { CAPS, usd } from "../lib/costs";
 import { canDecide, useMe, useToast } from "../lib/state";
 import type { Role } from "../lib/model";
 import {
-  HOME_SECTION_NAME, LANDING_NAME, deleteSavedView, landingsFor, readHomeLayout, readLanding, savedViews, writeHomeLayout, writeLanding, type HomeLayout, type Landing,
+  HOME_SECTION_NAME, LANDING_NAME, NOTIFY_LINES, deleteSavedView, landingsFor, readHomeLayout, readLanding, savedViews, writeHomeLayout, writeLanding, type HomeLayout, type Landing,
 } from "../lib/prefs";
 import { SHORTCUTS } from "../shell/Shell";
 import { Button } from "../components/kit";
@@ -228,7 +228,9 @@ function NotifyGroup() {
   return (
     <section aria-labelledby="g-notify" className="set-group">
       <h2 id="g-notify" className="set-h2">Notifications</h2>
-      <p className="muted">Notifications reach you in the Cockpit only: the bell at the top and Home. Email and phone are not connected yet, so there is nothing to switch on or off for them, and quiet hours and a digest have nothing to hold back.</p>
+      <p className="muted">
+        {NOTIFY_LINES.where} {NOTIFY_LINES.channels} {NOTIFY_LINES.quiet}
+      </p>
       <p>
         <Link to="/notifications">Open your notifications</Link>
       </p>

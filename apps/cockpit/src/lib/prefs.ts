@@ -87,3 +87,14 @@ export function savedViews(userId: string | null): SavedView[] {
   return out;
 }
 export const deleteSavedView = (key: string) => write(key, null);
+
+/* ---------------- notifications: where they reach you (one wording for Settings and Notifications) ---------------- */
+
+/** Measured 2026-10-16: the factory has no email or phone sender and no table for notification choices (only the
+ *  dispatch-job and submit-lead functions; profiles has id, role, full_name, created_at). So the Cockpit itself is the
+ *  only channel, always on, and nothing on screen pretends otherwise (BLOCKED-ON-NICK.md, notification channels). */
+export const NOTIFY_LINES = {
+  where: "Notifications reach you in the Cockpit only: the bell at the top and Home. That is always on, for every kind of notification.",
+  channels: "Email and phone are not connected yet, so there is nothing to switch on or off for them.",
+  quiet: "Quiet hours and a daily digest have nothing to hold back until email or phone is connected.",
+} as const;

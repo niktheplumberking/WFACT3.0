@@ -135,7 +135,7 @@ describe("notifications", () => {
   it("lists what needs you from the Home source; Mark all as read clears the bell", async () => {
     const t = start("/notifications");
     expect(await screen.findByRole("heading", { level: 1, name: "Notifications" }, T)).toBeInTheDocument();
-    expect(await screen.findByText("Approve the proposal", {}, T)).toBeInTheDocument();
+    expect(await screen.findByText(/: Approve the proposal$/, {}, T)).toBeInTheDocument();
     await t.user.click(screen.getByRole("button", { name: "Mark all as read" }));
     expect((await screen.findAllByRole("link", { name: "Notifications" }, T)).length).toBeGreaterThan(0);
   });

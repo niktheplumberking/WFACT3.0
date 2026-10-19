@@ -279,14 +279,14 @@ form.ask:focus-within { outline: 2px solid var(--caution); outline-offset: 1px; 
 .seg-now.seg-wait, .seg-now.seg-idle, .seg-now.seg-skip { background: var(--ink-2); }
 .seg-now.seg-run { background: repeating-linear-gradient(135deg, var(--ink-2) 0 4px, var(--line-2) 4px 8px); }
 
-/* segmented control (radiogroup) */
+/* segmented control (radiogroup, or the Notifications tablist with the same look) */
 .segmented { display: inline-flex; padding: 3px; border-radius: var(--r-ctl); background: var(--sunk); border: 1px solid var(--line); }
-.segmented [role="radio"] { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 0 14px; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--ink-2); font: 600 var(--fs-small)/1.2 var(--face-text); cursor: pointer; }
-.segmented [role="radio"][aria-checked="true"] { background: var(--sheet); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
+.segmented [role="radio"], .segmented [role="tab"] { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 38px; padding: 0 14px; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--ink-2); font: 600 var(--fs-small)/1.2 var(--face-text); cursor: pointer; }
+.segmented [role="radio"][aria-checked="true"], .segmented [role="tab"][aria-selected="true"] { background: var(--sheet); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
 .segmented svg { width: 16px; height: 16px; }
 /* The radios look 38px tall (design) but their hit area reaches into the 3px padding: 44px targets. */
-.segmented [role="radio"] { position: relative; }
-.segmented [role="radio"]::after { content: ""; position: absolute; inset: -3px 0; }
+.segmented [role="radio"], .segmented [role="tab"] { position: relative; }
+.segmented [role="radio"]::after, .segmented [role="tab"]::after { content: ""; position: absolute; inset: -3px 0; }
 
 /* empty state and coming later */
 .empty-state { display: grid; gap: var(--s-2); padding: 22px 0; border-top: 1px solid var(--line); }
