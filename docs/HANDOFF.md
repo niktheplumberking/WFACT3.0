@@ -127,7 +127,7 @@ Known conflicts and how they resolve: PROGRESS.md "Status summary" said 4D was u
 | Hosting on Hostinger | **Blocked/descoped** | no live Hostinger deploy exists |
 
 No TODO/FIXME markers in shipped source. Placeholders are explicit and labelled (SAMPLE content, synthetic provenance).
-**Retain**: everything above. **Correct**: Track A writes brief open-questions into page HTML comments (move to `content.json`); four copy-pasted mock model clients; `jobs/src/permissionsAttack.ts` lives in `src/`. **Retire**: nothing in code is proven obsolete; "Hermes-lite is superseded" is *not* evidenced. Migration 0016 is absent (cause not recorded).
+**Retain**: everything above. **Correct**: Track A writes brief open-questions into page HTML comments (move to `content.json`); four copy-pasted mock model clients; `jobs/src/permissionsAttack.ts` lived in `src/` (moved to `jobs/scripts/`, Step 21 J). **Retire**: nothing in code is proven obsolete; "Hermes-lite is superseded" is *not* evidenced. Migration 0016 is absent (cause not recorded).
 
 ---
 
