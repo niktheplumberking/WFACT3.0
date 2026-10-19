@@ -13,6 +13,7 @@
  *   workflow.reopen {by, fromStatus, baseCycle, fromStep?}  (a "continue": starts a new segment)
  */
 import type { JobRow } from "../jobsClient";
+import { KIND_OF_SITE } from "./path";
 
 export interface RunRow {
   action: string;
@@ -227,7 +228,7 @@ export function deriveTimeline(input: DeriveInput): Timeline {
     return step;
   };
 
-  if (plan) push({ kind: "plan", label: "Plan approved", state: "done", startedAt: plan.decidedAt, finishedAt: plan.decidedAt, detail: plan.track ? `Track ${plan.track}.` : null, segment: 0 });
+  if (plan) push({ kind: "plan", label: "Proposal approved", state: "done", startedAt: plan.decidedAt, finishedAt: plan.decidedAt, detail: plan.track ? `${KIND_OF_SITE[plan.track] ?? "A kind of site"}.` : null, segment: 0 });
 
   if (rows.length === 0) return fallback(input, steps, push);
 

@@ -37,9 +37,9 @@ describe("deriveTimeline", () => {
   it("a succeeded run: every step done, in order, ending ready for launch approval", () => {
     const rows = [start(), row(0.2, "workflow.preflight", { ok: true, needs: [], checks: [] }), ...round(1, 0, "approved"), checkpoint(8, 0, "verified"), row(8, "workflow.gate", { gate: "launch", tier: "hard-gate" })];
     const t = deriveTimeline({ rows, job: job("succeeded", { result: { status: "awaiting_launch_approval" } }), plan: { decidedAt: at(-10), track: "A" } });
-    expect(labels(t.steps)).toEqual(["Plan approved:done", "Ready to build:done", "Writing the site:done", "Saved:done", "Quality checks:done", "Ready for launch approval:done"]);
+    expect(labels(t.steps)).toEqual(["Proposal approved:done", "Ready to build:done", "Writing the site:done", "Saved:done", "Quality checks:done", "Ready for launch approval:done"]);
     expect(t.outcome).toBe("gate");
-    expect(t.steps[0]!.detail).toBe("Track A.");
+    expect(t.steps[0]!.detail).toBe("Fast local site.");
     expect(t.steps[2]!.durationMs).toBe(4 * 60_000);
     expect(t.steps[4]!.detail).toBe("Every check passed.");
     expect(t.current).toBeNull();

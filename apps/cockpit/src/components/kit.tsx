@@ -246,10 +246,12 @@ export function TechDetails({ items = [], children, summary = "Technical details
 
 /** WFACT is a typeset wordmark until a real mark exists (locked decision 6): "WFACT" in Newsreader 600, then
  *  "Cockpit" in Newsreader italic. No glyph tile. */
+/** The space between the words renders nothing (inline-flex) but keeps "WFACT Cockpit" in the text, so a link's
+ *  accessible name contains its visible label (WCAG 2.5.3). */
 export function Wordmark() {
   return (
     <span className="wordmark">
-      <span className="wordmark-a">WFACT</span>
+      <span className="wordmark-a">WFACT</span>{" "}
       <span className="wordmark-b">Cockpit</span>
     </span>
   );

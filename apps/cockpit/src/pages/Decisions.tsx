@@ -10,7 +10,7 @@ import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { ArrowRight, ArrowClockwise, Circle, Diamond, Play, RadioButton, SealCheck } from "@phosphor-icons/react";
 import { Button, ButtonLink, TechDetails } from "../components/kit";
 import { NeedRow } from "../components/flow";
-import { buildsOf } from "../lib/path";
+import { buildsOf, KIND_OF_SITE } from "../lib/path";
 import { currentInputs, savePlanInputs, SLOTS } from "../lib/inputs";
 import { placeholdersOf } from "../components/Placeholders";
 import { uploadImage, uploadLogo } from "../lib/brandUpload";
@@ -40,7 +40,7 @@ function Tabs() {
   return (
     <nav className="tabs" aria-label="Decision types">
       <NavLink to="/decisions" end>
-        Plans {pendingPlans + launches > 0 && <span className="count">{pendingPlans + launches}</span>}
+        Proposals {pendingPlans + launches > 0 && <span className="count">{pendingPlans + launches}</span>}
       </NavLink>
       <NavLink to="/team">Accounts {pendingAccounts > 0 && <span className="count">{pendingAccounts}</span>}</NavLink>
       <NavLink to="/decisions/stages">Stage moves</NavLink>
@@ -52,7 +52,7 @@ function Header() {
   return (
     <PageHead
       title="Decisions"
-      lead="Everything waiting for a person. Each decision is recorded with your name and the time. Escalations and blocked tasks join this page in Step 14."
+      lead="Everything waiting for a person. Each decision is recorded with your name and the time."
     />
   );
 }
@@ -70,12 +70,12 @@ export default function PlansTab() {
       <Header />
       <Tabs />
       <div className="stack">
-        {f.error && <LoadError what="plans" error={f.error} onRetry={f.reload} />}
-        <Plate title="Plans waiting for you">
-          {!plans && !f.error && <Loading rows={2} label="Loading plans" />}
+        {f.error && <LoadError what="proposals" error={f.error} onRetry={f.reload} />}
+        <Plate title="Proposals waiting for you">
+          {!plans && !f.error && <Loading rows={2} label="Loading proposals" />}
           {plans && pending.length === 0 && (
-            <Empty title="No plans are waiting.">
-              New plans arrive here after you start a request. <Link to="/projects/new">Start one</Link>
+            <Empty title="No proposals are waiting.">
+              New proposals arrive here after you start a request. <Link to="/projects/new">Start one</Link>
             </Empty>
           )}
           {pending.length > 0 && (
@@ -90,9 +90,9 @@ export default function PlansTab() {
                         {planName(p)}
                       </Link>
                       <p className="why">
-                        {LEAD_LABEL[p.plan.plan.intake?.leadType] ?? "Request"}, {p.entity_slug}.{" "}
-                        {rec?.track ? `Track ${rec.track} recommended (${Math.round(rec.confidence * 100)}% sure).` : "No track recommended."} Written {dateTime(p.created_at)}.
-                        {p.revision > 1 ? " This is a re-plan." : ""}
+                        {LEAD_LABEL[p.plan.plan.intake?.leadType] ?? "Request"}.{" "}
+                        {rec?.track ? `${KIND_OF_SITE[rec.track] ?? "A kind of site"} recommended (${Math.round(rec.confidence * 100)}% sure).` : "No kind of site recommended."} Written {dateTime(p.created_at)}.
+                        {p.revision > 1 ? " This is a revised proposal." : ""}
                       </p>
                     </div>
                     <Aspect tone="caution">Your decision</Aspect>
@@ -133,8 +133,8 @@ export default function PlansTab() {
                     <p className="why">
                       {p.status === "approved"
                         ? p.build_track
-                          ? `Track ${p.build_track}${p.track_overridden ? ", against the recommendation" : ""}.`
-                          : "Approved before the track choice existed: needs a new plan."
+                          ? `${KIND_OF_SITE[p.build_track] ?? "A kind of site"}${p.track_overridden ? ", against the recommendation" : ""}.`
+                          : "Approved before the kind of site was chosen: needs a new proposal."
                         : `Note: “${p.decision_note ?? ""}”`}
                     </p>
                   </div>
@@ -295,7 +295,7 @@ function PlanDetails({ row }: { row: PlanRow }) {
           </div>
         </Plate>
       )}
-      <Plate title="The plan">
+      <Plate title="The proposal">
         <div className="plate-body stack-tight">
           <dl className="facts">
             <div>
@@ -354,7 +354,7 @@ function AfterDecision({ row }: { row: PlanRow }) {
     setBusy(false);
     if (!jobId) return setError(`It didn't start: ${e}. Nothing changed; try again.`);
     if (e) toast(e);
-    else toast(kind === "build_plan" ? "Build started. It runs on the factory worker; this page updates as it goes." : "Re-plan started. The new plan appears in Decisions.");
+    else toast(kind === "build_plan" ? "Build started. It runs on the factory worker; this page updates as it goes." : "Revision started. The new proposal appears in Decisions.");
     await f.reload();
     nav(`/activity/${jobId}`);
   }
@@ -388,7 +388,7 @@ function AfterDecision({ row }: { row: PlanRow }) {
           </>
         )}
         {row.status === "approved" && !row.build_track && (
-          <Notice tone="caution">This plan was approved before the track choice existed, so it can't be built. Start a new request for this client and approve the new plan with a track.</Notice>
+          <Notice tone="caution">This proposal was approved before the kind of site was chosen, so it can't be built. Start a new request for this client and approve the new proposal with a kind of site.</Notice>
         )}
         {row.status === "rejected" && (
           <>
@@ -400,19 +400,19 @@ function AfterDecision({ row }: { row: PlanRow }) {
                 <div>
                   <button className="btn primary" type="button" disabled={busy} onClick={() => go("replan")}>
                     <ArrowClockwise aria-hidden="true" />
-                    {busy ? "Starting…" : "Re-plan from my note"}
+                    {busy ? "Starting…" : "Revise from my note"}
                   </button>
                 </div>
               )
             ) : (
-              <Notice tone="caution">This client has been re-planned twice already, the limit for automatic re-plans. Start a fresh request with a clearer brief.</Notice>
+              <Notice tone="caution">This client's proposal has been revised twice already, the limit for automatic revisions. Start a fresh request with a clearer brief.</Notice>
             )}
           </>
         )}
         {error && <Notice tone="stop">{error}</Notice>}
         {builds.length > 0 && (
           <div>
-            <h3 style={{ fontSize: "var(--fs-small)", marginBottom: 8 }}>Builds of this plan</h3>
+            <h3 style={{ fontSize: "var(--fs-small)", marginBottom: 8 }}>Builds of this proposal</h3>
             <ul className="mini" style={{ padding: 0 }}>
               {builds.map((j) => {
                 const s = jobState(j);
@@ -882,9 +882,9 @@ export function PlanPage() {
   const { id = "" } = useParams();
   const plan = useLoad(() => fetchPlan(id), [id]);
   const row = plan.data;
-  if (plan.error) return <LoadError what="this plan" error={plan.error} onRetry={plan.reload} />;
-  if (plan.loading && !row) return <Loading rows={4} label="Loading the plan" />;
-  if (!row) return <Empty title="This plan doesn't exist, or your role can't see it.">Plans are visible to owners and admins. <Link to="/decisions">Back to Decisions</Link></Empty>;
+  if (plan.error) return <LoadError what="this proposal" error={plan.error} onRetry={plan.reload} />;
+  if (plan.loading && !row) return <Loading rows={4} label="Loading the proposal" />;
+  if (!row) return <Empty title="This proposal doesn't exist, or your role can't see it.">Proposals are visible to owners and admins. <Link to="/decisions">Back to Decisions</Link></Empty>;
   // Cockpit v2: a proposal waiting for a decision is reviewed here; decided ones keep the pre-v2 page until the
   // details-list screen replaces it.
   if (row.status === "pending") return <ProposalReview row={row} onDone={plan.reload} />;
@@ -893,9 +893,9 @@ export function PlanPage() {
   return (
     <>
       <PageHead
-        kicker={`Plan, ${row.status}`}
+        kicker={`Proposal, ${row.status}`}
         title={planName(row)}
-        lead={`${LEAD_LABEL[p.intake?.leadType] ?? "Request"} for ${p.intake?.clientName ?? row.client_slug} (${row.entity_slug}). The planner wrote it from the client's request on ${dateTime(row.created_at)}${row.revision > 1 ? ", as a re-plan from your note" : ""}.`}
+        lead={`${LEAD_LABEL[p.intake?.leadType] ?? "Request"} for ${p.intake?.clientName ?? row.client_slug}. The factory wrote it from the client's request on ${dateTime(row.created_at)}${row.revision > 1 ? ", as a revision from your note" : ""}.`}
       />
       <div className="split">
         <PlanDetails row={row} />

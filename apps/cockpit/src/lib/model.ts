@@ -94,8 +94,8 @@ export interface RoundRow {
 /* ---------------- copy ---------------- */
 
 export const KIND_LABEL: Record<JobKind, string> = {
-  intake: "Read request and plan",
-  replan: "Re-plan from note",
+  intake: "Read the request and write a proposal",
+  replan: "Revise the proposal from a note",
   direction: "Prepare the direction again",
   build_plan: "Build and check",
   resume: "Resume build",
@@ -173,7 +173,7 @@ export function explainJobError(j: Pick<JobRow, "error" | "result" | "kind" | "g
   if (/credits exhausted|HTTP 402/i.test(e)) {
     return {
       headline: "the site builder is out of credits",
-      happened: "Agent 37, the service that writes the site, refused the job because the account has no AI credits left. Nothing was built and nothing was published.",
+      happened: "Agent 37, the service that writes the site, refused the work because the account has no AI credits left. Nothing was built and nothing was published.",
       todo: "Topping up Agent 37 is a money decision. Once credits are added, press Resume build: it restarts from the last saved step.",
     };
   }

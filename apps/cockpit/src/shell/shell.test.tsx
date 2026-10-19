@@ -41,7 +41,7 @@ describe("rail and wordmark", () => {
   it("is a typeset wordmark, with no WF glyph tile", async () => {
     start();
     const mark = await screen.findByRole("link", { name: "WFACT Cockpit, Home" }, T);
-    expect(mark).toHaveTextContent("WFACTCockpit");
+    expect(mark).toHaveTextContent("WFACT Cockpit");
     expect(document.querySelector(".mark-glyph")).toBeNull();
   });
 

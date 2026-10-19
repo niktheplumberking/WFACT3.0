@@ -31,7 +31,7 @@ import { ClientNeedsPanel } from "../components/Recovery";
 import { StoppedBuild } from "../components/StoppedBuild";
 import { SiteReview } from "../components/SiteReview";
 import { clientNameOf } from "../lib/clients";
-import { buildsOf } from "../lib/path";
+import { buildsOf, KIND_OF_SITE } from "../lib/path";
 import { PlaceholdersPanel } from "../components/Placeholders";
 import { LiveBuild } from "../components/LiveBuild";
 import { activityViewKey } from "../lib/prefs";
@@ -286,7 +286,7 @@ const NOUN: Record<JobRow["kind"], string> = {
   build_plan: "Build",
   resume: "Build",
   intake: "Planning",
-  replan: "Re-plan",
+  replan: "Revision",
   direction: "Direction",
   verify: "Page check",
   ask: "Question",
@@ -308,8 +308,8 @@ function title(j: JobRow, plan: PlanRow | undefined): string {
       return build ? `Building${name ? ` ${name}` : ""}` : j.kind === "ask" ? "Finding the answer" : "Working on it";
     case "succeeded":
       if (build) return `${name ?? "The"} build passed every check`;
-      if (j.kind === "intake" || j.kind === "replan") return "A plan is ready for your decision";
-      if (j.kind === "direction") return "The direction is ready; the plan is waiting for your decision";
+      if (j.kind === "intake" || j.kind === "replan") return "A proposal is ready for your decision";
+      if (j.kind === "direction") return "The direction is ready; the proposal is waiting for your decision";
       if (j.kind === "verify") return "The page passed its checks";
       return "Answered";
   }
@@ -397,13 +397,13 @@ function Results({ j }: { j: JobRow }) {
         </Plate>
       )}
       {r.briefBasis === "summary-only" && (
-        <Notice tone="caution">Built from a summary only: the client's original request was not on file for this plan, so the builder could not check the site against the client's own words.</Notice>
+        <Notice tone="caution">Built from a summary only: the client's original request was not on file for this proposal, so the builder could not check the site against the client's own words.</Notice>
       )}
       {(j.kind === "intake" || j.kind === "replan" || j.kind === "direction") && typeof r.planId === "string" && (
-        <Plate title="The plan">
+        <Plate title="The proposal">
           <div className="plate-body">
             <Link className="btn primary" to={`/decisions/plans/${r.planId}`}>
-              Open the plan to decide
+              Open the proposal to decide
             </Link>
           </div>
         </Plate>
@@ -513,9 +513,9 @@ export function RunPage() {
   const track = planEarly?.build_track ?? null;
   const live = !!j && isBuildJob && isActive(j);
   const stats = useLoad(() => (live ? loadBuildStats(f.jobs ?? [], f.plans ?? [], track, j?.id) : Promise.resolve(null)), [live, track, f.jobs?.length ?? 0]);
-  if (job.error) return <LoadError what="this run" error={job.error} onRetry={job.reload} />;
-  if (job.loading && !j) return <Loading rows={4} label="Loading the run" />;
-  if (!j) return <Empty title="This run doesn't exist, or your role can't see it.">Runs are visible to owners and admins. <Link to="/activity">Back to Activity</Link></Empty>;
+  if (job.error) return <LoadError what="this work" error={job.error} onRetry={job.reload} />;
+  if (job.loading && !j) return <Loading rows={4} label="Loading this work" />;
+  if (!j) return <Empty title="This work doesn't exist, or your role can't see it.">It is visible to owners and admins. <Link to="/activity">Back to Activity</Link></Empty>;
 
   const jobs = f.jobs ?? [];
   const planId = planIdOfJob(j, jobs);
@@ -600,7 +600,7 @@ export function RunPage() {
           </>
         }
         title={title(j, plan)}
-        lead={`${KIND_LABEL[j.kind]}${plan ? ` for ${planName(plan)}` : ""}${plan?.build_track ? `, Track ${plan.build_track}` : ""}.${j.kind === "ask" ? ` You asked: “${String(j.params?.question ?? "")}”` : ""}`}
+        lead={`${KIND_LABEL[j.kind]}${plan ? ` for ${planName(plan)}` : ""}${plan?.build_track ? `, ${(KIND_OF_SITE[plan.build_track] ?? "a kind of site").toLowerCase()}` : ""}.${j.kind === "ask" ? ` You asked: “${String(j.params?.question ?? "")}”` : ""}`}
         actions={
           <>
             {j.status === "queued" && (
@@ -628,7 +628,7 @@ export function RunPage() {
             )}
             {planId && (
               <Link className="btn ghost" to={`/decisions/plans/${planId}`}>
-                Open the plan
+                Open the proposal
               </Link>
             )}
           </>
@@ -645,7 +645,7 @@ export function RunPage() {
           {build && j.status === "succeeded" && <PlaceholdersPanel job={j} planId={planId} onStarted={(id) => nav(`/activity/${id}`)} />}
           {superseded && (
             <Notice tone="info">
-              A later build of the same plan passed every check ({dateTime(superseded.finished_at ?? superseded.created_at)}). You probably don't need to resume this one.{" "}
+              A later build of the same proposal passed every check ({dateTime(superseded.finished_at ?? superseded.created_at)}). You probably don't need to resume this one.{" "}
               <Link to={`/activity/${superseded.id}`}>Open the later build</Link>
             </Notice>
           )}
@@ -674,7 +674,7 @@ export function RunPage() {
                   finishedAt={j.finished_at}
                   tech={[{ k: "job", v: j.id }, ...(j.result?.workflowRunId ? [{ k: "run", v: String(j.result.workflowRunId) }] : []), ...(j.gh_run_url ? [{ k: "worker log", v: j.gh_run_url }] : [])]}
                 />
-                {run.data?.error && <p className="quiet fine" style={{ marginTop: 12 }}>The run's step-by-step record couldn't be read just now (“{run.data.error}”), so this shows what the job itself reported. Nothing changed.</p>}
+                {run.data?.error && <p className="quiet fine" style={{ marginTop: 12 }}>The build's step-by-step record couldn't be read just now (“{run.data.error}”), so this shows what the build itself reported. Nothing changed.</p>}
               </div>
             </Plate>
           ) : !timeline ? (

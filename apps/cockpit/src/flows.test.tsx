@@ -218,7 +218,7 @@ describe("walkthrough tasks, each ≤ 3 clicks from Home", () => {
   it("a failed run that a later build already fixed explains itself and offers no button to carry on", async () => {
     start(`/activity/${JOB_FAILED}`);
     expect(await screen.findByRole("heading", { level: 1, name: "Build stopped: the site builder is out of credits" }, T)).toBeInTheDocument();
-    expect(screen.getByText(/A later build of the same plan passed every check/)).toBeInTheDocument();
+    expect(screen.getByText(/A later build of the same proposal passed every check/)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /continue/i })).toBeNull();
   });
 

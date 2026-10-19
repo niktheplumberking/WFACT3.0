@@ -12,7 +12,7 @@ import { KIND_LABEL, jobState, planName, shortDate, type PlanRow, type ProjectRo
 import { canDecide, fetchProjects, useFactory, useLoad, useMe } from "../lib/state";
 import { Aspect, Empty, LoadError, Loading, RouteLine } from "../components/ui";
 import { PathSegments, StatusChip, type StatusTone } from "../components/kit";
-import { STEP_NAMES } from "../lib/path";
+import { KIND_OF_SITE, STEP_NAMES } from "../lib/path";
 import { CAPS, buildStopLine, capped, dayKey, fetchCostData, money, runSpend, sumDays } from "../lib/costs";
 import { estimate, formatMs, median } from "../lib/timeline";
 import type { JobRow } from "../jobsClient";
@@ -355,7 +355,7 @@ export function ClientLines({ projects, plans, error, reload }: { projects: Proj
           <div className="line-name">
             <Link to={`/projects/${p.id}`}>{p.name}</Link>
             <span className="quiet">
-              {p.clients?.entities?.name ?? "No entity"}. {p.status === "active" ? "Active" : p.status}.
+              {p.clients?.entities?.name ?? "No business"}. {p.status === "active" ? "Active" : p.status}.
             </span>
           </div>
           <RouteLine stage={p.stage} name={p.name} />
@@ -367,7 +367,7 @@ export function ClientLines({ projects, plans, error, reload }: { projects: Proj
             <Link to={`/decisions/plans/${p.id}`}>{p.plan.plan.intake?.clientName ?? planName(p)}</Link>
             <span className="quiet">
               {p.entity_slug}.{" "}
-              {p.status === "pending" ? "Plan waits for you." : p.status === "approved" ? `Plan approved${p.build_track ? `, Track ${p.build_track}` : ""}.` : "Plan rejected."} No project yet.
+              {p.status === "pending" ? "The proposal waits for you." : p.status === "approved" ? `Proposal approved${p.build_track ? `, ${(KIND_OF_SITE[p.build_track] ?? "a kind of site").toLowerCase()}` : ""}.` : "Proposal rejected."} No project yet.
             </span>
           </div>
           <RouteLine stage="1_intake" name={planName(p)} waitingAt={p.status === "pending" ? "1_intake" : undefined} />

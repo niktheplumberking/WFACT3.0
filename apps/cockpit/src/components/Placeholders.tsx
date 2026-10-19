@@ -69,7 +69,7 @@ export function PlaceholdersPanel({ job, planId, onStarted }: { job: JobRow; pla
     setBusy("build");
     const { jobId, error } = await requestJob("build_plan", { planId });
     setBusy(null);
-    if (!jobId) return setErr(/already in progress/i.test(error ?? "") ? "A build of this plan is already running. Your pictures are saved." : `Your pictures are saved, but the build didn't start: ${error}.`);
+    if (!jobId) return setErr(/already in progress/i.test(error ?? "") ? "A build of this proposal is already running. Your pictures are saved." : `Your pictures are saved, but the build didn't start: ${error}.`);
     toast("Building again with the client's pictures.");
     onStarted(jobId);
   }

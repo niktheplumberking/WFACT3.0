@@ -252,7 +252,7 @@ export function RecoveryPanel({
 
   async function carryOn(o: ContinueOption) {
     const req = o.id === "rerun" ? carryOnRequest(job, { carryOn: "rerun", headline: d.headline }, planId) : carryOnRequest(job, { carryOn: "continue", headline: d.headline }, planId, o.fromStep);
-    if (!req) return setErr("There's nothing this button can start for this run. Start a new request from the plan instead. Nothing changed.");
+    if (!req) return setErr("There's nothing this button can start for this build. Start a new request from the proposal instead. Nothing changed.");
     setBusy(true);
     setErr(null);
     const { jobId, error } = await requestJob(req.kind, req.params);
@@ -341,7 +341,7 @@ export function RecoveryPanel({
       )}
 
       {d.cause === "info" && !planId && (
-        <Notice tone="caution">The factory needs details (or the logo), but this run isn't linked to a plan, so they can't be saved here. Open the plan, add them under "Details you can add before building", then start the build from there.</Notice>
+        <Notice tone="caution">The factory needs details (or the logo), but this build isn't linked to a proposal, so they can't be saved here. Open the proposal, add them under "Details you can add before building", then start the build from there.</Notice>
       )}
 
       {err && (
@@ -373,7 +373,7 @@ export function RecoveryPanel({
               Copy a report for Huraira
             </button>
           )}
-          {buttons.length === 0 && !askFirst && d.cause !== "info" && <span className="quiet fine">There's nothing to press here: start a new request from the plan.</span>}
+          {buttons.length === 0 && !askFirst && d.cause !== "info" && <span className="quiet fine">There's nothing to press here: start a new request from the proposal.</span>}
         </div>
       )}
       {showReport && (
@@ -446,7 +446,7 @@ export function ClientNeedsPanel({ job, planId, onStarted }: { job: JobRow; plan
               onSaved={async () => {
                 setErr(null);
                 const { jobId, error } = await requestJob("build_plan", { planId });
-                if (!jobId) return setErr(/already in progress/i.test(error ?? "") ? "A build of this plan is already running. Your details are saved." : `Your details are saved, but the build didn't start: ${error}.`);
+                if (!jobId) return setErr(/already in progress/i.test(error ?? "") ? "A build of this proposal is already running. Your details are saved." : `Your details are saved, but the build didn't start: ${error}.`);
                 toast("Building again with your details.");
                 onStarted(jobId);
               }}
