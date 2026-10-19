@@ -326,6 +326,26 @@ jobs:
       - name: Unit tests
         run: deno test --no-prompt --allow-env dispatch.test.ts
 
+  # Step 21 H: every migration replayed on a THROWAWAY local Supabase database (Supabase CLI in Docker, database and auth
+  # only), then every machine-checked RLS attack script run against it. No secret and nothing live: the runner refuses
+  # any database that is not on 127.0.0.1. Checks that need live-only rows are printed as NOT COVERED, never as passed.
+  rls-attack:
+    name: RLS attack scripts — throwaway local database
+    runs-on: ubuntu-latest
+    needs: guardrails
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+      - name: Start a local database (scratch folder, not the repo)
+        run: |
+          mkdir -p "$RUNNER_TEMP/sb" && cd "$RUNNER_TEMP/sb"
+          supabase init --force
+          supabase start -x realtime,storage-api,imgproxy,kong,mailpit,postgrest,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Apply migrations and run the attack scripts
+        run: scripts/rls-attack-local.sh postgresql://postgres:postgres@127.0.0.1:54322/postgres
+
   # Step 21 H: generated media (Step 4B M5). Unit tests only; the live Higgsfield call needs HF_CREDENTIALS and stays manual.
   media:
     name: Media (Higgsfield client) — typecheck + unit tests
@@ -448,7 +468,7 @@ jobs:
     name: Deploy Cockpit to Vercel (trunk only)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [guardrails, audit, hermes, agent-runtime, documentation, frontend-loop, track-b-build, verification, rendered-qa, workflow, planning, jobs-runner, submit-lead, dispatch-job, media, build]
+    needs: [guardrails, audit, hermes, agent-runtime, documentation, frontend-loop, track-b-build, verification, rendered-qa, workflow, planning, jobs-runner, submit-lead, dispatch-job, media, rls-attack, build]
     concurrency:
       group: deploy-cockpit
       cancel-in-progress: false
