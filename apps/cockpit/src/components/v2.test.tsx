@@ -243,6 +243,62 @@ describe("ConfirmDialog (money confirm)", () => {
     await userEvent.click(within(dialog).getByRole("button", { name: "Not now" }));
     expect(opener).toHaveFocus();
   });
+  it("when the decision removes the opener, focus goes to the page, not <body>", async () => {
+    function Harness() {
+      const [open, setOpen] = useState(false);
+      const [done, setDone] = useState(false);
+      return (
+        <main id="main" tabIndex={-1}>
+          {done ? <p>Approved.</p> : <button onClick={() => setOpen(true)}>Approve</button>}
+          <ConfirmDialog
+            open={open}
+            title="Approve?"
+            body="Nothing is built until you start a build."
+            confirmLabel="Approve"
+            onConfirm={() => {
+              setOpen(false);
+              setTimeout(() => setDone(true), 10);
+            }}
+            onCancel={() => setOpen(false)}
+          />
+        </main>
+      );
+    }
+    render(<Harness />);
+    await userEvent.click(screen.getByRole("button", { name: "Approve" }));
+    await userEvent.click(within(screen.getByRole("alertdialog", { name: "Approve?" })).getByRole("button", { name: "Approve" }));
+    await screen.findByText("Approved.");
+    await new Promise((r) => setTimeout(r, 0));
+    expect(document.getElementById("main")).toHaveFocus();
+  });
+  it("when the decision disables the opener as the dialog closes, focus goes to the page, not <body>", async () => {
+    function Harness() {
+      const [open, setOpen] = useState(false);
+      const [busy, setBusy] = useState(false);
+      return (
+        <main id="main" tabIndex={-1}>
+          <button disabled={busy} onClick={() => setOpen(true)}>
+            Approve
+          </button>
+          <ConfirmDialog
+            open={open}
+            title="Approve?"
+            body="Nothing is built until you start a build."
+            confirmLabel="Approve"
+            onConfirm={() => {
+              setOpen(false);
+              setBusy(true);
+            }}
+            onCancel={() => setOpen(false)}
+          />
+        </main>
+      );
+    }
+    render(<Harness />);
+    await userEvent.click(screen.getByRole("button", { name: "Approve" }));
+    await userEvent.click(within(screen.getByRole("alertdialog", { name: "Approve?" })).getByRole("button", { name: "Approve" }));
+    expect(document.getElementById("main")).toHaveFocus();
+  });
   it("the per-build stop comes from spend-caps.json, never a hard-coded figure", () => {
     expect(buildStopLine({ perBuildUsd: 5 })).toBe("Each build stops itself at $5.00.");
     expect(buildStopLine({ perBuildUsd: 2 })).toBe("Each build stops itself at $2.00.");

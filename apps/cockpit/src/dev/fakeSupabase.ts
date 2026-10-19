@@ -28,6 +28,11 @@ if (new URLSearchParams(location.search).get("fake-live") === "1") {
   const at = new Date(Date.now() - 4 * 60_000).toISOString();
   rows.jobs = rows.jobs.map((j) => (j.id === "44444444-4444-4444-8444-444444444444" ? { ...j, status: "running", created_at: at, started_at: at, finished_at: null, result: null } : j));
 }
+// ?fake-logo=1 puts a SYNTHETIC logo on file for the approved proposal, so its build can be started (keyboard run).
+if (new URLSearchParams(location.search).get("fake-logo") === "1") {
+  const logo = { mime: "image/svg+xml", sha256: "0".repeat(64), bytes: 120, width: 120, height: 40, path: "uploads/synthetic/logo.svg", name: "synthetic-logo.svg" };
+  rows.plan_inputs = [...(rows.plan_inputs ?? []), { id: "fake-logo", created_at: new Date().toISOString(), plan_id: "22222222-2222-4222-8222-222222222222", kind: "fact", key: "asset.logo", label: "The logo", value: JSON.stringify(logo), waived: false }];
+}
 // ?fake-ph=1 gives the passing build a placeholder picture and two check results (the finished site review).
 if (new URLSearchParams(location.search).get("fake-ph") === "1") {
   rows.jobs = rows.jobs.map((j) =>
@@ -106,4 +111,9 @@ const auth = {
   onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
 };
 
-export const supabase = { ...fake.client, auth } as unknown as typeof import("../supabaseClient").supabase;
+// Uploads (logo, pictures) are accepted and kept nowhere: the dev fake only proves the screens and the keyboard path.
+const storage = {
+  from: (bucket: string) => ({ ...fake.client.storage.from(), bucket, upload: async (path: string) => ({ data: { path }, error: null }) }),
+};
+
+export const supabase = { ...fake.client, auth, storage } as unknown as typeof import("../supabaseClient").supabase;

@@ -92,6 +92,17 @@ export async function inspectLogoFile(file: File): Promise<{ ok: true; record: O
   return { ok: true, record: { mime: type, sha256: await sha256Hex(buf), bytes: file.size, width: size.width, height: size.height } };
 }
 
+/** Storage upload that never throws: a failed request (offline, blocked) comes back as an error with its cause, so the
+ *  screen says what happened instead of failing silently. */
+async function put(path: string, file: File, contentType: string): Promise<{ error: { message: string } | null }> {
+  try {
+    const { error } = await supabase.storage.from("client-assets").upload(path, file, { contentType, upsert: false });
+    return { error };
+  } catch (e) {
+    return { error: { message: e instanceof Error ? e.message : String(e) } };
+  }
+}
+
 /** Uploads a checked logo to the private bucket and returns its record, or a plain-words error. */
 export async function uploadLogo(file: File): Promise<{ ok: true; record: LogoRecord } | { ok: false; reason: string }> {
   const checked = await inspectLogoFile(file);
@@ -100,7 +111,7 @@ export async function uploadLogo(file: File): Promise<{ ok: true; record: LogoRe
   const userId = data.user?.id;
   if (!userId) return { ok: false, reason: "You're signed out. Sign in again, then add the logo." };
   const path = `uploads/${userId}/${checked.record.sha256}.${EXT[checked.record.mime]}`;
-  const { error } = await supabase.storage.from("client-assets").upload(path, file, { contentType: checked.record.mime, upsert: false });
+  const { error } = await put(path, file, checked.record.mime);
   // The same file uploaded before has the same name: that is fine, it is the same logo.
   if (error && !/already exists|duplicate/i.test(error.message)) {
     if (/bucket not found/i.test(error.message)) return { ok: false, reason: "Logo uploads aren't switched on yet: a database update is still waiting to be applied. Ask Huraira to apply it." };
@@ -183,7 +194,7 @@ export async function uploadImage(file: File): Promise<{ ok: true; record: Image
   const userId = data.user?.id;
   if (!userId) return { ok: false, reason: "You're signed out. Sign in again, then add the picture." };
   const path = `uploads/${userId}/${checked.record.sha256}.${IMAGE_EXT[checked.record.mime]}`;
-  const { error } = await supabase.storage.from("client-assets").upload(path, file, { contentType: checked.record.mime, upsert: false });
+  const { error } = await put(path, file, checked.record.mime);
   if (error && !/already exists|duplicate/i.test(error.message)) return { ok: false, reason: `The picture didn't upload: ${error.message}. Nothing was saved; try again.` };
   return { ok: true, record: { ...checked.record, path } };
 }

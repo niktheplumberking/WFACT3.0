@@ -153,6 +153,41 @@ export function Shell({ children }: { children: ReactNode }) {
     window.scrollTo(0, 0);
   }, [pathname, route.title]);
 
+  // Focus is never left on <body>. A control disabled while it saves loses focus (the browser moves it off a moment
+  // later); a control removed when the screen re-renders loses it too (Upload, Answer, Approve). Focus goes back to the
+  // control once it can take it again, or to the content if it is gone. A pointer press is a deliberate move: forget it.
+  useEffect(() => {
+    let last: HTMLElement | null = null;
+    const check = () => {
+      const a = document.activeElement;
+      if ((a && a !== document.body) || !last || last === mainRef.current) return;
+      if (!last.isConnected || last.closest("dialog:not([open])")) {
+        last = null;
+        mainRef.current?.focus({ preventScroll: true });
+      } else if (!(last as HTMLButtonElement).disabled) {
+        last.focus({ preventScroll: true });
+      }
+    };
+    const onIn = (e: FocusEvent) => {
+      last = e.target as HTMLElement;
+    };
+    const onDown = () => {
+      last = null;
+    };
+    const mo = new MutationObserver(() => {
+      check();
+      requestAnimationFrame(check);
+    });
+    document.addEventListener("focusin", onIn);
+    document.addEventListener("pointerdown", onDown, true);
+    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["disabled", "open"] });
+    return () => {
+      document.removeEventListener("focusin", onIn);
+      document.removeEventListener("pointerdown", onDown, true);
+      mo.disconnect();
+    };
+  }, []);
+
   const go = (to: string) => navigate(to);
 
   // Global keys. Single letters never fire while typing; ⌘K / Ctrl+K always does.

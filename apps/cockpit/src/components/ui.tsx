@@ -176,7 +176,26 @@ export function ConfirmDialog({
     } else if (!open && d.open) {
       if (typeof d.close === "function") d.close();
       else d.removeAttribute("open");
-      (opener.current as HTMLElement | null)?.focus?.();
+      // Focus goes back to the opener. The decision often disables it while it saves (in the same render that closes this
+      // dialog), or re-renders the page so it goes (Approve gives way to the approved view); then focus moves to the page
+      // itself, never left on <body> or on this closed dialog.
+      const back = opener.current as HTMLElement | null;
+      const usable = (e: HTMLElement | null) => !!e && e.isConnected && !(e as HTMLButtonElement).disabled;
+      if (usable(back)) back!.focus();
+      else document.getElementById("main")?.focus();
+      if (back && typeof MutationObserver === "function") {
+        const mo = new MutationObserver(() => {
+          const a = document.activeElement;
+          if (a && a !== document.body && !d.contains(a)) {
+            if (a !== back) mo.disconnect();
+            return;
+          }
+          mo.disconnect();
+          document.getElementById("main")?.focus();
+        });
+        mo.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["disabled"] });
+        setTimeout(() => mo.disconnect(), 15_000);
+      }
     }
   }, [open, reasonLabel]);
   const tid = `${rid}-t`;

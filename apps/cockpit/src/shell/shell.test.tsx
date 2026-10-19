@@ -140,3 +140,17 @@ describe("notifications", () => {
     expect((await screen.findAllByRole("link", { name: "Notifications" }, T)).length).toBeGreaterThan(0);
   });
 });
+
+describe("focus is never left on the page body", () => {
+  it("a focused control that is removed hands focus to the content", async () => {
+    start("/notifications");
+    const main = await screen.findByRole("main", {}, T);
+    const b = document.createElement("button");
+    b.textContent = "Synthetic control";
+    main.appendChild(b);
+    b.focus();
+    expect(b).toHaveFocus();
+    b.remove();
+    await vi.waitFor(() => expect(main).toHaveFocus());
+  });
+});

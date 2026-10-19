@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("../supabaseClient", () => ({ supabase: {} }));
-import { checkSiteUrl, inspectLogoFile, isTestAddress } from "./brandUpload";
+import { supabase } from "../supabaseClient";
+import { checkSiteUrl, inspectLogoFile, isTestAddress, uploadLogo } from "./brandUpload";
 
 // SYNTHETIC Lanternworks Studio logo (copy of clients/lanternworks-studio/logo.svg, which the build tests use).
 const LOGO = new TextEncoder().encode("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 240 48\" role=\"img\" aria-label=\"Lanternworks\"><title>Lanternworks (synthetic logo)</title><g fill=\"none\" stroke=\"#14213D\" stroke-width=\"2.5\" stroke-linejoin=\"round\"><path d=\"M14 6h12M20 6v4\"/><path d=\"M11 14h18l-2 24H13z\"/><path d=\"M10 42h20\"/></g><path d=\"M20 20c3 4 3 8 0 12c-3-4-3-8 0-12z\" fill=\"#F26B38\"/><text x=\"42\" y=\"31\" font-family=\"Georgia, serif\" font-size=\"20\" fill=\"#14213D\">Lanternworks</text></svg>");
@@ -54,5 +55,16 @@ describe("the live address", () => {
     expect(isTestAddress("https://lanternworks.example")).toBe(true);
     expect(isTestAddress("https://x.vercel.app")).toBe(true);
     expect(isTestAddress("https://bennettandco.com")).toBe(false);
+  });
+});
+
+describe("an upload that fails says why", () => {
+  it("a thrown upload (offline) comes back as a plain reason, never an unhandled error", async () => {
+    Object.assign(supabase, {
+      auth: { getUser: async () => ({ data: { user: { id: "u-synthetic" } } }) },
+      storage: { from: () => ({ upload: async () => { throw new Error("Failed to fetch"); } }) },
+    });
+    const r = await uploadLogo(file(LOGO, "logo.svg", "image/svg+xml"));
+    expect(r).toEqual({ ok: false, reason: "The logo didn't upload: Failed to fetch. Nothing was saved; try again." });
   });
 });
