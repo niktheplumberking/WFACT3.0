@@ -1566,6 +1566,8 @@ come first). Still open: the owner answers Harbor Street's two conflicts and pre
 branch `claude/objective-engelbart-d65df7`) and `scripts/rls_attack_test_placeholders.sql` wait on Huraira; Nick answers the caps,
 roles, site-approval, notification and app-icon questions.
 
+Agent prompt for rebuilding the pre-v2 screens (phases R1–R5, one per GO; R3 Decisions room and R4 fix rounds start with a question, since the design has no frame for them) — written 2026-10-19: `docs/design/cockpit-v2/docs/COCKPIT-V2-PRE-V2-REBUILD-PROMPT.md`.
+
 Full agent prompt for phases 18–19 and Package 5 — written 2026-10-19: `docs/design/cockpit-v2/docs/COCKPIT-V2-PHASES-18-ON-PROMPT.md` (state after phase 17 with SHAs and CI ids, the measured facts phases 18–19 depend on, verification and push routine, and the Package 5 stop questions). Paste that file's block into a new session; the short block below stays as the summary.
 
 Continuation prompt — updated 2026-10-19, after phase 19 (Step 28 Package 4, use this instead of starting the Cockpit v2 rebuild again):
