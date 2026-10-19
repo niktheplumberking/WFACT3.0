@@ -124,7 +124,7 @@ audit logging specifically, because it's the cheapest win and everything downstr
 2. Re-point `frontend-loop` and `verification` to be two `Agent` implementations running on this
    runtime, not two standalone scripts. Behavior should not change — this is a refactor with tests
    proving it, not a rewrite.
-3. Add a minimal agent registry: `packages/agent-runtime/registry.ts`, a typed list of
+3. Add a minimal agent registry: `packages/agent-runtime/src/registry.ts`, a typed list of
    `{ role, skillset, permissionScope }` — start with exactly the 2 agents that exist
    (`front-end-builder`, `qa-evaluator`). This is Blueprint §14's agent registry, seeded honestly small.
 

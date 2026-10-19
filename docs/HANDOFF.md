@@ -97,7 +97,7 @@ pilot client (synthetic); the governance table; the entity list.
 6. Reference only: Playbook (pillars, 2.0 carry-over), SOPs/Factory Book PDFs.
 7. **Not governing**: `docs/WFACT-3.0-Agency-Scope-Addendum-DRAFT.md` (proposal), `docs/step-4c/PHASE-1-PROPOSAL.md` (history), everything in `docs/archive/` (see `docs/archive/MANIFEST.md`).
 
-Known conflicts and how they resolve: PROGRESS.md "Status summary" said 4D was unapplied/unpushed → corrected this pass (header, CI and the Plan show applied/deployed). `README.md` described the finished sprint → rewritten. `.env.example` listed unused vars and missed used ones → rewritten. Continuation plan names `packages/agent-runtime/registry.ts`; the file is `src/registry.ts`.
+Known conflicts and how they resolve: PROGRESS.md "Status summary" said 4D was unapplied/unpushed → corrected this pass (header, CI and the Plan show applied/deployed). `README.md` described the finished sprint → rewritten. `.env.example` listed unused vars and missed used ones → rewritten. Continuation plan named `packages/agent-runtime/registry.ts`; corrected to `src/registry.ts` (Step 21 L).
 
 ---
 
