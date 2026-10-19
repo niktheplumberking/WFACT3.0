@@ -6,7 +6,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import {
-  Archive, ArrowCounterClockwise, ArrowSquareOut, ArrowsClockwise, BookmarkSimple, ChatCircleText, CheckCircle, FileText, Hammer, PencilSimple, Play, Question,
+  Archive, ArrowCounterClockwise, ArrowsClockwise, BookmarkSimple, ChatCircleText, CheckCircle, FileText, Hammer, PencilSimple, Play, Question,
   SealCheck, StopCircle, UserMinus, UserPlus, XCircle, type Icon,
 } from "@phosphor-icons/react";
 import { supabase } from "../supabaseClient";
@@ -14,25 +14,26 @@ import { archiveJob, cancelJob, dispatchJob, isActive, isFinished, isStaleQueued
 import { latestBuildByPlan, planIdOfJob } from "../lib/attention";
 import { asStopped, diagnoseJob } from "../lib/recovery";
 import { enrichWithRows, loadRun } from "../lib/runInfo";
-import { deriveTimeline, type Timeline } from "../lib/timeline";
+import { checkLabel, deriveTimeline, issueLabel, type Timeline } from "../lib/timeline";
 import { loadBuildStats } from "../lib/buildStats";
 import {
-  KIND_LABEL, clock, dateTime, duration, explainJobError, jobState, planName, shortId,
+  KIND_LABEL, clock, dateTime, duration, explainJobError, planName,
   type PlanRow, type RoundRow,
 } from "../lib/model";
 import { canDecide, fetchJob, useFactory, useLoad, useMe, useToast } from "../lib/state";
 import { ALL_ACTIVITY, FACTORY, actorName, byDay, factoryLines, fetchRoundEvents, matches, teamLines, type ActivityFilter, type ActivityLine } from "../lib/activity";
 import { fetchPeople, fetchPersonEvents } from "../lib/phrases";
-import { Button, EmptyState } from "../components/kit";
+import { Button, ButtonLink, EmptyState, StatusChip, TechDetails, type StatusTone } from "../components/kit";
+import { StepRow } from "../components/flow";
 import { fetchRunSpend, money, total } from "../lib/costs";
 import { stageLabel } from "../stages";
-import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
+import { ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, PagePreview, Plate } from "../components/ui";
 import { ClientNeedsPanel } from "../components/Recovery";
 import { StoppedBuild } from "../components/StoppedBuild";
-import { SiteReview } from "../components/SiteReview";
+import { PlaceholderPicturesSection, RebuildWithPicturesDialog, SiteReview, usePlaceholderPictures } from "../components/SiteReview";
 import { clientNameOf } from "../lib/clients";
 import { buildsOf, KIND_OF_SITE } from "../lib/path";
-import { PlaceholdersPanel } from "../components/Placeholders";
+import { placeholdersOf } from "../components/Placeholders";
 import { LiveBuild } from "../components/LiveBuild";
 import { activityViewKey } from "../lib/prefs";
 
@@ -315,63 +316,67 @@ function title(j: JobRow, plan: PlanRow | undefined): string {
   }
 }
 
-function Steps({ j }: { j: JobRow }) {
+/** The chip on a work page: glyph plus word, in the v2 states. */
+function chipOf(j: JobRow): { tone: StatusTone; word: string } {
+  const build = j.kind === "build_plan" || j.kind === "resume";
+  if (isStaleRunning(j)) return { tone: "stop", word: "Stopped without reporting" };
+  switch (j.status) {
+    case "queued":
+      return isStaleQueued(j) ? { tone: "stop", word: "Never started" } : { tone: "wait", word: "Waiting to start" };
+    case "dispatched":
+      return { tone: "run", word: "Starting" };
+    case "running":
+      return { tone: "run", word: "Running" };
+    case "cancelled":
+      return { tone: "skip", word: "Cancelled" };
+    case "failed":
+      return { tone: "stop", word: build ? "Build stopped" : "Stopped" };
+    case "succeeded":
+      return { tone: "done", word: build || j.kind === "verify" ? "Every check passed" : "Done" };
+  }
+}
+
+interface SimpleStep {
+  title: string;
+  tone: StatusTone;
+  word?: string;
+  time?: string;
+  sentence?: string;
+}
+
+/** Work that is not a started build: only what the record holds (when it was asked for, picked up, finished). A step
+ *  with no time on the record says "Not recorded"; nothing is made up. */
+function simpleSteps(j: JobRow): SimpleStep[] {
   const end = j.finished_at;
-  return (
-    <ol className="steps">
-      <li className="ok">
-        <b>Requested</b>
-        <span className="fig quiet">{clock(j.created_at)}</span>
-        <span className="muted">{dateTime(j.created_at)}.</span>
-      </li>
-      {j.status === "queued" ? (
-        <li className={isStaleQueued(j) ? "bad" : "now"}>
-          <b>{isStaleQueued(j) ? "Never reached GitHub" : "Waiting for the worker"}</b>
-          <span className="muted">{isStaleQueued(j) ? "The hand-off to the factory worker never landed. Start it again or close it." : "The worker usually picks it up within seconds."}</span>
-        </li>
-      ) : j.status === "cancelled" ? (
-        <li className="notrun">
-          <b>Cancelled</b>
-          {end && <span className="fig quiet">{clock(end)}</span>}
-          <span className="muted">{j.error}</span>
-        </li>
-      ) : (
-        <>
-          <li className={j.started_at ? "ok" : "now"}>
-            <b>{j.started_at ? "Started on GitHub" : "Starting"}</b>
-            {j.started_at && <span className="fig quiet">{clock(j.started_at)}</span>}
-            <span className="muted">Picked up by the factory worker.</span>
-          </li>
-          {(j.status === "running" || j.status === "dispatched") && isStaleRunning(j) && (
-            <li className="bad">
-              <b>Stopped without reporting</b>
-              <span className="muted">It has been going far longer than a build takes, so the worker most likely hit GitHub's time limit or crashed. What it saved is kept.</span>
-            </li>
-          )}
-          {(j.status === "running" || j.status === "dispatched") && !isStaleRunning(j) && (
-            <li className="now">
-              <b>Working</b>
-              <span className="muted">This page refreshes every few seconds.</span>
-            </li>
-          )}
-          {j.status === "succeeded" && end && (
-            <li className="ok">
-              <b>Finished</b>
-              <span className="fig quiet">{clock(end)}</span>
-              <span className="muted">Took {duration(j.started_at ?? j.created_at, end)}.</span>
-            </li>
-          )}
-          {j.status === "failed" && (
-            <li className="bad">
-              <b>Stopped and handed to a person</b>
-              {end && <span className="fig quiet">{clock(end)}</span>}
-              <span className="muted">Retries are capped; after that the factory stops and asks, by design.</span>
-            </li>
-          )}
-        </>
-      )}
-    </ol>
+  const steps: SimpleStep[] = [{ title: "Requested", tone: "done", time: clock(j.created_at), sentence: `${dateTime(j.created_at)}.` }];
+  if (j.status === "queued") {
+    steps.push(
+      isStaleQueued(j)
+        ? { title: "Never reached the factory worker", tone: "stop", word: "Never started", sentence: "The hand-off to the factory worker never landed, so nothing ran and nothing was spent. Start it again or close it." }
+        : { title: "Waiting for the factory worker", tone: "wait", sentence: "The worker usually picks it up within seconds." },
+    );
+    return steps;
+  }
+  if (j.status === "cancelled") {
+    steps.push({ title: "Cancelled", tone: "skip", word: "Cancelled", time: end ? clock(end) : undefined, sentence: j.error ? `Reason given: ${j.error}` : "No reason was recorded." });
+    return steps;
+  }
+  const active = j.status === "running" || j.status === "dispatched";
+  steps.push(
+    j.started_at
+      ? { title: "Picked up by the factory worker", tone: "done", time: clock(j.started_at) }
+      : active
+        ? { title: "Starting", tone: "run", sentence: "The factory worker is picking it up." }
+        : { title: "Picked up by the factory worker", tone: "skip", word: "Not recorded", sentence: "This record has no start time." },
   );
+  if (active && isStaleRunning(j))
+    steps.push({ title: "Stopped without reporting", tone: "stop", sentence: "It has been going far longer than this work takes, so the worker most likely ran out of time or crashed. What it saved is kept." });
+  else if (active) steps.push({ title: "Working", tone: "run", sentence: "This page refreshes every few seconds." });
+  else if (j.status === "succeeded")
+    steps.push({ title: "Finished", tone: "done", time: end ? clock(end) : undefined, sentence: end ? `Took ${duration(j.started_at ?? j.created_at, end) || "under a minute"}.` : "No finish time was recorded." });
+  else if (j.status === "failed")
+    steps.push({ title: "Stopped and handed to a person", tone: "stop", time: end ? clock(end) : undefined, sentence: "Retries are capped; after that the factory stops and asks, by design." });
+  return steps;
 }
 
 interface Round {
@@ -380,7 +385,8 @@ interface Round {
   issues: string[];
 }
 
-function Results({ j }: { j: JobRow }) {
+/** What the work produced, in plain words: the answer, the saved site, each check, and this build's rounds of fixes. */
+function Results({ j, showRounds }: { j: JobRow; showRounds: boolean }) {
   const r = j.result ?? {};
   const rounds = (Array.isArray(r.builderRounds) ? r.builderRounds : []) as Round[];
   const qa = (Array.isArray(r.qaIssues) ? r.qaIssues : []) as string[];
@@ -389,81 +395,99 @@ function Results({ j }: { j: JobRow }) {
   return (
     <>
       {j.kind === "ask" && typeof r.answer === "string" && (
-        <Plate title="Answer">
-          <div className="plate-body stack-tight">
-            <p className="lede">{r.answer}</p>
-            {r.needsHuman === true && <Notice tone="caution">The factory wasn't sure and flagged this for a person.</Notice>}
-          </div>
-        </Plate>
+        <section aria-labelledby="run-answer" className="run-sec">
+          <h2 id="run-answer" className="t-section">
+            Answer
+          </h2>
+          <p className="t-lead">{r.answer}</p>
+          {r.needsHuman === true && <Notice tone="caution">The factory wasn't sure and flagged this for a person.</Notice>}
+        </section>
       )}
       {r.briefBasis === "summary-only" && (
         <Notice tone="caution">Built from a summary only: the client's original request was not on file for this proposal, so the builder could not check the site against the client's own words.</Notice>
       )}
-      {(j.kind === "intake" || j.kind === "replan" || j.kind === "direction") && typeof r.planId === "string" && (
-        <Plate title="The proposal">
-          <div className="plate-body">
-            <Link className="btn primary" to={`/decisions/plans/${r.planId}`}>
-              Open the proposal to decide
-            </Link>
-          </div>
-        </Plate>
-      )}
       {checkpoint?.path && (
-        <Plate title="What was built" note="Shown safely: the page can't read your session.">
-          <div className="plate-body">
-            <PagePreview path={checkpoint.path} />
-          </div>
-        </Plate>
+        <section aria-labelledby="run-built" className="run-sec">
+          <h2 id="run-built" className="t-section">
+            What was built
+          </h2>
+          <PagePreview path={checkpoint.path} />
+        </section>
       )}
-      {qa.length > 0 && (
-        <Plate title="Checks that failed">
-          <ul className="plain plate-body" style={{ paddingLeft: 40 }}>
-            {qa.map((q, i) => (
-              <li key={i}>{q}</li>
-            ))}
-          </ul>
-        </Plate>
+      {(checks.length > 0 || qa.length > 0) && (
+        <section aria-labelledby="run-checks" className="run-sec">
+          <h2 id="run-checks" className="t-section">
+            Checks
+          </h2>
+          {checks.length > 0 && (
+            <>
+              <p className="muted">
+                {checks.filter((c) => c.passed).length} of {checks.length} passed.
+              </p>
+              <ul className="review-checks">
+                {checks.map((c) => (
+                  <li key={c.checkId}>
+                    <StatusChip tone={c.passed ? "done" : "stop"}>{c.passed ? "Passed" : "Failed"}</StatusChip>
+                    {checkLabel(c.checkId)}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {qa.length > 0 && (
+            <>
+              <p className="muted">What the checks found:</p>
+              <ul className="step-extra">
+                {qa.map((q, i) => (
+                  <li key={i}>{issueLabel(q)}</li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
       )}
-      {checks.length > 0 && (
-        <Plate title="Checks" note={`${checks.filter((c) => c.passed).length} of ${checks.length} passed`}>
-          <ul className="rows">
-            {checks.map((c) => (
-              <li key={c.checkId}>
-                <Aspect tone={c.passed ? "clear" : "stop"}>{c.passed ? "Passed" : "Failed"}</Aspect>
-                <div>
-                  <p className="what fig">{c.checkId}</p>
-                  {c.details && <p className="why">{c.details}</p>}
-                </div>
-                <span />
-              </li>
-            ))}
-          </ul>
-        </Plate>
-      )}
-      {rounds.length > 0 && (
-        <Plate title="Fix rounds during this build" note={`${rounds.length} round${rounds.length === 1 ? "" : "s"}: the reviewer sent work back, the builder fixed it`}>
-          <div className="plate-body rounds">
-            {rounds.map((x) => (
-              <div key={x.round}>
-                <h3>
-                  Round {x.round}: {x.verdict === "approved" ? "approved" : "changes requested"}
-                </h3>
-                {x.issues.length > 0 ? (
-                  <ul className="plain" style={{ paddingLeft: 20 }}>
-                    {x.issues.map((i, n) => (
-                      <li key={n} className="muted">
-                        {i}
-                      </li>
+      {showRounds && rounds.length > 0 && (
+        <section aria-labelledby="run-rounds" className="run-sec">
+          <h2 id="run-rounds" className="t-section">
+            Rounds of fixes
+          </h2>
+          <p className="muted">
+            {rounds.length} {rounds.length === 1 ? "round" : "rounds"}: the reviewer sent work back, the builder fixed it.
+          </p>
+          <ol className="steps-v2" aria-label="Rounds of fixes">
+            {rounds.map((x, i) => (
+              <StepRow
+                key={x.round}
+                n={i + 1}
+                title={`Round ${x.round}`}
+                tone={x.verdict === "approved" ? "done" : "need"}
+                word={x.verdict === "approved" ? "Approved" : "Changes asked for"}
+                sentence={x.issues.length ? undefined : "No problems were noted."}
+              >
+                {x.issues.length > 0 && (
+                  <ul className="step-extra">
+                    {x.issues.map((it, n) => (
+                      <li key={n}>{issueLabel(it)}</li>
                     ))}
                   </ul>
-                ) : (
-                  <p className="muted">No issues.</p>
                 )}
-              </div>
+              </StepRow>
             ))}
-          </div>
-        </Plate>
+          </ol>
+        </section>
       )}
+    </>
+  );
+}
+
+/** The placeholder pictures of a passing build that is not the one under review (older, archived): the same v2 rows
+ *  and the same plan_inputs writes as the finished site review. */
+function BuildPictures({ job, planId, onStarted }: { job: JobRow; planId: string; onStarted: (jobId: string) => void }) {
+  const ph = usePlaceholderPictures(job, planId, onStarted);
+  return (
+    <>
+      <PlaceholderPicturesSection ph={ph} />
+      <RebuildWithPicturesDialog ph={ph} />
     </>
   );
 }
@@ -473,14 +497,19 @@ const runIdOf = (j: JobRow): string | null => {
   return typeof id === "string" ? id : null;
 };
 
-/** MVP M6: this build's AI spend (every retry and reopen of the run). Owners only, like the Costs page. */
+/** MVP M6: this build's spend (every retry and reopen of the run). Owners only, like the Costs page. */
 function RunCost({ runId }: { runId: string | null }) {
   const me = useMe();
   const owner = me.role === "owner";
   const spend = useLoad(() => (owner && runId ? fetchRunSpend(runId) : Promise.resolve(null)), [owner, runId]);
   const s = spend.data;
   if (!s) return null;
-  return <>. AI spend {money(total(s))}{s.estimated + s.history > 0 ? " est." : ""} over {s.calls} calls</>;
+  return (
+    <span>
+      Spent {money(total(s))}
+      {s.estimated + s.history > 0 ? " (partly estimated)" : ""}
+    </span>
+  );
 }
 
 export function RunPage() {
@@ -517,10 +546,12 @@ export function RunPage() {
   if (job.loading && !j) return <Loading rows={4} label="Loading this work" />;
   if (!j) return <Empty title="This work doesn't exist, or your role can't see it.">It is visible to owners and admins. <Link to="/activity">Back to Activity</Link></Empty>;
 
+  // Which view a job gets (the review, the stop, or this page) depends on its siblings: wait for them, so the wrong view
+  // never flashes first.
+  if (!f.jobs && !f.error) return <Loading rows={4} label="Loading this work" />;
   const jobs = f.jobs ?? [];
   const planId = planIdOfJob(j, jobs);
   const plan = planId ? f.plans?.find((p) => p.id === planId) : undefined;
-  const s = jobState(j);
   const build = j.kind === "build_plan" || j.kind === "resume";
   const latest = planId ? latestBuildByPlan(jobs).get(planId) : undefined;
   const superseded = build && j.status === "failed" && latest && latest.id !== j.id && latest.status === "succeeded" ? latest : null;
@@ -586,153 +617,177 @@ export function RunPage() {
     );
   }
 
+  // Cockpit v2 (Package 4 R1): every other work page in the grammar of the build, stop and review views: chip and context,
+  // the title, a plain lead, then the steps, what it produced, and Technical details. "Start again", "Close it",
+  // "Archive" and "Unarchive" have no frame in the locked design (BLOCKED-ON-NICK.md), so they stay as quiet buttons.
+  const chip = chipOf(j);
+  const n = build && planId ? [...buildsOf(planId, jobs)].sort((a, b) => a.created_at.localeCompare(b.created_at)).findIndex((x) => x.id === j.id) + 1 : 0;
+  const context = [plan ? clientNameOf(plan) : null, build ? (n > 0 ? `Build ${n}` : "Build") : NOUN[j.kind]].filter(Boolean).join(" · ");
+  const took = duration(j.started_at, j.finished_at);
+  // A started build reads as the live build (its ten steps); anything else lists only what its record holds.
+  const started = build && !!timeline && (!!j.started_at || ["dispatched", "running", "succeeded", "failed"].includes(j.status));
+  const newer = build && j.status === "succeeded" && latest && latest.id !== j.id && latest.status === "succeeded" ? latest : null;
+  const proposalReady = (j.kind === "intake" || j.kind === "replan" || j.kind === "direction") && j.status === "succeeded" && typeof j.result?.planId === "string" ? j.result.planId : null;
+  const pictures = build && j.status === "succeeded" && !!planId && placeholdersOf(j).length > 0;
+  const r = j.result ?? {};
+  const tech = [
+    { k: "job", v: j.id },
+    ...(typeof r.workflowRunId === "string" ? [{ k: "run", v: r.workflowRunId }] : []),
+    ...(planId ? [{ k: "plan", v: planId }] : []),
+    ...(typeof r.cycles === "number" ? [{ k: "build and check cycles", v: String(r.cycles) }] : []),
+    { k: "status", v: typeof r.status === "string" ? `${j.status} / ${r.status}` : j.status },
+    ...(j.gh_run_url ? [{ k: "worker log", v: j.gh_run_url }] : []),
+  ];
+  const checkNotes = (Array.isArray(r.checks) ? (r.checks as { checkId: string; details?: string }[]) : []).filter((c) => c.details);
+  const qaRaw = (Array.isArray(r.qaIssues) ? r.qaIssues : []) as string[];
+
   return (
-    <>
-      <PageHead
-        kicker={
-          <>
-            <Aspect tone={s.tone}>{s.label}</Aspect>{" "}
-            <span className="fig" style={{ marginLeft: 10 }}>
-              {dateTime(j.created_at)}
-              {duration(j.started_at, j.finished_at) ? `. Took ${duration(j.started_at, j.finished_at)}` : ""}
-              <RunCost runId={runIdOf(j)} />
-            </span>
-          </>
-        }
-        title={title(j, plan)}
-        lead={`${KIND_LABEL[j.kind]}${plan ? ` for ${planName(plan)}` : ""}${plan?.build_track ? `, ${(KIND_OF_SITE[plan.build_track] ?? "a kind of site").toLowerCase()}` : ""}.${j.kind === "ask" ? ` You asked: “${String(j.params?.question ?? "")}”` : ""}`}
-        actions={
-          <>
-            {j.status === "queued" && (
-              <button className="btn primary" type="button" disabled={busy} onClick={() => act(() => dispatchJob(j.id), "Started. The worker picks it up within seconds.")}>
-                <Play aria-hidden="true" />
-                Start again
-              </button>
-            )}
-            {isStaleQueued(j) && (
-              <button className="btn danger" type="button" disabled={busy} onClick={() => { setCancelError(null); setCancelOpen(true); }}>
-                <XCircle aria-hidden="true" />
-                Close it
-              </button>
-            )}
-            {isFinished(j) && (
-              <button
-                className="btn ghost"
-                type="button"
-                disabled={busy}
-                onClick={() => act(() => archiveJob(j.id, !j.archived_at), j.archived_at ? "Back in Activity." : "Archived. It's hidden from Activity and Home; nothing was deleted.")}
-              >
-                {j.archived_at ? <ArrowCounterClockwise aria-hidden="true" /> : <Archive aria-hidden="true" />}
-                {j.archived_at ? "Unarchive" : "Archive"}
-              </button>
-            )}
-            {planId && (
-              <Link className="btn ghost" to={`/decisions/plans/${planId}`}>
-                Open the proposal
-              </Link>
-            )}
-          </>
-        }
-      />
-      <div className="split narrow">
-        <div className="stack">
-          {j.status === "failed" && superseded && (
-            <Notice tone="stop" title="What happened.">
-              {explainJobError(j).happened}
-            </Notice>
-          )}
-          {build && j.status === "succeeded" && <ClientNeedsPanel job={j} planId={planId} onStarted={(id) => nav(`/activity/${id}`)} />}
-          {build && j.status === "succeeded" && <PlaceholdersPanel job={j} planId={planId} onStarted={(id) => nav(`/activity/${id}`)} />}
-          {superseded && (
-            <Notice tone="info">
-              A later build of the same proposal passed every check ({dateTime(superseded.finished_at ?? superseded.created_at)}). You probably don't need to resume this one.{" "}
-              <Link to={`/activity/${superseded.id}`}>Open the later build</Link>
-            </Notice>
-          )}
-          {build && j.status === "succeeded" && j.result?.status === "awaiting_launch_approval" && (
-            <Notice tone="clear" title="Verified, not published.">
-              Every check passed. Launch is Nick's decision and happens outside the Cockpit; nothing here deploys a site.
-            </Notice>
-          )}
-          {j.archived_at && (
-            <Notice tone="info" title="Archived.">
-              Hidden from Activity and Home since {dateTime(j.archived_at)}. The record is kept; Unarchive brings it back.
-            </Notice>
-          )}
-          {actionError && <Notice tone="stop" title="That didn't work.">{actionError} Nothing changed.</Notice>}
-          {timeline && !runReady ? (
-            <Plate title="What the factory did">
-              <Loading rows={3} label="Reading the build's steps" />
-            </Plate>
-          ) : timeline && !showRecovery ? (
-            <Plate title={live ? "Build progress" : "What the factory did"} note={timeline.fromAudit ? undefined : "From the build's own record"}>
-              <div className="plate-body">
-                <LiveBuild
-                  timeline={timeline}
-                  stats={stats.data}
-                  startedAt={j.started_at ?? j.created_at}
-                  finishedAt={j.finished_at}
-                  tech={[{ k: "job", v: j.id }, ...(j.result?.workflowRunId ? [{ k: "run", v: String(j.result.workflowRunId) }] : []), ...(j.gh_run_url ? [{ k: "worker log", v: j.gh_run_url }] : [])]}
-                />
-                {run.data?.error && <p className="quiet fine" style={{ marginTop: 12 }}>The build's step-by-step record couldn't be read just now (“{run.data.error}”), so this shows what the build itself reported. Nothing changed.</p>}
-              </div>
-            </Plate>
-          ) : !timeline ? (
-            <Plate title="What the factory did">
-              <div className="plate-body">
-                <Steps j={j} />
-              </div>
-            </Plate>
+    <article className="stopped runpage" aria-labelledby="run-h">
+      <header className="stopped-head">
+        <p className="stopped-meta">
+          <StatusChip tone={chip.tone}>{chip.word}</StatusChip>
+          {context && <span>{context}</span>}
+          <span className="fig">{dateTime(j.created_at)}</span>
+          {took && <span>Took {took}</span>}
+          <RunCost runId={runIdOf(j)} />
+        </p>
+        <h1 id="run-h" className="t-title">
+          {title(j, plan)}
+        </h1>
+        <p className="t-lead muted">
+          {KIND_LABEL[j.kind]}
+          {plan ? ` for ${planName(plan)}` : ""}
+          {plan?.build_track ? `, ${(KIND_OF_SITE[plan.build_track] ?? "a kind of site").toLowerCase()}` : ""}.
+          {j.kind === "ask" ? ` You asked: “${String(j.params?.question ?? "")}”` : ""}
+        </p>
+      </header>
+
+      {(proposalReady || newer || superseded || j.status === "queued" || isFinished(j) || planId) && (
+        <div className="run-actions">
+          {proposalReady ? (
+            <ButtonLink to={`/decisions/plans/${proposalReady}`} variant="primary" size="page">
+              Open the proposal to decide
+            </ButtonLink>
+          ) : newer ? (
+            <ButtonLink to={`/activity/${newer.id}`} variant="primary" size="page">
+              Open the newest build
+            </ButtonLink>
+          ) : superseded ? (
+            <ButtonLink to={`/activity/${superseded.id}`} variant="primary" size="page">
+              Open the later build
+            </ButtonLink>
           ) : null}
-          <Results j={j} />
+          {j.status === "queued" && (
+            <Button variant="quiet" icon={Play} disabled={busy} onClick={() => act(() => dispatchJob(j.id), "Started. The worker picks it up within seconds.")}>
+              Start again
+            </Button>
+          )}
+          {isStaleQueued(j) && (
+            <Button
+              variant="quiet"
+              icon={XCircle}
+              disabled={busy}
+              onClick={() => {
+                setCancelError(null);
+                setCancelOpen(true);
+              }}
+            >
+              Close it
+            </Button>
+          )}
+          {isFinished(j) && (
+            <Button
+              variant="quiet"
+              icon={j.archived_at ? ArrowCounterClockwise : Archive}
+              disabled={busy}
+              onClick={() => act(() => archiveJob(j.id, !j.archived_at), j.archived_at ? "Back in Activity." : "Archived. It's hidden from Activity and Home; nothing was deleted.")}
+            >
+              {j.archived_at ? "Unarchive" : "Archive"}
+            </Button>
+          )}
+          {planId && !proposalReady && (
+            <ButtonLink to={`/decisions/plans/${planId}`} variant="quiet">
+              Open the proposal
+            </ButtonLink>
+          )}
         </div>
-        <Plate title="Technical details">
-          <dl className="kv plate-body">
-            <div>
-              <dt>Job</dt>
-              <dd className="fig">{shortId(j.id)}</dd>
-            </div>
-            {typeof j.result?.workflowRunId === "string" && (
-              <div>
-                <dt>Workflow run</dt>
-                <dd className="fig">{shortId(j.result.workflowRunId)}</dd>
-              </div>
-            )}
-            {planId && (
-              <div>
-                <dt>Plan</dt>
-                <dd className="fig">{shortId(planId)}</dd>
-              </div>
-            )}
-            {typeof j.result?.cycles === "number" && (
-              <div>
-                <dt>Build and check cycles</dt>
-                <dd className="fig">{j.result.cycles}</dd>
-              </div>
-            )}
-            {typeof j.result?.status === "string" && (
-              <div>
-                <dt>Pipeline status</dt>
-                <dd className="fig">{j.result.status}</dd>
-              </div>
-            )}
-          </dl>
-          {j.error && (
-            <details className="raw plate-body" style={{ paddingTop: 0 }}>
-              <summary>Raw error</summary>
-              <pre>{j.error}</pre>
-            </details>
+      )}
+
+      {actionError && (
+        <Notice tone="stop" title="That didn't work.">
+          {actionError} Nothing changed.
+        </Notice>
+      )}
+      {j.status === "failed" && superseded && (
+        <Notice tone="stop" title="What happened.">
+          {explainJobError(j).happened}
+        </Notice>
+      )}
+      {superseded && (
+        <Notice tone="info">
+          A later build of the same proposal passed every check ({dateTime(superseded.finished_at ?? superseded.created_at)}). You probably don't need to resume this one.
+        </Notice>
+      )}
+      {newer && (
+        <Notice tone="info">
+          A newer build of this site passed every check ({dateTime(newer.finished_at ?? newer.created_at)}). The site to review and approve is that one; this page keeps this build's record.
+        </Notice>
+      )}
+      {build && j.status === "succeeded" && j.result?.status === "awaiting_launch_approval" && (
+        <Notice tone="clear" title="Verified, not published.">
+          Every check passed. Launch is Nick's decision and happens outside the Cockpit; nothing here deploys a site.
+        </Notice>
+      )}
+      {j.archived_at && (
+        <Notice tone="info" title="Archived.">
+          Hidden from Activity and Home since {dateTime(j.archived_at)}. The record is kept; Unarchive brings it back.
+        </Notice>
+      )}
+
+      {build && j.status === "succeeded" && <ClientNeedsPanel job={j} planId={planId} onStarted={(id) => nav(`/activity/${id}`)} />}
+      {pictures && <BuildPictures job={j} planId={planId!} onStarted={(id) => nav(`/activity/${id}`)} />}
+
+      {started && !runReady ? (
+        <Loading rows={3} label="Reading the build's steps" />
+      ) : started ? (
+        <section aria-label={live ? "Build progress" : "What the factory did"} className="run-sec">
+          <LiveBuild timeline={timeline!} stats={stats.data} startedAt={j.started_at ?? j.created_at} finishedAt={j.finished_at} />
+          {run.data?.error && (
+            <p className="t-small muted">
+              The build's step-by-step record couldn't be read just now, so this shows what the build itself reported. Nothing changed.
+            </p>
           )}
-          {j.gh_run_url && (
-            <div className="plate-body" style={{ paddingTop: 0 }}>
-              <a className="btn small" href={j.gh_run_url} target="_blank" rel="noreferrer">
-                <ArrowSquareOut aria-hidden="true" />
-                GitHub run log
-              </a>
-            </div>
-          )}
-        </Plate>
-      </div>
+        </section>
+      ) : (
+        <section aria-labelledby="run-steps" className="run-sec">
+          <h2 id="run-steps" className="t-section">
+            What the factory did
+          </h2>
+          <ol className="steps-v2" aria-label="What the factory did">
+            {simpleSteps(j).map((x, i) => (
+              <StepRow key={x.title} n={i + 1} title={x.title} tone={x.tone} word={x.word} time={x.time} sentence={x.sentence} />
+            ))}
+          </ol>
+        </section>
+      )}
+
+      <Results j={j} showRounds={!started} />
+
+      <TechDetails items={tech}>
+        {run.data?.error && <p className="t-small muted">Step record: {run.data.error}</p>}
+        {checkNotes.length > 0 && (
+          <ul className="step-extra">
+            {checkNotes.map((c) => (
+              <li key={c.checkId}>
+                <span className="fig">{c.checkId}</span>: {c.details}
+              </li>
+            ))}
+          </ul>
+        )}
+        {qaRaw.length > 0 && <pre className="tech-log">{qaRaw.join("\n")}</pre>}
+        {j.error && <pre className="tech-log">{j.error}</pre>}
+      </TechDetails>
+
       <ConfirmDialog
         open={cancelOpen}
         title="Close this request?"
@@ -753,6 +808,6 @@ export function RunPage() {
           await Promise.all([job.reload(), f.reload()]);
         }}
       />
-    </>
+    </article>
   );
 }

@@ -151,7 +151,7 @@ export const HALT_WORDS: Record<string, string> = {
   build_failed: "The builder couldn't finish writing the site.",
   qa_failed: "The quality checks couldn't finish.",
   checkpoint_corrupt: "The saved copy of the site no longer matched, so it can't be checked. It has to be written again.",
-  already_finished: "This run had already finished.",
+  already_finished: "This build had already finished.",
   repeat_refused: "It was not continued, because nothing had changed since it stopped, so it would have failed the same way. Nothing was spent.",
 };
 export const CRASH_WORDS = "The worker stopped before reporting. Anything it saved is kept.";
@@ -250,7 +250,7 @@ export function deriveTimeline(input: DeriveInput): Timeline {
     const p = runningOf("preflight");
     if (p) {
       finish(p, at, "skipped");
-      p.detail = "Not checked on this run: it started before the readiness check existed.";
+      p.detail = "Not checked on this build: it started before the readiness check existed.";
       p.durationMs = null;
     }
   };

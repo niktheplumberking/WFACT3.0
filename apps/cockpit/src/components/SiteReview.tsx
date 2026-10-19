@@ -32,15 +32,16 @@ export interface SiteReviewProps {
   children?: React.ReactNode;
 }
 
-export function SiteReview({ job, planId, clientName, onStarted, children }: SiteReviewProps) {
+/** The placeholder pictures of a passing build: what each should show, "Add the picture" (plan input asset.image.<slot>),
+ *  "Build again with these pictures" and the owner-only "launch with placeholders" tick (launch.placeholders_ok). Shared by
+ *  the finished site review and the page of any other passing build, so both write the same rows. */
+export function usePlaceholderPictures(job: JobRow, planId: string | null, onStarted: (jobId: string) => void) {
   const toast = useToast();
   const me = useMe();
   const owner = me.role === "owner";
   const r = (job.result ?? {}) as Record<string, unknown>;
-  const runId = typeof r.workflowRunId === "string" ? r.workflowRunId : null;
   const slots = placeholdersOf(job);
   const inputs = useLoad(() => (planId ? fetchPlanInputs(planId) : Promise.resolve({ rows: [] as PlanInputRow[], unavailable: false })), [planId]);
-  const spend = useLoad(() => (owner && runId ? fetchRunSpend(runId) : Promise.resolve(null)), [owner, runId]);
   const [busy, setBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [rebuildOpen, setRebuildOpen] = useState(false);
@@ -105,6 +106,95 @@ export function SiteReview({ job, planId, clientName, onStarted, children }: Sit
     toast("Building again with the client's pictures.");
     onStarted(jobId);
   }
+  return { planId, owner, slots, busy, err, added, addedCount, launchOk, ready, readiness, add, toggleLaunch, rebuild, rebuildOpen, setRebuildOpen };
+}
+
+export type PlaceholderPictures = ReturnType<typeof usePlaceholderPictures>;
+
+/** The placeholder pictures section (heading, rows, readiness line). */
+export function PlaceholderPicturesSection({ ph }: { ph: PlaceholderPictures }) {
+  return (
+    <section aria-labelledby="ph-h" className="review-ph">
+      <h2 id="ph-h" className="t-section">
+        Placeholder pictures
+      </h2>
+      {ph.slots.length === 0 ? (
+        <p className="muted">None. Every picture on the site came from the client.</p>
+      ) : (
+        <>
+          <ul className="ph-list">
+            {ph.slots.map((s) => {
+              const a = ph.added(s);
+              return (
+                <li key={s.slot} className="ph-row">
+                  <span className="ph-thumb" aria-hidden="true" />
+                  <span className="ph-what">
+                    <b>{where(s)}</b>
+                    <span>Should show: {s.note}</span>
+                    {a && <span className="ph-added">Added. It goes on the site with the next build.</span>}
+                  </span>
+                  {ph.planId && (
+                    <label className="btn">
+                      <UploadSimple aria-hidden="true" />
+                      {ph.busy === s.slot ? "Adding…" : a ? "Replace the picture" : "Add the picture"}
+                      <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={!!ph.busy} aria-label={`Add the picture for ${where(s)}: ${s.note}`} onChange={(e) => void ph.add(s, e.target.files?.[0])} />
+                    </label>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+          <p className="t-small muted">JPEG, PNG or WebP, up to 2 MB each. The factory never invents or generates the client's pictures.</p>
+          {ph.addedCount > 0 && ph.planId && (
+            <div>
+              <Button disabled={!!ph.busy} onClick={() => ph.setRebuildOpen(true)}>
+                Build again with {ph.addedCount === 1 ? "this picture" : "these pictures"}
+              </Button>
+            </div>
+          )}
+          {ph.owner ? (
+            <label className="tick">
+              <input type="checkbox" checked={ph.launchOk} disabled={!!ph.busy || !ph.planId} onChange={(e) => void ph.toggleLaunch(e.target.checked)} />
+              <span>Launch with placeholders. I know a placeholder picture is still on the site, and visitors will see it.</span>
+            </label>
+          ) : (
+            <p className="muted">Only an owner can choose to launch with placeholders.</p>
+          )}
+        </>
+      )}
+      <p role="status" className="review-ready">
+        {ph.readiness}
+      </p>
+      {ph.err && <Notice tone="stop">{ph.err}</Notice>}
+    </section>
+  );
+}
+
+/** The money confirm for "Build again with these pictures". */
+export function RebuildWithPicturesDialog({ ph }: { ph: PlaceholderPictures }) {
+  return (
+    <ConfirmDialog
+      open={ph.rebuildOpen}
+      title="Build again with the client's pictures?"
+      body="This starts a new build from the approved proposal, with the pictures you added. Nothing is published, and this build is kept."
+      cost={costLine("one build")}
+      confirmLabel="Build again"
+      busy={ph.busy === "build"}
+      error={ph.rebuildOpen ? ph.err : null}
+      onCancel={() => ph.setRebuildOpen(false)}
+      onConfirm={() => void ph.rebuild()}
+    />
+  );
+}
+
+export function SiteReview({ job, planId, clientName, onStarted, children }: SiteReviewProps) {
+  const me = useMe();
+  const owner = me.role === "owner";
+  const r = (job.result ?? {}) as Record<string, unknown>;
+  const runId = typeof r.workflowRunId === "string" ? r.workflowRunId : null;
+  const ph = usePlaceholderPictures(job, planId, onStarted);
+  const { ready } = ph;
+  const spend = useLoad(() => (owner && runId ? fetchRunSpend(runId) : Promise.resolve(null)), [owner, runId]);
 
   const checks = (Array.isArray(r.checks) ? r.checks : []) as { checkId: string; passed: boolean }[];
   const rounds = (Array.isArray(r.builderRounds) ? r.builderRounds.length : 0) || (typeof r.cycles === "number" ? r.cycles : 0);
@@ -127,59 +217,7 @@ export function SiteReview({ job, planId, clientName, onStarted, children }: Sit
 
       {sitePath ? <PagePreview path={sitePath} /> : <Notice tone="caution">This build's record has no saved site to show.</Notice>}
 
-      <section aria-labelledby="ph-h" className="review-ph">
-        <h2 id="ph-h" className="t-section">
-          Placeholder pictures
-        </h2>
-        {slots.length === 0 ? (
-          <p className="muted">None. Every picture on the site came from the client.</p>
-        ) : (
-          <>
-            <ul className="ph-list">
-              {slots.map((s) => {
-                const a = added(s);
-                return (
-                  <li key={s.slot} className="ph-row">
-                    <span className="ph-thumb" aria-hidden="true" />
-                    <span className="ph-what">
-                      <b>{where(s)}</b>
-                      <span>Should show: {s.note}</span>
-                      {a && <span className="ph-added">Added. It goes on the site with the next build.</span>}
-                    </span>
-                    {planId && (
-                      <label className="btn">
-                        <UploadSimple aria-hidden="true" />
-                        {busy === s.slot ? "Adding…" : a ? "Replace the picture" : "Add the picture"}
-                        <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" disabled={!!busy} aria-label={`Add the picture for ${where(s)}: ${s.note}`} onChange={(e) => void add(s, e.target.files?.[0])} />
-                      </label>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-            <p className="t-small muted">JPEG, PNG or WebP, up to 2 MB each. The factory never invents or generates the client's pictures.</p>
-            {addedCount > 0 && planId && (
-              <div>
-                <Button disabled={!!busy} onClick={() => setRebuildOpen(true)}>
-                  Build again with {addedCount === 1 ? "this picture" : "these pictures"}
-                </Button>
-              </div>
-            )}
-            {owner ? (
-              <label className="tick">
-                <input type="checkbox" checked={launchOk} disabled={!!busy || !planId} onChange={(e) => void toggleLaunch(e.target.checked)} />
-                <span>Launch with placeholders. I know a placeholder picture is still on the site, and visitors will see it.</span>
-              </label>
-            ) : (
-              <p className="muted">Only an owner can choose to launch with placeholders.</p>
-            )}
-          </>
-        )}
-        <p role="status" className="review-ready">
-          {readiness}
-        </p>
-        {err && <Notice tone="stop">{err}</Notice>}
-      </section>
+      <PlaceholderPicturesSection ph={ph} />
 
       {children}
 
@@ -212,17 +250,7 @@ export function SiteReview({ job, planId, clientName, onStarted, children }: Sit
         </p>
       </div>
 
-      <ConfirmDialog
-        open={rebuildOpen}
-        title="Build again with the client's pictures?"
-        body="This starts a new build from the approved proposal, with the pictures you added. Nothing is published, and this build is kept."
-        cost={costLine("one build")}
-        confirmLabel="Build again"
-        busy={busy === "build"}
-        error={rebuildOpen ? err : null}
-        onCancel={() => setRebuildOpen(false)}
-        onConfirm={() => void rebuild()}
-      />
+      <RebuildWithPicturesDialog ph={ph} />
     </div>
   );
 }

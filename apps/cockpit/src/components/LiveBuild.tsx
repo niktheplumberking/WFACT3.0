@@ -71,11 +71,11 @@ export function LiveBuild({ timeline: t, stats, startedAt, finishedAt, spent, te
 
   // Steps the run does not record separately: "not recorded" once the step after them has finished, else waiting.
   const notRecorded = (after: TimelineStep | undefined): { tone: StatusTone; word?: string; sentence?: string } =>
-    after && (after.state === "done" || after.state === "failed") ? { tone: "skip", word: "Not recorded", sentence: "This run does not record this step separately." } : { tone: "wait" };
+    after && (after.state === "done" || after.state === "failed") ? { tone: "skip", word: "Not recorded", sentence: "This build does not record this step separately." } : { tone: "wait" };
 
   // A recorded step, or, once the build has passed, "not recorded" (never "waiting" on a finished build).
   const recorded = (st: TimelineStep | undefined, fallback: string) =>
-    !st && passed ? { tone: "skip" as StatusTone, word: "Not recorded", sentence: "This run does not record this step separately." } : { tone: toneOf(st), time: took(st, now), sentence: st?.detail ?? fallback };
+    !st && passed ? { tone: "skip" as StatusTone, word: "Not recorded", sentence: "This build does not record this step separately." } : { tone: toneOf(st), time: took(st, now), sentence: st?.detail ?? fallback };
 
   const rows: { title: string; tone: StatusTone; word?: string; time?: string; sentence?: string; checks?: { label: string; tone: StatusTone }[]; extra?: string[] }[] = [
     { title: LIVE_ROWS[0], ...recorded(preflight, "Checking the logo, the pictures and that the AI services answer, before any money is spent."), extra: preflight?.problems },

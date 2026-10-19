@@ -173,8 +173,8 @@ export function explainJobError(j: Pick<JobRow, "error" | "result" | "kind" | "g
   if (/credits exhausted|HTTP 402/i.test(e)) {
     return {
       headline: "the site builder is out of credits",
-      happened: "Agent 37, the service that writes the site, refused the work because the account has no AI credits left. Nothing was built and nothing was published.",
-      todo: "Topping up Agent 37 is a money decision. Once credits are added, press Resume build: it restarts from the last saved step.",
+      happened: "The service that writes the site refused the work because the account has no AI credits left. Nothing was built and nothing was published.",
+      todo: "Adding credits for the site builder is a money decision. Once credits are added, press Resume build: it restarts from the last saved step.",
     };
   }
   if (/GITHUB_DISPATCH_TOKEN|Dispatcher not configured/i.test(e)) {

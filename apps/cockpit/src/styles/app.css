@@ -812,6 +812,10 @@ body:has(.set-savebar) .toasts { bottom: calc(var(--s-6) + 80px); }
 .stopped-head { display: grid; gap: 12px; }
 .stopped-meta { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: var(--fs-small); color: var(--ink-3); }
 .stopped-head h1 { font-size: clamp(30px, 3.8cqi, 46px); line-height: 1.1; text-wrap: balance; }
+/* Any other work page (Package 4 R1): the stop view's grammar, one row of actions, plain sections. */
+.run-actions { display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: center; }
+.run-sec { display: grid; gap: 12px; min-width: 0; }
+.run-sec > p { margin: 0; }
 
 /* ---------- Finished site review (v2) ---------- */
 .review { display: grid; gap: 28px; }

@@ -98,6 +98,24 @@ if (new URLSearchParams(location.search).get("fake-team") === "1") {
 }
 const fake = createFake(rows);
 
+// ?fake-job=intake|ask|cancelled|archived|old: the other work pages (Package 4 R1). intake and ask add running work that is
+// not a build (id 88888888-…); cancelled closes the never-started request; archived puts the passing build away; old adds
+// a newer passing build (id 99999999-…), so the first one is an older build.
+const fakeJob = new URLSearchParams(location.search).get("fake-job");
+if (fakeJob) {
+  const ago = (min: number) => new Date(Date.now() - min * 60_000).toISOString();
+  const work = (kind: string, params: Record<string, unknown>) => ({ id: "88888888-8888-4888-8888-888888888888", created_at: ago(2), kind, params, status: "running", started_at: ago(1), finished_at: null, result: null, error: null, gh_run_url: null, archived_at: null });
+  if (fakeJob === "intake") rows.jobs = [...rows.jobs, work("intake", { clientSlug: "summit-line-roofing" })];
+  if (fakeJob === "ask") rows.jobs = [...rows.jobs, work("ask", { planId: "22222222-2222-4222-8222-222222222222", question: "Can the contact page show opening hours?" })];
+  if (fakeJob === "cancelled")
+    rows.jobs = rows.jobs.map((j) => (j.id === "55555555-5555-4555-8555-555555555555" ? { ...j, status: "cancelled", finished_at: ago(2900), error: "Never reached the worker; started a new one instead" } : j));
+  if (fakeJob === "archived") rows.jobs = rows.jobs.map((j) => (j.id === "44444444-4444-4444-8444-444444444444" ? { ...j, archived_at: ago(30) } : j));
+  if (fakeJob === "old") {
+    const first = rows.jobs.find((j) => j.id === "44444444-4444-4444-8444-444444444444")!;
+    rows.jobs = [...rows.jobs, { ...first, id: "99999999-9999-4999-8999-999999999999", created_at: ago(20), started_at: ago(19), finished_at: ago(15) }];
+  }
+}
+
 const signedIn = {
   user: { id: "00000000-0000-4000-8000-0000000000aa", email: "owner@example.test" },
   access_token: "synthetic",

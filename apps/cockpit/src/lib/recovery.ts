@@ -227,7 +227,7 @@ export function diagnoseJob(j: JobRow, siblings: JobRow[] = [], opts: { planId?:
       break;
     case "money":
       headline = "the site builder is out of credits";
-      happened = "Agent 37, the service that writes the site, refused the work because the account has no AI credits left. Nothing was published.";
+      happened = "The service that writes the site refused the work because the account has no AI credits left. Nothing was published.";
       label = "I've added credits, continue";
       break;
     case "setup":
