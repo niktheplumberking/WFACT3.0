@@ -46,6 +46,14 @@ jobs:
           fi
           echo "No tracked .env files found."
 
+      # Step 21 H: the step trackers (Factory Completion Plan Part D/E and PROGRESS.md) must agree and must not be
+      # behind the code (a code commit newer than the trackers fails unless it carries [no-tracker]). Needs full history.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Trackers agree and are not behind the code
+        run: node scripts/check-trackers.mjs
+
   # Phase 3: the first real, required (non-advisory) check job — Ecosystem Blueprint §15.
   # No network calls, no credentials needed (see packages/hermes/README.md verification table);
   # a live Claude/Supabase check stays a manual step until ANTHROPIC_API_KEY/SUPABASE_SERVICE_ROLE_KEY
@@ -299,6 +307,45 @@ jobs:
       - name: Unit tests
         run: deno test --no-prompt lead.test.ts
 
+  # Step 21 H: the dispatch-job Edge Function (the only path from a Cockpit click to a GitHub run). The tests run the
+  # deployed index.ts unchanged, with Supabase and GitHub stubbed (no network, no token).
+  dispatch-job:
+    name: dispatch-job Edge Function — deno check + unit tests
+    runs-on: ubuntu-latest
+    needs: guardrails
+    defaults:
+      run:
+        working-directory: supabase/functions/dispatch-job
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check
+        run: deno check index.ts dispatch.test.ts
+      - name: Unit tests
+        run: deno test --no-prompt --allow-env dispatch.test.ts
+
+  # Step 21 H: generated media (Step 4B M5). Unit tests only; the live Higgsfield call needs HF_CREDENTIALS and stays manual.
+  media:
+    name: Media (Higgsfield client) — typecheck + unit tests
+    runs-on: ubuntu-latest
+    needs: guardrails
+    defaults:
+      run:
+        working-directory: packages/media
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+
   # Factory Completion Plan Step 5 (Continuation Plan Stage 6): the Documentation agent and episodic memory
   # (entry format, append-only, escalation on write failure, redaction, permissions, no agent-runtime change).
   documentation:
@@ -401,7 +448,7 @@ jobs:
     name: Deploy Cockpit to Vercel (trunk only)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [guardrails, audit, hermes, agent-runtime, documentation, frontend-loop, track-b-build, verification, rendered-qa, workflow, planning, jobs-runner, submit-lead, build]
+    needs: [guardrails, audit, hermes, agent-runtime, documentation, frontend-loop, track-b-build, verification, rendered-qa, workflow, planning, jobs-runner, submit-lead, dispatch-job, media, build]
     concurrency:
       group: deploy-cockpit
       cancel-in-progress: false
