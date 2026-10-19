@@ -103,8 +103,8 @@ whoever manages the real production project, same as the item above.
 -- INSERT to be rejected with an "entity law violation" error, not succeed.
 ```
 
-**Since 2026-10-19 (Step 21 H)**: every machine-checked attack script (`scripts/rls_attack_test_*.sql`, one per migration since
-0010) runs in CI. The job `rls-attack` calls `scripts/rls-attack-local.sh`, which replays every migration on a throwaway local
+**Since 2026-10-19 (Step 21 H)**: every machine-checked attack script (`scripts/rls_attack_test_*.sql`, one for each migration since
+0010 that changed access) runs in CI. The job `rls-attack` calls `scripts/rls-attack-local.sh`, which replays every migration on a throwaway local
 Supabase database and fails on any check whose result differs from its expected value. Locally:
 `PSQL="docker exec -i supabase_db_<project> psql -U postgres -d postgres" scripts/rls-attack-local.sh`. Checks that need
 live-only rows are printed NOT COVERED there and are run live with `execute_sql` after each migration. Results for migrations

@@ -1845,7 +1845,7 @@ Not covered: a Cockpit job on the new runner code (first one after `37f99c7` wil
 | 2 | Three concurrent clients | open | 18 |
 | 3 | 50-point audit and registry re-run | partial (Step 7: 48-check registry re-run on the Step 4 page with a per-check table; the 78-check and 50-point source lists are not in this repo) | 7, 26, 19 |
 | 4 | Real cost per client | partial | 12 |
-| 5 | Every agent action audited | largely met | 16, 21 |
+| 5 | Every agent action audited | largely met (Step 21 DONE: new audit rows carry the entity when knowable, migration 0027; tool-call tracing is Step 16) | 16 |
 | 6 | Disaster-recovery drill | not verified | 19 |
 | 7 | Launch and Money hard-gated | met by design | every step |
 
