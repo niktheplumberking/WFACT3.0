@@ -15,11 +15,11 @@ Read at session start. Each item was paid for in a real incident (see `PROGRESS.
 6. **Never print or commit a secret.** Names only. Secrets live in Doppler project `wfact-3-0-codebase`; the only GitHub
    secret is `DOPPLER_TOKEN`. `.env.example` is the shape, not the source.
 7. **Agent 37 (the builder's provider) fails in three known ways:** HTTP 402 when credits run out, dropped connections
-   (ECONNRESET; retried since `734ded5`), and unpriced token cost (`model_traces.cost_usd` is null).
-8. **Same-vendor review is not independent.** The screenshot reviewer is also Agent 37 today; OpenAI returns 429 (no
-   credits). Say so in any report that relies on cross-model review.
-9. **Synthetic inputs must stay labelled.** `clients/summit-line-roofing` and `clients/dreamsign-pilot` are provisional
-   stand-ins, not real clients. Do not let them count toward Blueprint goal 1.
+   (ECONNRESET; retried since `734ded5`), and token cost that is only an estimate (`price_basis 'estimated'`, $3/$15 per M token).
+8. **Same-vendor review is not independent.** Since 2026-10-13 the screenshot reviewer and the evaluator are Anthropic and the
+   builder is Agent 37, so they differ; OpenAI still returns 429 (no credits). Say which vendors ran in any cross-model report.
+9. **Synthetic inputs must stay labelled.** `clients/summit-line-roofing`, `dreamsign-pilot`, `lanternworks-studio` and the two
+   `example-*` clients are stand-ins, not real clients. Do not let them count toward Blueprint goal 1.
 10. **Do not trust a doc over the code or the Blueprint.** Where docs disagree, `docs/HANDOFF.md` section 2 says which governs.
 11. **Other sessions work in this checkout at the same time.** On 2026-10-01 one committed another agent's uncommitted
     `PROGRESS.md` edit (`03138d9`) and pushed `main`, deploying a commit nobody meant to ship (`eaea97b`). Stage named paths only,

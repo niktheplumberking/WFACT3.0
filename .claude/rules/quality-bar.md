@@ -7,7 +7,7 @@
 2. A test that **fails without your change**: revert the fix locally, watch it fail, restore it (mutation check).
    Failure modes get an eval in the registry, not just a unit test.
 3. UI changes: build, then a browser check at 1440 and 375 px (screenshot, console clean, axe 0 violations, keyboard path).
-4. Database changes: the migration applied, its RLS attack test run for real (`scripts/rls_attack_test*.sql`), `get_advisors` clean.
+4. Database changes: the migration applied, its RLS attack test run for real (`scripts/rls_attack_test_*.sql`, live and via `scripts/rls-attack-local.sh`), `get_advisors` clean.
 5. Pipeline behaviour: a live run (job id, CI run id, `model_traces` rows checked with SQL).
 6. Review by a different instance, ideally a different vendor. Same-vendor review is labelled as such.
 

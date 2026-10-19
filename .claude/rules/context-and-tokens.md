@@ -5,8 +5,8 @@ fetch more just in time. (Sources: Anthropic context-engineering guidance; CLAUD
 
 ## What loads, and how to read the big files
 - Always loaded: `CLAUDE.md`, `.claude/CLAUDE.md`, this folder. Everything else is read on demand.
-- `PROGRESS.md` (~800 lines): read the top 60 lines, then only your step: `grep -n '^## Step 28' PROGRESS.md`, then read that range.
-- `docs/WFACT-3.0-Factory-Completion-Plan.md` (~1,800 lines): read Part C once, then only your step's Part D section and Part E row.
+- `PROGRESS.md` (~900 lines): read the top 60 lines, then only your step: `grep -n '^## Step 28' PROGRESS.md`, then read that range.
+- `docs/WFACT-3.0-Factory-Completion-Plan.md` (~1,900 lines): read Part C once, then only your step's Part D section and Part E row.
 - `docs/HANDOFF.md` is for orientation, not for every task. The Blueprint HTML: only the section a step cites.
 - Codebase questions: `graphify query "<q>"` / `graphify explain` first; `GRAPH_REPORT.md` only for architecture reviews.
 
