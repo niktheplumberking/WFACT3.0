@@ -414,15 +414,15 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1792056737.9245248,
-    "seen": 1792058103.07331,
-    "ast_hash": "00f50056407bb20ffeab7d0c28496cb7",
+    "mtime": 1792431459.1839886,
+    "seen": 1792431554.252009,
+    "ast_hash": "fa5e16ea638d2250add815316f1421e1",
     "semantic_hash": ""
   },
   "BLOCKED-ON-NICK.md": {
-    "mtime": 1792427610.5147521,
-    "seen": 1792427722.731819,
-    "ast_hash": "c4d5228e06252f2a4cda965a4585abec",
+    "mtime": 1792431547.9298797,
+    "seen": 1792431554.252036,
+    "ast_hash": "a764d13f88b80849975774442ef0d8a5",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1792427691.8755627,
-    "seen": 1792427722.7318442,
-    "ast_hash": "88ab4a06483808c3fe879f91bd7f79f9",
+    "mtime": 1792431650.2025216,
+    "seen": 1792431680.382036,
+    "ast_hash": "cb4eda4c29d0b178589d4b90636967de",
     "semantic_hash": ""
   },
   "README.md": {
@@ -468,9 +468,9 @@
     "semantic_hash": "5da272aca216e06281b8145fd5a7cacf"
   },
   "docs/INDEX.md": {
-    "mtime": 1792058065.4494023,
-    "seen": 1792058103.073641,
-    "ast_hash": "331b09af0e4ed5abaff2621d0ce24f55",
+    "mtime": 1792431621.5874805,
+    "seen": 1792431680.3825421,
+    "ast_hash": "fc60a664ce5d2ecb7636c2d5663db58e",
     "semantic_hash": ""
   },
   "docs/WFACT SOPS/Claude outputs/WFACT-SOP-1-Sales-Onboarding.md": {
@@ -492,9 +492,9 @@
     "semantic_hash": "d6805e616ab67475f2e07ddf8aaafdc2"
   },
   "docs/WFACT-3.0-Continuation-Build-Plan.md": {
-    "mtime": 1791391183.1157413,
-    "seen": 1791829942.128662,
-    "ast_hash": "c19636c53b55b8363e95d301a7c52060",
+    "mtime": 1792431319.3953128,
+    "seen": 1792431554.252552,
+    "ast_hash": "6d0619097b43c42fa77cbfd4963ade91",
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Ecosystem-Blueprint.md": {
@@ -858,8 +858,8 @@
     "semantic_hash": "9cd858610a3574fb843943fa616d5d6a"
   },
   "packages/planning/src/planner.ts": {
-    "mtime": 1792057449.9371848,
-    "seen": 1792058103.071525,
+    "mtime": 1792431309.969561,
+    "seen": 1792431554.249701,
     "ast_hash": "53db5d605a7102922dfcac752294e058",
     "semantic_hash": ""
   },
@@ -918,9 +918,9 @@
     "semantic_hash": "f4a09df9027a520ccc7215766b5d9920"
   },
   "packages/jobs/package.json": {
-    "mtime": 1791372504.171297,
-    "seen": 1791829942.127425,
-    "ast_hash": "e085bd110db9048ffb7ab6a9aaa9f84f",
+    "mtime": 1792431513.7846413,
+    "seen": 1792431554.249314,
+    "ast_hash": "33779324d21d9e81db6e796edbfb9661",
     "semantic_hash": ""
   },
   "packages/jobs/src/handlers.ts": {
@@ -948,10 +948,10 @@
     "semantic_hash": ""
   },
   "packages/jobs/tsconfig.json": {
-    "mtime": 1790607526.1376555,
-    "seen": 1790863790.339715,
-    "ast_hash": "6839de2b1e9ea7b22e5bbc58e8de5810",
-    "semantic_hash": "6839de2b1e9ea7b22e5bbc58e8de5810"
+    "mtime": 1792431513.7871041,
+    "seen": 1792431554.249475,
+    "ast_hash": "921312dfaea1617f545352e825bc7f5f",
+    "semantic_hash": ""
   },
   "packages/workflow/src/supabaseArtifacts.ts": {
     "mtime": 1791986196.689128,
@@ -960,8 +960,8 @@
     "semantic_hash": ""
   },
   "supabase/functions/dispatch-job/index.ts": {
-    "mtime": 1792055438.8283224,
-    "seen": 1792058103.072832,
+    "mtime": 1792431441.0114934,
+    "seen": 1792431554.251265,
     "ast_hash": "5f66db74342ebbbff6189749963f4c6e",
     "semantic_hash": ""
   },
@@ -1158,9 +1158,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1792427649.1679778,
-    "seen": 1792427722.732783,
-    "ast_hash": "a9f2764d636de48aec4eb77eb56ee98c",
+    "mtime": 1792431627.3143635,
+    "seen": 1792431680.382655,
+    "ast_hash": "feb5b1e2590fedbd18da69776819771a",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1500,9 +1500,9 @@
     "semantic_hash": ""
   },
   "packages/frontend-loop/src/trackA/render.ts": {
-    "mtime": 1792058966.9584324,
-    "seen": 1792060078.2072792,
-    "ast_hash": "eb01d567ea34aff1bd232de4b90c8bf9",
+    "mtime": 1792431280.8073435,
+    "seen": 1792431554.2479858,
+    "ast_hash": "c4e3457d8217ee555783444d1e2acfb7",
     "semantic_hash": ""
   },
   "packages/frontend-loop/starters/track-a/site.js": {
@@ -1518,9 +1518,9 @@
     "semantic_hash": ""
   },
   "packages/frontend-loop/test/trackA.test.ts": {
-    "mtime": 1791986833.7876918,
-    "seen": 1791989613.80794,
-    "ast_hash": "7d5834306a37b757b3bb34673a2b95ba",
+    "mtime": 1792431110.2887785,
+    "seen": 1792431554.248863,
+    "ast_hash": "a19e85eab7a2f347c5608f06d154af4d",
     "semantic_hash": ""
   },
   "packages/rendered-qa/test/trackA.test.ts": {
@@ -1602,9 +1602,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/model.ts": {
-    "mtime": 1792426219.821258,
-    "seen": 1792427722.7251709,
-    "ast_hash": "b2daa9fa820625e4b643d63e33cd0a9b",
+    "mtime": 1792431329.9078324,
+    "seen": 1792431554.2456892,
+    "ast_hash": "f596e97e26ee5be3322c075d37342640",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/state.tsx": {
@@ -1614,9 +1614,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Activity.tsx": {
-    "mtime": 1792426219.8200843,
-    "seen": 1792427722.725368,
-    "ast_hash": "5df2768acec81c34deac822ffff5d027",
+    "mtime": 1792431146.0641963,
+    "seen": 1792431554.245909,
+    "ast_hash": "eba9cdd9b101e69c52443a3159b3bc19",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Decisions.tsx": {
@@ -2771,12 +2771,6 @@
     "ast_hash": "a8cabb3b7a4aa3c60039925814474dc5",
     "semantic_hash": ""
   },
-  "packages/jobs/src/permissionsAttack.ts": {
-    "mtime": 1791292213.7926211,
-    "seen": 1791292774.45232,
-    "ast_hash": "0201e142b24c0465372a07c7c531b306",
-    "semantic_hash": ""
-  },
   "packages/jobs/test/permissions.test.ts": {
     "mtime": 1791292213.793105,
     "seen": 1791292774.4523368,
@@ -2832,9 +2826,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/recovery.ts": {
-    "mtime": 1792426219.8216152,
-    "seen": 1792427722.7252522,
-    "ast_hash": "003825512a77e46a52f5eae09beec876",
+    "mtime": 1792431281.9349642,
+    "seen": 1792431554.2457678,
+    "ast_hash": "9b1afe6fc5389f841f3b27bae0f46eec",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/runInfo.ts": {
@@ -3066,9 +3060,9 @@
     "semantic_hash": ""
   },
   "docs/HANDOFF.md": {
-    "mtime": 1792052706.8096116,
-    "seen": 1792058103.0736399,
-    "ast_hash": "d9a6c02e175339735f284d98b1195234",
+    "mtime": 1792431526.0028415,
+    "seen": 1792431554.25247,
+    "ast_hash": "e73c4ccb7a1c185e259ee2816fda2ce6",
     "semantic_hash": ""
   },
   "docs/MVP-CUTLINE.md": {
@@ -3612,9 +3606,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/timeline.ts": {
-    "mtime": 1792426228.5753639,
-    "seen": 1792427722.72535,
-    "ast_hash": "ab708552b8d5720c4e83f5b4d29c82c6",
+    "mtime": 1792431146.05523,
+    "seen": 1792431554.245877,
+    "ast_hash": "1ec3d2f16026f017a160acf7ad108e87",
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/useNow.ts": {
@@ -3714,9 +3708,9 @@
     "semantic_hash": ""
   },
   "packages/planning/test/request.test.ts": {
-    "mtime": 1791981585.4668322,
-    "seen": 1791982653.712058,
-    "ast_hash": "926c35547fc7f219092f3e8250a57f7c",
+    "mtime": 1792431301.792452,
+    "seen": 1792431554.249797,
+    "ast_hash": "650f8be018b44125bbef0a617035b5b3",
     "semantic_hash": ""
   },
   "packages/rendered-qa/src/longFetch.ts": {
@@ -4074,9 +4068,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/dev/fakeSupabase.ts": {
-    "mtime": 1792427126.6780527,
-    "seen": 1792427722.7249951,
-    "ast_hash": "bc74346ce5d90c9512b97bc42d711a8a",
+    "mtime": 1792431146.0470529,
+    "seen": 1792431554.245466,
+    "ast_hash": "6b31cefc2a60547541ac03513d42824c",
     "semantic_hash": ""
   },
   "apps/cockpit/src/shell/shell.test.tsx": {
@@ -4182,9 +4176,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/components/LiveBuild.tsx": {
-    "mtime": 1791996828.033658,
-    "seen": 1791996865.7131362,
-    "ast_hash": "e5f53575e27ced1071d96b676e61eb04",
+    "mtime": 1792431146.0283837,
+    "seen": 1792431554.245278,
+    "ast_hash": "c4369166617d5c5c347bc720396d85a9",
     "semantic_hash": ""
   },
   ".claude/completions/2026-10-15-step-28-package-4-phase-11.md": {
@@ -4218,9 +4212,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/components/SiteReview.tsx": {
-    "mtime": 1791998274.5083954,
-    "seen": 1791998333.049247,
-    "ast_hash": "24b4b36f743b256b6006fd7f4249da0a",
+    "mtime": 1792431146.0335457,
+    "seen": 1792431554.2453299,
+    "ast_hash": "d2112b7ba72187f4082191aaa870917b",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/review.test.tsx": {
@@ -4530,9 +4524,9 @@
     "semantic_hash": ""
   },
   "docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md": {
-    "mtime": 1792427691.8748155,
-    "seen": 1792427722.7330492,
-    "ast_hash": "acda6c8d68ba1550bf043147e4593348",
+    "mtime": 1792431650.2021701,
+    "seen": 1792431680.382762,
+    "ast_hash": "405ac36e1c1ec7357312df2b3e592d63",
     "semantic_hash": ""
   },
   "docs/archive/old-reports/wfact-mvp-progress-2026-10-12.html": {
@@ -4773,6 +4767,36 @@
     "mtime": 1792427712.353634,
     "seen": 1792427722.731565,
     "ast_hash": "b8e6dd84ebc44bf2fa60d7878d486eb8",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/pages/runpage.test.tsx": {
+    "mtime": 1792431317.5204117,
+    "seen": 1792431554.246148,
+    "ast_hash": "0621fa8875179984424ce6624da37f79",
+    "semantic_hash": ""
+  },
+  "packages/jobs/scripts/permissionsAttack.ts": {
+    "mtime": 1791292213.7926211,
+    "seen": 1792431554.249315,
+    "ast_hash": "0201e142b24c0465372a07c7c531b306",
+    "semantic_hash": ""
+  },
+  "supabase/functions/dispatch-job/dispatch.test.ts": {
+    "mtime": 1792431425.7868462,
+    "seen": 1792431554.251264,
+    "ast_hash": "c5133841f0844459c5c9f3a715b49997",
+    "semantic_hash": ""
+  },
+  "docs/design/cockpit-v2/docs/COCKPIT-V2-PRE-V2-REBUILD-PROMPT.md": {
+    "mtime": 1792429400.7851975,
+    "seen": 1792431554.2529979,
+    "ast_hash": "04076bd1690ca00178a274ea01dcf509",
+    "semantic_hash": ""
+  },
+  "docs/NPM-WORKSPACES-DECISION.md": {
+    "mtime": 1792431618.4985723,
+    "seen": 1792431680.382556,
+    "ast_hash": "887e7782b3a165911ac944102aeaf38a",
     "semantic_hash": ""
   }
 }
