@@ -1,6 +1,6 @@
 # Documentation Index
 
-**Last updated**: 2026-10-15 (cleanup round 3). Rule: a doc that is added, retired or renamed gets its row here in the same commit.
+**Last updated**: 2026-10-19 (Step 21 G: every current doc indexed by name or folder). Rule: a doc that is added, retired or renamed gets its row here in the same commit.
 
 ## Session start (essential)
 
@@ -33,8 +33,8 @@ Live status: `../PROGRESS.md` ("Status summary" and "Next up" at the top). Waiti
 | `BUILD-FAILURE-DIAGNOSIS.md` | 28 | All 25 build jobs diagnosed (2026-10-15); source of the build-failure guards |
 | `EXAMPLE-CLIENTS.md` | 28 | The two synthetic, complete example clients (`clients/example-*`): what they are for and how to run one |
 | `BUILD-SPEED-UX-PROMPTS.md` | proposed | Build-time baseline and prompts P0–P6 (P0 cited by `rendered-qa/src/reviewer.ts`) |
-| `design/cockpit-v2/` | 28 Pkg 4 | **Locked** Cockpit v2 design (Claude Design export) and its build prompts; extend, do not restyle |
-| `step-4c/` | 4C | `PHASE-1-PROPOSAL.md` (historical audit, cited by Cockpit source) and before/after screenshots cited as evidence |
+| `design/cockpit-v2/` | 28 Pkg 4 | **Locked** Cockpit v2 design (Claude Design export); extend, do not restyle. Build prompts in `design/cockpit-v2/docs/`: `COCKPIT-V2-BUILD-PROMPT.md`, `COCKPIT-V2-PHASES-14-ON-PROMPT.md`, `COCKPIT-V2-PHASES-18-ON-PROMPT.md`, `COCKPIT-V2-PRE-V2-REBUILD-PROMPT.md` |
+| `step-4c/` | 4C | `PHASE-1-PROPOSAL.md` (historical audit, cited by Cockpit source), `mockups/*.html` (the five pre-v2 screen mockups) and before/after screenshots cited as evidence |
 
 ## Reference (current, still cited by the law file and memory)
 
@@ -44,7 +44,7 @@ Live status: `../PROGRESS.md` ("Status summary" and "Next up" at the top). Waiti
 | `WFACT-3.0-Ecosystem-Blueprint.md` | Markdown version of the Blueprint (text-friendly) |
 | `COCKPIT-JOBS.md` | Cockpit job queue design and runbook |
 | `SECRETS.md` | Doppler secrets runbook |
-| `WFACT SOPS/` | The 3 SOPs, Factory Book and Factory Audit (PDFs, with markdown copies); cited by the eval registry |
+| `WFACT SOPS/` | The 3 SOPs, Factory Book and Factory Audit (PDFs); markdown copies of the SOPs in `WFACT SOPS/Claude outputs/` (`WFACT-SOP-1-Sales-Onboarding.md`, `-2-Production-Pipeline.md`, `-3-Post-Launch-Automation-Team-Ops.md`); cited by the eval registry |
 | `../PRODUCT.md` | Cockpit product and design constraints |
 
 ## Proposals kept in place (not governing)
