@@ -43,6 +43,7 @@ Live status: `../PROGRESS.md` ("Status summary" and "Next up" at the top). Waiti
 | `WFACT-3.0-Playbook.md` | Five pillars, 11-stage pipeline (§7), carried-over laws |
 | `WFACT-3.0-Ecosystem-Blueprint.md` | Markdown version of the Blueprint (text-friendly) |
 | `COCKPIT-JOBS.md` | Cockpit job queue design and runbook |
+| `NPM-WORKSPACES-DECISION.md` | Step 21 B: why the packages stay linked with `file:` (no npm workspaces), and when to revisit |
 | `SECRETS.md` | Doppler secrets runbook |
 | `WFACT SOPS/` | The 3 SOPs, Factory Book and Factory Audit (PDFs); markdown copies of the SOPs in `WFACT SOPS/Claude outputs/` (`WFACT-SOP-1-Sales-Onboarding.md`, `-2-Production-Pipeline.md`, `-3-Post-Launch-Automation-Team-Ops.md`); cited by the eval registry |
 | `../PRODUCT.md` | Cockpit product and design constraints |
