@@ -14,6 +14,7 @@ parallel with Steps 5-8 because it only touches `apps/cockpit`.
 **Last synced 2026-10-15 (night +05)** via `/progress-sync`: every step re-checked against git (HEAD `3b5a94c`; `origin/main` = `origin/huraira-work` = `2a64471`, 16 local commits unpushed), CI (`38706155999` and `38711602641` green on `2a64471`, incl. the Cockpit deploy) and the live database (read-only SQL: 34 jobs, `caa201f1` cancelled, `e6a71046` failed, 177 `model_traces`, 5 `leads`, 0 `account_requests`, latest migration 20261015103026). No step changed status and none newly qualifies for Closed (3A: still 0 sign-ups; 4C, 21, 25, 28: live checks pending). Fixed stale notes: `8e6e09d` and `b8d240f` are pushed (were "local"); Harbor Street's live continue result recorded under Step 28. Added work found in git but cited nowhere: `a6f64cd` and `dde68a5` (Step 28), `3c79212` and `892c468` (Step 12), `e11c1ea` (Step 21). **Synced 2026-10-15 (13:30 +05)** via `/progress-sync`: re-synced after `626667a` (pushed; CI `38695633253` running at sync) and `8e6e09d` (brand-colour rule, local). Huraira decided the palette rule (tints and shades on-brief, CTAs in the true accent at 4.5:1). Step 28 updated; no step changed status and none newly qualifies for Closed (3A still 0 `account_requests`; 4C and 21 still need their live checks). The Part B table gained a **Depends on / waiting for** column, rows 3A, 4B, 12 and 26 were realigned, and the missing 4D row was added; Part E rows 3A, 4B, 12, 26 and 28 were refreshed. Live (read-only SQL): 33 jobs, `d3c45995` failed, `caa201f1` queued and never dispatched; 165 `model_traces`; 31 `plan_inputs`; latest migration 20261014140027. **Updated 2026-10-15 (12:10 +05)** via `/step-close 28`: Step 28 stays IN PROGRESS; build-failure guards added (`b8d240f`, local, `docs/BUILD-FAILURE-DIAGNOSIS.md`). **Last synced 2026-10-14 (17:00 +05)** via `/progress-sync`: Step 4D closed (exit check met live, `55ddba7c`); Steps 4B, 25, 26 updated from the first passing build since 2026-10-01; CI `38554457540` green on `8271858`, `38557714567` on `caf42bc` running at sync (all jobs green except Rendered QA, still running). Previous sync 2026-10-14 (00:45 +05) via `/progress-sync`: every step re-checked against git (`92fd4ac`; `a9b271f` and `92fd4ac` local only, remotes at `d5129e0`), CI (`38452956084` on `d5129e0` FAILED in Rendered QA only, fixed by `a9b271f`, unpushed) and the live database (Cockpit continue `e2a204fb` reached a real QA verdict with the Anthropic reviewer). No status changed. No step newly qualifies for Closed: 3A still lacks its live sign-up (0 `account_requests` rows). The step table row for 4B is fixed (its columns were misaligned) and the Part E rows for 3A, 4B, 4D, 12 and 26 are refreshed. Previous sync 2026-10-13 via `/progress-sync`: every step re-checked against git (`76e9d6c`, no code since `c97e329`), CI (`38437214851`, `38438423293` green incl. deploy) and the live database (no build since 2026-10-12); no status changed. Previous full re-audit 2026-10-12 (no commits since `072b391`,
 2026-10-07), CI and the live database. Closed steps (DONE with citable evidence: 1, 2, 3, 5, 6, 7; 3A added 2026-10-15) moved to **"Closed steps"** at the end of
 Part D; open steps carry a **Next action** line and a continuation or verification prompt.
+**Status as of 2026-10-19 (late night, `/step-close 21`)**: Step 21 stays PARTIAL. A housekeeping round (`ac314ae`..`f490904`, local, not pushed) did B, C, E, G, I, L and parts of D, H and J; D's trigger part, F, K and H's RLS runs wait on Huraira. No other step changed.
 **Status as of 2026-10-19 (late night, `/step-close 28` R1)**: no status changed. Step 28 stays IN PROGRESS: pre-v2 rebuild R1 (the other work pages) built in `f9d4842` (vitest 335/335, axe 0 and Lighthouse a11y 100 in 8 rooms, fingerprints of unchanged rooms identical); Package 4 exit check still PARTIALLY MET (R2–R5 left). Waits on Huraira's GO for R2. No live build since 2026-10-15. Open verification prompts remain for 4C and 21.
 **Status as of 2026-10-15 (`/step-close 3A`)**: Step 3A is **DONE and closed**: the live sign-up was proven end to end (sign-up → owner approval as `pm` with audit row → password sign-in after approval in the Auth logs → role-limited view; attack test 32/32). Moved to Closed steps. No other step changed status. Open verification prompts remain for 4C and 21.
 **Status as of 2026-10-15 (night, `/progress-sync`)**: no status changed. Open steps that need only a live check or a sign-off keep their verification prompts (3A, 4C, 21). The next move is Huraira's push of the 16 local commits, then the Harbor Street continue (Step 28) and Nick's CRM and brief answers (Step 25).
@@ -1058,7 +1059,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 21 — Housekeeping (P2) — PARTIAL 2026-10-12, launch files (sub-item I, second half; MVP M5) done in `9968019`, verification pending; A and G done 2026-10-07; rest open
+### STEP 21 — Housekeeping (P2) — PARTIAL 2026-10-19, B, C, E, G, I, L done and D, H, J in part (`ac314ae`..`f490904`, local); D triggers, F, K and H's RLS runs wait on Huraira; launch files verification pending
 
 **Depends on**: none (best after Step 4).
 **Maps to**: Continuation "Gaps noticed" list.
@@ -1072,43 +1073,43 @@ an unreferenced report and 12 never-registered `.claude/hooks` scripts; moved th
 6/5/7/4D verbatim to `docs/archive/2026-10-15-cleanup/` (1,198 -> 789 lines); untracked `graphify-out/cache`; added `.claude/rules/`
 (context-and-tokens, agent-workflow, quality-bar), `AGENTS.md` and CLAUDE.md section 9; `check-trackers.mjs` OK after the move.
 **Proven live 2026-10-14 (SQL-checked)**: CI `38554457540` on `8271858` green, every job incl. Rendered QA and the Cockpit deploy. Huraira uploaded the Lanternworks logo in the details form (sha256 `be8c3281…` = `clients/lanternworks-studio/logo.svg`) and pressed "Fix and continue": job `55ddba7c` (run `4c35703b`) wrote a reopen with the logo in the brief, `workflow.preflight` ok (logo verified, Anthropic and Agent 37 answering), sent the stored findings to the builder first (no re-check), failed one real check (`render.layout`: two contact links 23 px tall at 375 px), fixed it in one revision and reached the launch gate at 11:28 UTC (verified checkpoint `4e4434db…`, `logo.svg` in the stored site). 14 min, about $0.68 ($0.51 builder, $0.17 review and evaluation). SYNTHETIC client: does not count toward Step 25.
+**Done 2026-10-19 (housekeeping round, `ac314ae`..`f490904`, local, not pushed)**: I first half (open questions only in
+`content.json`, track-a-starter 1.5.1), C (alias rule from `3e493f6` pinned by a test), L (dead registry path; hooks archived in
+`e11c1ea`), G (INDEX), H in part (CI: `media`, `dispatch-job` with 7 Deno tests, `check-trackers`), J in part (`permissionsAttack.ts`
+to `jobs/scripts/`; the shared mock deferred: three different contracts, adds CI install coupling), B (decision record
+`docs/NPM-WORKSPACES-DECISION.md`: keep `file:` links), E (0 dangling edges, PDFs title-only), D runtime part (QA CLI and `job.run`
+rows carry the entity, tests mutation-checked), K's `0016` record (never committed; numbering skipped in `681b9a8`). Detail and
+counts in PROGRESS.md Step 21.
+**Next action (2026-10-19)**: Huraira decides (1) K: live `entities` has no `bennett-co` and no aliases, so the switch from
+`KNOWN_ENTITIES` needs the entity list settled first; (2) F: redeploy or leave `dreamsign-deploy.vercel.app`; (3) GO for the D
+migration (entity on trigger-written job/plan rows) plus the `dispatch-job` redeploy; (4) H: a scratch Supabase project for the RLS
+attack scripts in CI; (5) push, so CI runs on this round. The M5 live launch-stage build still stands.
 **Next action (2026-10-14)**: the human screenshot review of the Lanternworks site (Step 4B M4, Track B half); fix the Track B starter's 23 px contact links so they never cost a round again; then continue Lanternworks with the logo added in the details form (proves the slice live). The earlier M5 check (one live build with a real `siteUrl` at stage `launch`) still stands.
 **Next action (2026-10-12)**: verify M5: push (Huraira's say-so), confirm CI green, then one live build with a real `siteUrl` run at stage `launch`. Every other sub-item waits until the MVP ships (D3). Sub-item I's first half (open questions out of the HTML) is still open. Prompt below unchanged for the remaining sub-items.
 
 ```
 You are the coding agent for WFACT 3.0. Work in wfact-3.0-build/. Follow the Standard Operating Rules
-in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY Step 21. Each sub-item is separate: commit
-each separately with its own evidence.
+in docs/WFACT-3.0-Factory-Completion-Plan.md Part C. Do ONLY what is left of Step 21. Each sub-item is
+separate: commit each with its own evidence. Done already (do not redo): A, B (docs/NPM-WORKSPACES-DECISION.md),
+C (3e493f6, 0e13089), E (f1eb53d), G (d5c8c12), I (9968019, ac314ae), L (3bf8df4, e11c1ea), J's move
+(e55e430), D's runtime part (f802994, f490904), H's media/dispatch-job/check-trackers jobs (0145064).
 
-TASK (from PROGRESS.md "Gaps noticed")
-A. CLAUDE.md section 0 is stale ("Current phase: Phase 1"). Rewrite the current-state section to reflect the
-   Continuation plan, this Factory Completion Plan, the current step, and the Standard Operating Rules. Keep
-   the law sections intact. Add a pointer to docs/WFACT-3.0-Factory-Completion-Plan.md and docs/INDEX.md.
-B. npm workspaces decision. There are 9+ linked `file:` packages with a hand-ordered install per CI job.
-   The repo root deliberately has no package.json (Phase 6 Vercel Root Directory incident). Investigate
-   whether workspaces can live in a separate root file or subfolder without reintroducing that incident.
-   Present the decision and the risk; only implement if you can prove a fresh git-shaped Vercel build of the
-   Cockpit still succeeds and CI stays green. Otherwise document why not and keep the current approach.
-C. Planner near-duplicate sections ("process" vs "how-it-works"): add a section-normalisation rule with a
-   test, without loosening the parseBrief contract.
-D. Null entity_slug in audit rows: pass entity context through the runtime everywhere (QA CLI included);
-   add a test that fails when a row is written without entity context where one is knowable.
-E. Knowledge graph: the graphify output has ~52 dangling edges and PDFs not extracted. Re-run graphify
-   after Steps 1-20 land, or do it now and note it is stale; fix dangling edges if the tool allows; report
-   what remains.
-F. The stale deployed DreamSign page: decide with Huraira whether to redeploy or leave; do not deploy
-   without a yes.
-G. Docs: update docs/INDEX.md so every doc, including this plan, is indexed.
-H. (added 2026-10-07 from the audit) CI coverage gaps: add `packages/media`, a test for the `dispatch-job` Edge Function, the
-   `scripts/rls_attack_test*.sql` runs (against a scratch project) and `scripts/check-trackers.mjs` to CI.
-I. Track A writes the brief's open questions into the home page as HTML comments; keep them in `content.json` only. Add launch
-   files to both starters (sitemap, robots.txt, canonical, og:image; Track A 404 page) if Huraira says yes (see PROGRESS "Gaps noticed").
-J. Four copy-pasted mock model clients (`hermes`, `frontend-loop`, `planning`, `verification` `src/modelClient.ts`): extract one shared
-   test double. Move `packages/jobs/src/permissionsAttack.ts` out of `src/` or document why it stays.
-K. Hermes-lite: replace hard-coded `KNOWN_ENTITIES` (`packages/hermes/src/controller.ts`) with the entity table and stop using an entity slug
-   as a client folder name. Record why migration `0016` is absent.
-L. Remove dead references: the Continuation plan's path `packages/agent-runtime/registry.ts` (real: `src/registry.ts`); decide whether the
-   11 unregistered `.claude/hooks/*` scripts are wanted.
+FIRST verify: the 2026-10-19 round is pushed and CI is green on it (all jobs incl. media, dispatch-job and the
+guardrails tracker check). If it is not pushed, ask Huraira; do not push main yourself.
+
+LEFT, each only with Huraira's answer recorded in PROGRESS.md:
+D. Entity on trigger-written rows: a new migration that sets entity_slug on job.requested, job.cancelled,
+   job.archived (from params.planId -> plan_approvals.entity_slug; verify jobs from the clients/<slug> path)
+   and plan.input (plan_id -> plan_approvals). Apply live only on Huraira's GO; extend the matching
+   scripts/rls_attack_test*.sql to assert entity_slug; run them for real; get_advisors after. dispatch-job:
+   select params, write entity_slug on job.dispatched, extend dispatch.test.ts, redeploy on GO. Null stays
+   correct for intake, ask and account.approved.
+F. Stale dreamsign-deploy.vercel.app: redeploy or leave, per Huraira. Never deploy without a yes.
+H. RLS attack scripts in CI against a scratch Supabase project (needs the project and its secret: Huraira).
+K. Replace KNOWN_ENTITIES (packages/hermes/src/controller.ts, used by planning/src/intake.ts) with the
+   entities table once the entity list is settled (live table lacks bennett-co and aliases; adding rows or an
+   alias column is a migration). Stop reading clients/<entitySlug>/memory.md (controller.ts ~139-148).
+I. M5 live check: one live build with a real siteUrl run at stage launch.
 
 ACCEPTANCE
 - Each sub-item done or explicitly deferred with a reason; CI green; no regressions.
@@ -1845,7 +1846,7 @@ last continuation prompt was retired at close.*
 | 18 | Three-concurrent-clients test | not started | | |
 | 19 | Disaster-recovery drill | not started | | |
 | 20 | Vercel serverless ceiling | not started | | |
-| 21 | Housekeeping | **PARTIAL** (launch files, MVP M5: `9968019`, migration 0019 applied live; CI `38292111323` failed on cross-package test imports, fixed in `b107de4`; CI `38427074538` green incl. the Cockpit deploy; a live launch-stage build pending; other sub-items open) | 2026-10-12 | |
+| 21 | Housekeeping | **PARTIAL** (2026-10-19 round `ac314ae`..`f490904`, local: B, C, E, G, I, L done; D runtime part, H media/dispatch-job/check-trackers, J move done; J shared mock deferred with reason; D triggers, F, K, H RLS runs wait on Huraira; CI not yet run on the round. Launch files M5: `9968019`, CI `38427074538` green; a live launch-stage build pending) | 2026-10-19 | |
 | 22 | Nick's items | not started | | |
 | 23 | Product features (A–E) | not started | | |
 | 24 | Advanced autonomy and optimization (A–C) | not started | | |

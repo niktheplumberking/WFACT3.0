@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-19 (late night, +05), via `/step-close 28` (Package 4 pre-v2 rebuild R1) — `f9d4842`: the other work pages (never started, cancelled, running non-build work, older and archived passing builds, a stop a later build fixed, the live build) rebuilt in the v2 grammar. vitest 335/335 (16 new in `pages/runpage.test.tsx`, 4 mutations caught), tsc and build clean (precache 42 entries, 1579.84 KiB, no dev code in `dist/`); axe 0 and Lighthouse a11y 100 in 8 rooms; fingerprints of SiteReview, stop case 5 and Home identical. Push and CI recorded at the next update.
+Last synced: 2026-10-19 (late night, +05), via `/step-close 21` — housekeeping round `ac314ae`..`f490904` plus graphify `f1eb53d`, `3db3263` (local, not pushed; CI not run on it): I first half, C, L, G, H in part (CI `media`, `dispatch-job` 7 Deno tests, `check-trackers`), J move, B decision record, E (0 dangling edges), D runtime part. Local: frontend-loop 130, planning 45, verification 123, jobs 38, workflow 89, hermes 55, agent-runtime 39, media 8, dispatch-job 7, rendered-qa 89 (run before the D change); typechecks clean; check-trackers OK. Step 21 stays PARTIAL: D triggers, F, K and H's RLS runs wait on Huraira.
+Previous sync: 2026-10-19 (late night, +05), via `/step-close 28` (Package 4 pre-v2 rebuild R1) — `f9d4842`: the other work pages (never started, cancelled, running non-build work, older and archived passing builds, a stop a later build fixed, the live build) rebuilt in the v2 grammar. vitest 335/335 (16 new in `pages/runpage.test.tsx`, 4 mutations caught), tsc and build clean (precache 42 entries, 1579.84 KiB, no dev code in `dist/`); axe 0 and Lighthouse a11y 100 in 8 rooms; fingerprints of SiteReview, stop case 5 and Home identical. Push and CI recorded at the next update.
 Previous sync: 2026-10-19 (night, +05), via `/progress-sync` — re-synced `2810f50`..`2657fef` (= `origin/main` = `origin/huraira-work`, nothing unpushed): only Step 28 Package 4 phases 18–19 landed (`b6a6e39`, `55e0a8a`, `f76a1f6`, `8bd6de1`, `5589192` plus trackers and graphify); no commit touches `packages/`, `clients/`, `scripts/` or `.github/`. Re-run here: Cockpit vitest 319/319, tsc clean, build clean (precache 1583.80 KiB), check-trackers OK. CI green incl. Deploy Cockpit to Vercel: phase 18 `39268206990` (`0da4c79`), phase 19 `39286692404` (`2657fef`). No status changed.
-Previous sync: 2026-10-19 (+05), via `/step-close 28` (Package 4 phase 19) — cleanup and the Package 4 exit check in `55e0a8a`..`5589192` (alias block gone, 0 old names, computed styles identical in 21 rooms × 3 views; Overpass sans removed, precache −52.5 KiB; plain words on the pre-v2 screens; focus never left on `<body>`; uploads never fail silently). vitest 319/319; axe 0 in 21 rooms at 1440/375 light and dark; Lighthouse accessibility 100 in 16 rooms; keyboard-only main flow run on the fake. Exit check PARTIALLY MET (pre-v2 screens cleaned, not rebuilt). Phase 18 CI `39268206990` green incl. deploy; phase 19 CI pending.
 Older sync entries (2026-09-28 to 2026-10-15): `docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md`. Keep at most two "Previous sync" lines here; move older ones there.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
@@ -16,6 +16,7 @@ phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07)
 steps; this file tracks the Continuation Stages.
 
 **Status summary (2026-10-15, 13:30 +05, `/progress-sync`)**:
+- **Step 21 PARTIAL** (`/step-close 21`, 2026-10-19): housekeeping round `ac314ae`..`f490904`, local, not pushed. B, C, E, G, I, L done; D, H and J in part; D's trigger part, F, K and H's RLS runs wait on Huraira.
 - **Step 3A DONE, closed** (`/step-close 3A`, 2026-10-15): the live sign-up is proven end to end (sign-up, owner approval as `pm` with audit row, password
   sign-in after approval in the Auth logs, role-limited view, attack test 32/32). Supabase email confirmation stays off (Huraira, 2026-10-15: the approval gate is enough).
 - **Step 25 PARTIAL** (`/step-close 25`, 2026-10-15): MVP M4, the contact form that saves leads, is **met live on synthetic data** (migrations 0025/0026
@@ -63,7 +64,7 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 
 **Next up** (2026-10-19, `/step-close 28` R1):
 1. **Huraira**: review the R1 report and the new BLOCKED-ON-NICK row (Start again / Close it / Archive have no design frame); say "GO for R2" (old and rejected proposals).
-2. **Huraira**: continue Harbor Street `e6a71046` (live proof of the brief consistency check and the brand-colour rule).
+2. **Huraira**: Step 21 decisions (K entity list: live `entities` lacks `bennett-co`; F stale DreamSign page; GO for the D migration and `dispatch-job` redeploy; a scratch project for RLS runs in CI) and a push so CI runs on the round; then continue Harbor Street `e6a71046`.
 3. **Nick**: the Cockpit v2 decisions in BLOCKED-ON-NICK (now including the work-page actions); the CRM target and lead notification.
 
 **Gaps noticed**:
@@ -113,7 +114,7 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 - **The live address must be supplied for launch**: without the brief's `siteUrl` (or an owner fact `site_url`) the launch-stage checks tells.canonical, tells.og-image and tells.sitemap fail by design; there is no Cockpit field for it yet. Add it to the Bennett intake.
 - **The share card is a plain colour card** (brand deep colour, accent rule, no text or logo). Replace it with a designed card from the client's own assets when supplied.
 - **No favicon in either starter** (tells.favicon, advisory). Small; could ride with the Bennett logo.
-- **Live migration name differs from the repo file**: applied as `build_recovery` (20261007144150), repo file is `0018_build_recovery.sql`; `0016` is absent in both. Cause not recorded.
+- **Live migration name differs from the repo file**: applied as `build_recovery` (20261007144150), repo file is `0018_build_recovery.sql`; `0016` is absent in both. Recorded 2026-10-19 (Step 21 K): no `0016` file was ever committed (`git log --all` finds none); the numbering skipped it when `0017` was added in `681b9a8`, and the live list goes 0015 (20261002173129) to 0017 (20261007114354), so nothing is missing.
 - **Doc-only commits trigger the full CI and a production deploy of the Cockpit** (three runs queued for three doc commits). Consider a paths filter (Step 21 H). Those three deploy jobs then failed without starting (0 steps, no runner; CI `37653665566`, `37653814793`, `37653952730`). The cause is not visible (logs show nothing; possibly the queued runs colliding or an Actions limit). The app code is unaffected, but the next real code push must confirm the deploy job runs.
 - **The MVP schedule has slipped**: `docs/MVP-CUTLINE.md` §5 planned the brief for Sat 10-10, the cap and launch files for Sun 10-11, and the first build for Mon 10-12. None of these is in the repo as of 2026-10-12. The cut-line asks for slippage to be reported on Monday evening.
 - **(Review part fixed 2026-10-14, `67033f7`: the screenshot reviewer is now Anthropic.)** **The Agent 37 gateway is a single point of failure for review**: it has caused design-review NOT RUN halts on 2026-10-03 (`5c85914b`) and 2026-10-07 (`b880a7d5`). Until a second vendor works (Step 26 item 1, OpenAI credits), any gateway outage stops verification.
@@ -138,26 +139,22 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
 - **Stage 7 prerequisites aren't flagged yet.** The plan says to flag them in `BLOCKED-ON-NICK.md` "the
   moment Stage 6 finishes". The rows exist ("One real pilot project brief", "business rules session")
   but are still framed as sprint Day 3–9 items.
-- **Linked `file:` packages need a decision.** There are 10 packages under `packages/` (`rendered-qa` added in M1), linked with a
-  hand-ordered install per CI job. It's worth deciding on npm workspaces now. Check first: the repo
-  root has no `package.json` on purpose, because of the Phase 6 Vercel Root Directory incident. (Three
-  near-identical copies of this gap were in the file; merged here.)
 - **Model routing covers only Intake and Planner.** The Phase 4 builder/evaluator and Hermes-lite's
   own model are still chosen inside their packages. Disclosed in the config's `_doc`.
 - **Traces cover model calls, not tool calls.** Hermes-lite tool calls are in `audit_log` with
   latency. Blueprint §3 names tool calls too; revisit under the Langfuse trigger (§13).
-- **Some audit rows carry `entity_slug = null`.** This covers lifecycle and `tool.invoke` rows when the
-  caller doesn't set `task.entitySlug` (e.g. the QA CLI has a client slug but no entity slug). Pass
-  entity context through from the runtime.
-- **The Planner emitted near-duplicate sections** (`process` and `how-it-works`), a candidate for a
-  section-normalisation rule.
+- **Some audit rows carry `entity_slug = null`** (narrowed 2026-10-19, Step 21 D). The QA CLI and `job.run` rows now carry the
+  entity (`f802994`, `f490904`). Still null where the entity is knowable: the database triggers' `job.requested`, `job.cancelled`,
+  `job.archived` and `plan.input` rows (entity via `params.planId` or `plan_id` to `plan_approvals.entity_slug`) and the
+  `dispatch-job` Edge Function's `job.dispatched` row. These need a migration and a redeploy (Huraira's GO). Null is correct for
+  intake before detection, founder questions naming no client, and `account.approved`.
 - **The deployed DreamSign page is stale.** The Stage 3 live run overwrote
   `clients/dreamsign-pilot/pages/clean-agency.html` and appended 2 rows to its `memory.md`, but
   `dreamsign-deploy.vercel.app` (HTTP 200 today) still serves the older build, since the workflow
   never deploys by design.
-- **The knowledge graph has holes.** `graphify-out/` (612 nodes / 972 edges) has 52 dangling edges, and
-  the PDFs weren't extracted. SOPs are covered by their markdown twins; Factory Book/Audit are
-  title-only.
+- **The knowledge graph's PDFs are title-only** (2026-10-19, Step 21 E): `graphify update .` gives 5048 nodes, 9793 edges and
+  0 dangling edges (was 52). All 6 PDFs are file nodes only; semantic extraction needs `/graphify --update` with a model key.
+  The SOPs are covered by their markdown copies.
 - **Two Nick disclosures are still owed in person**: Hermes-lite as a stand-in and Vercel substituting
   for Hostinger. Both are logged in `BLOCKED-ON-NICK.md` as "TELL NICK, DON'T JUST LOG IT", and
   neither conversation has happened.
@@ -734,7 +731,7 @@ reason; the walkthrough passes; accessibility and responsiveness proven with evi
 the Cockpit and is blocked as a stage move), except that every room has only been checked with copied data, not with a live signed-in
 session. The phone layout shift on Projects (0.118, measured on the copied-data build) is also still open.
 
-## Step 21 — Housekeeping (PARTIAL 2026-10-12 — launch files (MVP M5) built in `9968019`; verification pending)
+## Step 21 — Housekeeping (PARTIAL 2026-10-19 — B, C, E, G, I, L done; D and J in part; F, K, the rest of D and H's RLS runs wait on Huraira; launch files verification pending)
 
 - [ ] **Intake logo and live address (D4 Tier 2 slice, 2026-10-14)**: built in `8b3caed` and `a444a3d` (local, not pushed). Evidence: brandAsset tests 10, workflow readiness/continue tests 8, jobs 4, planning 1, Cockpit logo checks 9; a real isolated Track B build with the logo passes; migration 0021 dry run 28/28 on the live database, rolled back, nothing persisted (SQL-checked). Independent review: 1 HIGH (SVG `<x:script>` bypass) and 5 MEDIUM, fixed in `9597103`. Migration 0021 applied live 2026-10-14 (20261014110708, Huraira's GO); attack script on the applied migration 28/28. QA reliability fixes merged (`8857819`, `380bfd2`, `e921c6d`). Full suite green (rendered-qa 79, verification 113, frontend-loop 98, workflow 42, jobs 28, planning 34, documentation 18, hermes 55, agent-runtime 39, audit 14, media 8, Cockpit 116). CI `38554457540` green incl. deploy. **Live 2026-10-14**: Lanternworks "Fix and continue" with the uploaded logo (job `55ddba7c`) passed the readiness check, revised first, and reached the launch gate in 14 min for ~$0.68, the first passing build since 2026-10-01 (SYNTHETIC; Step 25 still needs a real client). Open: a human screenshot review; the Track B starter's 23 px contact links (cost one round). Found by Huraira on the live run: the Cockpit previewed the site's file list (site.manifest.json) instead of the site, and showed an advisory finding as a warning; both fixed (site preview with page switcher; notes marked not blocking). The preview shows pages as built; motion plays only on a real preview link (Step 4B M6).
 
@@ -750,8 +747,18 @@ Governed by the Factory Completion Plan Step 21 sub-item I (second half), pulled
       Evidence: a real isolated build in `frontend-loop/test/trackB.test.ts` passes every launch-stage check with an address.
 - [x] Artifact store accepts the PNG: `ARTIFACT_PATH_RE` and content types in `packages/workflow`, migration `0019_artifacts_png` applied
       live and confirmed by SQL.
-- [ ] Sub-item I first half: open questions out of Track A's HTML comments.
-- [ ] Sub-items B–F, H, J–L (deferred by D3).
+**Housekeeping round 2026-10-19** (`ac314ae`..`f490904`, local, not pushed; CI not yet run on it):
+- [x] **I (first half)**: Track A keeps open questions in `content.json` only; no HTML comment in any page (track-a-starter 1.5.1). `ac314ae`; `frontend-loop/test/trackA.test.ts` fails with the comment put back (mutation-checked); frontend-loop 130/130.
+- [x] **C**: the alias rule was already built in `3e493f6` (`canonicalSections`, `planning/src/planner.ts`); `0e13089` pins "process" and "how-it-works" to one section, and removing the alias fails it; parseBrief unchanged; planning 45/45.
+- [x] **L**: dead path `packages/agent-runtime/registry.ts` corrected to `src/registry.ts` (`3bf8df4`); the 12 unregistered hooks were archived in `e11c1ea`, only `stop-tracker-guard.sh` remains.
+- [x] **G**: `docs/INDEX.md` names the Cockpit v2 build prompts, step-4c mockups and SOP markdown copies (`d5c8c12`); new decision record indexed (`2bc9c4e`).
+- [x] **H (in part)**: CI gains a `media` job, a `dispatch-job` job (7 Deno tests that run the deployed `index.ts` unchanged with Supabase and GitHub stubbed; letting a `pm` dispatch fails them) and `check-trackers` in guardrails; the deploy waits on both new jobs (`0145064`). Local: media 8/8 from a clean `npm ci`, dispatch-job 7/7. **Not done**: the `scripts/rls_attack_test*.sql` runs in CI need a scratch Supabase project and its secret (cost, Huraira).
+- [x] **J (in part)**: `jobs/src/permissionsAttack.ts` moved to `jobs/scripts/` (manual live attack runner, not runtime code; `npm run attack:permissions` unchanged; jobs 38/38) in `e55e430`. **Deferred**: one shared mock model client. The four are 10–15 lines each with three different contracts (text, text with model family, JSON with usage). Sharing them adds a sibling dependency to each package's hand-ordered CI install (the B trade-off) for little gain.
+- [x] **B**: decision record `docs/NPM-WORKSPACES-DECISION.md` (`2bc9c4e`): keep `file:` links. The Cockpit uses no `@wfact/*` package; a root workspace changes the deploy root (the 2026-09-22 empty-deploy class), a `packages/` workspace drops 11 lockfiles and changes all 29 CI installs. Not implemented, so no Vercel proof was needed. Huraira to confirm.
+- [x] **E**: `graphify update .` (`f1eb53d`, `3db3263`): 5048 nodes, 9793 edges, **0 dangling edges** (was 52); all 6 PDFs present as file nodes only (semantic extraction needs a model key).
+- [x] **D (runtime part)**: the QA CLI puts the client's owner entity on its task (`qaCliTask`, `f802994`); `job.run` rows carry the plan's entity (`f490904`). Each has a test that fails when the row is written without it (mutation-checked); verification 123/123, jobs 38/38. Live before: 30-day null rows by writer, SQL 2026-10-19: Cockpit triggers 108/116, intake 18/25, hermes-lite 14/18, qa-evaluator 8/130, job-runner 4/4. **Not done**: the database triggers (`job.requested`, `job.cancelled`, `job.archived`, `plan.input`) and `dispatch-job`'s `job.dispatched` row need a migration and an Edge Function redeploy (Huraira's GO).
+- [ ] **K**: the live `entities` table has `dreamsign` and `synthetic-test`, but **no `bennett-co`** and no alias column, while `KNOWN_ENTITIES` has `dreamsign` and `bennett-co`. Switching now would stop intake recognising Bennett & Co: needs Huraira's (and for the client list, Nick's) call. The `0016` gap is recorded (Gaps noticed: nothing missing, the numbering skipped it in `681b9a8`).
+- [ ] **F**: the stale `dreamsign-deploy.vercel.app` page: redeploy or leave (Huraira; nothing deployed).
 
 **Verification**: pushed 2026-10-12; CI `38292111323` on `423c7c1` FAILED in the Frontend loop and Verification jobs (my new tests imported
 across packages, and each CI job installs only its own dependencies), so the Cockpit deploy was skipped. Fixed 2026-10-13 in `b107de4` by moving
@@ -761,6 +768,12 @@ Not yet: a live build with a real address at stage `launch`.
 
 **Exit check** (MVP M5): "Step 7 launch-stage checks pass on the output". **PARTIALLY MET**: they pass on both starters' output in tests with
 an address; not yet on a live build.
+
+**Step exit check** ("Each sub-item done or explicitly deferred with a reason; CI green; no regressions"): **PARTIALLY MET** (2026-10-19).
+B, C, E, G, I, L are done; J's second half is done and its first half is deferred with a reason. D's runtime part and H in part are
+done. D's trigger part, F, K and H's RLS runs wait on Huraira. No regressions locally: frontend-loop 130, planning 45, verification 123,
+jobs 38, workflow 89, hermes 55, agent-runtime 39, media 8, dispatch-job 7, rendered-qa 89 (run before the D change); typechecks clean. CI has not run
+on these commits yet (not pushed).
 
 ## Step 12 — Cost governance per client (PARTIAL 2026-10-14 — MVP M6 slice live; live trace rows proven on run `4c35703b`; Run page and live cap refusal pending)
 
