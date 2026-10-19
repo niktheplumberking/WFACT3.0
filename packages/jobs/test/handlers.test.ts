@@ -40,6 +40,7 @@ function deps(page: string) {
   const artifacts = new MemoryArtifactStore();
   const d: HandlerDeps = {
     planning: {
+      entities: TEST_ENTITIES,
       intakeModel: new MockJsonClient(() => intakeOut),
       plannerModel: new MockJsonClient(() => planOut),
       store: planStore,
@@ -433,6 +434,7 @@ test("readiness probes: credits, refused keys and silence stop the run; busy pro
 // ---- Build-quality Package 1: the request reaches the build ----
 
 import { rootPlanId } from "../src/requestLookup.js";
+import { TEST_ENTITIES } from "@wfact/hermes-lite/testing/entities";
 
 test("briefForBuild: an old plan with no request uses the intake job's text when found, else says 'summary only'; synonym sections collapse", () => {
   const brief = { clientSlug: "lanternworks-studio", entitySlug: "bennett-co", projectName: "x", goal: "x", requiredSections: ["hero", "home", "process", "how-we-work", "work"], brandNotes: "x", source: "intake-planner" as const, pageScope: "multi" as const };

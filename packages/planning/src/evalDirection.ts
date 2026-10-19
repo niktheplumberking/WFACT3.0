@@ -15,6 +15,7 @@ import { costForModel, resolveModelRoute } from "@wfact/hermes-lite/routing";
 import { ClaudeJsonClient } from "./modelClient.js";
 import { createIntakeAgent, INTAKE_DEFINITION, INTAKE_ROLE } from "./intake.js";
 import { createDirectionAgent, DIRECTION_DEFINITION, DIRECTION_ROLE, DIRECTION_TAXONOMY } from "./direction.js";
+import { loadEntities } from "@wfact/hermes-lite/entities";
 
 interface Case {
   id: string;
@@ -39,11 +40,13 @@ async function main() {
   const started = new Date();
   const rows: Record<string, unknown>[] = [];
 
+  // Step 21 K: the entity table, read once (a failed read stops the eval with its cause).
+  const entities = await loadEntities();
   for (const c of cases) {
     const t0 = Date.now();
     const intakeModel = new ClaudeJsonClient(intakeRoute, apiKey);
     const directionModel = new ClaudeJsonClient(directionRoute, apiKey);
-    const intake = await runAgent(createIntakeAgent({ model: intakeModel }), { taskId: crypto.randomUUID(), role: INTAKE_ROLE, input: c.text }, { registry });
+    const intake = await runAgent(createIntakeAgent({ model: intakeModel, entities }), { taskId: crypto.randomUUID(), role: INTAKE_ROLE, input: c.text }, { registry });
     let row: Record<string, unknown> = { id: c.id, expectedNiche: c.niche, expectTrack: c.expectTrack, alsoAcceptable: c.alsoAcceptable, intakeStatus: intake.status };
     if (intake.output) {
       const d = await runAgent(createDirectionAgent({ model: directionModel }), { taskId: crypto.randomUUID(), role: DIRECTION_ROLE, input: { intake: intake.output, rawText: c.text } }, { registry });

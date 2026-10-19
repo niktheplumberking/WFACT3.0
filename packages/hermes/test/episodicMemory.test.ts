@@ -10,6 +10,7 @@ import { MockModelClient } from "../src/modelClient.js";
 import { ToolRegistry } from "../src/tools/schema.js";
 import { readClientMemoryTool } from "../src/tools/memoryTools.js";
 import { EPISODIC_LOG_HEADING, episodeId, parseEpisodes, renderEpisode, validateEpisode, type Episode } from "../src/tools/episodes.js";
+import { TEST_ENTITIES } from "../src/testing/entities.js";
 
 const RUN = "0cfc6675-c312-47b1-8c51-a48c62202fa6";
 const BUILD = "b5abcbf9-df9e-4007-9053-895a7f407c28";
@@ -77,7 +78,7 @@ test("detectClientSlug: a client named in plain words maps to its folder; longes
 test("'What happened on <client>'s build?' is answered from the agent-written entries, not the hand-written notes", async () => {
   const calls: string[] = [];
   const model = new MockModelClient(() => "The build was approved; the RLS rules held and nothing was deployed.");
-  const hermes = new HermesLite({ toolRegistry: registry(MEMORY, calls), modelClient: model, clientSlugs: ["summit-line-roofing", "dreamsign-pilot"] });
+  const hermes = new HermesLite({ entities: TEST_ENTITIES, toolRegistry: registry(MEMORY, calls), modelClient: model, clientSlugs: ["summit-line-roofing", "dreamsign-pilot"] });
   const a = await hermes.answerStatusQuestion("What happened on Summit Line Roofing's build?");
   assert.equal(a.needsHuman, false);
   assert.equal(a.clientSlug, "summit-line-roofing");
@@ -98,7 +99,7 @@ test("'What happened on <client>'s build?' is answered from the agent-written en
 test("a non-history question about a client gets the whole memory file, as before", async () => {
   const calls: string[] = [];
   const model = new MockModelClient(() => "ok");
-  const hermes = new HermesLite({ toolRegistry: registry(MEMORY, calls), modelClient: model, clientSlugs: ["summit-line-roofing"] });
+  const hermes = new HermesLite({ entities: TEST_ENTITIES, toolRegistry: registry(MEMORY, calls), modelClient: model, clientSlugs: ["summit-line-roofing"] });
   const a = await hermes.answerStatusQuestion("What colours does Summit Line Roofing like?");
   assert.equal(a.episodesUsed, 0);
   assert.ok(model.calls[0]!.user.includes(HUMAN_NOTE));
@@ -107,7 +108,7 @@ test("a non-history question about a client gets the whole memory file, as befor
 test("a hand-edited entry is left out of the answer, and the model is told so", async () => {
   const tampered = MEMORY.replace("6 of 6 automated checks passed", "all checks skipped");
   const model = new MockModelClient(() => "ok");
-  const hermes = new HermesLite({ toolRegistry: registry(tampered, []), modelClient: model, clientSlugs: ["summit-line-roofing"] });
+  const hermes = new HermesLite({ entities: TEST_ENTITIES, toolRegistry: registry(tampered, []), modelClient: model, clientSlugs: ["summit-line-roofing"] });
   const a = await hermes.answerStatusQuestion("What happened on Summit Line Roofing's build?");
   assert.equal(a.episodesUsed, 1);
   assert.match(model.calls[0]!.user, /1 entry was left out because it failed validation or had been edited by hand/);

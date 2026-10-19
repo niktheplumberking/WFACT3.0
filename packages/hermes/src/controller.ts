@@ -15,24 +15,7 @@ import type { ModelClient } from "./modelClient.js";
 import { applyToneFilter, buildPlainLanguageSystemPrompt, type ToneFilterResult } from "./toneFilter.js";
 import { withBoundedRetry, EscalationError } from "./escalation.js";
 import { digestEpisodes, type Episode } from "./tools/episodes.js";
-
-// Placeholder entities per memory/context.md §2 and BLOCKED-ON-NICK.md — swap for the real,
-// confirmed list once Nick closes that decision. Aliases exist because a founder will type
-// "Bennett" or "Bennett & Co", not the slug "bennett-co".
-export const KNOWN_ENTITIES: { slug: string; aliases: string[] }[] = [
-  { slug: "dreamsign", aliases: ["dreamsign"] },
-  { slug: "bennett-co", aliases: ["bennett", "bennett & co", "bennett and co", "bennett-co"] },
-];
-
-export function detectEntitySlug(question: string): string | null {
-  const normalized = question.toLowerCase();
-  for (const entity of KNOWN_ENTITIES) {
-    if (entity.aliases.some((alias) => normalized.includes(alias))) {
-      return entity.slug;
-    }
-  }
-  return null;
-}
+import { detectEntitySlug, type KnownEntity } from "./entities.js";
 
 /**
  * Step 5: which client folder a question is about. "What happened on Summit Line Roofing's build?" names the
@@ -75,6 +58,8 @@ export interface HermesLiteOptions {
   retry?: { maxAttempts: number; baseDelayMs: number };
   /** Step 5: known client folder names (memoryTools.listClientSlugs), so a question can name a client. */
   clientSlugs?: string[];
+  /** Step 21 K: the entity table's rows (entities.loadEntities), so a question can name an entity. */
+  entities: readonly KnownEntity[];
 }
 
 export class HermesLite {
@@ -82,16 +67,18 @@ export class HermesLite {
   private readonly modelClient: ModelClient;
   private readonly retry: { maxAttempts: number; baseDelayMs: number };
   private readonly clientSlugs: string[];
+  private readonly entities: readonly KnownEntity[];
 
   constructor(opts: HermesLiteOptions) {
     this.toolRegistry = opts.toolRegistry;
     this.modelClient = opts.modelClient;
     this.retry = opts.retry ?? { maxAttempts: 3, baseDelayMs: 500 };
     this.clientSlugs = opts.clientSlugs ?? [];
+    this.entities = opts.entities;
   }
 
   async answerStatusQuestion(question: string, explicitEntitySlug?: string): Promise<HermesAnswer> {
-    let entitySlug = explicitEntitySlug ?? detectEntitySlug(question);
+    let entitySlug = explicitEntitySlug ?? detectEntitySlug(question, this.entities);
     const clientSlug = detectClientSlug(question, this.clientSlugs);
     const sourcesUsed: string[] = [];
     const contextParts: string[] = [];
@@ -136,18 +123,8 @@ export class HermesLite {
       }
     }
 
-    if (entitySlug && !clientSlug) {
-      // 2. Per-client memory, if a client folder exists for this entity yet.
-      const clientMemory = (await this.toolRegistry.invoke("memory.readClient", {
-        clientSlug: entitySlug,
-      })) as { found: boolean; content: string | null; path: string };
-      if (clientMemory.found && clientMemory.content) {
-        sourcesUsed.push(clientMemory.path);
-        contextParts.push(`--- ${clientMemory.path} ---\n${clientMemory.content}`);
-      } else {
-        contextParts.push(`--- clients/${entitySlug}/memory.md ---\n(no client memory file yet)`);
-      }
-    }
+    // Step 21 K: an entity is not a client folder. A question that names only an entity reads no clients/<slug>/ memory;
+    // it gets the entity's live state below. Client memory is read only for a client the question names (2a).
 
     // A history answer built from episodes needs no live project rows (they may be fixture data, see below).
     if (entitySlug && episodesUsed === 0) {

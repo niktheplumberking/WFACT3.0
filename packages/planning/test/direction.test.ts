@@ -11,6 +11,7 @@ import { MockJsonClient } from "../src/modelClient.js";
 import { MemoryPlanStore } from "../src/planStore.js";
 import { intakeAndPlan, registryWithPlanning, registryWithPlanningAndDirection, replan, type PlanningDeps } from "../src/pipeline.js";
 import type { IntakeResult } from "../src/intake.js";
+import { TEST_ENTITIES } from "@wfact/hermes-lite/testing/entities";
 
 const RAW = `Hi DreamSign, we're Northlight Signs, a small sign-making shop in town. Customers mostly phone us for a quote.
 We want something solid and trustworthy, dark green and cream, nothing flashy. Please make it load fast on phones.`;
@@ -124,7 +125,7 @@ const modelPlan = {
 
 function deps(direction: MockJsonClient | undefined) {
   const store = new MemoryPlanStore();
-  const d: PlanningDeps = { intakeModel: new MockJsonClient(() => modelIntake), plannerModel: new MockJsonClient(() => modelPlan), directionModel: direction, store, audit: null };
+  const d: PlanningDeps = { entities: TEST_ENTITIES, intakeModel: new MockJsonClient(() => modelIntake), plannerModel: new MockJsonClient(() => modelPlan), directionModel: direction, store, audit: null };
   return { d, store };
 }
 

@@ -9,6 +9,7 @@ import { assemblePlan, createPlannerAgent, PLANNER_ROLE, type ModelPlan } from "
 import { MockJsonClient } from "../src/modelClient.js";
 import { MemoryPlanStore } from "../src/planStore.js";
 import { intakeAndPlan, registryWithPlanning, replan, type PlanningDeps } from "../src/pipeline.js";
+import { TEST_ENTITIES } from "@wfact/hermes-lite/testing/entities";
 
 const TASK = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
 const RAW_EMAIL = `From: Priya Shah <priya@northlightsigns.example>
@@ -56,9 +57,20 @@ const certainIntake = {
 
 // ---------------- Intake ----------------
 
+test("Step 21 K: intake offers the model exactly the entities it is given (the entity table), never a list in code", async () => {
+  const model = new MockJsonClient(() => modelIntake());
+  const table = [{ slug: "dreamsign", aliases: ["dreamsign"] }, { slug: "harbor-street", aliases: ["harbor street co"] }];
+  await runAgent(createIntakeAgent({ model, entities: table }), { taskId: TASK, role: INTAKE_ROLE, input: RAW_EMAIL }, { registry: registryWithPlanning() });
+  assert.match(model.calls[0]!.system, /harbor-street \(also written: harbor street co\)/);
+  assert.doesNotMatch(model.calls[0]!.system, /bennett/);
+  assert.equal(entityAmbiguity("for Harbor Street Co", "harbor-street", table), null);
+  assert.match(entityAmbiguity("for Harbor Street Co", "harbor-street", TEST_ENTITIES) ?? "", /unknown entity/);
+  assert.throws(() => createIntakeAgent({ model, entities: [] }), /entity table is empty/);
+});
+
 test("intake: raw email → certain entity (model and Hermes' deterministic matcher agree), slug derived deterministically", async () => {
   const model = new MockJsonClient(() => modelIntake());
-  const run = await runAgent(createIntakeAgent({ model }), { taskId: TASK, role: INTAKE_ROLE, input: RAW_EMAIL }, { registry: registryWithPlanning() });
+  const run = await runAgent(createIntakeAgent({ model, entities: TEST_ENTITIES }), { taskId: TASK, role: INTAKE_ROLE, input: RAW_EMAIL }, { registry: registryWithPlanning() });
   assert.equal(run.status, "completed");
   assert.equal(run.output?.entityConfidence, "certain");
   assert.equal(run.output?.clientSlug, "northlight-signs");
@@ -70,7 +82,7 @@ test("intake: raw email → certain entity (model and Hermes' deterministic matc
 test("intake: model/deterministic disagreement → re-classified once, resolved on the second pass", async () => {
   const text = "Hello Bennett & Co, we'd like a landing page for our bakery.";
   const model = new MockJsonClient((_, i) => modelIntake({ entitySlug: i === 0 ? "dreamsign" : "bennett-co", clientName: "Crumb Bakery" }));
-  const run = await runAgent(createIntakeAgent({ model }), { taskId: TASK, role: INTAKE_ROLE, input: text }, { registry: registryWithPlanning() });
+  const run = await runAgent(createIntakeAgent({ model, entities: TEST_ENTITIES }), { taskId: TASK, role: INTAKE_ROLE, input: text }, { registry: registryWithPlanning() });
   assert.equal(run.status, "completed");
   assert.equal(run.output?.entitySlug, "bennett-co");
   assert.equal(run.output?.classificationAttempts, 2);
@@ -80,7 +92,7 @@ test("intake: model/deterministic disagreement → re-classified once, resolved 
 test("intake: still ambiguous after the one re-classification → escalated to a human, never guessed", async () => {
   const model = new MockJsonClient(() => modelIntake({ entitySlug: null }));
   const run = await runAgent(
-    createIntakeAgent({ model }),
+    createIntakeAgent({ model, entities: TEST_ENTITIES }),
     { taskId: TASK, role: INTAKE_ROLE, input: "We need a website for our shop, please get in touch." },
     { registry: registryWithPlanning() },
   );
@@ -92,15 +104,15 @@ test("intake: still ambiguous after the one re-classification → escalated to a
 test("intake: empty / oversized raw input is rejected before any model call", async () => {
   const model = new MockJsonClient(() => modelIntake());
   for (const input of ["   ", "x".repeat(20_001)]) {
-    const run = await runAgent(createIntakeAgent({ model }), { taskId: TASK, role: INTAKE_ROLE, input }, { registry: registryWithPlanning() });
+    const run = await runAgent(createIntakeAgent({ model, entities: TEST_ENTITIES }), { taskId: TASK, role: INTAKE_ROLE, input }, { registry: registryWithPlanning() });
     assert.equal(run.status, "rejected");
   }
   assert.equal(model.calls.length, 0);
 });
 
 test("entityAmbiguity + slugify are deterministic", () => {
-  assert.equal(entityAmbiguity("hi dreamsign", "dreamsign"), null);
-  assert.match(entityAmbiguity("hi dreamsign", "acme") ?? "", /unknown entity/);
+  assert.equal(entityAmbiguity("hi dreamsign", "dreamsign", TEST_ENTITIES), null);
+  assert.match(entityAmbiguity("hi dreamsign", "acme", TEST_ENTITIES) ?? "", /unknown entity/);
   assert.equal(slugify("Crumb & Co. Bakery!"), "crumb-co-bakery");
   assert.equal(slugify("123 Signs"), "client-123-signs");
 });
@@ -154,7 +166,7 @@ function deps(over: Partial<PlanningDeps> = {}) {
   const store = new MemoryPlanStore();
   const intakeModel = new MockJsonClient(() => modelIntake());
   const plannerModel = new MockJsonClient(() => modelPlan());
-  return { d: { intakeModel, plannerModel, store, audit, ...over } as PlanningDeps, audit, store, intakeModel, plannerModel };
+  return { d: { entities: TEST_ENTITIES, intakeModel, plannerModel, store, audit, ...over } as PlanningDeps, audit, store, intakeModel, plannerModel };
 }
 
 test("pipeline: raw email in → pending owner-approval plan out, no hand-written intermediate structure", async () => {

@@ -13,6 +13,7 @@ import { randomUUID } from "node:crypto";
 import { auditSinkFromEnv, recordAudit, traceSinkFromEnv, type AuditContext } from "@wfact/audit";
 import { costForModel } from "./routing.js";
 import { traceModelClient } from "./tracing.js";
+import { loadEntities, type KnownEntity } from "./entities.js";
 
 // Stage 5: prices come from the one table in config/model-routing.json (costForModel), not a copy here.
 
@@ -53,7 +54,16 @@ async function main() {
 
   const registry = buildToolRegistry(stateReader, audit);
   // Step 5: known client folders, so "What happened on <client>'s build?" reads that client's episodic entries.
-  const hermes = new HermesLite({ toolRegistry: registry, modelClient, clientSlugs: listClientSlugs() });
+  // Step 21 K: the entity list comes from public.entities; without it the question cannot be matched to an entity.
+  let entities: KnownEntity[];
+  try {
+    entities = await loadEntities();
+  } catch (err) {
+    console.error(`BLOCKED: ${(err as Error).message}`);
+    process.exitCode = 1;
+    return;
+  }
+  const hermes = new HermesLite({ toolRegistry: registry, modelClient, clientSlugs: listClientSlugs(), entities });
 
   const result = await hermes.answerStatusQuestion(question);
 

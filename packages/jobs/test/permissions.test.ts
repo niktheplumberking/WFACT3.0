@@ -11,6 +11,7 @@ import { createQaEvaluatorAgent } from "@wfact/verification/agent";
 import { MockModelClient } from "@wfact/verification/modelClient";
 import { askHermesGated } from "../src/hermesAsk.js";
 import { handleJob, type HandlerDeps } from "../src/handlers.js";
+import { TEST_ENTITIES } from "@wfact/hermes-lite/testing/entities";
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..", "..");
 
@@ -21,7 +22,7 @@ function model(answer = "All good.") {
 test("ask: with the controller scope Hermes reads its tools and calls its model; nothing is denied", async () => {
   const audit = new InMemoryAuditSink();
   const m = model();
-  const a = await askHermesGated("How is DreamSign doing?", { audit, stateReader: null, modelClient: m });
+  const a = await askHermesGated("How is DreamSign doing?", { audit, stateReader: null, entities: TEST_ENTITIES, modelClient: m });
   assert.equal(a.needsHuman, false);
   assert.equal(m.calls, 1);
   assert.ok(audit.events.some((e) => e.action === "tool.invoke" && e.outcome === "success"));
@@ -33,8 +34,12 @@ test("ask: a tool outside the controller's scope is refused, audited as agent.de
   const audit = new InMemoryAuditSink();
   const m = model();
   const narrow = defineScope({ models: ["hermes"], tools: ["memory.readContext"], maxCostUsdPerRun: 0.5, crossEntity: true });
-  // Naming an entity makes Hermes read that client's memory file: memory.readClient, not in the narrow scope.
-  await assert.rejects(() => askHermesGated("Status for DreamSign?", { audit, stateReader: null, modelClient: m, scope: narrow }), /not permitted/);
+  // Naming a client folder makes Hermes read that client's memory file: memory.readClient, not in the narrow scope.
+  // (Step 21 K: naming only an entity no longer reads a folder, so the question names a client.)
+  await assert.rejects(
+    () => askHermesGated("What happened on Summit Line Roofing's build?", { audit, stateReader: null, entities: TEST_ENTITIES, clientSlugs: ["summit-line-roofing"], modelClient: m, scope: narrow }),
+    /not permitted/,
+  );
   assert.equal(m.calls, 0, "no model call after a refused tool");
   const deny = audit.events.find((e) => e.action === "agent.deny")!;
   assert.equal(deny.actor, "hermes-lite");
@@ -46,7 +51,7 @@ test("ask: the model call is gated too (a scope without the hermes slot gets no 
   const audit = new InMemoryAuditSink();
   const m = model();
   const noModel = defineScope({ tools: ["memory.readContext"], crossEntity: true });
-  const a = await askHermesGated("Anything new?", { audit, stateReader: null, modelClient: m, scope: noModel });
+  const a = await askHermesGated("Anything new?", { audit, stateReader: null, entities: TEST_ENTITIES, modelClient: m, scope: noModel });
   assert.equal(m.calls, 0);
   assert.equal(a.needsHuman, true);
   assert.match(a.escalationReason ?? "", /model:hermes/);

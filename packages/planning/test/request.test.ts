@@ -11,6 +11,7 @@ import { MockJsonClient } from "../src/modelClient.js";
 import { MemoryPlanStore } from "../src/planStore.js";
 import { intakeAndPlan, replan, rerunDirection, type PlanningDeps } from "../src/pipeline.js";
 import { buildTaskTitle, canonicalSections } from "../src/planner.js";
+import { TEST_ENTITIES } from "@wfact/hermes-lite/testing/entities";
 
 const FX = path.join(import.meta.dirname, "..", "..", "frontend-loop", "test", "fixtures", "lanternworks");
 const RAW = readFileSync(path.join(FX, "raw-request.txt"), "utf-8");
@@ -38,7 +39,7 @@ function deps(directionModel?: MockJsonClient) {
   const store = new MemoryPlanStore();
   const intakeModel = new MockJsonClient(() => modelIntake);
   const plannerModel = new MockJsonClient(() => modelPlan);
-  const d: PlanningDeps = { intakeModel, plannerModel, directionModel, store, audit: null };
+  const d: PlanningDeps = { entities: TEST_ENTITIES, intakeModel, plannerModel, directionModel, store, audit: null };
   return { d, store, intakeModel, plannerModel };
 }
 

@@ -43,6 +43,7 @@ import { SupabaseLeadSiteLookup } from "./leadSites.js";
 import { askHermesGated } from "./hermesAsk.js";
 import { providerProbes } from "./providerProbes.js";
 import { readFileSync } from "node:fs";
+import { loadEntities } from "@wfact/hermes-lite/entities";
 
 const REPO_ROOT = path.resolve(import.meta.dirname, "..", "..", "..");
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -60,7 +61,7 @@ function ghRunUrl(): string | null {
     : null;
 }
 
-function buildDeps(): HandlerDeps {
+async function buildDeps(): Promise<HandlerDeps> {
   const url = need("SUPABASE_URL");
   const serviceKey = need("SUPABASE_SERVICE_ROLE_KEY");
   const apiKey = need("ANTHROPIC_API_KEY");
@@ -78,6 +79,8 @@ function buildDeps(): HandlerDeps {
     capModelClient(traceModelClient(client, traces, who), method, caps, ledger);
   const reviewerHooks = reviewerTraceHooks(traces, actor, capCheckForCurrentRun(caps, ledger));
 
+  // Step 21 K: the entity list is read from public.entities once per job; a failed read stops the job with its cause.
+  const entities = await loadEntities();
   const intakeModel = traced(new ClaudeJsonClient(resolveModelRoute("intake"), apiKey), "completeJson");
   const plannerModel = traced(new ClaudeJsonClient(resolveModelRoute("planner"), apiKey), "completeJson");
   // Step 4B M2: the direction step (niche, brand direction, track recommendation) between Intake and Planner.
@@ -128,7 +131,7 @@ function buildDeps(): HandlerDeps {
   };
 
   return {
-    planning: { intakeModel, plannerModel, directionModel, store: planStore, audit },
+    planning: { intakeModel, plannerModel, directionModel, store: planStore, audit, entities },
     planStore,
     // Step 4D: the details the owner added to the approved plan since approval (migration 0018).
     inputs: new SupabasePlanInputStore(url, serviceKey),
@@ -165,7 +168,7 @@ function buildDeps(): HandlerDeps {
       if (!client) throw new Error("ANTHROPIC_API_KEY missing for Hermes-lite");
       const { reader: stateReader } = stateReaderFromEnv();
       // Step 6: tool and model calls go through the controller's PermissionGate (hermesAsk.ts).
-      return askHermesGated(question, { audit, stateReader, modelClient: traced(client, "complete", "hermes-lite") });
+      return askHermesGated(question, { audit, stateReader, modelClient: traced(client, "complete", "hermes-lite"), entities });
     },
   };
 }
@@ -190,7 +193,7 @@ async function main() {
   await store.markRunning(jobId, ghRunUrl());
   console.error(`running ${job.kind} job ${jobId}`);
   try {
-    const outcome = await handleJob(job, buildDeps());
+    const outcome = await handleJob(job, await buildDeps());
     await store.finish(jobId, { status: outcome.ok ? "succeeded" : "failed", result: outcome.result, error: outcome.reason });
     console.error(`job ${jobId}: ${outcome.ok ? "succeeded" : `failed — ${outcome.reason}`}`);
   } catch (err) {

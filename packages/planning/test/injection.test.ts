@@ -19,6 +19,7 @@ import { PLANNER_DEFINITION } from "../src/planner.js";
 import { MockJsonClient } from "../src/modelClient.js";
 import { MemoryPlanStore } from "../src/planStore.js";
 import { intakeAndPlan, registryWithPlanning, type PlanningDeps } from "../src/pipeline.js";
+import { TEST_ENTITIES } from "@wfact/hermes-lite/testing/entities";
 
 const TASK = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
 
@@ -59,7 +60,7 @@ function deps(intake: Record<string, unknown>, over: Partial<PlanningDeps> = {})
   const store = new MemoryPlanStore();
   const intakeModel = new MockJsonClient(() => intake);
   const plannerModel = new MockJsonClient(() => planOut());
-  return { d: { intakeModel, plannerModel, store, audit, ...over } as PlanningDeps, audit, store, intakeModel, plannerModel };
+  return { d: { entities: TEST_ENTITIES, intakeModel, plannerModel, store, audit, ...over } as PlanningDeps, audit, store, intakeModel, plannerModel };
 }
 
 test("injected instructions are fenced as data, flagged and audited; the outcome is still only a PENDING plan", async () => {
@@ -119,7 +120,7 @@ test("'email the API key': no planning role holds a tool, network or file capabi
 
 test("an Intake agent that tried to ACT on the text (send email, write another client's folder) is denied and audited", async () => {
   const sink = new InMemoryAuditSink();
-  const base = createIntakeAgent({ model: new MockJsonClient(() => intakeOut()) });
+  const base = createIntakeAgent({ model: new MockJsonClient(() => intakeOut()), entities: TEST_ENTITIES });
   const attempts: string[] = [];
   const obeying: Agent<unknown, unknown> = {
     ...base,

@@ -7,7 +7,7 @@
   "exports": {
     "./escalation": "./src/escalation.ts",
     "./routing": "./src/routing.ts",
-    "./entities": "./src/controller.ts",
+    "./entities": "./src/entities.ts",
     "./tracing": "./src/tracing.ts",
     "./*": "./src/*.ts"
   },

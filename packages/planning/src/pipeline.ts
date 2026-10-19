@@ -21,6 +21,7 @@ import { createDirectionAgent, DIRECTION_DEFINITION, DIRECTION_ROLE, type Direct
 import type { JsonModelClient } from "./modelClient.js";
 import type { PlanStore } from "./planStore.js";
 import { parseBrief } from "@wfact/frontend-loop/brief";
+import type { KnownEntity } from "@wfact/hermes-lite/entities";
 
 export function registryWithPlanning(): AgentRegistry {
   const registry = createSeedRegistry();
@@ -38,6 +39,8 @@ export function registryWithPlanningAndDirection(): AgentRegistry {
 
 export interface PlanningDeps {
   intakeModel: JsonModelClient;
+  /** Step 21 K: the entity table's rows, which intake matches a request against. */
+  entities: readonly KnownEntity[];
   plannerModel: JsonModelClient;
   /** Step 4B M2. Absent = no direction step (the plan records why); production always passes it. */
   directionModel?: JsonModelClient;
@@ -192,7 +195,7 @@ export async function intakeAndPlan(raw: unknown, deps: PlanningDeps, assets: Ow
   const registry = deps.registry ?? registryWithPlanningAndDirection();
   const runId = randomUUID();
   const intakeRun = await runAgent(
-    createIntakeAgent({ model: deps.intakeModel }),
+    createIntakeAgent({ model: deps.intakeModel, entities: deps.entities }),
     { taskId: randomUUID(), role: INTAKE_ROLE, input: raw },
     { registry, audit: deps.audit ? { sink: deps.audit } : null, runId },
   );

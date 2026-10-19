@@ -22,6 +22,7 @@ import { MemoryArtifactStore } from "@wfact/workflow";
 import { briefForBuild, handleJob, type HandlerDeps } from "../src/handlers.js";
 import { SupabaseLeadSiteLookup, type LeadSiteLookup } from "../src/leadSites.js";
 import type { Job } from "../src/jobStore.js";
+import { TEST_ENTITIES } from "@wfact/hermes-lite/testing/entities";
 
 const KEY = "0b7d3c1e-2a4f-4e6b-9c8d-1f2e3a4b5c6d";
 const URL_BASE = "https://abcdefghijklmnopqrst.supabase.co";
@@ -84,7 +85,7 @@ async function trackABuild(leadSites?: LeadSiteLookup) {
     maxQaRevisions: 1,
   };
   const d: HandlerDeps = {
-    planning: { intakeModel: new MockJsonClient(() => intakeOut), plannerModel: new MockJsonClient(() => planOut), store: planStore, audit },
+    planning: { entities: TEST_ENTITIES, intakeModel: new MockJsonClient(() => intakeOut), plannerModel: new MockJsonClient(() => planOut), store: planStore, audit },
     planStore,
     workflow,
     trackAWorkflow: {

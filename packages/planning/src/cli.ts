@@ -18,6 +18,7 @@ import { resolveModelRoute, estimateCostUsd } from "@wfact/hermes-lite/routing";
 import { ClaudeJsonClient } from "./modelClient.js";
 import { planStoreFromEnv } from "./planStore.js";
 import { intakeAndPlan, replan, type PlanningResult } from "./pipeline.js";
+import { loadEntities, type KnownEntity } from "@wfact/hermes-lite/entities";
 
 function blocked(msg: string): never {
   console.error(`BLOCKED: ${msg}`);
@@ -55,7 +56,14 @@ async function main() {
   const plannerModel = traceModelClient(new ClaudeJsonClient(plannerRoute, apiKey), traceSink, "cli:intake");
   // Step 4B M2: the direction step between Intake and Planner.
   const directionModel = traceModelClient(new ClaudeJsonClient(resolveModelRoute("direction"), apiKey), traceSink, "cli:intake");
-  const deps = { intakeModel, plannerModel, directionModel, store, audit };
+  // Step 21 K: intake matches the request against the entity table (public.entities), read once here.
+  let entities: KnownEntity[];
+  try {
+    entities = await loadEntities();
+  } catch (err) {
+    return blocked((err as Error).message);
+  }
+  const deps = { intakeModel, plannerModel, directionModel, store, audit, entities };
 
   let result: PlanningResult;
   if (replanId) {
