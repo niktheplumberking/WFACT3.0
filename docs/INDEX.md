@@ -17,7 +17,7 @@
 | `wfact-3.0-blueprint.html` | Scope source of truth: 13 phases, Cockpit map (§9), Definition of Done (§16K) |
 | `WFACT-3.0-Continuation-Build-Plan.md` | Stages 1–7 (1–5 met; 6 partial; 7 waits on Nick) |
 | `WFACT-3.0-Factory-Completion-Plan.md` | Steps 1–28, one agent prompt per step, Execution order, Standard Operating Rules (Part C), checklist (Part E) |
-| `MVP-CUTLINE.md` | Decision D3 (2026-10-10): the Bennett & Co MVP due 2026-10-14, scope fence, schedule, cost cap |
+| `MVP-CUTLINE.md` | Decision D3 (2026-10-10): the Bennett & Co MVP, scope fence, schedule, cost cap (window closed 2026-10-14; history plus the scope fence) |
 
 Live status: `../PROGRESS.md` ("Status summary" and "Next up" at the top). Waiting on Nick: `../BLOCKED-ON-NICK.md`.
 

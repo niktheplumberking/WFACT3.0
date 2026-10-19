@@ -109,11 +109,10 @@ Think of someone who does not know what a checkpoint is.
   cancelled (migration 0013). It is shown as "Stopped without reporting" and no longer blocks anything.
 - **Content that was approved but not yet built** is not checkpointed on its own: a failure after the builder's content review but before the
   site is saved starts the writing again. Only a saved site is carried on.
-- **Cost across a whole build** is still per agent run (builder $1, QA evaluator $0.50 on metered models); there is no per-build $5 total yet
-  (found while cataloguing; recorded, not changed here). Agent 37 is unpriced.
-- Migration **0018 is written and its attack test is written (`scripts/rls_attack_test_recovery.sql`) but neither has been run against the live
-  database**: applying a migration is Huraira's GO. Until it is applied, the details form says it is not switched on; reopening a halted run
-  from the Cockpit needs the new jobs parameters and the active-build guard.
+- **Cost across a whole build**: per agent run (builder $3, QA evaluator $0.50) plus, since 2026-10-13 (MVP M6, Step 12), a $5 per-build and
+  $20 per-7-days cap checked before every model call in a Cockpit job. Agent 37 is priced as an estimate and counted by every cap.
+- Migration **0018 is applied live** (as `build_recovery`, 2026-10-07) and its attack test (`scripts/rls_attack_test_recovery.sql`) passed
+  26/26; it also runs in CI on a throwaway database. Step 4D is DONE: the live continues `63278e56`, `e2a204fb` and `55ddba7c` proved it.
 - Pushing, deploying the Cockpit and the worker are separate steps (Huraira's GO).
 
 ## 7. Files

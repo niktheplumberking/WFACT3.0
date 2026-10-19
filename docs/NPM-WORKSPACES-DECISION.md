@@ -6,7 +6,7 @@ root `package.json`, and no workspace file in a subfolder. Revisit only when the
 
 ## What was checked (measured 2026-10-19)
 
-- 11 packages under `packages/` (`db` holds only SQL), each with its own `package-lock.json` (11 lockfiles). The Track B starter
+- 12 folders under `packages/`: 11 npm packages, each with its own `package-lock.json` (11 lockfiles), plus `db` (SQL only). The Track B starter
   (`packages/frontend-loop/starters/track-b`) has a 12th; it is installed with `npm ci --offline` inside a network sandbox.
 - `.github/workflows/ci.yml` runs `npm ci` 29 times. Jobs that need sibling packages install them first, in a loop such as
   `for p in audit hermes agent-runtime; do (cd ../$p && npm ci); done`.

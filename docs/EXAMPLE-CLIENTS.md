@@ -61,10 +61,11 @@ A perfect brief flatters the factory. Real clients contradict themselves, leave 
 example proves the build path, not the intake path. A "realistically messy" example (contradictions, a missing logo, a
 vague offer, half-answered questions) should follow, so the guards that handle mess are exercised too.
 
-## Not built yet (waiting on the lead-form work and Huraira's GO)
+## Not built yet
 
-These are proposals in `PROGRESS.md` "Gaps noticed", not features:
+The lead-form work (Step 25 M4) is live, and the database already has what these need: an `is_test` flag on lead sites and leads
+(migration 0025) and a `synthetic-test` entity. Still proposals, not features:
 
 - a "Start from example" button in the Cockpit that loads one of these intakes;
-- an `is_test` flag with its own test entity, so rehearsal spend stops landing on `bennett-co`;
-- a `lead_sites` row for each example, so its contact form is connected rather than marked "not connected".
+- briefs that use the `synthetic-test` entity, so rehearsal spend stops landing on `bennett-co` (the example briefs still name it);
+- a `lead_sites` row (with `is_test`) for each example, so its contact form is connected rather than marked "not connected".

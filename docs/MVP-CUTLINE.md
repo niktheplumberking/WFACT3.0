@@ -1,5 +1,8 @@
 # Website Build Module MVP: cut-line (Decision D3)
 
+**Status (2026-10-20)**: the window closed on 2026-10-14. M5 (launch files) and M6 (cost caps) are met; M4 (contact form) is met
+live on synthetic data; the real Bennett & Co run waits on Nick's brief (Step 25). The order of work is now `PROGRESS.md` "Next up".
+
 Recorded 2026-10-10 from the Nikola/Huraira chat of 2026-10-08. Owner: Huraira (sequencing); Nick (money, client, final design call).
 This file is the scope fence. Anything not listed under "Must work" is deferred, and adding to "Must work" costs time that must be named.
 

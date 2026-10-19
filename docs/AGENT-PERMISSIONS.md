@@ -100,9 +100,9 @@ Not agent capabilities (runtime/orchestrator, listed so nothing is hidden):
   slot, but nothing stops code in the runner from opening another socket. (The rendered-QA browser and link checker
   were confined in Step 7, see the table above; WebRTC from the QA browser is not separately filtered.)
 - **The screenshot reviewer's cost is not metered** against the run's spend ceiling (it makes its own HTTP call);
-  its slot is gated and its cost is traced. Agent 37 calls are unpriced, so they add nothing to spend either: the
-  ceiling bites on metered Claude calls only. The ceiling is checked before each call, so a run can exceed it by at
-  most one call.
+  its slot is gated and its cost is traced. Since MVP M6 (2026-10-13) Agent 37 calls are priced as an estimate and
+  count toward the ceiling (the builder's ceiling was raised to $3 for that). The ceiling is checked before each call,
+  so a run can exceed it by at most one call.
 - **Credentials are shared**, not per-agent (Blueprint §12 asks for per-agent scoped credentials). Every agent in a
   runner uses the same service-role key; the gate is an in-process boundary, not a credential boundary. RLS still
   guards the anon/authenticated paths.

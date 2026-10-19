@@ -18,8 +18,9 @@ Cockpit polls the jobs list every 5s while anything is in flight.
 |---|---|---|
 | New client request (paste) | `intake` | Intake → Planner → pending plan in **Approvals** |
 | Re-plan from note (rejected plan) | `replan` | Planner with the owner's rejection note (once; then human) |
+| Re-run the direction step (pending plan) | `direction` | Direction step alone, before the owner decides (migration 0022); the new pending plan supersedes the old |
 | Build + verify (approved plan) | `build_plan` | build-and-verify@1; pages → private `artifacts` bucket; ends at the launch **hard-gate** |
-| Resume from last checkpoint (failed build) | `resume` | continues from the durable checkpoint, no rebuild |
+| Resume from last checkpoint (stopped build) | `resume` | continues from the durable checkpoint (Step 4D: may reopen a halted run and start from qa, revise or rebuild) |
 | Verify a page | `verify` | qa-evaluator on a page (artifact store first, else repo) |
 | Ask Hermes | `ask` | Hermes-lite status answer from memory + state |
 

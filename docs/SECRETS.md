@@ -11,7 +11,7 @@ be swapped for Infisical/Vault later without touching code, since every package 
 | Doppler project | Config | Used by |
 |---|---|---|
 | `wfact-3-0-codebase` | `dev` | Local runs: `doppler run -- npm run ask -- "…"`, `npm run verify`, `npm run build-page` |
-| `wfact-3-0-codebase` | `prd` | GitHub Actions `deploy-cockpit` job (via a **service token** in the `DOPPLER_TOKEN` GitHub secret) |
+| `wfact-3-0-codebase` | `prd` | GitHub Actions `deploy-cockpit` job and the `cockpit-job.yml` job runner (via a **service token** in the `DOPPLER_TOKEN` GitHub secret) |
 
 Variable names are exactly `.env.example`'s (plus `AGENT37_BASE_URL`, `AGENT37_API_KEY`, `API_KEY_21ST`,
 `ANTHROPIC_MODEL` if overridden). No code change is needed — packages already read `process.env`.
@@ -63,5 +63,5 @@ non-empty `.env.local` values imported into `dev` and `prd` (hash-verified 9/9 i
   `MOTION_SITES_MCP_TOKEN` (MotionSites uses browser OAuth, no static key), `STRIPE_SECRET_KEY`,
   `TELEGRAM_BOT_TOKEN`.
 - `GITHUB_DISPATCH_TOKEN` lives only in the `dispatch-job` Edge Function's secrets, never in Doppler.
-- Still to verify: CI with the new keys (needs a push/PR), the `DOPPLER_TOKEN` GitHub secret (dated
-  2026-09-28), and that the old CLI token is revoked (dashboard check).
+- Verified since: CI and the job runner run green with the Doppler keys (e.g. CI `39304787144`, 2026-10-19). Still to verify: that the
+  old CLI token is revoked (dashboard check).
