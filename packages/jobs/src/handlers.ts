@@ -153,16 +153,16 @@ function workflowOutcome(r: WorkflowResult, extra: Record<string, unknown> = {})
 /**
  * Step 4D: writes `job.run` (task = the Cockpit job, run = the workflow run) as soon as a run starts. Without it a job that
  * died before reporting (GitHub's 30-minute limit, a crashed runner) has no way to say which run it was, and its saved
- * site could not be continued.
+ * site could not be continued. Step 21 D: the row carries the plan's entity, which is always known here.
  */
-function linkRun(wf: WorkflowDeps, job: Job, deps: HandlerDeps): WorkflowDeps {
+function linkRun(wf: WorkflowDeps, job: Job, deps: HandlerDeps, entitySlug: string): WorkflowDeps {
   const sink = deps.audit;
   if (!sink) return wf;
   return {
     ...wf,
     onRunStart: async (runId) => {
       await wf.onRunStart?.(runId);
-      await sink.write({ actor: "job-runner", action: "job.run", outcome: "info", taskId: job.id, runId, payload: { jobId: job.id, kind: job.kind } });
+      await sink.write({ actor: "job-runner", action: "job.run", outcome: "info", taskId: job.id, runId, entitySlug, payload: { jobId: job.id, kind: job.kind } });
     },
   };
 }
@@ -268,7 +268,7 @@ export async function handleJob(job: Job, deps: HandlerDeps): Promise<JobOutcome
       if (stored.buildTrack === "B" && !deps.trackBWorkflow) {
         return { ok: false, reason: `plan ${planId} is Track B, but this runner has no Track B builder configured; it is not built as Track A`, result: { planId, buildTrack: "B" } };
       }
-      const wf = linkRun(stored.buildTrack === "B" ? deps.trackBWorkflow! : deps.trackAWorkflow ?? deps.workflow, job, deps);
+      const wf = linkRun(stored.buildTrack === "B" ? deps.trackBWorkflow! : deps.trackAWorkflow ?? deps.workflow, job, deps, stored.plan.brief.entitySlug);
       const inputs = (await deps.inputs?.current(planId)) ?? [];
       const lead = await leadFormFor(stored.plan.brief.clientSlug, deps);
       const brief = briefForBuild(stored.plan, inputs, stored.plan.brief.requestText ? null : await requestFor(planId, deps), lead.leadForm);

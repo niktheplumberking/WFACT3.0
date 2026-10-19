@@ -342,6 +342,9 @@ test("Step 4D: a build links its Cockpit job to the run the moment it starts (so
   assert.ok(link, "job.run row written");
   assert.equal(link!.taskId, j.id);
   assert.equal(link!.runId, out.result.workflowRunId);
+  // Step 21 D: the plan's entity is known here, so the row carries it (it was null on 4 live rows before).
+  assert.equal(link!.entitySlug, (await planStore.get(planId))!.plan.brief.entitySlug);
+  assert.ok(link!.entitySlug, "job.run carries an entity");
 });
 
 // ---- 2026-10-14: logo and live address, continue from a chosen step, readiness probes ----
