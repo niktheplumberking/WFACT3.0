@@ -45,13 +45,16 @@ test("renders a deterministic multi-page site: one file per page, nav order kept
 });
 
 test("SAMPLE facts are labelled where they appear and never published as structured data", () => {
-  const site = renderSite(validateSiteContent(fixture(), brief).content!);
+  const content = validateSiteContent(fixture(), brief).content!;
+  const site = renderSite(content);
   const home = site.files["index.html"]!;
   assert.match(home, /555-0142<\/span><\/a> <span class="sample">SAMPLE<\/span>/);
   const ld = JSON.parse(home.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)![1]!);
   assert.equal(ld.name, "Summit Line Roofing");
   assert.equal(ld.telephone, undefined, "a SAMPLE phone is never published as a fact");
-  assert.match(home, /<!-- OPEN QUESTION for a human \(not shown on the page\): Should package prices/);
+  // Step 21 I: open questions stay in content.json for a person; they never ship inside a page, not even as a comment.
+  assert.ok(content.openQuestions.some((q) => q.startsWith("Should package prices")), "the open question is kept in the content");
+  for (const [file, html] of Object.entries(site.files)) if (file.endsWith(".html")) assert.doesNotMatch(html, /<!--|Should package prices/, `${file}: no open question in the page`);
 });
 
 test("the request form is labelled, required fields are announced, and the primary action reaches it", () => {

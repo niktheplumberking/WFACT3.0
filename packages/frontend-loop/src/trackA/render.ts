@@ -20,7 +20,7 @@ import type { LeadForm } from "../leadForm.js";
 // Package 2): the logo has an explicit display size and an SVG without one gets it from its viewBox (it collapsed to 0x0).
 // 1.4.0 (Build-quality Package 3): media slots on hero, services and prose: the owner's verified image, or a labelled card.
 // 1.5.0 (Step 25 / MVP M4): the request form posts to submit-lead when the brief carries a lead form (leadForm.ts).
-export const STARTER_VERSION = "track-a-starter/1.5.0";
+export const STARTER_VERSION = "track-a-starter/1.5.1";
 const STARTER_DIR = path.join(import.meta.dirname, "..", "..", "starters", "track-a");
 const STARTER_CSS = readFileSync(path.join(STARTER_DIR, "styles.css"), "utf-8");
 const STARTER_JS = readFileSync(path.join(STARTER_DIR, "site.js"), "utf-8");
@@ -372,8 +372,6 @@ function jsonLd(content: SiteContent): string {
   return `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, "\\u003c")}</script>`;
 }
 
-const comment = (s: string) => `<!-- OPEN QUESTION for a human (not shown on the page): ${s.replace(/--+/g, "-").replace(/>/g, "&gt;")} -->`;
-
 /** The URL path a page is served at: "" for the home page, "services.html" for the rest. */
 const pagePath = (slug: string) => (slug === "index" ? "" : pageFile(slug));
 
@@ -425,7 +423,6 @@ function renderPage(content: SiteContent, page: Page, palette: Palette, siteUrl:
     faviconLink(logo),
     `<style>${rootTokens(palette, content)}\n${STARTER_CSS}</style>`,
     isHome ? jsonLd(content) : "",
-    isHome ? content.openQuestions.map(comment).join("\n") : "",
     "</head>",
     "<body>",
     '<a class="skip" href="#main">Skip to content</a>',
