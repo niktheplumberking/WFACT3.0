@@ -161,20 +161,7 @@ form.ask:focus-within { outline: 2px solid var(--need); outline-offset: 1px; }
 .notice.clear { background: var(--done-w); border-color: color-mix(in srgb, var(--done) 45%, transparent); }
 .notice.clear > svg { color: var(--done); }
 
-/* Costs (MVP M6) */
-.cost-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-6); align-items: start; }
-.caps { display: grid; gap: var(--s-5); padding: var(--s-5); }
-.cap { display: grid; gap: var(--s-2); }
-.cap-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-2); }
-.cap-bar { height: 8px; border-radius: 4px; background: var(--sunk); border: 1px solid var(--line); overflow: hidden; }
-.cap-bar > span { display: block; height: 100%; background: var(--done); }
-.cap-bar > span.near { background: var(--need); }
-.cap-bar > span.over { background: var(--stop); }
-.sub { font: 700 var(--fs-small)/1.3 var(--face-text); margin: var(--s-5) var(--s-5) var(--s-2); }
-.tag-over { color: var(--stop); font-weight: 700; }
-
 @media (max-width: 900px) {
-  .cost-grid { grid-template-columns: minmax(0, 1fr); }
   .plate-head { flex-wrap: wrap; }
   .plate-head .quiet { margin-left: 0; flex-basis: 100%; }
   .home-grid, .split, .split.narrow, .form-grid, .form-grid.three, .form-grid.account-form { grid-template-columns: minmax(0, 1fr); }
@@ -552,6 +539,13 @@ dialog.palette::backdrop { background: rgb(20 19 17 / 0.38); }
 .set-savebar-save { min-height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--inv); color: var(--ink); font-weight: 600; cursor: pointer; }
 .set-savebar-discard { min-height: 44px; padding: 0 12px; border: 0; background: none; color: var(--inv); text-decoration: underline; cursor: pointer; }
 .set-savebar button:focus-visible { outline: 3px solid var(--inv); outline-offset: 2px; }
+/* While the save bar is up (72 px, sticky at the bottom), toasts sit above it rather than over it. */
+body:has(.set-savebar) .toasts { bottom: calc(var(--s-6) + 80px); }
+@media (max-width: 900px) {
+  /* Phones: the bar stays above the fixed tab bar (73 px), and toasts above the bar (up to 136 px when its text wraps). */
+  .set-savebar { bottom: calc(80px + env(safe-area-inset-bottom)); }
+  body:has(.set-savebar) .toasts { bottom: calc(88px + 136px + env(safe-area-inset-bottom)); }
+}
 .set-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 14px; }
 .set-card { padding: 20px; border-radius: 14px; border: 1px solid var(--line-2); display: grid; gap: 8px; align-content: start; }
 .set-card b { font-weight: 600; font-size: 17px; }
