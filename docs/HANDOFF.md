@@ -1,19 +1,23 @@
 # WFACT 3.0 — Agent Handoff
 
 **Written**: 2026-10-07, branch `huraira-work` at `1323cbe` (= `origin/main` and `origin/huraira-work`). Product and solution alignment pass.
-**Refreshed**: 2026-10-15 (cleanup pass). Sections 1, 2, 4 to 6 and 8 to 9 still hold. Section 3 rows and section 10 were corrected
-against Part E of the Factory Completion Plan. For anything time-sensitive (step status, next task), `PROGRESS.md` ("Status summary",
+**Refreshed**: 2026-10-20 (after Step 21 closed). Sections 1, 2, 4 to 6 and 8 to 9 still hold. Sections 1, 3, 5 and 7 were corrected
+against Part E of the Factory Completion Plan and the repo. For anything time-sensitive (step status, next task), `PROGRESS.md` ("Status summary",
 "Next up") and Part E win over this file.
 
-**What changed since 2026-10-07** (from Part E and `PROGRESS.md`, 2026-10-15):
+**What changed since 2026-10-07** (from Part E and `PROGRESS.md`, 2026-10-20):
 - Step **4D** (build recovery) is **DONE**: exit check met live (continues `63278e56`, `e2a204fb`, `55ddba7c`).
 - Step **28** (build quality and plain-language Cockpit, `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md`) is **IN PROGRESS**: Packages
-  1–3 built and verified, Package 4 (Cockpit v2 to the locked design in `docs/design/cockpit-v2/`) phases 1–13 done, build-failure
+  1–3 built and verified, Package 4 (Cockpit v2 to the locked design in `docs/design/cockpit-v2/`) phases 1–19 deployed and the pre-v2 rebuild R1–R3 done (R4–R5 left), build-failure
   guards (`docs/BUILD-FAILURE-DIAGNOSIS.md`) and the brand-colour rule in code; live proof pending.
-- Steps **12** (cost caps $5/build, $20/7 days, `docs/AI-COST-AUDIT.md`), **21** (launch files) and **26** (item 1: independent
-  reviewer call live) are **PARTIAL**.
+- Steps **12** (cost caps $5/build, $20/7 days, ON since 2026-10-13, `docs/AI-COST-AUDIT.md`), **25** (contact form met live on synthetic
+  data) and **26** (item 1: independent reviewer call live) are **PARTIAL**.
+- Step **21** (housekeeping) is **DONE** (2026-10-20, CI `39304787144`): launch files proven on live run `4c35703b`; audit rows carry the
+  entity (migration `0027`); the entity list lives in `public.entities` (migration `0028`, `bennett-co` added); RLS attack scripts run in CI;
+  one shared mock model client; no npm workspaces (`docs/NPM-WORKSPACES-DECISION.md`).
 - The MVP window (Decision D3, `docs/MVP-CUTLINE.md`, due 2026-10-14) has passed; check `PROGRESS.md` for what was proven.
-- Verification registry is v1.3.0 with **53** checks (`packages/verification/config/eval-registry.json`). Migrations run to `0023`.
+- Verification registry is v1.4.0 with **54** checks (`packages/verification/config/eval-registry.json`). Migrations run to `0028`
+  (`0016` was skipped in numbering; `0024` exists only on another branch and is not applied).
 
 **Purpose**: let a coding agent continue the build without reconstructing the project's history. Self-contained; the documents
 it points to are the detail, this is the orientation.
@@ -48,8 +52,8 @@ failure of "done" claims nobody verified (a whole feature pack was never install
 |---|---|---|
 | 1 | One real client end-to-end with fewer than 40 correction batches | **Open.** Only synthetic client runs exist (Summit Line Roofing, 2 change rounds, not comparable). A real brief is Nick's. |
 | 2 | Three concurrent clients, no firefighting | **Open** (Step 18; needs Step 8 queue). |
-| 3 | 50-point audit + extended registry re-run on the new stack | **Partial.** 48-check registry exists and re-runs; the 78-check and 50-point *source lists are not in this repo*. |
-| 4 | Real cost per client measured | **Partial.** Model traces exist; Agent 37 calls are unpriced (null cost). |
+| 3 | 50-point audit + extended registry re-run on the new stack | **Partial.** 54-check registry exists and re-runs; the 78-check and 50-point *source lists are not in this repo*. |
+| 4 | Real cost per client measured | **Partial.** Model traces exist; Agent 37 calls carry an estimated price (`price_basis 'estimated'`, MVP M6); caps $5/build, $20/7 days are ON. |
 | 5 | Every agent action audited | **Largely met** (audit log + traces + permission denials). |
 | 6 | Disaster-recovery drill run | **Not done** (Step 19). |
 | 7 | Launch and Money hard-gated to a human, forever | **Met by design** (no deploy button; launch is a human stage move). |
@@ -58,14 +62,14 @@ failure of "done" claims nobody verified (a whole feature pack was never install
 1. **Request → plan → approve → build → verify → launch gate** (works end-to-end for synthetic clients): paste request in Cockpit →
    Intake + Planner write a plan → owner approves/rejects and picks Track A or B → build + verify job on GitHub Actions →
    "awaiting launch approval" or a plain-language failure.
-2. **Failure → recovery** (Step 4D, built and deployed; live use not yet exercised): a stopped build says why in plain words and can be continued.
+2. **Failure → recovery** (Step 4D, DONE, proven live 2026-10-14): a stopped build says why in plain words and can be continued.
 3. **Account request → owner/admin approval → sign-in** (Step 3A, done).
 4. **"What needs me?"** home screen from real rows (Step 4C, deployed; signed-in live check still pending).
 
 ### 1.6 Scope
 | In the current release (the plan in force) | Later | Out of scope (for now) |
 |---|---|---|
-| Steps 4B (finish), 4D (live proof), 25, 26, 27, 8–22 of `docs/WFACT-3.0-Factory-Completion-Plan.md`, in the Execution order | Step 23 Owner's Key port, closing reports, care plans; Step 24 autonomy upgrades; self-hosted/local models; SaaS packaging | Auto-deploy of client sites; moving money; Rizm's pipeline (Atif's, separate); knowledge graph (Cognee) before the Step 15 trial; simulation environment |
+| Steps 4B (finish), 28 (current), 25, 26, 27, 8–20, 22 of `docs/WFACT-3.0-Factory-Completion-Plan.md`, in the Execution order | Step 23 Owner's Key port, closing reports, care plans; Step 24 autonomy upgrades; self-hosted/local models; SaaS packaging | Auto-deploy of client sites; moving money; Rizm's pipeline (Atif's, separate); knowledge graph (Cognee) before the Step 15 trial; simulation environment |
 | **Proposed, sequenced after the first paid delivery**: agency pipeline (niche research, offer design), lead-gen content engine, dynamic features if ever needed (Part F of the plan). **Deferred**: e-commerce site type | | |
 
 ### 1.7 Confirmed vs assumed
@@ -78,12 +82,12 @@ pilot client (synthetic); the governance table; the entity list.
 **Recommendations (mine, not decisions)**: sequencing changes in §6.
 
 ### 1.8 Misunderstandings and direction changes on record
-- 100-hour sprint superseded 2026-09-28 by the Continuation Plan, then the Factory Completion Plan (steps 1–24, since extended to 1–27).
+- 100-hour sprint superseded 2026-09-28 by the Continuation Plan, then the Factory Completion Plan (steps 1–24, since extended to 1–28).
 - Hostinger descoped 2026-09-22 for the sprint; Vercel stood in for "live". The hosting law itself is unchanged and Nick was never told in conversation (written disclosure only).
 - Hermes-lite replaced a real Hermes Agent by the manual's pre-authorised fallback; Nick not yet told in conversation.
 - **D1 decided 2026-10-07 (Huraira)**: two tracks kept, Track A motion budget (Step 27), conversion as a hard gate, e-commerce deferred.
 - Static output was a deliberate 4B choice, then Nick (2026-10-07) said "static" meant flat, not technically static — the Addendum's dynamic tiers D0–D4 misread this and are superseded. The revised direction is now decided (D1 above); Nick confirms it by rating sample builds.
-- Track B builder: planned as a different vendor from reviewer; today both are Agent 37 (same vendor), recorded in `packages/rendered-qa/config/reviewer.json`.
+- Track B builder: planned as a different vendor from the reviewer. Since 2026-10-13 the screenshot reviewer is Anthropic `claude-sonnet-5` (`packages/rendered-qa/config/reviewer.json` v1.1.0) and the builder is Agent 37, so they differ.
 
 ---
 
@@ -107,27 +111,27 @@ Known conflicts and how they resolve: PROGRESS.md "Status summary" said 4D was u
 
 | Capability | Status | Evidence / caveat |
 |---|---|---|
-| Cockpit job dispatch (UI → Edge Function → GitHub Actions) | **Complete, verified** | Step 1; no tests or CI for the Edge Function itself |
-| Accounts, RLS, approval-gated sign-in | **Complete, verified** *(reported)* | Attack scripts `scripts/rls_attack_test*.sql` (3A 32/32, 4D 26/26); run by hand, not in CI |
+| Cockpit job dispatch (UI → Edge Function → GitHub Actions) | **Complete, verified** | Step 1; `dispatch-job` has Deno tests in CI (Step 21 H) |
+| Accounts, RLS, approval-gated sign-in | **Complete, verified** *(reported)* | Attack scripts `scripts/rls_attack_test*.sql` (3A 32/32, 4D 26/26); run in CI on a throwaway local database (`scripts/rls-attack-local.sh`, job `rls-attack`) and live by hand after each migration |
 | Intake → Direction → Planner | **Complete** | `packages/planning`, 32 tests; synthetic inputs only |
 | Builder/evaluator loop, Track A (static multi-page) and Track B (Next.js, motion) | **Partial** | Track B live build passes all but a simulated-LCP check missing 2.5 s by 0.02–0.08 s *(reported)*; Track A last live re-run failed on a dropped connection, retry added. M4 not closed |
-| Rendered QA (screenshots, axe, Lighthouse, design rulebook) | **Complete, CI-verified** | reviewer is same vendor as builder |
-| Verification registry (53 checks, v1.3.0) + evaluator | **Complete for what exists** | 78-check / 50-point lists missing; OpenAI evaluator never made a live call (429) |
-| Agent permissions (default-deny) | **Complete** *(reported live)* | Step 6; Hermes-lite reads `clients/<entitySlug>/memory.md` (slug misuse) |
+| Rendered QA (screenshots, axe, Lighthouse, design rulebook) | **Complete, CI-verified** | reviewer (Anthropic) is a different vendor from the builder (Agent 37) |
+| Verification registry (54 checks, v1.4.0) + evaluator | **Complete for what exists** | 78-check / 50-point lists missing; OpenAI evaluator never made a live call (429) |
+| Agent permissions (default-deny) | **Complete** *(reported live)* | Step 6; Hermes-lite no longer reads an entity slug as a client folder (Step 21 K) |
 | Documentation agent / episodic memory | **Complete** *(reported live)* | Step 5 |
 | Build recovery (stopped build → plain diagnosis → continue) | **Complete, verified live** | Step 4D DONE 2026-10-14; continues `63278e56`, `e2a204fb`, `55ddba7c` |
 | Cockpit rooms: Home, Decisions, Projects, Activity, Costs, Settings, More | **Complete** (real data, no mocks) | signed-in live check pending; 3 test files for ~5k LOC |
 | Cockpit rooms: System, Agents, Memory, Business | **Placeholders** ("Coming in Step N", honest) | Steps 9, 10, 14, 23 |
-| Hermes-lite controller | **Partial, live** | read-only `ask` jobs; `KNOWN_ENTITIES` hard-coded (`packages/hermes/src/controller.ts:19`) |
-| `packages/media` (Seedance/Higgsfield) | **Orphaned groundwork** | no importer, no CI job; M5 blocked on Higgsfield credits |
+| Hermes-lite controller | **Partial, live** | read-only `ask` jobs; entities read from `public.entities` (`@wfact/hermes-lite/entities`, Step 21 K) |
+| `packages/media` (Seedance/Higgsfield) | **Groundwork** | no importer yet; unit tests in CI (Step 21 H); M5 blocked on Higgsfield credits |
 | Task/event queue, durable execution | **Missing** | Step 8; jobs table + GH Actions only |
 | Cost caps per build / per 7 days | **Partial, live** | Step 12 MVP slice; Run page and live cap refusal pending |
 | Alerts, DR drill, 3-client test, Owner's Key | **Missing** | Steps 17, 19, 18, 23 (real-client run: 25; calibration: 26; Track A motion: 27) |
-| Launch files in starters (sitemap, robots, canonical, og:image; Track A 404) | **Partial** | Step 21: built in `9968019`; verification pending |
+| Launch files in starters (sitemap, robots, canonical, og:image; Track A 404) | **Complete, verified live** | Step 21 DONE: built in `9968019`; every launch-file check passes on live run `4c35703b` |
 | Hosting on Hostinger | **Blocked/descoped** | no live Hostinger deploy exists |
 
 No TODO/FIXME markers in shipped source. Placeholders are explicit and labelled (SAMPLE content, synthetic provenance).
-**Retain**: everything above. **Correct**: Track A writes brief open-questions into page HTML comments (move to `content.json`); four copy-pasted mock model clients; `jobs/src/permissionsAttack.ts` lived in `src/` (moved to `jobs/scripts/`, Step 21 J). **Retire**: nothing in code is proven obsolete; "Hermes-lite is superseded" is *not* evidenced. Migration 0016 is absent (cause not recorded).
+**Retain**: everything above. **Corrected in Step 21** (2026-10-19): Track A open questions now live only in `content.json`; one shared mock model client (`@wfact/hermes-lite/testing/mockModel`); `permissionsAttack.ts` moved to `jobs/scripts/`. **Retire**: nothing in code is proven obsolete; "Hermes-lite is superseded" is *not* evidenced. Migration 0016 never existed (numbering skipped it in `681b9a8`).
 
 ---
 
@@ -146,10 +150,10 @@ Cockpit PWA (Vercel) --anon key, RLS--> Supabase (Postgres, Auth, Edge Function 
 | Work runs on GitHub Actions, Cockpit only displays/gates | Hermes/Cockpit never execute code (CLAUDE.md §6) | ~15 min CI, 26 min job cap; Step 8 needed for durability |
 | Doppler is the sole secret store; one GH secret | CLAUDE.md §6 | Edge Function secrets live separately in Supabase |
 | Two tracks: A static multi-page (content JSON, starter owns code; motion budget coming in Step 27); B Next.js static export, isolated build | Different clients need different bars | Track B output differs byte-wise by platform; needs sudo/unshare sandbox |
-| Checkpoint-and-resume, evaluator ≠ builder | "Never trust done" | Same-vendor review today (gap) |
+| Checkpoint-and-resume, evaluator ≠ builder | "Never trust done" | Reviewer (Anthropic) and builder (Agent 37) are different vendors since 2026-10-13 |
 | Deploys only from CI on `main`; `huraira-work` is the working branch | Launch stays human | **Pushing `main` deploys production** |
 
-Optional improvement, not required: a root workspace/`npm ci` script (Step 21 decides workspaces).
+No npm workspaces: decided in Step 21 B (`docs/NPM-WORKSPACES-DECISION.md`); packages stay linked with `file:`.
 
 ---
 
@@ -159,14 +163,14 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 |---|---|---|
 | 1 | Nick has not yet confirmed D1 (he will, via the Step 27 blind rating); the agency pipeline is sequenced after the first paid delivery | Medium |
 | 2 | Only synthetic clients; business rules provisional | High for goal 1 |
-| 3 | Same-vendor reviewer; OpenAI 429; evaluator second vendor unproven live | Medium |
-| 4 | Agent 37 builder unpriced; no USD or token ceiling sees ~190k tokens/run | Medium (Step 12) |
+| 3 | OpenAI 429; an OpenAI evaluator never made a live call (the live evaluator and reviewer are Anthropic) | Medium |
+| 4 | Agent 37 builder priced as an estimate ($3/$15); spend caps ON; live cap refusal not yet proven | Low–medium (Step 12) |
 | 5 | Vercel 12-function ceiling caused a silent outage once | Medium (Step 20) |
 | 6 | Higgsfield key posted in chat — rotate; no credits; no spend cap | Medium, security |
-| 7 | CI does not cover `media`, `dispatch-job`, `db` attack SQL, `check-trackers` | Medium |
+| 7 | Old `audit_log` rows (before 2026-10-19) keep a null entity; the table is append-only | Low |
 | 8 | Hosting law (Hostinger) never exercised; Vercel stood in | Medium |
-| 9 | Track B simulated-LCP miss; launch files missing | Low–medium |
-| 10 | 11 of 13 `.claude/hooks` scripts unregistered; unknown if wanted | Low |
+| 9 | Track B simulated-LCP miss | Low–medium |
+| 10 | Security advisor flags `public.rls_auto_enable()` as callable by signed-out users (predates Step 21) | Low–medium |
 
 ---
 
@@ -176,7 +180,7 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 |---|---|---|---|
 | D1 | **DECIDED 2026-10-07 (Huraira)**: keep two tracks; Track A gets a motion budget; Track B stays full 21st.dev/React; conversion is a hard gate (speed, layout shift, visible CTA); e-commerce deferred. Nick confirms by blind-rating sample builds (Step 27), not by conversation | Huraira | — |
 | D2 | **DECIDED 2026-10-07 (Huraira): approved.** Steps 12 and 20 join Step 8 as one bundle, after the real-client proof run | Huraira | — |
-| D3 | **DECIDED 2026-10-10 (Huraira, from the Nick chat of 2026-10-08)**: MVP of the Website Build Module proven on Bennett & Co by Wed 2026-10-14; websites only; scope fence, schedule and cost cap proposal in `docs/MVP-CUTLINE.md`. The cap itself (Agent 37 priced, $5 per build, $20 per week) awaits Huraira's yes and Nick's top-up | Huraira, Nick | Overrides the order in §7 until the MVP ships |
+| D3 | **DECIDED 2026-10-10 (Huraira, from the Nick chat of 2026-10-08)**: MVP of the Website Build Module proven on Bennett & Co by Wed 2026-10-14; websites only; scope fence, schedule and cost cap proposal in `docs/MVP-CUTLINE.md`. The cap ($5 per build, $20 per 7 days, Agent 37 priced as an estimate) is ON since 2026-10-13, approved by Nick. The window has passed | Huraira, Nick | Was an override of §7 until 2026-10-14 |
 | D3b | Runtime shape for any dynamic features within the Hostinger/Vercel law (was D3 before 2026-10-10) | Huraira | Only if dynamic features are proposed |
 | D4 | Obtain AIW2.0STACK "website-factory shell" to compare real output | Huraira | Comparison currently rests on Nick's description |
 | D5 | Spend caps: Higgsfield per build/month; Agent 37 auto top-up | Nick | M5 |
@@ -187,25 +191,25 @@ Optional improvement, not required: a root workspace/`npm ci` script (Step 21 de
 
 Order approved by Huraira 2026-10-07 (it replaces the numeric order; the full table is "Execution order" in the Factory Completion Plan). Each step: read its Part D prompt, follow Part C, report, wait for GO.
 
-**MVP override (Decision D3, 2026-10-10)**: until Wed 2026-10-14 only items 1 to 4 below run, trimmed to the Bennett & Co proof (what must work and what is deferred: `docs/MVP-CUTLINE.md`). Items 5 onward wait until after the MVP.
+**MVP override (Decision D3, 2026-10-10)**: ran until Wed 2026-10-14 (items 1 to 4, trimmed to the Bennett & Co proof; `docs/MVP-CUTLINE.md`). The window has passed; Step 28 is the current step and `PROGRESS.md` "Next up" is the order of work.
 
 | Order | Item | Depends on | Acceptance / verification (summary) |
 |---|---|---|---|
-| 1 | **Huraira actions**: re-run Track B `4acbde1f` and Track A `b5a45a8e` (closes 4B M4); press "continue" on a stopped build (4D live proof); buy OpenAI and Higgsfield credits; rotate the Higgsfield key | CI green | M4 closes when one live build per track passes and screenshots are reviewed |
+| 1 | **Huraira actions**: re-run Track B `4acbde1f` and Track A `b5a45a8e` (closes 4B M4); buy OpenAI and Higgsfield credits; rotate the Higgsfield key | CI green | M4 closes when one live build per track passes and screenshots are reviewed |
 | 2 | **Step 26** quality calibration | OpenAI credits | Live different-vendor call with trace row; human-vs-automated calibration table; visual-regression baseline that fails on a seeded regression |
 | 3 | **Step 27** Track A motion budget (decision D1) | Step 26 | One-page design approved first; richer Track A passes speed, layout-shift and CTA checks; seeded motion violation fails; blind-rating sheet for Nick |
 | 4 | **Step 25** real-client proof run (with 4B M5/M6 when Higgsfield credits land) | Nick's real brief or the real 2.0 DreamSign case; Step 26 | Measured corrections, cost, time vs the 40+ baseline; defects the checks missed listed; stops at the launch gate |
-| 5 | **Steps 8, 12, 20** as one reliability bundle, plus Step 21 sub-item H (CI coverage) | 4, 6 | Crash-resume, capped retries + escalation, per-client serialisation; Agent 37 priced or token-capped; no 12-function risk; attack tests in CI |
+| 5 | **Steps 8, 12, 20** as one reliability bundle | 4, 6 | Crash-resume, capped retries + escalation, per-client serialisation; Agent 37 priced or token-capped; no 12-function risk; attack tests in CI |
 | 6 | **Steps 9 then 10**: one thin Health room | 8 | Real data; failed check named |
 | 7 | Steps 11, 13, 14, 17 as needed | 8–12 | Bounded scopes under the Step 6 model |
 | 8 | Steps 18, 19, plus define the 50-point audit list | 8 | Three-client test, DR drill, goal 3 closable |
-| 9 | Step 21 (rest), 22 | real inputs | per plan |
+| 9 | Step 22 | real inputs | per plan |
 | 10 | After the first paid delivery: Step 23 and Part F proposals | revenue | per plan |
 | Deferred | Steps 15, 16, 24 | real data | revisit after item 8 |
 
 Not in scope now: an e-commerce site type (Huraira 2026-10-07).
 
-Housekeeping folded into Step 21: launch files for both starters; stop writing open questions into Track A HTML; dedupe model clients; real entity list instead of `KNOWN_ENTITIES`.
+Housekeeping (Step 21) is DONE (2026-10-20): launch files, open questions out of Track A HTML, one shared mock model client, the entity table instead of a hard-coded list, entity on audit rows, RLS attack scripts in CI.
 
 ---
 
