@@ -171,7 +171,7 @@ the client's own work, people, premises or results.
 The forward plan is `docs/WFACT-3.0-Continuation-Build-Plan.md` (Stages 1–7), with
 `docs/WFACT-3.0-Factory-Completion-Plan.md` mapping every remaining Blueprint phase to numbered steps.
 Live status is in `PROGRESS.md`; its "Next up" list is the order of work (2026-10-20: Step 28, build quality and the
-plain-language Cockpit, is the current step; Steps 2, 3 and 21 are DONE).
+plain-language Cockpit, is the current step; Steps 1, 2, 3, 3A, 4D, 5, 6, 7 and 21 are DONE, per Part E of the Factory Completion Plan).
 
 ## 6. Open decisions blocking this file from being "real"
 

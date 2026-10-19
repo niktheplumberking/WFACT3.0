@@ -8,7 +8,7 @@ against Part E of the Factory Completion Plan and the repo. For anything time-se
 **What changed since 2026-10-07** (from Part E and `PROGRESS.md`, 2026-10-20):
 - Step **4D** (build recovery) is **DONE**: exit check met live (continues `63278e56`, `e2a204fb`, `55ddba7c`).
 - Step **28** (build quality and plain-language Cockpit, `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md`) is **IN PROGRESS**: Packages
-  1–3 built and verified, Package 4 (Cockpit v2 to the locked design in `docs/design/cockpit-v2/`) phases 1–19 deployed and the pre-v2 rebuild R1–R3 done (R4–R5 left), build-failure
+  1–3 built and verified, Package 4 (Cockpit v2 to the locked design in `docs/design/cockpit-v2/`) phases 1–19 deployed and the pre-v2 rebuild R1–R4 done (R5 left), build-failure
   guards (`docs/BUILD-FAILURE-DIAGNOSIS.md`) and the brand-colour rule in code; live proof pending.
 - Steps **12** (cost caps $5/build, $20/7 days, ON since 2026-10-13, `docs/AI-COST-AUDIT.md`), **25** (contact form met live on synthetic
   data) and **26** (item 1: independent reviewer call live) are **PARTIAL**.
