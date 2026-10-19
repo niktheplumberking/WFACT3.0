@@ -78,6 +78,8 @@ test("plan: hero/home and process/how-we-work collapse to one id each; the build
 
 test("helpers: canonical sections and the build title for a landing page", () => {
   assert.deepEqual(canonicalSections(["Hero", "home", "Our Process", "how-we-work", "faq", "FAQ"]), ["hero", "process", "faq"]);
+  // Step 21 C: "process" and "how-it-works" are one section; order is kept and an unknown section is never dropped.
+  assert.deepEqual(canonicalSections(["process", "how-it-works", "How It Works", "pricing"]), ["process", "pricing"]);
   assert.equal(buildTaskTitle("Build the homepage", true, []), "Build the landing page: Build the homepage");
   assert.equal(buildTaskTitle("Build homepage", false, []), "Build the multi-page site: Build site");
 });
