@@ -1,8 +1,8 @@
 # Progress — WFACT 3.0
 
-Last synced: 2026-10-19 (late night, +05), via `/step-close 28` (Package 4 pre-v2 rebuild R2) — `80f1391`: decided proposals (changes asked for; approved before the kind of site existed) in the v2 proposal grammar; BeforeBuild, AfterDecision, PlanDetails, WhatTheClientWants deleted (python count 3/2/2/2 → 0). vitest 342/342 (7 new in `pages/decided.test.tsx`, 4 mutations caught), tsc and build clean (precache 42 entries, 1575.43 KiB, no dev code in `dist/`); axe 0 and Lighthouse a11y 100 in 3 rooms; fingerprints of the proposal review, needs and Home identical. CI recorded at the next update.
+Last synced: 2026-10-19 (late night, +05), via `/step-close 21` (round 2) — `32cfa80`..`fb6f922`: D migration 0027 (live, 12/12), H RLS runs in CI on a throwaway local database, J shared mock, K entity table (migration 0028 live, 10/10; KNOWN_ENTITIES removed), F left by decision, M5 launch files proven on live run `4c35703b`. Round 1 CI `39299701250` green. Step 21 PARTIAL until CI is green on round 2.
+Previous sync: 2026-10-19 (late night, +05), via `/step-close 28` (Package 4 pre-v2 rebuild R2) — `80f1391`: decided proposals (changes asked for; approved before the kind of site existed) in the v2 proposal grammar; BeforeBuild, AfterDecision, PlanDetails, WhatTheClientWants deleted (python count 3/2/2/2 → 0). vitest 342/342 (7 new in `pages/decided.test.tsx`, 4 mutations caught), tsc and build clean (precache 42 entries, 1575.43 KiB, no dev code in `dist/`); axe 0 and Lighthouse a11y 100 in 3 rooms; fingerprints of the proposal review, needs and Home identical. CI recorded at the next update.
 Previous sync: 2026-10-19 (late night, +05), via `/step-close 21` — housekeeping round `ac314ae`..`f490904` plus graphify `f1eb53d`, `3db3263` (local, not pushed; CI not run on it): I first half, C, L, G, H in part (CI `media`, `dispatch-job` 7 Deno tests, `check-trackers`), J move, B decision record, E (0 dangling edges), D runtime part. Local: frontend-loop 130, planning 45, verification 123, jobs 38, workflow 89, hermes 55, agent-runtime 39, media 8, dispatch-job 7, rendered-qa 89 (run before the D change); typechecks clean; check-trackers OK. Step 21 stays PARTIAL: D triggers, F, K and H's RLS runs wait on Huraira.
-Previous sync: 2026-10-19 (late night, +05), via `/step-close 28` (Package 4 pre-v2 rebuild R1) — `f9d4842`: the other work pages (never started, cancelled, running non-build work, older and archived passing builds, a stop a later build fixed, the live build) rebuilt in the v2 grammar. vitest 335/335 (16 new in `pages/runpage.test.tsx`, 4 mutations caught), tsc and build clean (precache 42 entries, 1579.84 KiB, no dev code in `dist/`); axe 0 and Lighthouse a11y 100 in 8 rooms; fingerprints of SiteReview, stop case 5 and Home identical. Pushed in `b88d308` (with the Step 21 commits, on Huraira's OK); CI `39296573842` green incl. Deploy Cockpit to Vercel.
 Older sync entries (2026-09-28 to 2026-10-15): `docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md`. Keep at most two "Previous sync" lines here; move older ones there.
 
 **Which document governs what**: the Continuation Build Plan section (bottom) tracks
@@ -16,7 +16,7 @@ phases to numbered steps 1–27 (execution order re-set and approved 2026-10-07)
 steps; this file tracks the Continuation Stages.
 
 **Status summary (2026-10-15, 13:30 +05, `/progress-sync`)**:
-- **Step 21 PARTIAL** (`/step-close 21`, 2026-10-19): housekeeping round `ac314ae`..`f490904`, local, not pushed. B, C, E, G, I, L done; D, H and J in part; D's trigger part, F, K and H's RLS runs wait on Huraira.
+- **Step 21 PARTIAL, CI only** (`/step-close 21`, 2026-10-19): every sub-item A–L done or decided; migrations 0027 and 0028 applied live and attack-tested (12/12, 10/10); M5 launch files proven on live run `4c35703b`. Round 1 CI `39299701250` green; DONE once CI is green on round 2 (`32cfa80`..`fb6f922`).
 - **Step 3A DONE, closed** (`/step-close 3A`, 2026-10-15): the live sign-up is proven end to end (sign-up, owner approval as `pm` with audit row, password
   sign-in after approval in the Auth logs, role-limited view, attack test 32/32). Supabase email confirmation stays off (Huraira, 2026-10-15: the approval gate is enough).
 - **Step 25 PARTIAL** (`/step-close 25`, 2026-10-15): MVP M4, the contact form that saves leads, is **met live on synthetic data** (migrations 0025/0026
@@ -143,12 +143,10 @@ Huraira's own actions (M4 live re-runs, one live "continue", OpenAI and Higgsfie
   own model are still chosen inside their packages. Disclosed in the config's `_doc`.
 - **Traces cover model calls, not tool calls.** Hermes-lite tool calls are in `audit_log` with
   latency. Blueprint §3 names tool calls too; revisit under the Langfuse trigger (§13).
-- **Some audit rows carry `entity_slug = null`** (narrowed 2026-10-19, Step 21 D). The QA CLI and `job.run` rows now carry the
-  entity (`f802994`, `f490904`). Still null where the entity is knowable: the database triggers' `job.requested`, `job.cancelled`,
-  `job.archived` and `plan.input` rows (entity via `params.planId` or `plan_id` to `plan_approvals.entity_slug`) and the
-  `dispatch-job` Edge Function's `job.dispatched` row. These need a migration and a redeploy (Huraira's GO). Null is correct for
-  intake before detection, founder questions naming no client, and `account.approved`.
-- **The deployed DreamSign page is stale.** The Stage 3 live run overwrote
+- **Audit rows from before 2026-10-19 18:25 UTC keep `entity_slug = null`** where it was knowable (Step 21 D fixed new rows in
+  `0027`; `audit_log` is append-only, so old rows are not backfilled). Reports that group by entity should read older rows through
+  their job's plan.
+- **The deployed DreamSign page is stale (left as is, Huraira 2026-10-19, Step 21 F).** The Stage 3 live run overwrote
   `clients/dreamsign-pilot/pages/clean-agency.html` and appended 2 rows to its `memory.md`, but
   `dreamsign-deploy.vercel.app` (HTTP 200 today) still serves the older build, since the workflow
   never deploys by design.
@@ -731,7 +729,7 @@ reason; the walkthrough passes; accessibility and responsiveness proven with evi
 the Cockpit and is blocked as a stage move), except that every room has only been checked with copied data, not with a live signed-in
 session. The phone layout shift on Projects (0.118, measured on the copied-data build) is also still open.
 
-## Step 21 — Housekeeping (PARTIAL 2026-10-19 — B, C, E, G, I, L done; D and J in part; F, K, the rest of D and H's RLS runs wait on Huraira; launch files verification pending)
+## Step 21 — Housekeeping (PARTIAL 2026-10-19 — every sub-item done or decided; round 2 `32cfa80`..`fb6f922` waits only on CI)
 
 - [ ] **Intake logo and live address (D4 Tier 2 slice, 2026-10-14)**: built in `8b3caed` and `a444a3d` (local, not pushed). Evidence: brandAsset tests 10, workflow readiness/continue tests 8, jobs 4, planning 1, Cockpit logo checks 9; a real isolated Track B build with the logo passes; migration 0021 dry run 28/28 on the live database, rolled back, nothing persisted (SQL-checked). Independent review: 1 HIGH (SVG `<x:script>` bypass) and 5 MEDIUM, fixed in `9597103`. Migration 0021 applied live 2026-10-14 (20261014110708, Huraira's GO); attack script on the applied migration 28/28. QA reliability fixes merged (`8857819`, `380bfd2`, `e921c6d`). Full suite green (rendered-qa 79, verification 113, frontend-loop 98, workflow 42, jobs 28, planning 34, documentation 18, hermes 55, agent-runtime 39, audit 14, media 8, Cockpit 116). CI `38554457540` green incl. deploy. **Live 2026-10-14**: Lanternworks "Fix and continue" with the uploaded logo (job `55ddba7c`) passed the readiness check, revised first, and reached the launch gate in 14 min for ~$0.68, the first passing build since 2026-10-01 (SYNTHETIC; Step 25 still needs a real client). Open: a human screenshot review; the Track B starter's 23 px contact links (cost one round). Found by Huraira on the live run: the Cockpit previewed the site's file list (site.manifest.json) instead of the site, and showed an advisory finding as a warning; both fixed (site preview with page switcher; notes marked not blocking). The preview shows pages as built; motion plays only on a real preview link (Step 4B M6).
 
@@ -747,7 +745,7 @@ Governed by the Factory Completion Plan Step 21 sub-item I (second half), pulled
       Evidence: a real isolated build in `frontend-loop/test/trackB.test.ts` passes every launch-stage check with an address.
 - [x] Artifact store accepts the PNG: `ARTIFACT_PATH_RE` and content types in `packages/workflow`, migration `0019_artifacts_png` applied
       live and confirmed by SQL.
-**Housekeeping round 2026-10-19** (`ac314ae`..`f490904`, local, not pushed; CI not yet run on it):
+**Housekeeping round 1, 2026-10-19** (`ac314ae`..`f490904`; pushed with Step 28 by the other session; CI `39299701250` on `06bfa71` green, every job incl. the new `media`, `dispatch-job` and the guardrails tracker check, and the Cockpit deploy):
 - [x] **I (first half)**: Track A keeps open questions in `content.json` only; no HTML comment in any page (track-a-starter 1.5.1). `ac314ae`; `frontend-loop/test/trackA.test.ts` fails with the comment put back (mutation-checked); frontend-loop 130/130.
 - [x] **C**: the alias rule was already built in `3e493f6` (`canonicalSections`, `planning/src/planner.ts`); `0e13089` pins "process" and "how-it-works" to one section, and removing the alias fails it; parseBrief unchanged; planning 45/45.
 - [x] **L**: dead path `packages/agent-runtime/registry.ts` corrected to `src/registry.ts` (`3bf8df4`); the 12 unregistered hooks were archived in `e11c1ea`, only `stop-tracker-guard.sh` remains.
@@ -757,8 +755,13 @@ Governed by the Factory Completion Plan Step 21 sub-item I (second half), pulled
 - [x] **B**: decision record `docs/NPM-WORKSPACES-DECISION.md` (`2bc9c4e`): keep `file:` links. The Cockpit uses no `@wfact/*` package; a root workspace changes the deploy root (the 2026-09-22 empty-deploy class), a `packages/` workspace drops 11 lockfiles and changes all 29 CI installs. Not implemented, so no Vercel proof was needed. Huraira to confirm.
 - [x] **E**: `graphify update .` (`f1eb53d`, `3db3263`): 5048 nodes, 9793 edges, **0 dangling edges** (was 52); all 6 PDFs present as file nodes only (semantic extraction needs a model key).
 - [x] **D (runtime part)**: the QA CLI puts the client's owner entity on its task (`qaCliTask`, `f802994`); `job.run` rows carry the plan's entity (`f490904`). Each has a test that fails when the row is written without it (mutation-checked); verification 123/123, jobs 38/38. Live before: 30-day null rows by writer, SQL 2026-10-19: Cockpit triggers 108/116, intake 18/25, hermes-lite 14/18, qa-evaluator 8/130, job-runner 4/4. **Not done**: the database triggers (`job.requested`, `job.cancelled`, `job.archived`, `plan.input`) and `dispatch-job`'s `job.dispatched` row need a migration and an Edge Function redeploy (Huraira's GO).
-- [ ] **K**: the live `entities` table has `dreamsign` and `synthetic-test`, but **no `bennett-co`** and no alias column, while `KNOWN_ENTITIES` has `dreamsign` and `bennett-co`. Switching now would stop intake recognising Bennett & Co: needs Huraira's (and for the client list, Nick's) call. The `0016` gap is recorded (Gaps noticed: nothing missing, the numbering skipped it in `681b9a8`).
-- [ ] **F**: the stale `dreamsign-deploy.vercel.app` page: redeploy or leave (Huraira; nothing deployed).
+**Round 2, 2026-10-19** (after Huraira's answers: K add the `bennett-co` row; F leave; H throwaway local Postgres; GO for the live migrations, push and the M5 check):
+- [x] **D (database part)**: migration `0027_audit_entity_fill` (`32cfa80`): one BEFORE INSERT trigger on `audit_log` fills a null `entity_slug` from the job's plan (`params.planId`), a verify job's client, the `job.requested` payload, or the plan itself; a named entity is never changed; null stays where none is knowable. **Applied live** (20261019182532). Attack test `scripts/rls_attack_test_audit_entity.sql` **12/12 live** (rolled back; SQL check: 0 users, plans or audit rows left) and 12/12 on a fresh local stack; **without 0027 it fails 5/12** (mutation). Live proof on a real job not started by me: Cockpit job `ffcce674` (18:26 UTC) wrote `job.requested`, `job.dispatched` and `job.run` all with `bennett-co`. `dispatch-job` needed **no change and no redeploy**: the trigger fills its row. Old rows are not backfilled (append-only by design).
+- [x] **H (RLS runs)**: `scripts/rls-attack-local.sh` replays every migration on a throwaway local Supabase database and runs every machine-checked attack script (refuses any non-local URL); CI job `rls-attack` runs it, and the deploy waits on it (`de855a6`). Local: 26 migrations applied; 10 scripts pass; 2 checks that need live-only rows (a pre-0011 plan; the dreamsign row) are printed NOT COVERED, never as passed. The Phase 2 hand-read `rls_attack_test.sql` is not machine-checked and is not run.
+- [x] **J (shared double)**: `@wfact/hermes-lite/testing/mockModel` (`ScriptedModel`, `MockTextModel`, `MockJsonModel`); the four package mocks are thin subclasses with unchanged names (`73b82bd`); hermes 59, planning 46, verification 123, frontend-loop 130, jobs 38, workflow 89. This replaces round 1's deferral: every package already installs hermes in CI, so no install order changed.
+- [x] **K**: migration `0028_entity_aliases` (`fb6f922`): `entities.aliases` (lower case, at most 20) and the `bennett-co` row (Huraira's GO). **Applied live** (20261019183408); attack test `scripts/rls_attack_test_entities.sql` **10/10 live**. `KNOWN_ENTITIES` removed; `@wfact/hermes-lite/entities` reads the table (`loadEntities`, no fallback list) and intake, the planning CLI, the job runner and Hermes-lite take the rows. Live read: bennett-co, dreamsign, synthetic-test; "Bennett & Co" resolves to `bennett-co`. Hermes-lite no longer reads `clients/<entity>/` as a client folder; removing that fix fails its test (mutation). The `0016` gap is recorded (never committed; numbering skipped in `681b9a8`).
+- [x] **F**: decided by Huraira 2026-10-19: **leave** `dreamsign-deploy.vercel.app` as a frozen preview of the 2.0-era build; nothing deployed.
+- [x] **I (M5 live check)**: launch-stage checks on the stored output of live build run `4c35703b` (job `55ddba7c`, Lanternworks, **SYNTHETIC client**; `site_url` detail `https://lanternworks.com` set 11:13:06, before the job started at 11:14:17). All 81 files were re-hashed against the launch-gate checkpoint `4e4434db…`. Results: 404, sitemap, robots, llms, canonical (`https://lanternworks.com/`) and og-image **PASS**; `content.placeholders-launch` PASS. `launch.form-connected` **FAIL**, because this client has no lead site. That is Step 25's contact-form requirement (M4), built after this run, not a launch file. No new paid build was needed (one-off read-only script; no model call).
 
 **Verification**: pushed 2026-10-12; CI `38292111323` on `423c7c1` FAILED in the Frontend loop and Verification jobs (my new tests imported
 across packages, and each CI job installs only its own dependencies), so the Cockpit deploy was skipped. Fixed 2026-10-13 in `b107de4` by moving
@@ -766,14 +769,14 @@ those tests into `packages/rendered-qa/test/launchFiles.test.ts` (that job insta
 rendered-qa launch + Track A 10, typecheck clean. CI `38427074538` on `368dd80`: every job green, including Rendered QA and **Deploy Cockpit to Vercel** (it ran this time); Cockpit HTTP 200.
 Not yet: a live build with a real address at stage `launch`.
 
-**Exit check** (MVP M5): "Step 7 launch-stage checks pass on the output". **PARTIALLY MET**: they pass on both starters' output in tests with
-an address; not yet on a live build.
+**Exit check** (MVP M5): "Step 7 launch-stage checks pass on the output". **MET for the launch files** (2026-10-19): every M5 check
+passes on a live build's checkpoint-verified output (run `4c35703b`). The separate contact-form check (Step 25 M4) fails there, because that
+synthetic client has no lead site.
 
-**Step exit check** ("Each sub-item done or explicitly deferred with a reason; CI green; no regressions"): **PARTIALLY MET** (2026-10-19).
-B, C, E, G, I, L are done; J's second half is done and its first half is deferred with a reason. D's runtime part and H in part are
-done. D's trigger part, F, K and H's RLS runs wait on Huraira. No regressions locally: frontend-loop 130, planning 45, verification 123,
-jobs 38, workflow 89, hermes 55, agent-runtime 39, media 8, dispatch-job 7, rendered-qa 89 (run before the D change); typechecks clean. CI has not run
-on these commits yet (not pushed).
+**Step exit check** ("Each sub-item done or explicitly deferred with a reason; CI green; no regressions"): **PARTIALLY MET** (2026-10-19):
+every sub-item A–L is done or decided (F: leave, by Huraira). Round 1 is CI-green (`39299701250`). Round 2 is green locally: hermes 59,
+planning 46, jobs 38, verification 123, frontend-loop 130, workflow 89, documentation 18; typechecks clean; the RLS runner passes on a
+fresh database. CI on round 2 is the only check left; DONE when it is green.
 
 ## Step 12 — Cost governance per client (PARTIAL 2026-10-14 — MVP M6 slice live; live trace rows proven on run `4c35703b`; Run page and live cap refusal pending)
 
