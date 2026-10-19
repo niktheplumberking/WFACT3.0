@@ -420,9 +420,9 @@
     "semantic_hash": ""
   },
   "BLOCKED-ON-NICK.md": {
-    "mtime": 1792175007.3799987,
-    "seen": 1792175080.2011452,
-    "ast_hash": "6090df62654dcd9ad2134b5f25ccad92",
+    "mtime": 1792419579.579192,
+    "seen": 1792419665.5483892,
+    "ast_hash": "935724622e8740e5c966a1c6fe5fdcc8",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "PROGRESS.md": {
-    "mtime": 1792175054.3165293,
-    "seen": 1792175080.201167,
-    "ast_hash": "a364a35ff949a3e4aea0e05623a2706a",
+    "mtime": 1792419649.2032833,
+    "seen": 1792419665.548411,
+    "ast_hash": "a4ad5ca4d1c570ce61b3d9c35cd2e5a9",
     "semantic_hash": ""
   },
   "README.md": {
@@ -1158,9 +1158,9 @@
     "semantic_hash": ""
   },
   "docs/WFACT-3.0-Factory-Completion-Plan.md": {
-    "mtime": 1792175054.31435,
-    "seen": 1792175080.2016609,
-    "ast_hash": "1dd2a3e729e153534fcf30a907bf47e8",
+    "mtime": 1792419636.4882944,
+    "seen": 1792419665.548898,
+    "ast_hash": "70834580e3c90db93ac7de010ae63ea2",
     "semantic_hash": ""
   },
   "docs/archive/README.md": {
@@ -1632,9 +1632,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Misc.tsx": {
-    "mtime": 1792174606.6848466,
-    "seen": 1792175080.19563,
-    "ast_hash": "e170464440943f9b9856d64f15ab9056",
+    "mtime": 1792419548.7413754,
+    "seen": 1792419665.542871,
+    "ast_hash": "0c74b77d5a0b42ff107327e890255a7d",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Work.tsx": {
@@ -3960,9 +3960,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/components/kit.tsx": {
-    "mtime": 1791995109.3051171,
-    "seen": 1791995213.5638661,
-    "ast_hash": "5f0ff0fb0513b18924d9080a4fa3eec0",
+    "mtime": 1792419409.5289803,
+    "seen": 1792419665.542312,
+    "ast_hash": "b0ea649ac40768658d5d7fc495d28a47",
     "semantic_hash": ""
   },
   "apps/cockpit/src/components/v2.test.tsx": {
@@ -4080,9 +4080,9 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/shell/shell.test.tsx": {
-    "mtime": 1791993818.0681434,
-    "seen": 1791994041.7641332,
-    "ast_hash": "7a86bcab18c07d51d47e9541f2b3669f",
+    "mtime": 1792419391.6182659,
+    "seen": 1792419665.543065,
+    "ast_hash": "70391e699eb9265f18ad11030068992d",
     "semantic_hash": ""
   },
   ".claude/completions/2026-10-14-step-28-package-4-phase-3.md": {
@@ -4530,9 +4530,9 @@
     "semantic_hash": ""
   },
   "docs/archive/2026-10-15-cleanup/PROGRESS-sync-log-to-2026-10-15.md": {
-    "mtime": 1792175054.316136,
-    "seen": 1792175080.20175,
-    "ast_hash": "2a0897ba0c2d37e06e18b59b8c0fa42a",
+    "mtime": 1792419649.202623,
+    "seen": 1792419665.548983,
+    "ast_hash": "a37df9da047d72e79b4740733b064243",
     "semantic_hash": ""
   },
   "docs/archive/old-reports/wfact-mvp-progress-2026-10-12.html": {
@@ -4722,15 +4722,15 @@
     "semantic_hash": ""
   },
   "apps/cockpit/src/lib/prefs.ts": {
-    "mtime": 1792174460.7706933,
-    "seen": 1792175080.195431,
-    "ast_hash": "e4ede7974e8fb2718dda5d8ff11215c3",
+    "mtime": 1792419260.0677836,
+    "seen": 1792419665.5426471,
+    "ast_hash": "833b3fb74477619c8e3d63024fc94562",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/Settings.tsx": {
-    "mtime": 1792174821.949712,
-    "seen": 1792175080.195631,
-    "ast_hash": "48132f2b4dc38f60a755cae7386d4156",
+    "mtime": 1792419266.433001,
+    "seen": 1792419665.542872,
+    "ast_hash": "19ee22075bbf849cb9a893bf0c9934f6",
     "semantic_hash": ""
   },
   "apps/cockpit/src/pages/settings.test.tsx": {
@@ -4749,6 +4749,18 @@
     "mtime": 1792175071.1331353,
     "seen": 1792175080.200914,
     "ast_hash": "6805d040672dfdbcb03f91f62ded9162",
+    "semantic_hash": ""
+  },
+  "apps/cockpit/src/pages/notifications.test.tsx": {
+    "mtime": 1792419544.0522733,
+    "seen": 1792419665.5429702,
+    "ast_hash": "f8e2eced1dc287633504678cf4b1de7e",
+    "semantic_hash": ""
+  },
+  "docs/design/cockpit-v2/docs/COCKPIT-V2-PHASES-18-ON-PROMPT.md": {
+    "mtime": 1792419016.826774,
+    "seen": 1792419665.5492601,
+    "ast_hash": "ea6199257458eb0f05488dabc5f15793",
     "semantic_hash": ""
   }
 }
