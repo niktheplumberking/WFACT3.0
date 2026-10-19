@@ -412,7 +412,7 @@ function AfterDecision({ row }: { row: PlanRow }) {
         {error && <Notice tone="stop">{error}</Notice>}
         {builds.length > 0 && (
           <div>
-            <h3 style={{ fontSize: "var(--t-sm)", marginBottom: 8 }}>Builds of this plan</h3>
+            <h3 style={{ fontSize: "var(--fs-small)", marginBottom: 8 }}>Builds of this plan</h3>
             <ul className="mini" style={{ padding: 0 }}>
               {builds.map((j) => {
                 const s = jobState(j);

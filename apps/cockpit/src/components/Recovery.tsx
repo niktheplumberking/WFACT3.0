@@ -318,7 +318,7 @@ export function RecoveryPanel({
 
       {askFirst && (
         <div className="stack-tight">
-          <h3 style={{ fontSize: "var(--t-md)", margin: 0 }}>We need {formNeeds.length === 1 ? "this from the client" : "these from the client"}</h3>
+          <h3 style={{ fontSize: "var(--fs-body)", margin: 0 }}>We need {formNeeds.length === 1 ? "this from the client" : "these from the client"}</h3>
           {inputs.loading && !inputs.data ? (
             <p className="muted">Checking what you've already given…</p>
           ) : (

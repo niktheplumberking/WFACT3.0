@@ -2,6 +2,7 @@
 // clears WCAG AA 4.5:1 on every surface it can sit on, in light and dark. Reads the real stylesheet.
 import { describe, expect, it } from "vitest";
 import css from "./tokens.css?raw";
+import appCss from "./app.css?raw";
 
 function block(selector: string): Record<string, string> {
   const at = css.indexOf(`${selector} {`);
@@ -59,5 +60,15 @@ describe("v2 tokens", () => {
     const accents = [...css.matchAll(/(\[data-theme="dark"\])?\[data-accent="(\w+)"\]\s*\{\s*--acc: (#[0-9A-F]{6});\s*\}/g)];
     expect(accents).toHaveLength(6);
     for (const [, isDark, , hex] of accents) expect(contrast(hex, isDark ? dark["acc-ink"] : light["acc-ink"])).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("the pre-v2 alias names are gone (phase 19)", () => {
+  const OLD = /var\(--(ground|plate|plate-2|plate-sunk|seam|seam-strong|ink-inverse|track-idle|track-proven|clear|clear-wash|caution|caution-wash|stop-wash|lamp|face-plate|t-xs|t-sm|t-md|t-lg|t-xl|t-2xl|t-3xl|r-plate|r-control|d-route)\)/;
+  it("no stylesheet reads or defines an old signal-box name", () => {
+    for (const sheet of [css, appCss]) {
+      expect(sheet).not.toMatch(OLD);
+      expect(sheet).not.toMatch(/--(ground|plate|seam|lamp|face-plate|r-plate|r-control|d-route|t-[a-z0-9]+):/);
+    }
   });
 });

@@ -56,7 +56,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
-    // Stylesheets are not processed in tests, except tokens.css, which tokens.test.ts reads raw to prove contrast.
-    css: { include: [/styles\/tokens\.css/] },
+    // Stylesheets are not processed in tests, except tokens.css and app.css, which tokens.test.ts reads raw (contrast,
+    // and no pre-v2 alias names).
+    css: { include: [/styles\/(tokens|app)\.css/] },
   },
 });
