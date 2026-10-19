@@ -15,7 +15,7 @@ parallel with Steps 5-8 because it only touches `apps/cockpit`.
 2026-10-07), CI and the live database. Closed steps (DONE with citable evidence: 1, 2, 3, 5, 6, 7; 3A added 2026-10-15) moved to **"Closed steps"** at the end of
 Part D; open steps carry a **Next action** line and a continuation or verification prompt.
 **Status as of 2026-10-19 (late night, `/step-close 21`)**: Step 21 stays PARTIAL. A housekeeping round (`ac314ae`..`f490904`, local, not pushed) did B, C, E, G, I, L and parts of D, H and J; D's trigger part, F, K and H's RLS runs wait on Huraira. No other step changed.
-**Status as of 2026-10-19 (late night, `/step-close 28` R1)**: no status changed. Step 28 stays IN PROGRESS: pre-v2 rebuild R1 (the other work pages) built in `f9d4842`, CI `39296573842` green and deployed (vitest 335/335, axe 0 and Lighthouse a11y 100 in 8 rooms, fingerprints of unchanged rooms identical); Package 4 exit check still PARTIALLY MET (R2–R5 left). Waits on Huraira's GO for R2. No live build since 2026-10-15. Open verification prompts remain for 4C and 21.
+**Status as of 2026-10-19 (late night, `/step-close 28` R2)**: no status changed. Step 28 stays IN PROGRESS: pre-v2 rebuild R1 (`f9d4842`, CI `39296573842` green, deployed) and R2, decided proposals (`80f1391`: vitest 342/342, axe 0 and Lighthouse a11y 100 in 3 rooms, fingerprints of unchanged rooms identical); Package 4 exit check still PARTIALLY MET (R3–R5 left). Waits on Huraira's answer to the R3 question. No live build since 2026-10-15. Open verification prompts remain for 4C and 21.
 **Status as of 2026-10-15 (`/step-close 3A`)**: Step 3A is **DONE and closed**: the live sign-up was proven end to end (sign-up → owner approval as `pm` with audit row → password sign-in after approval in the Auth logs → role-limited view; attack test 32/32). Moved to Closed steps. No other step changed status. Open verification prompts remain for 4C and 21.
 **Status as of 2026-10-15 (night, `/progress-sync`)**: no status changed. Open steps that need only a live check or a sign-off keep their verification prompts (3A, 4C, 21). The next move is Huraira's push of the 16 local commits, then the Harbor Street continue (Step 28) and Nick's CRM and brief answers (Step 25).
 **Status as of 2026-10-15 (`/step-close 25`, live)**: Step 25 is **PARTIAL**: MVP M4 (contact form that saves leads) is met live on synthetic data (migrations 0025/0026 applied, attack test 43/43, `submit-lead` deployed, JS and no-JS submits on both tracks stored as rows); not pushed. The real-client run waits on Nick's brief. Step 28 stays IN PROGRESS. No other step changed status.
@@ -1347,7 +1347,7 @@ REPORT in the Part C format, then STOP.
 
 ---
 
-### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-19, Packages 1–3 of 5 built and verified; Package 4 phases 1–19 CI-green and deployed, pre-v2 rebuild R1 (other work pages) built and verified locally, Package 4 exit check PARTIALLY MET; build-failure guards, brand-colour rule, brief consistency check and example clients built, live proof pending
+### STEP 28 — Build quality and Cockpit plain-language UX (P0, added 2026-10-14) — IN PROGRESS 2026-10-19, Packages 1–3 of 5 built and verified; Package 4 phases 1–19 CI-green and deployed, pre-v2 rebuild R1 (other work pages) and R2 (decided proposals) built and verified, Package 4 exit check PARTIALLY MET; build-failure guards, brand-colour rule, brief consistency check and example clients built, live proof pending
 
 **Source**: `docs/BUILD-QUALITY-AND-COCKPIT-UX-PROMPTS.md` (the full agent prompt, five packages; Huraira gave it as the task on
 2026-10-14). One package at a time, report, wait for GO. Package 5 is a paid build (cap $3) and needs GO.
@@ -1563,6 +1563,14 @@ phase 5 and `2cd7f6b` phase 6, CI `38595375699` and `38596185659` green and depl
   builder's vendor name on screen. `pages/runpage.test.tsx` 16 (SYNTHETIC); vitest 335/335; 4 mutations caught; SiteReview,
   stop case 5 and Home computed-style fingerprints identical before and after; axe 0 in 8 rooms at 1440/375 light and dark;
   Lighthouse a11y 100 in 8 rooms. Pushed in `b88d308`; CI `39296573842` green, deployed.
+- Pre-v2 rebuild R2, decided proposals (2026-10-19, `80f1391`): rejected proposals and ones approved before the kind of site
+  existed show the proposal review page read-only (header, client's words, pages, open questions; shared ProposalHead and
+  ProposalColumns, review DOM unchanged) with the design's decided line. "Revise from my note" (owner/admin, same re-plan,
+  now behind a cost confirm; refused after two revisions with "Start a new request"; an existing revision is opened, not
+  asked twice). Approved without a kind: cannot be built, one way forward. Removed: BeforeBuild, AfterDecision (with its
+  unreachable build branch), PlanDetails, WhatTheClientWants (python count 3/2/2/2 → 0). `pages/decided.test.tsx` 7;
+  vitest 342/342; 4 mutations caught; proposal review, needs and Home fingerprints identical; axe 0 in 3 rooms at
+  1440/375 light and dark; Lighthouse a11y 100 in 3 rooms. CI recorded at the next tracker update.
 - Also done for this step, not cited before (found in git 2026-10-15 sync): `a6f64cd` (2026-10-14, pushed) the Cockpit's "What was
   built" shows the built site itself (pages, styles, fonts, logo via signed links, page switcher; links caught in the sandboxed
   frame) instead of a file list, and advisory findings show as non-blocking notes (`verification.decision` rows flag advisory);
@@ -1570,11 +1578,11 @@ phase 5 and `2cd7f6b` phase 6, CI `38595375699` and `38596185659` green and depl
   curl-checked) `dispatch-job` v6 allows the `wfact-3-cockpit.vercel.app` alias, whose presses were CORS-refused (why `caa201f1`
   and the first `e6a71046` press stayed queued).
 
-**Next action** (2026-10-19, after pre-v2 rebuild R1): Huraira reviews the R1 report (and the design-gap row for Start again /
-Close it / Archive in BLOCKED-ON-NICK) and says "GO for R2" (old and rejected proposals in the Proposal review grammar). R3 and R4
-start with a question. Still open: the owner answers Harbor Street's two conflicts and presses continue; migration 0024 (`562c5ae`,
-unmerged branch `claude/objective-engelbart-d65df7`) and `scripts/rls_attack_test_placeholders.sql` wait on Huraira; Nick answers
-the caps, roles, site-approval, notification and app-icon questions. Package 5 needs its own GO.
+**Next action** (2026-10-19, after pre-v2 rebuild R2): Huraira reviews the R2 report and answers R3's question: the locked design
+has no Decisions room or stage-moves screen. Options: (a) retire `/decisions` and `/decisions/stages` (redirect to Home; StageMove
+stays on the client's page); (b) keep them, restyled in the Projects grammar; (c) other. R3 is built only after that answer. Still open:
+Harbor Street's owner answers and continue; migration 0024 (`562c5ae`) and its attack test wait on Huraira; Nick's Cockpit v2
+questions. Package 5 needs its own GO.
 
 Agent prompt for rebuilding the pre-v2 screens (phases R1–R5, one per GO; R3 Decisions room and R4 fix rounds start with a question, since the design has no frame for them) — written 2026-10-19: `docs/design/cockpit-v2/docs/COCKPIT-V2-PRE-V2-REBUILD-PROMPT.md`.
 
@@ -1638,7 +1646,10 @@ ALREADY DONE (do not redo):
   Dev: ?fake-live=1 (a running build), ?fake-logo=1 (logo on file for the approved proposal).
 - Pre-v2 rebuild R1, f9d4842: RunPage fallback in the v2 grammar (pages/Activity.tsx chipOf/simpleSteps/Results);
   usePlaceholderPictures + PlaceholderPicturesSection exported from components/SiteReview.tsx; pages/runpage.test.tsx.
-  Dev: ?fake-job=intake|ask|cancelled|archived|old. Next phase: R2 per COCKPIT-V2-PRE-V2-REBUILD-PROMPT.md.
+  Dev: ?fake-job=intake|ask|cancelled|archived|old.
+- Pre-v2 rebuild R2, 80f1391: DecidedProposal in pages/Decisions.tsx (ProposalHead/ProposalColumns shared with
+  ProposalReview); BeforeBuild, AfterDecision, PlanDetails, WhatTheClientWants deleted; pages/decided.test.tsx.
+  Dev: ?fake-plan=rejected|rejected2|nokind. Next phase: R3 (question first) per COCKPIT-V2-PRE-V2-REBUILD-PROMPT.md.
 - Not UI (side session, branch claude/objective-engelbart-d65df7, 562c5ae): migration 0024 makes launch.placeholders_ok
   owner-only in the database; not merged, not applied. Leave it to Huraira.
 - Not UI, already done (do not touch): dispatch-job v6 dde68a5 (Cockpit alias allowed); a6f64cd "What was built" site
@@ -1649,7 +1660,7 @@ ALREADY DONE (do not redo):
 
 LEFT (Package 4 exit check PARTIALLY MET; each item only on Huraira's GO):
 - Rebuild the rest of the pre-v2 screens (R2–R5 in docs/design/cockpit-v2/docs/COCKPIT-V2-PRE-V2-REBUILD-PROMPT.md; R1, the
-  build page fallback, is done): rejected and pre-track proposals (AfterDecision), Decisions list and stage moves, /activity/fixes,
+  build page fallback, and R2, decided proposals, are done): Decisions list and stage moves, /activity/fixes,
   components/Recovery.tsx, PlaceholdersPanel, Home's unused helpers, NotFound. Then re-run the exit check.
 - Package 5 (paid): separate GO naming the spend; stop questions first.
 Each screen with empty, loading, running, waiting, stopped and success states; owner-only gates; PM view.
@@ -1853,7 +1864,7 @@ last continuation prompt was retired at close.*
 | 25 | Real-client proof run | **PARTIAL** (MVP M4 contact form MET live on synthetic data: migrations 0025/0026 applied (20261015102916, 20261015103026), attack test 43/43, `submit-lead` v1 deployed, 4 browser submits (JS and no-JS, both tracks) = 4 `leads` rows, curl refusals as designed; code `1da9a5a`..`2154fda`, not pushed; the real-client run still waits on Nick's brief) | 2026-10-15 | |
 | 26 | Quality calibration | **PARTIAL**: item 1 met live 2026-10-14 (`67033f7`; Anthropic reviewer and evaluator rows on run `4c35703b`; build `55ddba7c` reached the launch gate; CI `38554457540` green); items 2–4 (blind calibration, reference set, cost report) open, after the MVP | 2026-10-14 | |
 | 27 | Track A motion budget | not started | | |
-| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (2026-10-15: Packages 1–3 built, verified and deployed (`3e493f6` CI `38569635936`, `d112f62` CI `38574380444`, `7e30b09` CI `38585878100`; migrations 0022 and 0023 live). Package 4 Cockpit v2 phases 1–13 CI-green and deployed (last `38605626110` on `47a2da4`); phase 14 Activity `35a869d` (CI `38929657403` green, deployed); phase 15 Costs `1af12c7` (CI `38934744558` green, deployed); phase 16 Team and access `e5c6333` (CI `38942505031` green, deployed); phase 17 Settings `dc4b05b` (CI `38947151902` green, deployed); phase 18 Notifications `b6a6e39` (CI `39268206990` green, deployed); phase 19 cleanup `55e0a8a`..`5589192` (2026-10-19, vitest 319/319, axe 0 in 21 rooms, Lighthouse a11y 100 in 16 rooms, keyboard main flow on the fake; CI `39286692404` green, deployed); pre-v2 rebuild R1, the other work pages, `f9d4842` (2026-10-19, vitest 335/335, axe 0 and Lighthouse a11y 100 in 8 rooms; CI `39296573842` green, deployed); Package 4 exit check PARTIALLY MET (pre-v2 screens cleaned, not rebuilt). Build-failure guards `b8d240f` and brand-colour rule `8e6e09d` pushed (CI `38695633253`, `38706155999` green; decision by Huraira 2026-10-15; eval E5 mutation-checked); live continue `e6a71046` proved the quote fix and failed on contradictory owner answers; a passing live build is still pending. Also `a6f64cd` ("What was built" site preview, pushed) and `dde68a5` (`dispatch-job` v6, deployed, commit local). Migration 0024 written on the unmerged branch `claude/objective-engelbart-d65df7`, not applied. Brief consistency check `fd67328` (contradictory owner answers halt at preflight unpaid, owner's pick clears it, planner asks each topic once; eval E6 mutation-checked) and example clients `52f7088` (`docs/EXAMPLE-CLIENTS.md`), local, not pushed, live proof pending. Package 5 open) | 2026-10-19 | |
+| 28 | Build quality and Cockpit plain-language UX | **IN PROGRESS** (2026-10-15: Packages 1–3 built, verified and deployed (`3e493f6` CI `38569635936`, `d112f62` CI `38574380444`, `7e30b09` CI `38585878100`; migrations 0022 and 0023 live). Package 4 Cockpit v2 phases 1–13 CI-green and deployed (last `38605626110` on `47a2da4`); phase 14 Activity `35a869d` (CI `38929657403` green, deployed); phase 15 Costs `1af12c7` (CI `38934744558` green, deployed); phase 16 Team and access `e5c6333` (CI `38942505031` green, deployed); phase 17 Settings `dc4b05b` (CI `38947151902` green, deployed); phase 18 Notifications `b6a6e39` (CI `39268206990` green, deployed); phase 19 cleanup `55e0a8a`..`5589192` (2026-10-19, vitest 319/319, axe 0 in 21 rooms, Lighthouse a11y 100 in 16 rooms, keyboard main flow on the fake; CI `39286692404` green, deployed); pre-v2 rebuild R1, the other work pages, `f9d4842` (2026-10-19, vitest 335/335, axe 0 and Lighthouse a11y 100 in 8 rooms; CI `39296573842` green, deployed); R2, decided proposals, `80f1391` (2026-10-19, vitest 342/342, axe 0 and Lighthouse a11y 100 in 3 rooms; CI recorded at the next update); Package 4 exit check PARTIALLY MET (pre-v2 screens cleaned, not rebuilt). Build-failure guards `b8d240f` and brand-colour rule `8e6e09d` pushed (CI `38695633253`, `38706155999` green; decision by Huraira 2026-10-15; eval E5 mutation-checked); live continue `e6a71046` proved the quote fix and failed on contradictory owner answers; a passing live build is still pending. Also `a6f64cd` ("What was built" site preview, pushed) and `dde68a5` (`dispatch-job` v6, deployed, commit local). Migration 0024 written on the unmerged branch `claude/objective-engelbart-d65df7`, not applied. Brief consistency check `fd67328` (contradictory owner answers halt at preflight unpaid, owner's pick clears it, planner asks each topic once; eval E6 mutation-checked) and example clients `52f7088` (`docs/EXAMPLE-CLIENTS.md`), local, not pushed, live proof pending. Package 5 open) | 2026-10-19 | |
 
 **Goal tracker (Blueprint §16K)**
 
