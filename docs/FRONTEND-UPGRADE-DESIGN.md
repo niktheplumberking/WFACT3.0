@@ -1,7 +1,7 @@
 # Front-end upgrade (Step 4B) — two build tracks, chosen per client — design for approval
 
 **Status**: v3, **APPROVED by Huraira 2026-10-01** with one change: Track B uses Next.js plus the animation and design libraries below.
-Built since (2026-10-20): M1–M3 done, M4 partial; both tracks build live (Track A starter 1.5.1, Track B starter 1.3.0 or later). Status is
+Built since (2026-10-20): M1–M3 done, M4 partial; both tracks build live (Track A starter 1.5.1, Track B starter 1.6.0). Status is
 Step 4B in Part E of `docs/WFACT-3.0-Factory-Completion-Plan.md`; this file is the approved design, not a status log.
 **Decisions so far**: 2026-09-30 Huraira chose Option B. **Revised 2026-10-01 (Huraira): keep BOTH options as build tracks.** For each
 build the Cockpit asks the owner to choose a track, and a new direction step reads the client's request, works out their niche,
