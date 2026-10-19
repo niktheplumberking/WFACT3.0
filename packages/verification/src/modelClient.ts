@@ -16,6 +16,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { familyOf, loadEvaluatorConfig, type EvaluatorConfig, type ModelIdentity } from "./crossModel.js";
 import { isCreditsExhausted } from "./credits.js";
+import { MockTextModel } from "@wfact/hermes-lite/testing/mockModel";
 
 export interface ModelRequest {
   system: string;
@@ -196,20 +197,8 @@ export function evaluatorModelClientFromEnv(
   };
 }
 
-/** Deterministic stand-in for tests — no network, no key, fully inspectable. */
-export class MockModelClient implements ModelClient {
-  readonly name = "mock";
-  public readonly calls: ModelRequest[] = [];
-
-  /** `family` (optional, Step 7): lets a test give two mocks distinct model families for the cross-model rule. */
-  constructor(
-    private readonly respond: (request: ModelRequest, callIndex: number) => string,
-    public readonly family?: string,
-  ) {}
-
-  async complete(request: ModelRequest): Promise<string> {
-    const result = this.respond(request, this.calls.length);
-    this.calls.push(request);
-    return result;
-  }
-}
+/**
+ * Deterministic stand-in for tests (Step 21 J: the shared scripted double in @wfact/hermes-lite/testing/mockModel).
+ * `family` (optional, Step 7) lets a test give two mocks distinct model families for the cross-model rule.
+ */
+export class MockModelClient extends MockTextModel<ModelRequest> implements ModelClient {}

@@ -7,6 +7,7 @@
  * controller.
  */
 import Anthropic from "@anthropic-ai/sdk";
+import { MockTextModel } from "./testing/mockModel.js";
 
 export interface ModelRequest {
   system: string;
@@ -93,15 +94,5 @@ export function modelClientFromEnv(env: NodeJS.ProcessEnv = process.env): {
   return { client: new ClaudeModelClient(apiKey, env.ANTHROPIC_MODEL), reason: null };
 }
 
-/** Deterministic stand-in for tests — no network, no key, fully inspectable. */
-export class MockModelClient implements ModelClient {
-  readonly name = "mock";
-  public readonly calls: ModelRequest[] = [];
-
-  constructor(private readonly respond: (request: ModelRequest) => string) {}
-
-  async complete(request: ModelRequest): Promise<string> {
-    this.calls.push(request);
-    return this.respond(request);
-  }
-}
+/** Deterministic stand-in for tests (Step 21 J: the shared scripted double, src/testing/mockModel.ts). */
+export class MockModelClient extends MockTextModel<ModelRequest> implements ModelClient {}

@@ -19,6 +19,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { fetchWithTimeout } from "./longFetch.js";
+import { MockTextModel } from "@wfact/hermes-lite/testing/mockModel";
 
 export interface ModelRequest {
   system: string;
@@ -248,16 +249,5 @@ export function modelClientFromEnv(
   return { client: new ClaudeModelClient(apiKey, env.ANTHROPIC_MODEL), reason: null, chose: why };
 }
 
-/** Deterministic stand-in for tests — no network, no key, fully inspectable. */
-export class MockModelClient implements ModelClient {
-  readonly name = "mock";
-  public readonly calls: ModelRequest[] = [];
-
-  constructor(private readonly respond: (request: ModelRequest, callIndex: number) => string) {}
-
-  async complete(request: ModelRequest): Promise<string> {
-    const result = this.respond(request, this.calls.length);
-    this.calls.push(request);
-    return result;
-  }
-}
+/** Deterministic stand-in for tests (Step 21 J: the shared scripted double in @wfact/hermes-lite/testing/mockModel). */
+export class MockModelClient extends MockTextModel<ModelRequest> implements ModelClient {}

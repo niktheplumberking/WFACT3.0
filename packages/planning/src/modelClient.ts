@@ -9,6 +9,7 @@
  */
 import Anthropic from "@anthropic-ai/sdk";
 import type { ModelRoute } from "@wfact/hermes-lite/routing";
+import { MockJsonModel } from "@wfact/hermes-lite/testing/mockModel";
 
 export interface JsonRequest {
   system: string;
@@ -67,22 +68,8 @@ export class ClaudeJsonClient implements JsonModelClient {
   }
 }
 
-/** Deterministic stand-in for tests: scripted outputs, every request recorded. */
-export class MockJsonClient implements JsonModelClient {
-  readonly name = "mock";
-  readonly route = null;
-  readonly totalUsage = { inputTokens: 0, outputTokens: 0 };
-  readonly calls: JsonRequest[] = [];
-
-  constructor(private readonly respond: (req: JsonRequest, index: number) => unknown) {}
-
-  async completeJson(request: JsonRequest): Promise<unknown> {
-    const out = this.respond(request, this.calls.length);
-    this.calls.push(request);
-    if (out instanceof Error) throw out;
-    return structuredClone(out);
-  }
-}
+/** Deterministic stand-in for tests (Step 21 J: the shared scripted double in @wfact/hermes-lite/testing/mockModel). */
+export class MockJsonClient extends MockJsonModel<JsonRequest> implements JsonModelClient {}
 
 /** A zod-4 JSON Schema, minus the `$schema` marker the API doesn't need. */
 export function toApiSchema(jsonSchema: Record<string, unknown>): Record<string, unknown> {
