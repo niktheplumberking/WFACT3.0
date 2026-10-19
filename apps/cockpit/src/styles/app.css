@@ -676,6 +676,17 @@ body:has(.set-savebar) .toasts { bottom: calc(var(--s-6) + 80px); }
 .pill { display: inline-flex; align-items: center; gap: 8px; min-height: var(--target); padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--line-2); background: var(--sheet); color: var(--ink); font: 600 var(--fs-small)/1 var(--face-text); cursor: pointer; }
 .pill[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--inv); }
 .pill-n { font: 600 12px/1 var(--face-figure); opacity: 0.8; }
+a.pill { text-decoration: none; }
+.pill[aria-current="page"] { background: var(--ink); border-color: var(--ink); color: var(--inv); }
+/* The Decisions room (Package 4 R3, kept in the Projects grammar): titled groups of rows, chip or action at the end. */
+.decision-group { display: grid; gap: 12px; }
+.decision-group > div:first-child { display: grid; gap: 4px; }
+.decision-rows { list-style: none; margin: 0; padding: 0; display: grid; }
+.decision-row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+.decision-row:last-child { border-bottom: 1px solid var(--line); }
+.decision-what { flex: 1 1 280px; display: grid; gap: 4px; min-width: 0; }
+.decision-what p { margin: 0; }
+.decision-what .project-name { justify-self: start; display: inline-block; padding-block: 9px; margin-block: -9px; }
 .no-match { padding: 40px 0; border-top: 1px solid var(--line); display: grid; gap: 10px; justify-items: start; }
 .project-group { display: grid; gap: 12px; }
 .project-group-h { color: var(--ink-2); }

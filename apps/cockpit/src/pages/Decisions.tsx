@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
 import { ArrowClockwise, Circle, Diamond, Play, RadioButton, SealCheck } from "@phosphor-icons/react";
-import { Button, ButtonLink, StatusGlyph, TechDetails } from "../components/kit";
+import { Button, ButtonLink, EmptyState, StatusChip, StatusGlyph, TechDetails, type StatusTone } from "../components/kit";
 import { NeedRow } from "../components/flow";
 import { buildsOf, KIND_OF_SITE } from "../lib/path";
 import { currentInputs, savePlanInputs, SLOTS } from "../lib/inputs";
@@ -24,126 +24,149 @@ import {
 } from "../lib/model";
 import { canDecide, fetchPlan, useFactory, useLoad, useMe, useToast } from "../lib/state";
 import { nextStage, stageLabel, stageMoveBlock } from "../stages";
-import { Aspect, ConfirmDialog, Empty, LoadError, Loading, Notice, PageHead, Plate } from "../components/ui";
+import { ConfirmDialog, LoadError, Loading, Notice } from "../components/ui";
 import { fetchProjects } from "./Home";
 
-/* ---------------- tabs ---------------- */
+/* ---------------- the Decisions room (Package 4 R3, option b: kept, in the Projects grammar) ---------------- */
 
-function Tabs() {
+/** Title, one summary sentence, then the three kinds of decision as pill links (the current one is marked). */
+function DecisionsHead({ summary }: { summary: string }) {
   const { plans, accounts, attention } = useFactory();
   const me = useMe();
   const pendingPlans = plans?.filter((p) => p.status === "pending").length ?? 0;
   const pendingAccounts = accounts?.filter((a) => a.status === "pending" && a.user_id !== me.userId).length ?? 0;
   const launches = attention.filter((i) => i.kind === "launch").length;
   return (
-    <nav className="tabs" aria-label="Decision types">
-      <NavLink to="/decisions" end>
-        Proposals {pendingPlans + launches > 0 && <span className="count">{pendingPlans + launches}</span>}
-      </NavLink>
-      <NavLink to="/team">Accounts {pendingAccounts > 0 && <span className="count">{pendingAccounts}</span>}</NavLink>
-      <NavLink to="/decisions/stages">Stage moves</NavLink>
-    </nav>
+    <>
+      <header className="projects-head">
+        <div>
+          <h1 className="t-title">Decisions</h1>
+          <p className="muted">{summary}</p>
+        </div>
+      </header>
+      <nav aria-label="Decision types" className="filters">
+        <NavLink to="/decisions" end className="pill">
+          Proposals
+          <span className="pill-n">{pendingPlans + launches}</span>
+        </NavLink>
+        {canDecide(me.role) && (
+          <NavLink to="/team" className="pill">
+            Accounts
+            <span className="pill-n">{pendingAccounts}</span>
+          </NavLink>
+        )}
+        <NavLink to="/decisions/stages" className="pill">
+          Stage moves
+        </NavLink>
+      </nav>
+    </>
   );
 }
 
-function Header() {
+interface DecisionRow {
+  key: string;
+  href: string;
+  title: string;
+  why: string;
+  chip?: { tone: StatusTone; word: string };
+  when?: string;
+  action?: React.ReactNode;
+}
+
+/** A titled list of rows: name, a plain sentence, a status chip (glyph and word) or an action. */
+function DecisionList({ id, title, note, rows }: { id: string; title: string; note?: string; rows: DecisionRow[] }) {
   return (
-    <PageHead
-      title="Decisions"
-      lead="Everything waiting for a person. Each decision is recorded with your name and the time."
-    />
+    <section aria-labelledby={id} className="decision-group">
+      <div>
+        <h2 id={id} className="t-section">
+          {title}
+        </h2>
+        {note && <p className="t-small muted">{note}</p>}
+      </div>
+      <ul className="decision-rows">
+        {rows.map((r) => (
+          <li key={r.key} className="decision-row">
+            <div className="decision-what">
+              <Link className="project-name" to={r.href}>
+                {r.title}
+              </Link>
+              <p className="t-small muted">{r.why}</p>
+            </div>
+            {r.when && <span className="t-small quiet fig">{r.when}</span>}
+            {r.chip && <StatusChip tone={r.chip.tone}>{r.chip.word}</StatusChip>}
+            {r.action}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
-
-/* ---------------- plans list ---------------- */
 
 export default function PlansTab() {
   const f = useFactory();
+  const me = useMe();
   const plans = f.plans;
   const pending = plans?.filter((p) => p.status === "pending") ?? [];
   const decided = plans?.filter((p) => p.status !== "pending").slice(0, 8) ?? [];
   const launches = f.attention.filter((i) => i.kind === "launch");
+  const waiting = pending.length + launches.length;
+  const yours = me.role === "owner";
+  const summary = !plans ? "Loading what is waiting." : waiting === 0 ? "Nothing is waiting for a decision." : `${waiting} ${waiting === 1 ? "decision is" : "decisions are"} waiting. Each decision is recorded with your name and the time.`;
+  const word = yours ? "Your decision" : `${f.decider} decides`;
   return (
-    <>
-      <Header />
-      <Tabs />
-      <div className="stack">
-        {f.error && <LoadError what="proposals" error={f.error} onRetry={f.reload} />}
-        <Plate title="Proposals waiting for you">
-          {!plans && !f.error && <Loading rows={2} label="Loading proposals" />}
-          {plans && pending.length === 0 && (
-            <Empty title="No proposals are waiting.">
-              New proposals arrive here after you start a request. <Link to="/projects/new">Start one</Link>
-            </Empty>
-          )}
-          {pending.length > 0 && (
-            <ul className="queue">
-              {pending.map((p) => {
-                const rec = p.plan.direction?.recommendation;
-                return (
-                  <li key={p.id}>
-                    <span className="lamp caution" aria-hidden="true" />
-                    <div>
-                      <Link className="row-link what" to={`/decisions/plans/${p.id}`}>
-                        {planName(p)}
-                      </Link>
-                      <p className="why">
-                        {LEAD_LABEL[p.plan.plan.intake?.leadType] ?? "Request"}.{" "}
-                        {rec?.track ? `${KIND_OF_SITE[rec.track] ?? "A kind of site"} recommended (${Math.round(rec.confidence * 100)}% sure).` : "No kind of site recommended."} Written {dateTime(p.created_at)}.
-                        {p.revision > 1 ? " This is a revised proposal." : ""}
-                      </p>
-                    </div>
-                    <Aspect tone="caution">Your decision</Aspect>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </Plate>
-        {launches.length > 0 && (
-          <Plate title="Builds ready for a launch decision" note="Launch happens outside the Cockpit. Nothing here publishes a site.">
-            <ul className="queue">
-              {launches.map((i) => (
-                <li key={i.key}>
-                  <span className="lamp caution" aria-hidden="true" />
-                  <div>
-                    <Link className="row-link what" to={i.href}>
-                      {i.title}
-                    </Link>
-                    <p className="why">{i.why}</p>
-                  </div>
-                  <Aspect tone="caution">Your decision</Aspect>
-                </li>
-              ))}
-            </ul>
-          </Plate>
-        )}
-        {decided.length > 0 && (
-          <Plate title="Recently decided">
-            <ul className="rows">
-              {decided.map((p) => (
-                <li key={p.id}>
-                  <Aspect tone={p.status === "approved" ? "clear" : "stop"}>{p.status === "approved" ? "Approved" : "Rejected"}</Aspect>
-                  <div>
-                    <Link className="row-link what" to={`/decisions/plans/${p.id}`}>
-                      {planName(p)}
-                    </Link>
-                    <p className="why">
-                      {p.status === "approved"
-                        ? p.build_track
-                          ? `${KIND_OF_SITE[p.build_track] ?? "A kind of site"}${p.track_overridden ? ", against the recommendation" : ""}.`
-                          : "Approved before the kind of site was chosen: needs a new proposal."
-                        : `Note: “${p.decision_note ?? ""}”`}
-                    </p>
-                  </div>
-                  <span className="when fig">{shortDate(p.decided_at ?? p.created_at)}</span>
-                </li>
-              ))}
-            </ul>
-          </Plate>
-        )}
-      </div>
-    </>
+    <div className="projects">
+      <DecisionsHead summary={summary} />
+      {f.error && <LoadError what="proposals" error={f.error} onRetry={f.reload} />}
+      {!plans && !f.error && <Loading rows={2} label="Loading proposals" />}
+      {plans && pending.length === 0 && (
+        <EmptyState title="No proposals are waiting." action={canDecide(me.role) ? <ButtonLink to="/projects/new">Start a new request</ButtonLink> : undefined}>
+          New proposals arrive here after a request is started.
+        </EmptyState>
+      )}
+      {pending.length > 0 && (
+        <DecisionList
+          id="dec-waiting"
+          title="Proposals waiting"
+          rows={pending.map((p) => {
+            const rec = p.plan.direction?.recommendation;
+            return {
+              key: p.id,
+              href: `/decisions/plans/${p.id}`,
+              title: planName(p),
+              why: `${LEAD_LABEL[p.plan.plan.intake?.leadType] ?? "Request"}. ${rec?.track ? `${KIND_OF_SITE[rec.track] ?? "A kind of site"} recommended (${Math.round(rec.confidence * 100)}% sure).` : "No kind of site recommended."} Written ${dateTime(p.created_at)}.${p.revision > 1 ? " A revised proposal." : ""}`,
+              chip: { tone: "need" as StatusTone, word },
+            };
+          })}
+        />
+      )}
+      {launches.length > 0 && (
+        <DecisionList
+          id="dec-launch"
+          title="Builds ready for a launch decision"
+          note="Launch happens outside the Cockpit. Nothing here publishes a site."
+          rows={launches.map((i) => ({ key: i.key, href: i.href, title: i.title, why: i.why, chip: { tone: "need" as StatusTone, word } }))}
+        />
+      )}
+      {decided.length > 0 && (
+        <DecisionList
+          id="dec-decided"
+          title="Recently decided"
+          rows={decided.map((p) => ({
+            key: p.id,
+            href: `/decisions/plans/${p.id}`,
+            title: planName(p),
+            why:
+              p.status === "approved"
+                ? p.build_track
+                  ? `${KIND_OF_SITE[p.build_track] ?? "A kind of site"}${p.track_overridden ? ", against the recommendation" : ""}.`
+                  : "Approved before the kind of site was chosen: needs a new request."
+                : `Note: “${p.decision_note ?? ""}”`,
+            when: shortDate(p.decided_at ?? p.created_at),
+            chip: p.status === "approved" ? { tone: "done" as StatusTone, word: "Approved" } : { tone: "wait" as StatusTone, word: "Changes asked for" },
+          }))}
+        />
+      )}
+    </div>
   );
 }
 
@@ -791,7 +814,7 @@ export function PlanPage() {
   const row = plan.data;
   if (plan.error) return <LoadError what="this proposal" error={plan.error} onRetry={plan.reload} />;
   if (plan.loading && !row) return <Loading rows={4} label="Loading the proposal" />;
-  if (!row) return <Empty title="This proposal doesn't exist, or your role can't see it.">Proposals are visible to owners and admins. <Link to="/decisions">Back to Decisions</Link></Empty>;
+  if (!row) return <EmptyState title="This proposal doesn't exist, or your role can't see it." action={<ButtonLink to="/decisions">Back to Decisions</ButtonLink>}>Proposals are visible to owners and admins.</EmptyState>;
   // Cockpit v2: waiting → the proposal review; approved with a kind of site → what the site still needs; anything else
   // (changes asked for, or approved before the kind of site existed) → the same page, read-only, with the decision.
   if (row.status === "pending") return <ProposalReview row={row} onDone={plan.reload} />;
@@ -844,31 +867,28 @@ export function StageMove({ project, onMoved }: { project: ProjectRow; onMoved: 
 
 export function StagesTab() {
   const projects = useLoad(fetchProjects, []);
+  // Moving a stage is owner/admin under RLS: project managers see where each project is, without the button.
+  const mover = canDecide(useMe().role);
+  const n = projects.data?.length ?? 0;
   return (
-    <>
-      <Header />
-      <Tabs />
-      <Plate title="Move a project to its next stage" note="Launch is never moved from the Cockpit.">
-        {projects.error && <div className="plate-body"><LoadError what="projects" error={projects.error} onRetry={projects.reload} /></div>}
-        {!projects.data && !projects.error && <Loading rows={2} label="Loading projects" />}
-        {projects.data && projects.data.length === 0 && <Empty title="No projects yet." />}
-        {projects.data && projects.data.length > 0 && (
-          <ul className="rows">
-            {projects.data.map((p) => (
-              <li key={p.id}>
-                <Aspect tone="idle">{stageLabel(p.stage)}</Aspect>
-                <div>
-                  <Link className="what" to={`/projects/${p.id}`}>
-                    {p.name}
-                  </Link>
-                  <p className="why">{p.clients?.name ?? "No client"}</p>
-                </div>
-                <StageMove project={p} onMoved={projects.reload} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </Plate>
-    </>
+    <div className="projects">
+      <DecisionsHead summary={projects.data ? `${n} ${n === 1 ? "project" : "projects"}. ${mover ? "Move one to its next stage when that stage is done" : "An owner or admin moves a project to its next stage"}. Launch is never moved from the Cockpit.` : "Loading the projects."} />
+      {projects.error && <LoadError what="projects" error={projects.error} onRetry={projects.reload} />}
+      {!projects.data && !projects.error && <Loading rows={2} label="Loading projects" />}
+      {projects.data && projects.data.length === 0 && <EmptyState title="No projects yet.">Projects appear here once a client's work has started.</EmptyState>}
+      {projects.data && projects.data.length > 0 && (
+        <DecisionList
+          id="dec-stages"
+          title="Move a project to its next stage"
+          rows={projects.data.map((p) => ({
+            key: p.id,
+            href: `/projects/${p.id}`,
+            title: p.name,
+            why: `${p.clients?.name ?? "No client"}. Now: ${stageLabel(p.stage)}.`,
+            action: mover ? <StageMove project={p} onMoved={projects.reload} /> : undefined,
+          }))}
+        />
+      )}
+    </div>
   );
 }
