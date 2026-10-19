@@ -40,13 +40,13 @@ himself, so the confirmation stays a **`[PROVISIONAL - Nick to replace]`** item 
 | Entity | Slug | Status | Notes |
 |---|---|---|---|
 | DreamSign | `dreamsign` | Active — **`[PROVISIONAL - Nick to replace]`** (R-01) | The 2.0 benchmark case (40+ correction batches recorded). Row exists in Supabase. |
-| Bennett & Co | `bennett-co` | Active — **`[PROVISIONAL - Nick to replace]`** (R-01) | Stripe account not yet connected as of the Blueprint. **No row in Supabase yet** (checked 2026-09-30: `entities` holds only `dreamsign`); it is created when the first Bennett & Co client is registered. |
+| Bennett & Co | `bennett-co` | Active — **`[PROVISIONAL - Nick to replace]`** (R-01) | Stripe account not yet connected as of the Blueprint. Row added 2026-10-19 (migration `0028`, Huraira's GO) with its aliases, so intake recognises "Bennett & Co". Live `entities` (2026-10-20): `bennett-co`, `dreamsign`, `synthetic-test` (test only). |
 | Rizm | — | Separate, Atif-owned | Not part of the 2-entity build scope. |
 
 ## 3. Active clients / projects
 
-Real, registered clients: **none.** The only client row in Supabase is the placeholder
-`DreamSign (pilot)`, and it is not a real client (see `clients/dreamsign-pilot/memory.md`).
+Real, registered clients: **none.** The client rows in Supabase (2026-10-20) are the placeholder `DreamSign (pilot)` and
+`Lanternworks Studio (SYNTHETIC)` under the `synthetic-test` entity; neither is a real client (see each `clients/<slug>/memory.md`).
 
 Synthetic (fictional) clients used to test the factory. **None of these is a real client, and none may
 be presented to anyone as one:**
@@ -55,6 +55,8 @@ be presented to anyone as one:**
 |---|---|---|
 | `clients/dreamsign-pilot/` | `dreamsign` | Placeholder from the 2.0 DreamSign homepage case (`source: "placeholder-2.0-case"`). |
 | `clients/summit-line-roofing/` | `bennett-co` | Fictional roofing company, written 2026-09-30 as the Step 2 pilot (`source: "synthetic-provisional-2026-09-30"`). |
+| `clients/lanternworks-studio/` | `bennett-co` (plan) | Fictional design studio used for the Step 25 rehearsal (2026-10-13/14); its rehearsal log is in the folder. |
+| `clients/example-agency-studio/`, `clients/example-local-trade/` | `bennett-co` | Complete synthetic example clients for rehearsals (`docs/EXAMPLE-CLIENTS.md`). |
 
 The Stage 4/5 example requests (`packages/planning/examples/`: "Northlight Signs", "Harbor Street
 Bakery") are also fictional test inputs, not client folders.
@@ -168,8 +170,8 @@ the client's own work, people, premises or results.
 
 The forward plan is `docs/WFACT-3.0-Continuation-Build-Plan.md` (Stages 1–7), with
 `docs/WFACT-3.0-Factory-Completion-Plan.md` mapping every remaining Blueprint phase to numbered steps.
-Live status is in `PROGRESS.md`. As of 2026-09-30 the immediate steps are: this provisional context and
-pilot brief (Step 2), retiring plaintext secrets (Step 3), and a full run on the pilot brief (Step 4).
+Live status is in `PROGRESS.md`; its "Next up" list is the order of work (2026-10-20: Step 28, build quality and the
+plain-language Cockpit, is the current step; Steps 2, 3 and 21 are DONE).
 
 ## 6. Open decisions blocking this file from being "real"
 
