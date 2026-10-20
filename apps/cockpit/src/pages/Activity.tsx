@@ -25,7 +25,7 @@ import { fetchPeople, fetchPersonEvents } from "../lib/phrases";
 import { Button, ButtonLink, EmptyState, StatusChip, TechDetails, type StatusTone } from "../components/kit";
 import { StepRow } from "../components/flow";
 import { fetchRunSpend, money, total } from "../lib/costs";
-import { ConfirmDialog, Empty, LoadError, Loading, Notice, PagePreview } from "../components/ui";
+import { ConfirmDialog, LoadError, Loading, Notice, PagePreview } from "../components/ui";
 import { ClientNeedsPanel } from "../components/Recovery";
 import { StoppedBuild } from "../components/StoppedBuild";
 import { PlaceholderPicturesSection, RebuildWithPicturesDialog, SiteReview, usePlaceholderPictures } from "../components/SiteReview";
@@ -495,7 +495,7 @@ export function RunPage() {
   const stats = useLoad(() => (live ? loadBuildStats(f.jobs ?? [], f.plans ?? [], track, j?.id) : Promise.resolve(null)), [live, track, f.jobs?.length ?? 0]);
   if (job.error) return <LoadError what="this work" error={job.error} onRetry={job.reload} />;
   if (job.loading && !j) return <Loading rows={4} label="Loading this work" />;
-  if (!j) return <Empty title="This work doesn't exist, or your role can't see it.">It is visible to owners and admins. <Link to="/activity">Back to Activity</Link></Empty>;
+  if (!j) return <EmptyState title="This work doesn't exist, or your role can't see it." action={<ButtonLink to="/activity">Back to Activity</ButtonLink>}>It is visible to owners and admins.</EmptyState>;
 
   // Which view a job gets (the review, the stop, or this page) depends on its siblings: wait for them, so the wrong view
   // never flashes first.

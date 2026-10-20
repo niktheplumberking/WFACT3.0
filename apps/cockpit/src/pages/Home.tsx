@@ -8,11 +8,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle, Plus } from "@phosphor-icons/react";
-import { KIND_LABEL, jobState, planName, shortDate, type PlanRow, type ProjectRow } from "../lib/model";
 import { canDecide, fetchProjects, useFactory, useLoad, useMe } from "../lib/state";
-import { Aspect, Empty, LoadError, Loading, RouteLine } from "../components/ui";
+import { LoadError, Loading } from "../components/ui";
 import { PathSegments, StatusChip, type StatusTone } from "../components/kit";
-import { KIND_OF_SITE, STEP_NAMES } from "../lib/path";
+import { STEP_NAMES } from "../lib/path";
 import { CAPS, buildStopLine, capped, dayKey, fetchCostData, money, runSpend, sumDays } from "../lib/costs";
 import { estimate, formatMs, median } from "../lib/timeline";
 import type { JobRow } from "../jobsClient";
@@ -298,81 +297,5 @@ function EveryClient({ clients, pm }: { clients: ClientRow[]; pm: boolean }) {
         ))}
       </ul>
     </section>
-  );
-}
-
-/* ---------------- shared with pages not yet rebuilt (Projects, Decisions; Cockpit v2 phases 6+) ---------------- */
-
-export function subjectOf(j: JobRow, plans: PlanRow[]): string {
-  const planId = (j.params?.planId ?? j.result?.planId) as string | undefined;
-  const p = planId ? plans.find((x) => x.id === planId) : undefined;
-  if (p) return planName(p);
-  if (j.kind === "ask") return String(j.params?.question ?? "");
-  if (j.kind === "verify") return String(j.params?.path ?? "");
-  return "";
-}
-
-export function JobLine({ j, plans }: { j: JobRow; plans: PlanRow[] }) {
-  const s = jobState(j);
-  const subject = subjectOf(j, plans);
-  return (
-    <li>
-      <Aspect tone={s.tone}>{s.label}</Aspect>
-      <Link to={`/activity/${j.id}`}>
-        {KIND_LABEL[j.kind]}
-        {subject ? `: ${subject}` : ""}
-      </Link>
-      <span className="fig quiet">{shortDate(j.finished_at ?? j.created_at)}</span>
-    </li>
-  );
-}
-
-/** Plans whose client has no project row yet still belong on the route map, at Intake. */
-function planLines(plans: PlanRow[], projects: ProjectRow[]): PlanRow[] {
-  const names = new Set(projects.map((p) => p.clients?.name?.toLowerCase()));
-  const seen = new Set<string>();
-  return plans.filter((p) => {
-    if (p.status === "rejected" && p.revision >= 2) return false;
-    const client = p.plan.plan.intake?.clientName?.toLowerCase();
-    if (seen.has(p.client_slug) || (client && names.has(client))) return false;
-    seen.add(p.client_slug);
-    return true;
-  });
-}
-
-export function ClientLines({ projects, plans, error, reload }: { projects: ProjectRow[] | null; plans: PlanRow[] | null; error: string | null; reload: () => void }) {
-  if (error) return <div className="plate-body"><LoadError what="projects" error={error} onRetry={reload} /></div>;
-  // Wait for both lists, so plan lines never pop in under the project lines and shift the page.
-  if (!projects || !plans) return <Loading rows={3} label="Loading projects" />;
-  const extra = planLines(plans, projects);
-  if (projects.length === 0 && extra.length === 0) {
-    return <Empty title="No clients yet.">A client appears here after its first request is planned.</Empty>;
-  }
-  return (
-    <div className="lines">
-      {projects.map((p) => (
-        <div className="line" key={p.id}>
-          <div className="line-name">
-            <Link to={`/projects/${p.id}`}>{p.name}</Link>
-            <span className="quiet">
-              {p.clients?.entities?.name ?? "No business"}. {p.status === "active" ? "Active" : p.status}.
-            </span>
-          </div>
-          <RouteLine stage={p.stage} name={p.name} />
-        </div>
-      ))}
-      {extra.map((p) => (
-        <div className="line" key={p.id}>
-          <div className="line-name">
-            <Link to={`/decisions/plans/${p.id}`}>{p.plan.plan.intake?.clientName ?? planName(p)}</Link>
-            <span className="quiet">
-              {p.entity_slug}.{" "}
-              {p.status === "pending" ? "The proposal waits for you." : p.status === "approved" ? `Proposal approved${p.build_track ? `, ${(KIND_OF_SITE[p.build_track] ?? "a kind of site").toLowerCase()}` : ""}.` : "Proposal rejected."} No project yet.
-            </span>
-          </div>
-          <RouteLine stage="1_intake" name={planName(p)} waitingAt={p.status === "pending" ? "1_intake" : undefined} />
-        </div>
-      ))}
-    </div>
   );
 }

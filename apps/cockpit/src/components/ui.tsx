@@ -1,16 +1,9 @@
-/** Core components. Pre-v2 pieces (Aspect, Notice, Plate, RouteLine) are replaced screen by screen in Cockpit v2;
- *  the v2 primitives live in kit.tsx and flow.tsx. ConfirmDialog and SitePreview here are v2. */
+/** Core components. Notice, Loading, LoadError and Plate (still used by ClientNeedsPanel) predate Cockpit v2; the v2
+ *  primitives live in kit.tsx and flow.tsx. ConfirmDialog and SitePreview here are v2. */
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { WarningOctagon, Info, CheckCircle, Warning, ArrowsOut, ArrowsIn, X, Eye } from "@phosphor-icons/react";
 import { previewHtml } from "../jobsClient";
 import { loadSitePreview, pageForHref, pageLabel, type SitePreviewData } from "../lib/sitePreview";
-import { GATE_STAGES, LAUNCH_STAGE, STAGES, STAGE_SHORT, stageIndex, stageLabel } from "../stages";
-import type { Tone } from "../lib/model";
-
-/** Status = lamp + word. Never colour alone. */
-export function Aspect({ tone, children }: { tone: Tone; children: ReactNode }) {
-  return <span className={`aspect ${tone}`}>{children}</span>;
-}
 
 export function Notice({ tone, title, children }: { tone: "stop" | "caution" | "info" | "clear"; title?: string; children: ReactNode }) {
   const Icon = tone === "stop" ? WarningOctagon : tone === "caution" ? Warning : tone === "clear" ? CheckCircle : Info;
@@ -21,15 +14,6 @@ export function Notice({ tone, title, children }: { tone: "stop" | "caution" | "
         {title && <b>{title} </b>}
         {children}
       </div>
-    </div>
-  );
-}
-
-export function Empty({ title, children }: { title: string; children?: ReactNode }) {
-  return (
-    <div className="empty">
-      <b>{title}</b>
-      {children}
     </div>
   );
 }
@@ -67,19 +51,6 @@ export function LoadError({ what, error, onRetry }: { what: string; error: strin
   );
 }
 
-export function PageHead({ title, lead, kicker, actions, big }: { title: ReactNode; lead?: ReactNode; kicker?: ReactNode; actions?: ReactNode; big?: boolean }) {
-  return (
-    <div className="page-head">
-      <div>
-        {kicker && <div className="quiet" style={{ marginBottom: 8 }}>{kicker}</div>}
-        <h1 className={big ? "status-line" : undefined}>{title}</h1>
-        {lead && <p>{lead}</p>}
-      </div>
-      {actions && <div className="head-actions">{actions}</div>}
-    </div>
-  );
-}
-
 export function Plate({ title, note, children, id }: { title: ReactNode; note?: ReactNode; children: ReactNode; id?: string }) {
   const auto = useId();
   const hid = id ?? auto;
@@ -91,36 +62,6 @@ export function Plate({ title, note, children, id }: { title: ReactNode; note?: 
       </div>
       {children}
     </section>
-  );
-}
-
-/**
- * The route line: where a client is on the 11 stages, which stages are proven, and which human gate
- * holds it. `waitingAt` lights a yellow signal (a person is needed there). Launch is always a locked signal.
- */
-export function RouteLine({ stage, name, waitingAt }: { stage: string; name: string; waitingAt?: string }) {
-  const here = Math.max(0, stageIndex(stage));
-  const waiting = waitingAt ? stageIndex(waitingAt) : -1;
-  const p = ((here + 0.5) / STAGES.length) * 100;
-  return (
-    <div className="route-wrap">
-      <div className="route" role="img" aria-label={`${name}: at ${stageLabel(stage)}, stage ${here + 1} of ${STAGES.length}${waiting >= 0 ? ", waiting for a decision" : ""}`}>
-        <span className="proven" style={{ ["--p" as string]: `${p.toFixed(1)}%` }} />
-        {STAGES.map((s, i) => {
-          if (i === waiting) return <span key={s} className="signal waiting" />;
-          if (s === LAUNCH_STAGE) return <span key={s} className="signal locked" />;
-          if (GATE_STAGES.includes(s)) return <span key={s} className={`signal${i < here ? " cleared" : ""}`} />;
-          return <span key={s} className={`stop-pt${i < here ? " done" : i === here ? " here" : ""}`} />;
-        })}
-      </div>
-      <div className="route-labels" aria-hidden="true">
-        {STAGES.map((s, i) => (
-          <span key={s} className={i === here ? "on" : undefined}>
-            {i === here || i === waiting || s === LAUNCH_STAGE ? STAGE_SHORT[s] : ""}
-          </span>
-        ))}
-      </div>
-    </div>
   );
 }
 

@@ -11,8 +11,8 @@ import { canDecide, useFactory, useMe, useNotifications } from "../lib/state";
 import { NOTIFY_LINES } from "../lib/prefs";
 import { useDetail } from "../lib/detail";
 import { COMING } from "../shell/Shell";
-import { LoadError, PageHead } from "../components/ui";
-import { EmptyState, Segmented, StatusChip, Tabs } from "../components/kit";
+import { LoadError } from "../components/ui";
+import { ButtonLink, EmptyState, Segmented, StatusChip, Tabs } from "../components/kit";
 import { dateTime } from "../lib/model";
 
 /* ---------------- coming later ---------------- */
@@ -196,11 +196,14 @@ export function Notifications() {
 
 export function NotFound() {
   return (
-    <>
-      <PageHead title="There's nothing at this address." lead="The link may be old, or the page may need a role you don't have." />
-      <Link className="btn primary" to="/">
-        Go to Home
-      </Link>
-    </>
+    <div className="soon-page">
+      <h1 className="t-title">There's nothing at this address.</h1>
+      <p className="t-lead muted">The link may be old, or the page may need a role you don't have.</p>
+      <div>
+        <ButtonLink to="/" variant="primary">
+          Go to Home
+        </ButtonLink>
+      </div>
+    </div>
   );
 }
